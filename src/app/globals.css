@@ -1,26 +1,265 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #fafafa;
+  --color-foreground: #1a1a1a;
+  --color-gold: #c8a96e;
+  --color-gold-light: #e8d5b0;
+  --color-gold-dark: #a8894e;
+  --color-dark: #1a1a1a;
+  --color-dark-light: #333333;
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-border: #e5e5e5;
+  --color-success: #2d7a3a;
+  --color-error: #c0392b;
+  --color-warning: #e67e22;
+  --color-surface: #ffffff;
+  --color-muted: #f5f5f5;
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c8a96e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8894e;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 169, 110, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(200, 169, 110, 0); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
+.animate-slideUp { animation: slideUp 0.5s ease-out forwards; }
+.animate-slideDown { animation: slideDown 0.3s ease-out forwards; }
+.animate-slideInRight { animation: slideInRight 0.3s ease-out forwards; }
+.animate-slideInLeft { animation: slideInLeft 0.3s ease-out forwards; }
+.animate-scaleIn { animation: scaleIn 0.3s ease-out forwards; }
+.animate-pulse-gold { animation: pulse-gold 2s infinite; }
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-dark {
+  background: rgba(26, 26, 26, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Gradient overlays */
+.gradient-overlay {
+  background: linear-gradient(180deg, transparent 0%, rgba(26, 26, 26, 0.7) 100%);
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, #c8a96e 0%, #e8d5b0 50%, #c8a96e 100%);
+}
+
+.gradient-dark {
+  background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+}
+
+/* Luxury button styles */
+.btn-gold {
+  background-color: #c8a96e;
+  color: white;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+  background-color: #a8894e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 169, 110, 0.3);
+}
+
+.btn-outline-gold {
+  border: 1.5px solid #c8a96e;
+  color: #c8a96e;
+  background: transparent;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-gold:hover {
+  background-color: #c8a96e;
+  color: white;
+}
+
+.btn-dark {
+  background-color: #1a1a1a;
+  color: white;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Product card hover */
+.product-card {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.product-card .product-image {
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* Badge styles */
+.badge-sale {
+  background-color: #c0392b;
+  color: white;
+}
+
+.badge-new {
+  background-color: #c8a96e;
+  color: white;
+}
+
+.badge-b2b {
+  background-color: #1a1a1a;
+  color: #c8a96e;
+}
+
+/* Star rating */
+.star-filled { color: #c8a96e; }
+.star-empty { color: #e5e5e5; }
+
+/* Mega menu */
+.mega-menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover .mega-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Tab underline animation */
+.tab-active {
+  position: relative;
+}
+
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #c8a96e;
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(200, 169, 110, 0.3);
+  color: #1a1a1a;
+}
+
+/* Focus styles */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #c8a96e;
+  box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.15);
+}
+
+/* Number input arrows removal */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
