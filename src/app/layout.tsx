@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sr">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased" style={{ fontFamily: "'DM Sans', sans-serif" }}>{children}</body>
     </html>
   );
 }

@@ -3,34 +3,23 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
-  Search,
-  ShoppingBag,
   Heart,
-  User,
-  Menu,
-  X,
-  Phone,
-  Globe,
-  ChevronLeft,
-  ChevronRight,
   Star,
   ArrowRight,
-  Scissors,
-  Palette,
-  Sparkles,
-  Wind,
-  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Leaf,
+  ShieldCheck,
   Award,
+  Truck,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Instagram,
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  Facebook,
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  Youtube,
   Mail,
-  MapPin,
-  Clock,
   Send,
+  X,
+  TrendingUp,
+  Clock,
+  MapPin,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -53,22 +42,13 @@ const productImages: Record<number, string> = {
   12: "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=500&h=500&fit=crop",
   13: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500&h=500&fit=crop",
   14: "https://images.unsplash.com/photo-1599849556829-6cef53ccb3d3?w=500&h=500&fit=crop",
+  15: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&h=500&fit=crop",
+  16: "https://images.unsplash.com/photo-1570194065650-d99fb4ee8249?w=500&h=500&fit=crop",
+  17: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop",
+  18: "https://images.unsplash.com/photo-1619451334792-150fd785ee74?w=500&h=500&fit=crop",
+  19: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=500&h=500&fit=crop",
+  20: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=500&h=500&fit=crop",
 };
-
-const categoryImages: Record<string, string> = {
-  "Boje za kosu": "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=400&fit=crop",
-  "Nega kose": "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=400&fit=crop",
-  "Styling": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=400&fit=crop",
-  "Aparati": "https://images.unsplash.com/photo-1522338140262-f46f5913618a?w=400&h=400&fit=crop",
-  "Alati & Pribor": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=400&fit=crop",
-  "Brendovi": "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=400&fit=crop",
-};
-
-const blogImages = [
-  "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&h=400&fit=crop",
-];
 
 const instagramImages = [
   "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=300&h=300&fit=crop",
@@ -79,83 +59,120 @@ const instagramImages = [
   "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=300&h=300&fit=crop",
 ];
 
-/* ─── mock data ─── */
-const brands = ["L'Oreal", "Schwarzkopf", "Wella", "Kerastase", "Olaplex", "Moroccanoil"];
-
-const categories = [
-  { name: "Boje za kosu", icon: Palette, count: 520 },
-  { name: "Nega kose", icon: Sparkles, count: 340 },
-  { name: "Styling", icon: Wind, count: 210 },
-  { name: "Aparati", icon: Zap, count: 95 },
-  { name: "Alati & Pribor", icon: Scissors, count: 180 },
-  { name: "Brendovi", icon: Award, count: 45 },
+/* ─── Trust badges ─── */
+const trustBadges = [
+  { icon: Leaf, title: "Prirodna Formula", desc: "Nežna nega za vašu kosu sa premium sastojcima" },
+  { icon: ShieldCheck, title: "Bez Okrutnosti", desc: "Naši proizvodi nisu testirani na životinjama" },
+  { icon: Award, title: "Stručno Odobreno", desc: "Testirano za sigurnost i vidljive rezultate" },
+  { icon: Truck, title: "Besplatna Dostava", desc: "Za porudžbine preko 5.000 RSD, bez dodatnih troškova" },
 ];
 
-const saleProducts = [
+/* ─── Product type ─── */
+type Product = { id: number; brand: string; name: string; price: number; oldPrice?: number; badge?: string; rating: number };
+
+/* ─── Product tabs data ─── */
+const productTabs = ["Šamponi", "Maske", "Serumi", "Ulja"];
+
+const tabbedProducts: Record<string, Product[]> = {
+  "Šamponi": [
+    { id: 7, brand: "L'Oreal", name: "Metal Detox Šampon 300ml", price: 2400, rating: 5 },
+    { id: 10, brand: "Wella", name: "Ultimate Repair Šampon 250ml", price: 2800, rating: 4 },
+    { id: 11, brand: "Olaplex", name: "No.4 Bond Maintenance Šampon", price: 3600, badge: "HIT", rating: 5 },
+    { id: 15, brand: "Matrix", name: "Total Results So Long Šampon 300ml", price: 1950, rating: 4 },
+  ],
+  "Maske": [
+    { id: 8, brand: "Schwarzkopf", name: "BlondMe Bond Maska 200ml", price: 3100, badge: "NOVO", rating: 4 },
+    { id: 14, brand: "Kerastase", name: "Nutritive Bain Satin 200ml", price: 3400, rating: 5 },
+    { id: 3, brand: "Kerastase", name: "Elixir Ultime Maska 200ml", oldPrice: 4500, price: 3200, badge: "-29%", rating: 5 },
+    { id: 16, brand: "L'Oreal", name: "Absolut Repair Gold Maska 250ml", price: 2900, rating: 5 },
+  ],
+  "Serumi": [
+    { id: 9, brand: "Kerastase", name: "Genesis Serum Anti-Chute 90ml", price: 5200, badge: "NOVO", rating: 5 },
+    { id: 5, brand: "Moroccanoil", name: "Treatment Original 100ml", price: 4200, rating: 4 },
+    { id: 4, brand: "Olaplex", name: "No.3 Hair Perfector 100ml", oldPrice: 3800, price: 2850, badge: "-25%", rating: 5 },
+    { id: 17, brand: "Wella", name: "Oil Reflections Luminous Serum 100ml", price: 3100, rating: 4 },
+  ],
+  "Ulja": [
+    { id: 18, brand: "Moroccanoil", name: "Treatment Light 50ml", price: 3600, badge: "HIT", rating: 5 },
+    { id: 19, brand: "Kerastase", name: "Elixir Ultime L'Huile 100ml", price: 4800, rating: 5 },
+    { id: 20, brand: "L'Oreal", name: "Mythic Oil Original 100ml", price: 2700, rating: 4 },
+    { id: 6, brand: "Schwarzkopf", name: "Oil Ultime Argan Finishing Oil 100ml", price: 2200, rating: 4 },
+  ],
+};
+
+/* ─── Bestseller products ─── */
+const bestsellers: Product[] = [
+  { id: 4, brand: "Olaplex", name: "No.3 Hair Perfector 100ml", price: 2850, badge: "#1", rating: 5 },
+  { id: 11, brand: "Olaplex", name: "No.4 Bond Maintenance Šampon 250ml", price: 3600, badge: "#2", rating: 5 },
+  { id: 5, brand: "Moroccanoil", name: "Treatment Original 100ml", price: 4200, badge: "#3", rating: 5 },
+  { id: 9, brand: "Kerastase", name: "Genesis Serum Anti-Chute 90ml", price: 5200, badge: "#4", rating: 5 },
+  { id: 14, brand: "Kerastase", name: "Nutritive Bain Satin 200ml", price: 3400, badge: "#5", rating: 5 },
+  { id: 12, brand: "Moroccanoil", name: "Hydrating Styling Cream 300ml", price: 3200, badge: "#6", rating: 5 },
+  { id: 7, brand: "L'Oreal", name: "Metal Detox Šampon 300ml", price: 2400, badge: "#7", rating: 4 },
+  { id: 8, brand: "Schwarzkopf", name: "BlondMe Bond Maska 200ml", price: 3100, badge: "#8", rating: 4 },
+];
+
+/* ─── New arrivals ─── */
+const newArrivals: Product[] = [
+  { id: 15, brand: "Matrix", name: "Total Results So Long Šampon 300ml", price: 1950, badge: "NOVO", rating: 4 },
+  { id: 16, brand: "L'Oreal", name: "Absolut Repair Gold Maska 250ml", price: 2900, badge: "NOVO", rating: 5 },
+  { id: 17, brand: "Wella", name: "Oil Reflections Luminous Serum 100ml", price: 3100, badge: "NOVO", rating: 4 },
+  { id: 18, brand: "Moroccanoil", name: "Treatment Light 50ml", price: 3600, badge: "NOVO", rating: 5 },
+];
+
+/* ─── Sale products ─── */
+const saleProducts: Product[] = [
   { id: 1, brand: "L'Oreal", name: "Majirel 7.0 Srednje Plava", oldPrice: 1290, price: 890, badge: "-31%", rating: 5 },
   { id: 2, brand: "Schwarzkopf", name: "Igora Royal 6.1 Tamno Pepeljasta", oldPrice: 1350, price: 950, badge: "-30%", rating: 4 },
   { id: 3, brand: "Kerastase", name: "Elixir Ultime Serum", oldPrice: 4500, price: 3200, badge: "-29%", rating: 5 },
   { id: 4, brand: "Olaplex", name: "No.3 Hair Perfector", oldPrice: 3800, price: 2850, badge: "-25%", rating: 5 },
   { id: 5, brand: "Moroccanoil", name: "Treatment Original 100ml", oldPrice: 4200, price: 3150, badge: "-25%", rating: 4 },
   { id: 6, brand: "Wella", name: "Koleston Perfect 8/0", oldPrice: 1100, price: 780, badge: "-29%", rating: 4 },
-];
-
-const newArrivals = [
-  { id: 7, brand: "L'Oreal", name: "Metal Detox Sampon 300ml", price: 2400, badge: "NOVO", rating: 5 },
-  { id: 8, brand: "Schwarzkopf", name: "BlondMe Bond Maska", price: 3100, badge: "NOVO", rating: 4 },
-  { id: 9, brand: "Kerastase", name: "Genesis Serum Anti-Chute", price: 5200, badge: "NOVO", rating: 5 },
-  { id: 10, brand: "Wella", name: "Ultimate Repair Sampon", price: 2800, badge: "NOVO", rating: 4 },
-];
-
-const bestsellers = [
-  { id: 11, brand: "Olaplex", name: "No.4 Bond Maintenance Sampon", price: 3600, badge: "HIT", rating: 5 },
-  { id: 12, brand: "Moroccanoil", name: "Hydrating Styling Cream", price: 3200, badge: "HIT", rating: 5 },
-  { id: 13, brand: "L'Oreal", name: "Vitamino Color Sampon 500ml", price: 2100, badge: "HIT", rating: 4 },
-  { id: 14, brand: "Kerastase", name: "Nutritive Bain Satin", price: 3400, badge: "HIT", rating: 5 },
-];
-
-const blogPosts = [
-  { id: 1, title: "Trendovi boja za kosu - Proleće 2026", category: "Trendovi", date: "12. mar 2026" },
-  { id: 2, title: "Kako pravilno negovati farbanu kosu", category: "Nega", date: "8. mar 2026" },
-  { id: 3, title: "Top 5 styling proizvoda za volumen", category: "Styling", date: "3. mar 2026" },
+  { id: 13, brand: "L'Oreal", name: "Vitamino Color Šampon 500ml", oldPrice: 2800, price: 2100, badge: "-25%", rating: 4 },
+  { id: 10, brand: "Wella", name: "Ultimate Repair Šampon 250ml", oldPrice: 3200, price: 2800, badge: "-13%", rating: 4 },
 ];
 
 /* ─── ProductCard ─── */
-function ProductCard({ product, showOld = false }: { product: { id: number; brand: string; name: string; price: number; oldPrice?: number; badge?: string; rating: number }; showOld?: boolean }) {
+function ProductCard({ product, showOld = false }: { product: Product; showOld?: boolean }) {
   const [liked, setLiked] = useState(false);
   return (
-    <Link href={`/products/${product.id}`} className="product-card bg-white rounded-lg shadow-sm hover:shadow-md transition-all group relative overflow-hidden flex flex-col">
-      <div className="relative aspect-square overflow-hidden bg-[#f5f0e8]">
+    <Link href={`/products/${product.id}`} className="product-card bg-white rounded-2xl border border-[#e0d8cc] hover:border-[#b07a87] transition-all group relative overflow-hidden flex flex-col">
+      <div className="relative aspect-square overflow-hidden bg-[#f5f0e8] rounded-t-2xl">
         <img
           src={productImages[product.id] || "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop"}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {product.badge && (
-          <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-semibold rounded ${product.badge === "NOVO" ? "bg-[#c8a96e] text-white" : product.badge === "HIT" ? "bg-[#1a1a1a] text-[#c8a96e]" : "bg-[#c0392b] text-white"}`}>
+          <span className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-medium rounded-full ${
+            product.badge === "NOVO" ? "bg-[#8c4a5a] text-white"
+            : product.badge === "HIT" ? "bg-[#2d2d2d] text-white"
+            : product.badge.startsWith("#") ? "bg-[#c4883a] text-white"
+            : "bg-[#b5453a] text-white"
+          }`}>
             {product.badge}
           </span>
         )}
-        <button onClick={(e) => { e.preventDefault(); setLiked(!liked); }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10">
-          <Heart className={`w-4 h-4 ${liked ? "fill-[#c0392b] text-[#c0392b]" : "text-gray-400"}`} />
+        <button onClick={(e) => { e.preventDefault(); setLiked(!liked); }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10">
+          <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#b07a87]"}`} />
         </button>
-        <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/30 to-transparent">
-          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#c8a96e] hover:bg-[#a8894e] text-white text-sm font-medium py-2.5 rounded transition-colors">
+        <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium py-2.5 rounded-full transition-colors">
             Dodaj u korpu
           </button>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <span className="text-xs text-[#c8a96e] font-medium uppercase tracking-wider">{product.brand}</span>
-        <h3 className="text-sm font-medium text-[#1a1a1a] mt-1 line-clamp-2 flex-1">{product.name}</h3>
+        <span className="text-xs text-[#8c4a5a] font-medium tracking-wider">{product.brand}</span>
+        <h3 className="text-sm font-medium text-[#2d2d2d] mt-1 line-clamp-2 flex-1">{product.name}</h3>
         <div className="flex items-center gap-0.5 mt-2">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} className={`w-3 h-3 ${i < product.rating ? "fill-[#c8a96e] text-[#c8a96e]" : "text-gray-200"}`} />
+            <Star key={i} className={`w-3 h-3 ${i < product.rating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#e0d8cc]"}`} />
           ))}
         </div>
         <div className="mt-2 flex items-center gap-2">
-          {showOld && product.oldPrice && <span className="text-sm text-gray-400 line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-          <span className="text-base font-bold text-[#1a1a1a]">{product.price.toLocaleString("sr-RS")} RSD</span>
+          {showOld && product.oldPrice && <span className="text-sm text-[#b07a87] line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+          <span className="text-base font-semibold text-[#2d2d2d]">{product.price.toLocaleString("sr-RS")} RSD</span>
         </div>
       </div>
     </Link>
@@ -168,7 +185,7 @@ function ProductCarousel({
   showOld = false,
   autoSlideInterval = 4000,
 }: {
-  products: { id: number; brand: string; name: string; price: number; oldPrice?: number; badge?: string; rating: number }[];
+  products: Product[];
   showOld?: boolean;
   autoSlideInterval?: number;
 }) {
@@ -262,7 +279,7 @@ function ProductCarousel({
           {products.map((p) => (
             <div
               key={p.id}
-              className="flex-shrink-0 px-2"
+              className="flex-shrink-0 px-8 sm:px-2"
               style={{ width: `${slidePercent}%` }}
             >
               <ProductCard product={p} showOld={showOld} />
@@ -273,18 +290,18 @@ function ProductCarousel({
 
       <button
         onClick={goPrev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-all z-10 group"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 w-10 h-10 rounded-full bg-white border border-[#e0d8cc] flex items-center justify-center hover:border-[#8c4a5a] transition-all z-10 group"
         aria-label="Previous"
       >
-        <ChevronLeft className="w-5 h-5 text-gray-500 group-hover:text-[#c8a96e] transition-colors" />
+        <ChevronLeft className="w-5 h-5 text-[#b07a87] group-hover:text-[#8c4a5a] transition-colors" />
       </button>
 
       <button
         onClick={goNext}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-all z-10 group"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 w-10 h-10 rounded-full bg-white border border-[#e0d8cc] flex items-center justify-center hover:border-[#8c4a5a] transition-all z-10 group"
         aria-label="Next"
       >
-        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[#c8a96e] transition-colors" />
+        <ChevronRight className="w-5 h-5 text-[#b07a87] group-hover:text-[#8c4a5a] transition-colors" />
       </button>
 
       <div className="flex items-center justify-center gap-2 mt-6">
@@ -292,8 +309,8 @@ function ProductCarousel({
           <button
             key={i}
             onClick={() => goTo(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-colors ${
-              i === currentIndex ? "bg-[#c8a96e]" : "bg-gray-300"
+            className={`w-2 h-2 rounded-full transition-colors ${
+              i === currentIndex ? "bg-[#8c4a5a]" : "bg-[#e0d8cc]"
             }`}
             aria-label={`Go to slide ${i + 1}`}
           />
@@ -306,136 +323,159 @@ function ProductCarousel({
 /* ─── Main Page ─── */
 export default function HomePage() {
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [activeTab, setActiveTab] = useState("Šamponi");
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f0e8]">
       <Header />
 
       {/* HERO */}
-      <section className="relative h-[600px] md:h-[700px] overflow-hidden">
+      <section className="relative h-[600px] md:h-[750px] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1562940215-4314619607a2?w=1600&h=900&fit=crop&q=80"
-          alt="Hero - Professional hair care"
+          src="/hero.png"
+          alt="Hero - Professional hair care products"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a]/90 via-[#1a1a1a]/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2d2d2d]/70 via-[#2d2d2d]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/30 to-transparent" />
+
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
           <div className="max-w-2xl">
-            <span className="inline-block text-[#c8a96e] uppercase tracking-[0.25em] text-xs font-medium mb-4 animate-fadeIn">Premium Frizerska Kozmetika</span>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-white animate-slideUp" style={{ fontFamily: "'Playfair Display', serif" }}>
-              Profesionalna nega za <span className="text-[#c8a96e]">savršenu</span> kosu
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-light leading-[0.95] mb-6 text-white animate-slideUp" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Profesionalna{" "}
+              <em className="italic text-[#b07a87]">Nega</em>
             </h1>
-            <p className="text-white/70 text-lg mb-8 max-w-lg animate-slideUp" style={{ animationDelay: "0.1s" }}>
-              Otkrijte premium proizvode vodećih svetskih brendova za profesionalnu negu, farbanje i styling kose.
+            <p className="text-white/60 text-base md:text-lg mb-8 max-w-lg animate-slideUp leading-relaxed" style={{ animationDelay: "0.1s" }}>
+              Započnite dan sa nežnom negom i hranjivim sastojcima koji su dizajnirani da probudu prirodnu lepotu vaše kose.
             </p>
-            <div className="flex flex-wrap gap-4 animate-slideUp" style={{ animationDelay: "0.2s" }}>
-              <Link href="/products" className="inline-flex items-center gap-2 bg-[#c8a96e] hover:bg-[#a8894e] text-white px-8 py-3.5 rounded font-medium tracking-wide transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                Kupujte Sada <ArrowRight className="w-4 h-4" />
+            <div className="flex flex-wrap items-center gap-6 animate-slideUp" style={{ animationDelay: "0.2s" }}>
+              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm tracking-wide">
+                Kupujte Sada
               </Link>
-              <Link href="/account/login" className="inline-flex items-center gap-2 border border-white/30 hover:border-[#c8a96e] text-white px-8 py-3.5 rounded font-medium tracking-wide transition-all hover:text-[#c8a96e]">
-                B2B Pristup
-              </Link>
+            </div>
+            <div className="absolute bottom-8 right-8 text-white/40 text-xs tracking-widest hidden md:block animate-fadeIn" style={{ animationDelay: "0.8s", writingMode: "vertical-rl" }}>
+              Scroll Down
             </div>
           </div>
         </div>
       </section>
 
-      {/* BRAND LOGOS */}
-      <section className="bg-white py-8 border-b border-gray-100">
+      {/* TRUST BADGES */}
+      <section className="py-10 bg-white border-b border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between gap-8 overflow-x-auto">
-            {brands.map((b) => (
-              <span key={b} className="text-gray-400 font-semibold text-sm md:text-base whitespace-nowrap tracking-wider uppercase cursor-pointer hover:text-[#c8a96e] transition-colors">{b}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CATEGORIES */}
-      <section className="py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Kategorije Proizvoda</h2>
-            <p className="text-gray-500">Pronađite sve što vam je potrebno za savršen rezultat</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {trustBadges.map((badge) => {
+              const Icon = badge.icon;
               return (
-                <Link key={cat.name} href="/products" className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 relative">
-                  <div className="aspect-square relative overflow-hidden">
-                    <img
-                      src={categoryImages[cat.name]}
-                      alt={cat.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/80 via-[#1a1a1a]/30 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <h3 className="text-sm font-semibold text-white">{cat.name}</h3>
-                      <span className="text-xs text-white/60">{cat.count} proizvoda</span>
-                    </div>
-                  </div>
-                </Link>
+                <div key={badge.title} className="flex flex-col items-center text-center p-6 rounded-2xl border border-[#e0d8cc] bg-white hover:border-[#b07a87] transition-colors">
+                  <Icon className="w-7 h-7 text-[#8c4a5a] mb-3" strokeWidth={1.5} />
+                  <h3 className="text-sm font-semibold text-[#2d2d2d]">{badge.title}</h3>
+                  <p className="text-xs text-[#b07a87] mt-1.5 leading-relaxed">{badge.desc}</p>
+                </div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* SALE PRODUCTS */}
-      <section className="py-16 bg-white">
+      {/* EDITORIAL HEADING */}
+      <section className="py-16 md:py-20 text-center bg-[#f5f0e8]">
+        <p className="text-3xl md:text-4xl lg:text-5xl text-[#2d2d2d] font-light italic max-w-3xl mx-auto px-4 leading-relaxed" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          Osvežite svoju kosu, negujte sebe, obnovite sjaj.
+        </p>
+      </section>
+
+      {/* TABBED PRODUCTS (4 per tab, 4 tabs) */}
+      <section className="py-16 bg-white border-y border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Playfair Display', serif" }}>Akcijske Ponude</h2>
-              <p className="text-gray-500 mt-1">Uštedite na omiljenim proizvodima</p>
-            </div>
-            <Link href="/outlet" className="hidden md:flex items-center gap-1 text-[#c8a96e] hover:text-[#a8894e] font-medium text-sm transition-colors">
-              Sve akcije <ChevronRight className="w-4 h-4" />
+          <div className="flex items-center justify-center gap-2 mb-10">
+            {productTabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeTab === tab
+                    ? "bg-[#2d2d2d] text-white"
+                    : "bg-transparent text-[#6b6b6b] border border-[#e0d8cc] hover:border-[#b07a87] hover:text-[#2d2d2d]"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {tabbedProducts[activeTab]?.map((p) => (
+              <ProductCard key={p.id} product={p} showOld={!!p.oldPrice} />
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link href="/products" className="inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">
+              Pogledajte Sve Proizvode
             </Link>
           </div>
-          <ProductCarousel products={saleProducts} showOld />
         </div>
       </section>
 
-      {/* B2B PROMO BANNER */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="relative rounded-2xl overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&h=500&fit=crop"
-              alt="Professional salon"
-              className="w-full h-[400px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a]/95 via-[#1a1a1a]/80 to-[#1a1a1a]/40" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="max-w-7xl mx-auto px-8 md:px-12">
-                <span className="text-[#c8a96e] text-xs uppercase tracking-[0.2em] font-medium">Za Profesionalce</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>B2B Program za Salone</h2>
-                <p className="text-white/60 mb-6 max-w-md">Ekskluzivne cene, prioritetna dostava i podrška za vaš salon. Registrujte se kao B2B korisnik i uživajte u posebnim pogodnostima.</p>
-                <Link href="/account/login" className="inline-flex items-center gap-2 bg-[#c8a96e] hover:bg-[#a8894e] text-white px-6 py-3 rounded font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                  Registrujte Salon <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+      {/* ECO-FRIENDLY BANNER */}
+      <section className="relative overflow-hidden">
+        <div className="bg-[#38202a] py-20 md:py-28">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-10">
+            <div className="flex-1 text-center md:text-left">
+              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">Za Profesionalce</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Ekološki,{" "}
+                <em className="italic text-[#b07a87]">Prijateljski</em>{" "}
+                za Kosu
+              </h2>
+              <p className="text-white/50 mb-8 max-w-lg text-sm leading-relaxed">
+                Naši proizvodi su napravljeni sa prirodnim sastojcima, bez štetnih hemikalija. Brinemo o vašoj kosi i o planeti.
+              </p>
+              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">
+                Saznajte Više <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="flex-1 relative">
+              <img
+                src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=700&fit=crop"
+                alt="Natural products"
+                className="rounded-3xl w-full max-w-md mx-auto object-cover aspect-[4/5]"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* NEW ARRIVALS */}
-      <section className="py-16 bg-white">
+      {/* BESTSELLERS - Dedicated section */}
+      <section className="py-16 bg-white border-y border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Playfair Display', serif" }}>Novo u Ponudi</h2>
-              <p className="text-gray-500 mt-1">Najnoviji proizvodi iz naše kolekcije</p>
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-6 h-6 text-[#c4883a]" />
+              <div>
+                <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Najprodavaniji</h2>
+                <p className="text-[#b07a87] mt-1 text-sm">Proizvodi koje naši kupci najviše vole</p>
+              </div>
             </div>
-            <Link href="/products" className="hidden md:flex items-center gap-1 text-[#c8a96e] hover:text-[#a8894e] font-medium text-sm transition-colors">
-              Svi proizvodi <ChevronRight className="w-4 h-4" />
+            <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">
+              Pogledaj sve
+            </Link>
+          </div>
+          <ProductCarousel products={bestsellers} />
+        </div>
+      </section>
+
+      {/* NEW ARRIVALS - Grid of 4 */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Novo u Ponudi</h2>
+              <p className="text-[#b07a87] mt-1 text-sm">Najnoviji proizvodi iz naše kolekcije</p>
+            </div>
+            <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">
+              Svi proizvodi
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -446,67 +486,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* BESTSELLERS */}
-      <section className="py-16">
+      {/* SALE PRODUCTS CAROUSEL */}
+      <section className="py-16 bg-white border-y border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Playfair Display', serif" }}>Najprodavaniji</h2>
-              <p className="text-gray-500 mt-1">Proizvodi koje naši kupci najviše vole</p>
+              <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Akcijske Ponude</h2>
+              <p className="text-[#b07a87] mt-2 text-sm">Uštedite na omiljenim proizvodima</p>
             </div>
-            <Link href="/products" className="hidden md:flex items-center gap-1 text-[#c8a96e] hover:text-[#a8894e] font-medium text-sm transition-colors">
-              Pogledaj sve <ChevronRight className="w-4 h-4" />
+            <Link href="/outlet" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">
+              Sve akcije
             </Link>
           </div>
-          <ProductCarousel products={bestsellers} />
+          <ProductCarousel products={saleProducts} showOld />
         </div>
       </section>
 
-      {/* BLOG PREVIEW */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Playfair Display', serif" }}>Blog & Saveti</h2>
-            <p className="text-gray-500 mt-2">Najnoviji trendovi, saveti i inspiracija</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {blogPosts.map((post, idx) => (
-              <div key={post.id} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={blogImages[idx]}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-5">
-                  <span className="text-xs text-[#c8a96e] font-medium uppercase tracking-wider">{post.category}</span>
-                  <h3 className="text-lg font-semibold text-[#1a1a1a] mt-1 group-hover:text-[#c8a96e] transition-colors">{post.title}</h3>
-                  <span className="text-xs text-gray-400 mt-2 block">{post.date}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SEMINAR PREVIEW */}
+      {/* B2B PROMO BANNER */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="relative rounded-2xl overflow-hidden">
+          <div className="relative rounded-3xl overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1200&h=500&fit=crop"
-              alt="Hair seminar"
-              className="w-full h-[350px] object-cover"
+              src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&h=500&fit=crop"
+              alt="Professional salon"
+              className="w-full h-[400px] md:h-[450px] object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a]/90 to-[#1a1a1a]/40" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#2d2d2d]/85 via-[#2d2d2d]/60 to-[#2d2d2d]/30" />
             <div className="absolute inset-0 flex items-center">
-              <div className="px-8 md:px-12">
-                <span className="text-[#c8a96e] text-xs uppercase tracking-[0.2em] font-medium">Edukacija</span>
-                <h2 className="text-3xl font-bold text-white mt-2 mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Seminari i Radionice</h2>
-                <p className="text-white/60 mb-6 max-w-md">Unapredite svoje veštine uz naše profesionalne seminare sa vrhunskim edukatorima iz celog sveta.</p>
-                <Link href="/seminars" className="inline-flex items-center gap-2 bg-[#c8a96e] hover:bg-[#a8894e] text-white px-6 py-3 rounded font-medium transition-all hover:-translate-y-0.5">
-                  Pogledaj Raspored <ArrowRight className="w-4 h-4" />
+              <div className="max-w-7xl mx-auto px-8 md:px-12">
+                <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">Za Salone</span>
+                <h2 className="text-3xl md:text-5xl font-light text-white mt-3 mb-5" style={{ fontFamily: "'Cormorant Garamond', serif" }}>B2B Program za <em className="italic">Profesionalce</em></h2>
+                <p className="text-white/50 mb-8 max-w-md text-sm leading-relaxed">Ekskluzivne cene, prioritetna dostava i podrška za vaš salon. Registrujte se kao B2B korisnik.</p>
+                <Link href="/account/login" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">
+                  Registrujte Salon <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -514,18 +526,169 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* INSTAGRAM FEED */}
-      <section className="py-16 bg-white">
+      {/* BLOG BANNER — eco-banner style: text left, cards right */}
+      <section className="bg-[#1e1a1b] py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Playfair Display', serif" }}>@altamoda.rs</h2>
-            <p className="text-gray-500 mt-2">Pratite nas na Instagramu za inspiraciju</p>
+          <div className="flex flex-col md:flex-row items-stretch gap-10 md:gap-14">
+            {/* Left: text */}
+            <div className="flex-1 flex flex-col justify-center md:text-left text-center">
+              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">Alta Moda Blog</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Saveti, Trendovi &{" "}
+                <em className="italic text-[#b07a87]">Inspiracija</em>
+              </h2>
+              <p className="text-white/45 mb-8 max-w-sm text-sm leading-relaxed">
+                Najnoviji članci o nezi kose, trendovima farbanja i styling tehnikama od naših stručnjaka.
+              </p>
+              <div>
+                <Link href="/blog" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-7 py-3 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">
+                  Svi Članci <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: blog cards stacked */}
+            <div className="flex-1 space-y-4 w-full">
+              <Link href="/blog/trendovi-boja-prolece-2026" className="group relative rounded-2xl overflow-hidden block h-[220px]">
+                <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=700&h=440&fit=crop" alt="Trendovi boja" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <span className="inline-block px-2.5 py-1 bg-[#8c4a5a] text-white text-[10px] font-semibold rounded-lg tracking-wider uppercase mb-2.5">Trendovi</span>
+                  <h3 className="text-lg font-medium text-white leading-snug transition-colors">Trendovi boja za kosu — Proleće 2026</h3>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
+                    <span>12. mar 2026</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 5 min</span>
+                  </div>
+                </div>
+              </Link>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Link href="/blog/nega-farbane-kose" className="group relative rounded-2xl overflow-hidden block h-[180px]">
+                  <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=360&fit=crop" alt="Nega kose" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <span className="inline-block px-2 py-0.5 bg-white/15 backdrop-blur-sm text-white text-[10px] font-semibold rounded-md tracking-wider uppercase mb-2">Nega</span>
+                    <h3 className="text-sm font-medium text-white leading-snug transition-colors">Kako negovati farbanu kosu</h3>
+                  </div>
+                </Link>
+
+                <Link href="/blog/top-5-styling-volumen" className="group relative rounded-2xl overflow-hidden block h-[180px]">
+                  <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400&h=360&fit=crop" alt="Styling" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <span className="inline-block px-2 py-0.5 bg-white/15 backdrop-blur-sm text-white text-[10px] font-semibold rounded-md tracking-wider uppercase mb-2">Styling</span>
+                    <h3 className="text-sm font-medium text-white leading-snug transition-colors">Top 5 proizvoda za volumen</h3>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SEMINARS — separate section, lighter tone */}
+      <section className="py-16 bg-white border-y border-[#e0d8cc]">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+              <span className="text-[#8c4a5a] text-xs tracking-[0.2em] font-medium uppercase">Edukacija</span>
+              <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] mt-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Predstojeći <em className="italic">Seminari</em>
+              </h2>
+            </div>
+            <Link href="/seminars" className="hidden md:inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">
+              Svi seminari
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {/* Seminar 1 */}
+            <Link href="/seminars" className="group block rounded-2xl overflow-hidden border border-[#e0d8cc] hover:border-[#b07a87] transition-all hover:shadow-md">
+              <div className="relative h-44 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=500&h=350&fit=crop" alt="Balayage" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute top-3 left-3 bg-white rounded-xl px-3 py-2 text-center shadow-sm">
+                  <span className="text-lg font-bold text-[#8c4a5a] block leading-none">25</span>
+                  <span className="text-[10px] text-[#6b6b6b] uppercase font-medium">mart</span>
+                </div>
+                <div className="absolute top-3 right-3 px-2.5 py-1 bg-[#8c4a5a] text-white text-[10px] font-semibold rounded-lg">8 mesta</div>
+              </div>
+              <div className="p-5">
+                <span className="text-[10px] font-semibold text-[#8c4a5a] tracking-widest uppercase">Koloristika</span>
+                <h4 className="text-base font-medium text-[#2d2d2d] mt-1.5 group-hover:text-[#8c4a5a] transition-colors">Balayage Masterclass</h4>
+                <p className="text-sm text-[#6b6b6b] mt-1">Marco Rossi</p>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#f0ebe3]">
+                  <div className="flex items-center gap-3 text-xs text-[#999]">
+                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Beograd</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 10-16h</span>
+                  </div>
+                  <span className="text-sm font-bold text-[#2d2d2d]">15.000 <span className="text-[10px] text-[#999]">RSD</span></span>
+                </div>
+              </div>
+            </Link>
+
+            {/* Seminar 2 */}
+            <Link href="/seminars" className="group block rounded-2xl overflow-hidden border border-[#e0d8cc] hover:border-[#b07a87] transition-all hover:shadow-md">
+              <div className="relative h-44 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&h=350&fit=crop" alt="Šišanje" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute top-3 left-3 bg-white rounded-xl px-3 py-2 text-center shadow-sm">
+                  <span className="text-lg font-bold text-[#8c4a5a] block leading-none">2</span>
+                  <span className="text-[10px] text-[#6b6b6b] uppercase font-medium">april</span>
+                </div>
+                <div className="absolute top-3 right-3 px-2.5 py-1 bg-[#8c4a5a] text-white text-[10px] font-semibold rounded-lg">15 mesta</div>
+              </div>
+              <div className="p-5">
+                <span className="text-[10px] font-semibold text-[#8c4a5a] tracking-widest uppercase">Šišanje</span>
+                <h4 className="text-base font-medium text-[#2d2d2d] mt-1.5 group-hover:text-[#8c4a5a] transition-colors">Napredne Tehnike Šišanja</h4>
+                <p className="text-sm text-[#6b6b6b] mt-1">Elena Vukčević</p>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#f0ebe3]">
+                  <div className="flex items-center gap-3 text-xs text-[#999]">
+                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Hotel Hyatt</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 09-15h</span>
+                  </div>
+                  <span className="text-sm font-bold text-[#2d2d2d]">12.000 <span className="text-[10px] text-[#999]">RSD</span></span>
+                </div>
+              </div>
+            </Link>
+
+            {/* Seminar 3 — urgent */}
+            <Link href="/seminars" className="group block rounded-2xl overflow-hidden border border-[#e0d8cc] hover:border-[#b07a87] transition-all hover:shadow-md">
+              <div className="relative h-44 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500&h=350&fit=crop" alt="Tretmani" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute top-3 left-3 bg-white rounded-xl px-3 py-2 text-center shadow-sm">
+                  <span className="text-lg font-bold text-[#8c4a5a] block leading-none">10</span>
+                  <span className="text-[10px] text-[#6b6b6b] uppercase font-medium">april</span>
+                </div>
+                <div className="absolute top-3 right-3 px-2.5 py-1 bg-[#b5453a] text-white text-[10px] font-semibold rounded-lg">Još 5!</div>
+              </div>
+              <div className="p-5">
+                <span className="text-[10px] font-semibold text-[#8c4a5a] tracking-widest uppercase">Nega</span>
+                <h4 className="text-base font-medium text-[#2d2d2d] mt-1.5 group-hover:text-[#8c4a5a] transition-colors">Kérastase Ritual Tretmani</h4>
+                <p className="text-sm text-[#6b6b6b] mt-1">Sophie Laurent</p>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#f0ebe3]">
+                  <div className="flex items-center gap-3 text-xs text-[#999]">
+                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Beograd</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 11-17h</span>
+                  </div>
+                  <span className="text-sm font-bold text-[#2d2d2d]">8.000 <span className="text-[10px] text-[#999]">RSD</span></span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* INSTAGRAM FEED */}
+      <section className="py-16 bg-white border-y border-[#e0d8cc]">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>@altamoda.rs</h2>
+            <p className="text-[#b07a87] mt-2 text-sm">Pratite nas na Instagramu za inspiraciju</p>
           </div>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
             {instagramImages.map((img, i) => (
-              <div key={i} className="aspect-square rounded-lg overflow-hidden cursor-pointer group relative">
-                <img src={img} alt={`Instagram ${i + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+              <div key={i} className="aspect-square rounded-2xl overflow-hidden cursor-pointer group relative">
+                <img src={img} alt={`Instagram ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <Instagram className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
@@ -535,14 +698,14 @@ export default function HomePage() {
       </section>
 
       {/* NEWSLETTER */}
-      <section className="py-16 bg-[#1a1a1a]">
+      <section className="py-16 bg-[#f5f0e8]">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <Mail className="w-10 h-10 text-[#c8a96e] mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Prijavite se na Newsletter</h2>
-          <p className="text-white/60 mb-8 max-w-md mx-auto">Budite prvi koji saznaju za nove proizvode, akcije i ekskluzivne ponude.</p>
+          <Mail className="w-8 h-8 text-[#8c4a5a] mx-auto mb-4" />
+          <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Prijavite se na <em className="italic">Newsletter</em></h2>
+          <p className="text-[#b07a87] mb-8 max-w-md mx-auto text-sm">Budite prvi koji saznaju za nove proizvode, akcije i ekskluzivne ponude.</p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input type="email" placeholder="Vaša email adresa" className="flex-1 bg-white/10 border border-white/20 rounded px-4 py-3 text-white placeholder-white/40 text-sm focus:border-[#c8a96e] focus:ring-0" />
-            <button className="bg-[#c8a96e] hover:bg-[#a8894e] text-white px-6 py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
+            <input type="email" placeholder="Vaša email adresa" className="flex-1 bg-white border border-[#e0d8cc] rounded-full px-5 py-3 text-[#2d2d2d] placeholder-[#b07a87] text-sm focus:border-[#8c4a5a] focus:ring-0" />
+            <button className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 text-sm">
               Prijavite se <Send className="w-4 h-4" />
             </button>
           </div>
@@ -554,34 +717,31 @@ export default function HomePage() {
       {/* NEWSLETTER POPUP MODAL */}
       {showNewsletter && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setShowNewsletter(false)} />
-          <div className="bg-white rounded-2xl max-w-md w-full p-8 relative z-10 animate-scaleIn">
-            <button onClick={() => setShowNewsletter(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-gray-400 hover:text-gray-600" /></button>
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowNewsletter(false)} />
+          <div className="bg-white rounded-2xl max-w-md w-full p-8 relative z-10 animate-scaleIn border border-[#e0d8cc]">
+            <button onClick={() => setShowNewsletter(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-[#b07a87] hover:text-[#2d2d2d]" /></button>
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#faf7f2] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-8 h-8 text-[#c8a96e]" />
+              <div className="w-16 h-16 bg-[#f5f0e8] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-8 h-8 text-[#8c4a5a]" />
               </div>
-              <h3 className="text-2xl font-bold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Ostvarite 10% Popusta</h3>
-              <p className="text-gray-500 text-sm mb-6">Prijavite se na naš newsletter i dobijte 10% popusta na prvu kupovinu.</p>
-              <input type="email" placeholder="Vaša email adresa" className="w-full border border-gray-200 rounded px-4 py-3 text-sm mb-3" />
-              <button className="w-full bg-[#c8a96e] hover:bg-[#a8894e] text-white py-3 rounded font-medium transition-colors">Prijavite se</button>
-              <button onClick={() => setShowNewsletter(false)} className="text-xs text-gray-400 mt-3 hover:text-gray-600 block mx-auto">Ne hvala, možda drugi put</button>
+              <h3 className="text-2xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Ostvarite 10% Popusta</h3>
+              <p className="text-[#b07a87] text-sm mb-6">Prijavite se na naš newsletter i dobijte 10% popusta na prvu kupovinu.</p>
+              <input type="email" placeholder="Vaša email adresa" className="w-full border border-[#e0d8cc] rounded-full px-4 py-3 text-sm mb-3 focus:border-[#8c4a5a]" />
+              <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded-full font-medium transition-colors">Prijavite se</button>
+              <button onClick={() => setShowNewsletter(false)} className="text-xs text-[#b07a87] mt-3 hover:text-[#2d2d2d] block mx-auto">Ne hvala, možda drugi put</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Floating newsletter trigger - bottom right */}
+      {/* Floating newsletter trigger */}
       {!showNewsletter && (
-        <button onClick={() => setShowNewsletter(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-[#c8a96e] hover:bg-[#a8894e] text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-all hover:scale-110">
+        <button onClick={() => setShowNewsletter(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-[#8c4a5a] hover:bg-[#6e3848] text-white rounded-full flex items-center justify-center z-40 transition-all hover:scale-110">
           <Mail className="w-6 h-6" />
         </button>
       )}
 
-      {/* Chat Widget - bottom left */}
       <ChatWidget />
-
-      {/* Cookie Consent */}
       <CookieConsent />
     </div>
   );

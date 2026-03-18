@@ -79,7 +79,7 @@ export default function ChatWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 w-14 h-14 bg-[#1a1a1a] hover:bg-[#333] text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-all hover:scale-110 animate-pulse-gold"
+        className="fixed bottom-6 left-6 w-14 h-14 bg-[#2d2d2d] hover:bg-[#4a4a4a] text-white rounded-full flex items-center justify-center z-40 transition-all hover:scale-110 animate-pulse-accent"
         aria-label="Otvorite chat"
       >
         <MessageCircle className="w-6 h-6" />
@@ -91,7 +91,7 @@ export default function ChatWidget() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 left-6 w-14 h-14 bg-[#1a1a1a] hover:bg-[#333] text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-all hover:scale-110"
+        className="fixed bottom-6 left-6 w-14 h-14 bg-[#2d2d2d] hover:bg-[#4a4a4a] text-white rounded-full flex items-center justify-center z-40 transition-all hover:scale-110"
         aria-label="Otvorite chat"
       >
         <MessageCircle className="w-6 h-6" />
@@ -106,17 +106,17 @@ export default function ChatWidget() {
         animation: "slideUp 0.3s ease-out forwards",
       }}
     >
-      <div className="w-[350px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100">
+      <div className="w-[350px] h-[500px] bg-white rounded-2xl flex flex-col overflow-hidden border border-[#e0d8cc]">
         {/* Header */}
-        <div className="bg-[#1a1a1a] px-4 py-3 flex items-center justify-between flex-shrink-0">
+        <div className="bg-[#2d2d2d] px-4 py-3 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#c8a96e]/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#c8a96e]" />
+            <div className="w-9 h-9 rounded-full bg-[#8c4a5a]/20 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-[#b07a87]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-white font-semibold text-sm">Alta Moda Asistent</span>
-                <span className="px-1.5 py-0.5 text-[10px] bg-[#c8a96e] text-white rounded font-medium">
+                <span className="text-white font-medium text-sm">Alta Moda Asistent</span>
+                <span className="px-1.5 py-0.5 text-[10px] bg-[#8c4a5a] text-white rounded font-medium">
                   AI
                 </span>
               </div>
@@ -140,7 +140,7 @@ export default function ChatWidget() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#fafafa]">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f5f0e8]">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -149,8 +149,8 @@ export default function ChatWidget() {
               <div
                 className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   msg.sender === "user"
-                    ? "bg-[#c8a96e] text-white rounded-br-sm"
-                    : "bg-white text-gray-700 shadow-sm border border-gray-100 rounded-bl-sm"
+                    ? "bg-[#8c4a5a] text-white rounded-br-sm"
+                    : "bg-white text-[#2d2d2d] border border-[#e0d8cc] rounded-bl-sm"
                 }`}
               >
                 {msg.text}
@@ -159,11 +159,11 @@ export default function ChatWidget() {
           ))}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white text-gray-500 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm border border-gray-100">
+              <div className="bg-white text-[#6b6b6b] px-4 py-3 rounded-2xl rounded-bl-sm border border-[#e0d8cc]">
                 <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-2 h-2 bg-[#b07a87] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 bg-[#b07a87] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 bg-[#b07a87] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function ChatWidget() {
                 <button
                   key={reply}
                   onClick={() => handleQuickReply(reply)}
-                  className="px-3 py-1.5 text-xs font-medium border border-[#c8a96e] text-[#c8a96e] rounded-full hover:bg-[#c8a96e] hover:text-white transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium border border-[#8c4a5a] text-[#8c4a5a] rounded-full hover:bg-[#8c4a5a] hover:text-white transition-colors"
                 >
                   {reply}
                 </button>
@@ -189,19 +189,19 @@ export default function ChatWidget() {
         {/* Input */}
         <form
           onSubmit={handleSubmit}
-          className="flex items-center gap-2 p-3 border-t border-gray-100 bg-white flex-shrink-0"
+          className="flex items-center gap-2 p-3 border-t border-[#e0d8cc] bg-white flex-shrink-0"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Unesite poruku..."
-            className="flex-1 bg-gray-50 border-0 rounded-full px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#c8a96e] placeholder-gray-400"
+            className="flex-1 bg-[#f5f0e8] border-0 rounded-full px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#8c4a5a] placeholder-[#b07a87]"
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="w-10 h-10 bg-[#c8a96e] hover:bg-[#a8894e] disabled:bg-gray-200 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+            className="w-10 h-10 bg-[#8c4a5a] hover:bg-[#6e3848] disabled:bg-[#e0d8cc] disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </button>

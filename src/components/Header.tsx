@@ -9,12 +9,9 @@ import {
   User,
   Menu,
   X,
-  Phone,
-  Globe,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { LanguageToggle } from "./LanguageToggle";
 
 /* ─── Mega Menu Data ─── */
 interface MegaMenuColumn {
@@ -33,44 +30,10 @@ interface MegaMenuData {
 }
 
 const megaMenus: Record<string, MegaMenuData> = {
-  Boje: {
+  Proizvodi: {
     columns: [
       {
-        title: "Boje za kosu",
-        links: [
-          { name: "Permanentne", href: "/colors?type=permanentne" },
-          { name: "Bez amonijaka", href: "/colors?type=bez-amonijaka" },
-          { name: "Demi-permanentne", href: "/colors?type=demi-permanentne" },
-        ],
-      },
-      {
-        title: "Oksidanti",
-        links: [
-          { name: "3%", href: "/colors?type=oksidanti-3" },
-          { name: "6%", href: "/colors?type=oksidanti-6" },
-          { name: "9%", href: "/colors?type=oksidanti-9" },
-          { name: "12%", href: "/colors?type=oksidanti-12" },
-        ],
-      },
-      {
-        title: "Dekoloranti",
-        links: [
-          { name: "Puderi", href: "/colors?type=dekoloranti-puderi" },
-          { name: "Kreme", href: "/colors?type=dekoloranti-kreme" },
-        ],
-      },
-    ],
-    featured: {
-      image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=300&fit=crop",
-      title: "Nova kolekcija boja",
-      cta: "Pogledajte",
-      href: "/colors",
-    },
-  },
-  Nega: {
-    columns: [
-      {
-        title: "Proizvodi za negu",
+        title: "Nega kose",
         links: [
           { name: "Šamponi", href: "/products?category=samponi" },
           { name: "Maske", href: "/products?category=maske" },
@@ -80,45 +43,15 @@ const megaMenus: Record<string, MegaMenuData> = {
         ],
       },
       {
-        title: "Po tipu kose",
-        links: [
-          { name: "Suva kosa", href: "/products?hair=suva" },
-          { name: "Oštećena kosa", href: "/products?hair=ostecena" },
-          { name: "Farbana kosa", href: "/products?hair=farbana" },
-          { name: "Kovrdžava kosa", href: "/products?hair=kovrdzava" },
-        ],
-      },
-    ],
-    featured: {
-      image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
-      title: "Premium nega kose",
-      cta: "Istražite",
-      href: "/products?category=nega",
-    },
-  },
-  Styling: {
-    columns: [
-      {
-        title: "Styling proizvodi",
+        title: "Styling",
         links: [
           { name: "Gelovi", href: "/products?category=gelovi" },
           { name: "Lakovi", href: "/products?category=lakovi" },
           { name: "Voskovi", href: "/products?category=voskovi" },
           { name: "Kreme", href: "/products?category=styling-kreme" },
-          { name: "Pene", href: "/products?category=pene" },
           { name: "Sprejevi", href: "/products?category=sprejevi" },
         ],
       },
-    ],
-    featured: {
-      image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop",
-      title: "Profesionalni styling",
-      cta: "Pogledajte",
-      href: "/products?category=styling",
-    },
-  },
-  Aparati: {
-    columns: [
       {
         title: "Aparati",
         links: [
@@ -129,18 +62,48 @@ const megaMenus: Record<string, MegaMenuData> = {
         ],
       },
     ],
+    featured: {
+      image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
+      title: "Premium nega kose",
+      cta: "Istražite",
+      href: "/products",
+    },
+  },
+  Kolekcije: {
+    columns: [
+      {
+        title: "Boje za kosu",
+        links: [
+          { name: "Permanentne", href: "/colors?type=permanentne" },
+          { name: "Bez amonijaka", href: "/colors?type=bez-amonijaka" },
+          { name: "Demi-permanentne", href: "/colors?type=demi-permanentne" },
+        ],
+      },
+      {
+        title: "Oksidanti & Dekoloranti",
+        links: [
+          { name: "Oksidanti 3%", href: "/colors?type=oksidanti-3" },
+          { name: "Oksidanti 6%", href: "/colors?type=oksidanti-6" },
+          { name: "Oksidanti 9%", href: "/colors?type=oksidanti-9" },
+          { name: "Dekolorant puderi", href: "/colors?type=dekoloranti-puderi" },
+        ],
+      },
+    ],
+    featured: {
+      image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=300&fit=crop",
+      title: "Nova kolekcija boja",
+      cta: "Pogledajte",
+      href: "/colors",
+    },
   },
 };
 
 const navLinks = [
-  // { name: "Boje", href: "/colors" },
-  { name: "Nega", href: "/products" },
-  { name: "Styling", href: "/products" },
-  { name: "Aparati", href: "/products" },
-  { name: "Brendovi", href: "/products" },
-  // { name: "Akcije", href: "/outlet" },
-  // { name: "Blog", href: "/blog" },
-  // { name: "Seminari", href: "/seminars" },
+  { name: "Proizvodi", href: "/products", hasMega: true },
+  { name: "Kolekcije", href: "/colors", hasMega: true },
+  { name: "O Nama", href: "/about", hasMega: false },
+  { name: "Blog", href: "/blog", hasMega: false },
+  { name: "Kontakt", href: "/contact", hasMega: false },
 ];
 
 export default function Header() {
@@ -150,7 +113,6 @@ export default function Header() {
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Close mobile menu on resize to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) setMobileMenu(false);
@@ -176,79 +138,23 @@ export default function Header() {
 
   return (
     <>
-      {/* TOP BAR */}
-      <div className="bg-[#1a1a1a] text-white/80 text-xs">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-9">
-          <div className="flex items-center gap-4">
-            <LanguageToggle />
-            {/* <Link href="/account/login" className="hover:text-[#c8a96e] transition-colors">
-              B2B Prijava
-            </Link> */}
-          </div>
-          <div className="hidden md:flex items-center gap-1">
-            <Phone className="w-3 h-3" />
-            <span>+381 11 123 4567</span>
-          </div>
-          <span className="hidden md:block">Besplatna dostava za porudžbine preko 5.000 RSD</span>
-        </div>
-      </div>
-
-      {/* MAIN HEADER */}
-      <header className="bg-white sticky top-0 z-50 shadow-sm">
+      {/* MAIN HEADER - Clean Kanva style */}
+      <header className="bg-white sticky top-0 z-50 border-b border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-          <Link href="/" className="block">
-            <img src="/logo.png" alt="Alta Moda" className="h-8" />
-          </Link>
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Pretražite proizvode..."
-                className="w-full border border-gray-200 rounded-full pl-4 pr-10 py-2 text-sm focus:border-[#c8a96e] focus:ring-0 transition-colors"
-              />
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSearchOpen(!searchOpen)} className="md:hidden">
-              <Search className="w-5 h-5 text-[#1a1a1a]" />
-            </button>
-            <span className="relative hidden sm:block cursor-default">
-              <Heart className="w-5 h-5 text-[#1a1a1a]" />
-              <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c8a96e] text-white text-[10px] rounded-full flex items-center justify-center">
-                3
-              </span>
-            </span>
-            <span className="hidden sm:block cursor-default">
-              <User className="w-5 h-5 text-[#1a1a1a]" />
-            </span>
-            <span className="relative cursor-default">
-              <ShoppingBag className="w-5 h-5 text-[#1a1a1a]" />
-              <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c8a96e] text-white text-[10px] rounded-full flex items-center justify-center">
-                2
-              </span>
-            </span>
-            <button onClick={() => setMobileMenu(true)} className="md:hidden">
-              <Menu className="w-6 h-6 text-[#1a1a1a]" />
-            </button>
-          </div>
-        </div>
-
-        {/* DESKTOP NAV WITH MEGA MENU */}
-        <nav className="hidden md:block border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 flex items-center gap-8 h-11 text-sm font-medium">
+          {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
+          <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((l) => {
-              const hasMega = megaMenus[l.name] !== undefined;
+              const hasMega = l.hasMega && megaMenus[l.name] !== undefined;
               return (
                 <div
                   key={l.name}
-                  className="nav-item relative h-full flex items-center"
+                  className="nav-item relative h-16 flex items-center"
                   onMouseEnter={() => hasMega && handleMenuEnter(l.name)}
                   onMouseLeave={handleMenuLeave}
                 >
                   <Link
                     href={l.href}
-                    className="text-[#1a1a1a] hover:text-[#c8a96e] transition-colors tracking-wide uppercase text-xs flex items-center gap-1"
+                    className="text-sm text-[#2d2d2d] hover:text-[#8c4a5a] transition-colors tracking-normal font-normal flex items-center gap-1"
                   >
                     {l.name}
                     {hasMega && <ChevronDown className="w-3 h-3" />}
@@ -264,15 +170,13 @@ export default function Header() {
                       onMouseEnter={() => handleMenuEnter(l.name)}
                       onMouseLeave={handleMenuLeave}
                     >
-                      <div className="bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden">
-                        {/* Gold accent top border */}
-                        <div className="h-0.5 bg-gradient-to-r from-[#c8a96e] via-[#e8d5b0] to-[#c8a96e]" />
+                      <div className="bg-white rounded-2xl border border-[#e0d8cc] overflow-hidden shadow-lg">
+                        <div className="h-0.5 bg-gradient-to-r from-[#8c4a5a] via-[#b07a87] to-[#8c4a5a]" />
                         <div className="p-6 flex gap-8">
-                          {/* Columns */}
                           <div className="flex-1 flex gap-8">
                             {megaMenus[l.name].columns.map((col) => (
                               <div key={col.title} className="min-w-[140px]">
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#c8a96e] mb-3">
+                                <h4 className="text-xs font-medium uppercase tracking-wider text-[#8c4a5a] mb-3">
                                   {col.title}
                                 </h4>
                                 <ul className="space-y-2">
@@ -280,9 +184,9 @@ export default function Header() {
                                     <li key={link.name}>
                                       <Link
                                         href={link.href}
-                                        className="text-sm text-gray-600 hover:text-[#c8a96e] transition-colors flex items-center gap-1 group"
+                                        className="text-sm text-[#6b6b6b] hover:text-[#8c4a5a] transition-colors flex items-center gap-1 group"
                                       >
-                                        <span className="w-0 group-hover:w-2 h-px bg-[#c8a96e] transition-all duration-200" />
+                                        <span className="w-0 group-hover:w-2 h-px bg-[#8c4a5a] transition-all duration-200" />
                                         {link.name}
                                       </Link>
                                     </li>
@@ -291,22 +195,21 @@ export default function Header() {
                               </div>
                             ))}
                           </div>
-                          {/* Featured Image */}
                           {megaMenus[l.name].featured && (
                             <div className="w-[200px] flex-shrink-0">
                               <Link href={megaMenus[l.name].featured!.href} className="block group">
-                                <div className="relative rounded-lg overflow-hidden aspect-[4/3]">
+                                <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                                   <img
                                     src={megaMenus[l.name].featured!.image}
                                     alt={megaMenus[l.name].featured!.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                                   <div className="absolute bottom-0 left-0 right-0 p-3">
-                                    <p className="text-white text-sm font-semibold">
+                                    <p className="text-white text-sm font-medium">
                                       {megaMenus[l.name].featured!.title}
                                     </p>
-                                    <span className="text-[#c8a96e] text-xs font-medium flex items-center gap-1 mt-1">
+                                    <span className="text-[#b07a87] text-xs font-medium flex items-center gap-1 mt-1">
                                       {megaMenus[l.name].featured!.cta}
                                       <ChevronRight className="w-3 h-3" />
                                     </span>
@@ -322,17 +225,50 @@ export default function Header() {
                 </div>
               );
             })}
-          </div>
-        </nav>
+          </nav>
 
-        {/* Mobile search */}
+          {/* Logo - center (Kanva style: parenthesized brand name) */}
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
+            <img src="/logo.png" alt="Alta Moda" className="h-6 md:h-7" />
+          </Link>
+
+          {/* Icons - right (Kanva style: user, search, heart, cart) */}
+          <div className="flex items-center gap-5">
+            <span className="hidden sm:block cursor-pointer hover:text-[#8c4a5a] transition-colors">
+              <User className="w-5 h-5 text-[#2d2d2d]" />
+            </span>
+            <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#8c4a5a] transition-colors">
+              <Search className="w-5 h-5 text-[#2d2d2d]" />
+            </button>
+            <span className="relative hidden sm:block cursor-pointer hover:text-[#8c4a5a] transition-colors">
+              <Heart className="w-5 h-5 text-[#2d2d2d]" />
+            </span>
+            <span className="relative cursor-pointer hover:text-[#8c4a5a] transition-colors">
+              <ShoppingBag className="w-5 h-5 text-[#2d2d2d]" />
+              <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#8c4a5a] text-white text-[10px] rounded-full flex items-center justify-center">
+                2
+              </span>
+            </span>
+            <button onClick={() => setMobileMenu(true)} className="md:hidden">
+              <Menu className="w-6 h-6 text-[#2d2d2d]" />
+            </button>
+          </div>
+        </div>
+
+        {/* Search overlay */}
         {searchOpen && (
-          <div className="md:hidden px-4 pb-3">
-            <input
-              type="text"
-              placeholder="Pretražite proizvode..."
-              className="w-full border border-gray-200 rounded-full pl-4 pr-10 py-2 text-sm"
-            />
+          <div className="absolute top-full left-0 right-0 bg-white border-b border-[#e0d8cc] animate-slideDown">
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="relative max-w-xl mx-auto">
+                <input
+                  type="text"
+                  placeholder="Pretražite proizvode..."
+                  autoFocus
+                  className="w-full border border-[#e0d8cc] rounded-full pl-5 pr-12 py-3 text-sm focus:border-[#8c4a5a] focus:ring-0 transition-colors bg-transparent"
+                />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#b07a87]" />
+              </div>
+            </div>
           </div>
         )}
       </header>
@@ -340,37 +276,32 @@ export default function Header() {
       {/* MOBILE MENU */}
       {mobileMenu && (
         <div className="fixed inset-0 z-[100]">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenu(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl overflow-y-auto animate-slideInRight">
-            <div className="flex items-center justify-between p-4 border-b">
-              <span
-                className="font-bold text-lg"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                Meni
-              </span>
+          <div className="absolute inset-0 bg-black/30" onClick={() => setMobileMenu(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white overflow-y-auto animate-slideInRight">
+            <div className="flex items-center justify-between p-4 border-b border-[#e0d8cc]">
+              <img src="/logo.png" alt="Alta Moda" className="h-5" />
               <button onClick={() => setMobileMenu(false)}>
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-[#2d2d2d]" />
               </button>
             </div>
             <div className="p-4 space-y-1">
               {navLinks.map((l) => {
-                const hasMega = megaMenus[l.name] !== undefined;
+                const hasMega = l.hasMega && megaMenus[l.name] !== undefined;
                 const isExpanded = expandedMobile === l.name;
                 return (
                   <div key={l.name}>
-                    <div className="flex items-center justify-between border-b border-gray-50">
+                    <div className="flex items-center justify-between border-b border-[#f5f0e8]">
                       <Link
                         href={l.href}
                         onClick={() => setMobileMenu(false)}
-                        className="flex-1 py-3 px-2 text-[#1a1a1a] hover:text-[#c8a96e] text-sm uppercase tracking-wider font-medium"
+                        className="flex-1 py-3 px-2 text-[#2d2d2d] hover:text-[#8c4a5a] text-sm font-normal tracking-normal"
                       >
                         {l.name}
                       </Link>
                       {hasMega && (
                         <button
                           onClick={() => toggleMobileSubmenu(l.name)}
-                          className="p-2 hover:text-[#c8a96e] transition-colors"
+                          className="p-2 hover:text-[#8c4a5a] transition-colors"
                         >
                           <ChevronDown
                             className={`w-4 h-4 transition-transform duration-200 ${
@@ -380,12 +311,11 @@ export default function Header() {
                         </button>
                       )}
                     </div>
-                    {/* Mobile sub-items */}
                     {hasMega && isExpanded && (
                       <div className="pl-4 pb-2 animate-slideDown">
                         {megaMenus[l.name].columns.map((col) => (
                           <div key={col.title} className="mb-3">
-                            <span className="text-xs font-semibold uppercase tracking-wider text-[#c8a96e] block py-1 px-2">
+                            <span className="text-xs font-medium uppercase tracking-wider text-[#8c4a5a] block py-1 px-2">
                               {col.title}
                             </span>
                             {col.links.map((link) => (
@@ -393,7 +323,7 @@ export default function Header() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block py-2 px-2 text-sm text-gray-600 hover:text-[#c8a96e] transition-colors"
+                                className="block py-2 px-2 text-sm text-[#6b6b6b] hover:text-[#8c4a5a] transition-colors"
                               >
                                 {link.name}
                               </Link>
@@ -405,22 +335,6 @@ export default function Header() {
                   </div>
                 );
               })}
-              <div className="pt-4 space-y-2">
-                {/* <Link
-                  href="/account/login"
-                  onClick={() => setMobileMenu(false)}
-                  className="block w-full text-center py-2.5 bg-[#c8a96e] hover:bg-[#a8894e] text-white rounded text-sm font-medium"
-                >
-                  Prijava
-                </Link>
-                <Link
-                  href="/wishlist"
-                  onClick={() => setMobileMenu(false)}
-                  className="block w-full text-center py-2.5 border border-[#c8a96e] text-[#c8a96e] rounded text-sm font-medium"
-                >
-                  Lista želja
-                </Link> */}
-              </div>
             </div>
           </div>
         </div>
