@@ -151,6 +151,36 @@ interface Props {
 /* ─── Main Page ─── */
 export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts }: Props) {
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+  const [popupEmail, setPopupEmail] = useState("");
+  const [popupStatus, setPopupStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const handleNewsletterSubmit = async (email: string, setStatus: (s: "idle" | "loading" | "success" | "error") => void, setMessage: (m: string) => void, onSuccess?: () => void) => {
+    if (!email) return;
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setStatus("success");
+        setMessage(json.data?.message || "Uspešno ste se prijavili!");
+        onSuccess?.();
+      } else {
+        setStatus("error");
+        setMessage(json.error || "Došlo je do greške");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Došlo je do greške");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
@@ -327,10 +357,15 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <Mail className="w-8 h-8 text-[#8c4a5a] mx-auto mb-4" />
           <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Prijavite se na <em className="italic">Newsletter</em></h2>
           <p className="text-[#b07a87] mb-8 max-w-md mx-auto text-sm">Budite prvi koji saznaju za nove proizvode, akcije i ekskluzivne ponude.</p>
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input type="email" placeholder="Vaša email adresa" className="flex-1 bg-white border border-[#e0d8cc] rounded-full px-5 py-3 text-[#2d2d2d] placeholder-[#b07a87] text-sm focus:border-[#8c4a5a] focus:ring-0" />
-            <button className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 text-sm">Prijavite se <Send className="w-4 h-4" /></button>
-          </div>
+          <form onSubmit={(e) => { e.preventDefault(); handleNewsletterSubmit(newsletterEmail, setNewsletterStatus, setNewsletterMessage); }} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input type="email" placeholder="Vaša email adresa" value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} className="flex-1 bg-white border border-[#e0d8cc] rounded-full px-5 py-3 text-[#2d2d2d] placeholder-[#b07a87] text-sm focus:border-[#8c4a5a] focus:ring-0" required />
+            <button type="submit" disabled={newsletterStatus === "loading"} className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-60">
+              {newsletterStatus === "loading" ? "..." : "Prijavite se"} <Send className="w-4 h-4" />
+            </button>
+          </form>
+          {newsletterStatus !== "idle" && newsletterStatus !== "loading" && (
+            <p className={`mt-3 text-sm ${newsletterStatus === "success" ? "text-green-600" : "text-red-500"}`}>{newsletterMessage}</p>
+          )}
         </div>
       </section>
 
@@ -344,10 +379,26 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             <button onClick={() => setShowNewsletter(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-[#b07a87] hover:text-[#2d2d2d]" /></button>
             <div className="text-center">
               <div className="w-16 h-16 bg-[#f5f0e8] rounded-full flex items-center justify-center mx-auto mb-4"><Mail className="w-8 h-8 text-[#8c4a5a]" /></div>
-              <h3 className="text-2xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Ostvarite 10% Popusta</h3>
-              <p className="text-[#b07a87] text-sm mb-6">Prijavite se na naš newsletter i dobijte 10% popusta na prvu kupovinu.</p>
-              <input type="email" placeholder="Vaša email adresa" className="w-full border border-[#e0d8cc] rounded-full px-4 py-3 text-sm mb-3 focus:border-[#8c4a5a]" />
-              <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded-full font-medium transition-colors">Prijavite se</button>
+              <h3 className="text-2xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Prijavite se na Newsletter</h3>
+              <p className="text-[#b07a87] text-sm mb-6">Budite u toku sa najnovijim proizvodima i ekskluzivnim ponudama.</p>
+              {popupStatus === "success" ? (
+                <p className="text-green-600 text-sm py-4">{popupMessage}</p>
+              ) : (
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  handleNewsletterSubmit(popupEmail, setPopupStatus, setPopupMessage, () => {
+                    setTimeout(() => setShowNewsletter(false), 1500);
+                  });
+                }}>
+                  <input type="email" placeholder="Vaša email adresa" value={popupEmail} onChange={(e) => setPopupEmail(e.target.value)} className="w-full border border-[#e0d8cc] rounded-full px-4 py-3 text-sm mb-3 focus:border-[#8c4a5a]" required />
+                  <button type="submit" disabled={popupStatus === "loading"} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded-full font-medium transition-colors disabled:opacity-60">
+                    {popupStatus === "loading" ? "Prijava..." : "Prijavite se"}
+                  </button>
+                  {popupStatus === "error" && (
+                    <p className="text-red-500 text-sm mt-2">{popupMessage}</p>
+                  )}
+                </form>
+              )}
               <button onClick={() => setShowNewsletter(false)} className="text-xs text-[#b07a87] mt-3 hover:text-[#2d2d2d] block mx-auto">Ne hvala, možda drugi put</button>
             </div>
           </div>

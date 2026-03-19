@@ -149,59 +149,91 @@
 
 ---
 
-## PHASE 3: Cart, Wishlist, Orders & Quick Order ⬜
-**Covers:** REQ 3 (promo codes), REQ 6 (wishlist/reviews), REQ 14 (quick order), REQ 15 (orders) partial
+## PHASE 3: Cart, Wishlist, Orders & Quick Order ✅ COMPLETE
+**Covers:** REQ 6 (wishlist/reviews), REQ 14 (quick order), REQ 15 (orders) partial
 
-### Step 3.1 — Zustand Cart Store
-- [ ] `src/lib/stores/cart-store.ts` — items, add, remove, updateQty, clearCart
-- [ ] Guest: localStorage. Logged-in: sync to DB
-- [ ] `src/components/providers/CartProvider.tsx` — load cart on mount, merge on login
+### Step 3.1 — Zustand Cart Store ✅
+- [x] `src/lib/stores/cart-store.ts` — items, add, remove, updateQty, clearCart, getTotal, getItemCount
+- [x] Guest: localStorage via zustand persist middleware. Logged-in: sync to DB
+- [x] `src/components/providers/CartProvider.tsx` — load cart on mount, merge guest→DB on login, fetch wishlist count
+- [x] `src/lib/stores/wishlist-store.ts` — wishlist count store for navbar badge
 
-### Step 3.2 — Cart & Wishlist APIs
-- [ ] GET/POST /api/cart, PUT/DELETE /api/cart/[itemId], POST /api/cart/merge
-- [ ] GET/POST/DELETE /api/wishlist
+### Step 3.2 — Cart & Wishlist APIs ✅
+- [x] `GET /api/cart` — get user's cart with product details, role-aware pricing
+- [x] `POST /api/cart` — add item (validates product exists + active)
+- [x] `PUT /api/cart/[itemId]` — update quantity
+- [x] `DELETE /api/cart/[itemId]` — remove item (ownership check)
+- [x] `POST /api/cart/merge` — merge guest cart on login (batch validation, sum quantities)
+- [x] `GET /api/wishlist` — list with DB-aggregated ratings (no N+1)
+- [x] `POST /api/wishlist` — toggle (add/remove)
+- [x] `DELETE /api/wishlist?productId=X` — remove by productId
 
-### Step 3.3 — Promo Code Validation
-- [ ] POST /api/promo-codes/validate — check code, dates, limits, audience, min order
+### Step 3.3 — Promo Code Validation ⬜ DEFERRED
+- [ ] POST /api/promo-codes/validate — deferred to Phase 4/5
 
-### Step 3.4 — Order APIs
-- [ ] GET /api/orders (user list or admin list)
-- [ ] POST /api/orders — validate stock, snapshot prices, calc totals, decrement stock, generate order number
-- [ ] GET /api/orders/[id] — detail with items + status history
-- [ ] PATCH /api/orders/[id]/status (admin) — change status, log history
+### Step 3.4 — Order APIs ✅
+- [x] `GET /api/orders` — user's orders (admin sees all), paginated
+- [x] `POST /api/orders` — validate stock, snapshot prices, calc shipping, decrement stock, generate order number, clear cart (transaction)
+- [x] `GET /api/orders/[id]` — detail with items, product images, status history (owner or admin)
+- [x] `PATCH /api/orders/[id]/status` (admin) — state machine validation (novi→u_obradi→isporuceno, otkazano as terminal)
 
-### Step 3.5 — Reviews API
-- [ ] GET /api/reviews?productId=X, POST /api/reviews (rate 1-5, one per user)
+### Step 3.5 — Reviews API ✅
+- [x] `GET /api/reviews?productId=X` — paginated, DB-aggregated avg rating
+- [x] `POST /api/reviews` — rate 1-5, one per user per product (rejects duplicates with 409)
+- [x] Product detail page shows user's existing rating, hides review form if already reviewed
 
-### Step 3.6 — B2B Quick Order API
-- [ ] SKU lookup, CSV upload parse, repeat previous order
+### Step 3.6 — B2B Quick Order API ✅
+- [x] `POST /api/orders/quick` (type=sku) — lookup product by SKU, return B2B price
+- [x] `POST /api/orders/quick` (type=csv) — parse CSV rows, validate SKUs, return preview with found/notFound/outOfStock summary
+- [x] `POST /api/orders/quick` (type=repeat) — copy items from previous order at current prices
 
-### Step 3.7 — Checkout Page (NEW)
-- [ ] src/app/checkout/page.tsx — address, shipping, promo, payment, review
-- [ ] src/app/checkout/confirmation/page.tsx — order summary
+### Step 3.7 — Checkout Page (NEW) ✅
+- [x] `src/app/checkout/page.tsx` — server wrapper, fetches user addresses
+- [x] `src/app/checkout/CheckoutClient.tsx` — multi-step: contact (guests) → address → shipping → payment → review → place order
+- [x] `src/app/checkout/confirmation/page.tsx` — order confirmation with order number
+- [x] Guest checkout: fill in name/email/phone, then address (API requires login to finalize)
+- [x] B2B minimum order check (10,000 RSD)
 
-### Step 3.8 — Wire Existing Pages
-- [ ] cart/page.tsx → Zustand cart, real promo, delivery options
-- [ ] wishlist/page.tsx → API toggle/remove, add to cart
-- [ ] quick-order/page.tsx → SKU search, CSV upload, repeat order
+### Step 3.8 — Wire Existing Pages ✅
+- [x] `cart/page.tsx` → Zustand cart store, delivery options, B2B options (role-gated), navigate to /checkout
+- [x] `wishlist/page.tsx` → server fetches from DB, client remove/add-to-cart/add-all
+- [x] `quick-order/page.tsx` → server fetches recent orders, client SKU search/CSV upload/repeat order
+- [x] `products/[id]/ProductDetailClient.tsx` → add-to-cart (store), wishlist toggle (API), review submission (API)
+- [x] `products/ProductsPageClient.tsx` → ProductCard heart toggles wishlist API, add-to-cart button works
+- [x] `account/page.tsx` → WishlistSection fetches real data from API (replaced hardcoded mock)
+- [x] Header — bag icon links to /cart with real item count badge, heart icon links to /wishlist with count badge
 
-### PHASE 3 — DONE WHEN:
-- [ ] Guest → login → cart preserved
-- [ ] Promo code works at checkout
-- [ ] Order placed → stock decremented → order number shown
-- [ ] B2B invoice order works
-- [ ] Quick order all 3 tabs work
-- [ ] Wishlist + star ratings work
+### Step 3.9 — Validation & Quality ✅
+- [x] `src/lib/validations/cart.ts` — addToCartSchema, updateCartItemSchema (max 999)
+- [x] `src/lib/validations/review.ts` — createReviewSchema (rating 1-5 integer)
+- [x] `src/lib/api-utils.ts` — ZodError now returns 400 (was 500)
+- [x] `src/lib/auth.config.ts` — /checkout accessible to guests
+
+### Step 3.10 — Tests ✅
+- [x] `src/__tests__/unit/phase3-validations.test.ts` — 26 tests (cart + review schema validation)
+- [x] `src/__tests__/unit/cart-store.test.ts` — 21 tests (Zustand store: add/update/remove/clear/totals + wishlist store)
+- [x] `src/__tests__/api/phase3-api.test.ts` — 25 tests (cart/wishlist/reviews/orders/quick-order API logic)
+- [x] `src/__tests__/security/phase3-security.test.ts` — 9 tests (XSS, quantity bounds, payment methods, status values)
+
+### PHASE 3 — DONE:
+- [x] Guest → login → cart preserved (localStorage merge into DB)
+- [ ] Promo code works at checkout — DEFERRED
+- [x] Order placed → stock decremented → order number shown
+- [x] B2B invoice order works
+- [x] Quick order all 3 tabs work (SKU, CSV, repeat)
+- [x] Wishlist + star ratings work (toggle from product cards + detail, one review per user)
+- [x] 305 total tests pass (81 new)
 
 ---
 
-## PHASE 4: Payment & Shipping ⬜
-**Covers:** REQ 12 (card payment), REQ 15 (delivery + emails)
+## PHASE 4: i18n, SEO & Newsletter ⬜
+**Covers:** REQ 13 (multilingual), REQ 10 (SEO), REQ 9 (newsletter automations)
 
-- [ ] Serbian PSP integration (Allpay.rs or PaySpot)
-- [ ] D Express shipping integration (shipment creation, tracking, rate calculation)
-- [ ] Email notifications via Resend (order confirmation, shipping, welcome, B2B approval)
-- [ ] B2B invoice PDF generation
+- [ ] next-intl setup (sr-Latn / sr-Cyrl)
+- [ ] Translation files, locale routing, LanguageToggle upgrade
+- [ ] generateMetadata() on all server pages
+- [ ] sitemap.ts, robots.ts, JSON-LD structured data
+- [ ] Newsletter first-purchase popup, campaign sending, automations
 
 ---
 
@@ -230,14 +262,13 @@
 
 ---
 
-## PHASE 7: i18n, SEO & Newsletter ⬜
-**Covers:** REQ 13 (multilingual), REQ 10 (SEO), REQ 9 (newsletter automations)
+## PHASE 7: Payment & Shipping ⬜
+**Covers:** REQ 12 (card payment), REQ 15 (delivery + emails)
 
-- [ ] next-intl setup (sr-Latn / sr-Cyrl)
-- [ ] Translation files, locale routing, LanguageToggle upgrade
-- [ ] generateMetadata() on all server pages
-- [ ] sitemap.ts, robots.ts, JSON-LD structured data
-- [ ] Newsletter first-purchase popup, campaign sending, automations
+- [ ] Serbian PSP integration (Allpay.rs or PaySpot)
+- [ ] D Express shipping integration (shipment creation, tracking, rate calculation)
+- [ ] Email notifications via Resend (order confirmation, shipping, welcome, B2B approval)
+- [ ] B2B invoice PDF generation
 
 ---
 
