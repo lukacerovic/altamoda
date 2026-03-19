@@ -93,9 +93,9 @@ describe('Auth Config - Route Authorization Logic', () => {
     expect(authorized(makeArgs('/quick-order', 'admin'))).toBe(true)
   })
 
-  // Checkout
-  it('blocks unauthenticated from /checkout', () => {
-    expect(authorized(makeArgs('/checkout'))).toBe(false)
+  // Checkout — accessible to guests (they fill in contact info)
+  it('allows unauthenticated to /checkout (guest checkout)', () => {
+    expect(authorized(makeArgs('/checkout'))).toBe(true)
   })
 
   it('allows any authenticated user to /checkout', () => {

@@ -7,9 +7,9 @@ const mergeSchema = z.object({
   items: z.array(
     z.object({
       productId: z.string().min(1),
-      quantity: z.coerce.number().int().min(1),
+      quantity: z.coerce.number().int().min(1).max(999),
     })
-  ),
+  ).max(100),
 })
 
 // POST /api/cart/merge — merge guest cart items into user's DB cart on login
@@ -32,23 +32,31 @@ export const POST = withErrorHandler(async (req: Request) => {
     })
   }
 
-  // Merge each item
-  for (const item of items) {
-    // Verify product exists
-    const product = await prisma.product.findFirst({
-      where: { id: item.productId, isActive: true },
-    })
-    if (!product) continue
+  // Batch-validate all products in one query (fixes N+1)
+  const productIds = items.map((i) => i.productId)
+  const validProducts = await prisma.product.findMany({
+    where: { id: { in: productIds }, isActive: true },
+    select: { id: true },
+  })
+  const validProductIds = new Set(validProducts.map((p) => p.id))
 
-    const existing = await prisma.cartItem.findUnique({
-      where: { cartId_productId: { cartId: cart.id, productId: item.productId } },
-    })
+  // Get existing cart items in one query
+  const existingCartItems = await prisma.cartItem.findMany({
+    where: { cartId: cart.id, productId: { in: productIds } },
+  })
+  const existingMap = new Map(existingCartItems.map((ci) => [ci.productId, ci]))
+
+  // Merge each valid item
+  for (const item of items) {
+    if (!validProductIds.has(item.productId)) continue
+
+    const existing = existingMap.get(item.productId)
 
     if (existing) {
-      // Keep the higher quantity
+      // Sum quantities (not max — guest items should add to existing)
       await prisma.cartItem.update({
         where: { id: existing.id },
-        data: { quantity: Math.max(existing.quantity, item.quantity) },
+        data: { quantity: existing.quantity + item.quantity },
       })
     } else {
       await prisma.cartItem.create({

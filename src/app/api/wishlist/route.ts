@@ -18,34 +18,35 @@ export const GET = withErrorHandler(async () => {
         include: {
           brand: true,
           images: { where: { isPrimary: true }, take: 1 },
-          reviews: true,
         },
       },
     },
     orderBy: { createdAt: 'desc' },
   })
 
-  const items = wishlistItems.map((w) => {
-    const avgRating =
-      w.product.reviews.length > 0
-        ? w.product.reviews.reduce((sum, r) => sum + r.rating, 0) / w.product.reviews.length
-        : 0
-
-    return {
-      id: w.id,
-      productId: w.productId,
-      name: w.product.nameLat,
-      brand: w.product.brand?.name ?? '',
-      price: Number(user.role === 'b2b' && w.product.priceB2b
-        ? w.product.priceB2b
-        : w.product.priceB2c),
-      oldPrice: w.product.oldPrice ? Number(w.product.oldPrice) : null,
-      image: w.product.images[0]?.url ?? '',
-      rating: Math.round(avgRating * 10) / 10,
-      inStock: w.product.stockQuantity > 0,
-      slug: w.product.slug,
-    }
+  // Batch-fetch avg ratings using DB aggregation (fixes N+1 reviews loading)
+  const productIds = wishlistItems.map((w) => w.productId)
+  const ratings = await prisma.review.groupBy({
+    by: ['productId'],
+    where: { productId: { in: productIds } },
+    _avg: { rating: true },
   })
+  const ratingMap = new Map(ratings.map((r) => [r.productId, r._avg.rating ?? 0]))
+
+  const items = wishlistItems.map((w) => ({
+    id: w.id,
+    productId: w.productId,
+    name: w.product.nameLat,
+    brand: w.product.brand?.name ?? '',
+    price: Number(user.role === 'b2b' && w.product.priceB2b
+      ? w.product.priceB2b
+      : w.product.priceB2c),
+    oldPrice: w.product.oldPrice ? Number(w.product.oldPrice) : null,
+    image: w.product.images[0]?.url ?? '',
+    rating: Math.round((ratingMap.get(w.productId) ?? 0) * 10) / 10,
+    inStock: w.product.stockQuantity > 0,
+    slug: w.product.slug,
+  }))
 
   return successResponse({ items })
 })

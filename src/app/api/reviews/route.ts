@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
-import { withErrorHandler, successResponse, ApiError } from '@/lib/api-utils'
-import { requireAuth, getCurrentUser } from '@/lib/auth-helpers'
+import { withErrorHandler, successResponse, ApiError, getPaginationParams } from '@/lib/api-utils'
+import { requireAuth } from '@/lib/auth-helpers'
 import { createReviewSchema } from '@/lib/validations/review'
 
 // GET /api/reviews?productId=xxx — get reviews for a product
@@ -12,18 +12,26 @@ export const GET = withErrorHandler(async (req: Request) => {
     throw new ApiError(400, 'productId je obavezan')
   }
 
-  const reviews = await prisma.review.findMany({
-    where: { productId },
-    include: {
-      user: { select: { name: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  const { page, limit, skip } = getPaginationParams(searchParams)
 
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0
+  const [reviews, total, avgResult] = await Promise.all([
+    prisma.review.findMany({
+      where: { productId },
+      include: {
+        user: { select: { name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({ where: { productId } }),
+    prisma.review.aggregate({
+      where: { productId },
+      _avg: { rating: true },
+    }),
+  ])
+
+  const avgRating = avgResult._avg.rating ?? 0
 
   return successResponse({
     reviews: reviews.map((r) => ({
@@ -33,7 +41,8 @@ export const GET = withErrorHandler(async (req: Request) => {
       user: r.user,
     })),
     avgRating: Math.round(avgRating * 10) / 10,
-    count: reviews.length,
+    count: total,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   })
 })
 
@@ -51,13 +60,17 @@ export const POST = withErrorHandler(async (req: Request) => {
     throw new ApiError(404, 'Proizvod nije pronađen')
   }
 
-  // Upsert — one review per user per product
-  const review = await prisma.review.upsert({
-    where: {
-      productId_userId: { productId, userId: user.id },
-    },
-    update: { rating },
-    create: { productId, userId: user.id, rating },
+  // Check if user already reviewed — return error instead of upsert
+  const existing = await prisma.review.findUnique({
+    where: { productId_userId: { productId, userId: user.id } },
+  })
+
+  if (existing) {
+    throw new ApiError(409, 'Već ste ocenili ovaj proizvod')
+  }
+
+  const review = await prisma.review.create({
+    data: { productId, userId: user.id, rating },
   })
 
   return successResponse({

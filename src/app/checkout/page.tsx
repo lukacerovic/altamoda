@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@/lib/auth-helpers'
+import { prisma } from '@/lib/db'
 import CheckoutClient from './CheckoutClient'
 
 export default async function CheckoutPage() {
@@ -15,10 +16,9 @@ export default async function CheckoutPage() {
   }[] = []
 
   if (user) {
-    const { prisma } = await import('@/lib/db')
     const dbAddresses = await prisma.userAddress.findMany({
       where: { userId: user.id },
-      orderBy: { isDefault: 'desc' },
+      orderBy: [{ isDefault: 'desc' }, { label: 'asc' }],
     })
     addresses = dbAddresses.map((a) => ({
       id: a.id,
