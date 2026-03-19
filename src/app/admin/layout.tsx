@@ -3,14 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Package,
   ShoppingCart,
   Users,
-  FileText,
-  GraduationCap,
-  BarChart3,
   Settings,
   Menu,
   X,
@@ -19,13 +17,9 @@ import {
   ChevronDown,
   LogOut,
   User,
-  Ticket,
   PackageOpen,
-  Image,
   Mail,
-  Database,
-  Upload,
-  Globe,
+  Zap,
 } from "lucide-react";
 
 interface NavSection {
@@ -40,33 +34,23 @@ const navSections: NavSection[] = [
       { href: "/admin/products", label: "Proizvodi", icon: Package },
       { href: "/admin/orders", label: "Porudžbine", icon: ShoppingCart },
       { href: "/admin/users", label: "Korisnici", icon: Users },
-      { href: "/admin/blog", label: "Blog", icon: FileText },
-      { href: "/admin/seminars", label: "Seminari", icon: GraduationCap },
-      { href: "/admin/analytics", label: "Analitika", icon: BarChart3 },
     ],
   },
   {
-    title: "Marketing",
+    title: "Prodaja",
     items: [
-      { href: "/admin/promo-codes", label: "Promo Kodovi", icon: Ticket },
+      { href: "/admin/actions", label: "Akcije", icon: Zap },
       { href: "/admin/bundles", label: "Paketi", icon: PackageOpen },
-      { href: "/admin/banners", label: "Baneri", icon: Image },
-      { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
     ],
   },
   {
     title: "Sistem",
     items: [
-      { href: "/admin/erp", label: "ERP Integracija", icon: Database },
-      { href: "/admin/import", label: "Import/Export", icon: Upload },
-      { href: "/admin/seo", label: "SEO", icon: Globe },
+      { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
       { href: "/admin/settings", label: "Podešavanja", icon: Settings },
     ],
   },
 ];
-
-// Flat list for compatibility
-const navItems = navSections.flatMap((s) => s.items);
 
 export default function AdminLayout({
   children,
@@ -74,10 +58,14 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  const userName = session?.user?.name || "Admin";
+  const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   const notifications = [
     { id: 1, text: "Nova porudžbina #1048", time: "Pre 5 min", unread: true },
@@ -159,12 +147,12 @@ export default function AdminLayout({
         <div className="p-4 border-t border-white/10">
           <div className={`flex items-center gap-3 ${sidebarOpen ? "" : "justify-center"}`}>
             <div className="w-9 h-9 rounded-full bg-[#8c4a5a] flex items-center justify-center text-[#2d2d2d] font-semibold text-sm flex-shrink-0">
-              AM
+              {userInitials}
             </div>
             {sidebarOpen && (
               <div className="min-w-0">
-                <p className="text-sm font-medium text-white truncate">Admin Korisnik</p>
-                <p className="text-xs text-white/40">Super Admin</p>
+                <p className="text-sm font-medium text-white truncate">{userName}</p>
+                <p className="text-xs text-white/40">Admin</p>
               </div>
             )}
           </div>
@@ -322,10 +310,10 @@ export default function AdminLayout({
                 className="flex items-center gap-2 p-2 hover:bg-[#f5f0e8] rounded-lg transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-[#8c4a5a] flex items-center justify-center text-white font-semibold text-xs">
-                  AM
+                  {userInitials}
                 </div>
                 <span className="hidden sm:block text-sm font-medium text-[#333]">
-                  Admin
+                  {userName}
                 </span>
                 <ChevronDown size={14} className="text-[#999]" />
               </button>
@@ -347,7 +335,7 @@ export default function AdminLayout({
                     Podešavanja
                   </Link>
                   <div className="border-t border-[#e0d8cc]">
-                    <button className="flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 w-full transition-colors">
+                    <button onClick={() => signOut({ callbackUrl: "/account/login" })} className="flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 w-full transition-colors">
                       <LogOut size={16} />
                       Odjavi se
                     </button>

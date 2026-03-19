@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import {
   Search,
   ShoppingBag,
@@ -112,6 +113,7 @@ export default function Header() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleResize = () => {
@@ -234,9 +236,9 @@ export default function Header() {
 
           {/* Icons - right (Kanva style: user, search, heart, cart) */}
           <div className="flex items-center gap-5">
-            <span className="hidden sm:block cursor-pointer hover:text-[#8c4a5a] transition-colors">
+            <Link href={session ? "/account" : "/account/login"} className="hidden sm:block hover:text-[#8c4a5a] transition-colors">
               <User className="w-5 h-5 text-[#2d2d2d]" />
-            </span>
+            </Link>
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#8c4a5a] transition-colors">
               <Search className="w-5 h-5 text-[#2d2d2d]" />
             </button>
