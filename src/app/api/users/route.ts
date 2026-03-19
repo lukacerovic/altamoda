@@ -1,0 +1,61 @@
+import { hash } from 'bcryptjs'
+import { prisma } from '@/lib/db'
+import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
+import { registerB2cSchema, registerB2bSchema } from '@/lib/validations/user'
+
+export const POST = withErrorHandler(async (req: Request) => {
+  const body = await req.json()
+  const isB2b = body.salonName || body.pib
+
+  const schema = isB2b ? registerB2bSchema : registerB2cSchema
+  const parsed = schema.safeParse(body)
+
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues?.[0]
+    return errorResponse(firstIssue?.message || 'Nevažeći podaci', 400)
+  }
+
+  const data = parsed.data as Record<string, string | undefined>
+
+  const existing = await prisma.user.findUnique({
+    where: { email: data.email as string },
+  })
+
+  if (existing) {
+    return errorResponse('Korisnik sa ovom email adresom već postoji', 409)
+  }
+
+  const passwordHash = await hash(data.password as string, 12)
+
+  const user = await prisma.user.create({
+    data: {
+      email: data.email as string,
+      passwordHash,
+      name: data.name as string,
+      phone: data.phone,
+      role: isB2b ? 'b2b' : 'b2c',
+      status: isB2b ? 'pending' : 'active',
+      ...(isB2b && data.salonName
+        ? {
+            b2bProfile: {
+              create: {
+                salonName: data.salonName as string,
+                pib: data.pib as string,
+                maticniBroj: data.maticniBroj as string,
+                address: data.address,
+              },
+            },
+          }
+        : {}),
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      status: true,
+    },
+  })
+
+  return successResponse(user, 201)
+})

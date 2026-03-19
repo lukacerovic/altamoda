@@ -1,0 +1,9 @@
+export const CURRENCY = 'RSD'
+export const CURRENCY_SYMBOL = 'RSD'
+export const FREE_SHIPPING_THRESHOLD = 5000
+export const ORDER_PREFIX = 'ALT'
+export const PAGINATION_DEFAULT_PAGE = 1
+export const PAGINATION_DEFAULT_LIMIT = 12
+export const PAGINATION_MAX_LIMIT = 100
+export const MIN_B2B_ORDER = 10000
+export const B2B_BULK_DISCOUNT = 15
