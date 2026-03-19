@@ -48,6 +48,13 @@ export const POST = withErrorHandler(async (req: Request) => {
   const rows = parseCsv(text)
 
   if (rows.length === 0) return errorResponse('CSV fajl je prazan ili ima neispravan format', 400)
+  if (rows.length > 10000) return errorResponse('Maksimalno 10.000 redova po importu', 400)
+
+  // Batch load brands and categories to avoid N+1
+  const allBrands = await prisma.brand.findMany({ select: { id: true, name: true } })
+  const allCategories = await prisma.category.findMany({ select: { id: true, nameLat: true } })
+  const brandMap = new Map(allBrands.map(b => [b.name.toLowerCase(), b.id]))
+  const categoryMap = new Map(allCategories.map(c => [c.nameLat.toLowerCase(), c.id]))
 
   let created = 0
   let updated = 0
@@ -68,22 +75,18 @@ export const POST = withErrorHandler(async (req: Request) => {
     }
 
     try {
-      // Find brand by name
+      // Find brand from pre-loaded map
       let brandId: string | null = null
       if (row.brand) {
-        const brand = await prisma.brand.findFirst({
-          where: { name: { contains: row.brand, mode: 'insensitive' } },
-        })
-        brandId = brand?.id || null
+        const key = row.brand.toLowerCase()
+        brandId = brandMap.get(key) || [...brandMap.entries()].find(([k]) => k.includes(key))?.[1] || null
       }
 
-      // Find category by name
+      // Find category from pre-loaded map
       let categoryId: string | null = null
       if (row.category) {
-        const category = await prisma.category.findFirst({
-          where: { nameLat: { contains: row.category, mode: 'insensitive' } },
-        })
-        categoryId = category?.id || null
+        const key = row.category.toLowerCase()
+        categoryId = categoryMap.get(key) || [...categoryMap.entries()].find(([k]) => k.includes(key))?.[1] || null
       }
 
       const existing = await prisma.product.findUnique({ where: { sku: row.sku } })

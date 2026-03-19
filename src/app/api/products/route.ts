@@ -15,7 +15,7 @@ export const GET = withErrorHandler(async (req: Request) => {
   // Filter params
   const category = searchParams.get('category')
   const brandSlugs = searchParams.getAll('brand')
-  const search = searchParams.get('search')
+  const search = searchParams.get('search')?.slice(0, 255)
   const sort = searchParams.get('sort') || 'popular'
   const priceMin = searchParams.get('priceMin')
   const priceMax = searchParams.get('priceMax')
@@ -71,11 +71,13 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   }
 
-  // Price range (uses B2C price for filtering)
+  // Price range — filter by the price the user actually sees
   if (priceMin || priceMax) {
-    where.priceB2c = {}
-    if (priceMin) where.priceB2c.gte = Number(priceMin)
-    if (priceMax) where.priceB2c.lte = Number(priceMax)
+    const priceField = role === 'b2b' ? 'priceB2b' : 'priceB2c'
+    const priceFilter: { gte?: number; lte?: number } = {}
+    if (priceMin) priceFilter.gte = Number(priceMin)
+    if (priceMax) priceFilter.lte = Number(priceMax)
+    where[priceField] = priceFilter
   }
 
   // Boolean filters

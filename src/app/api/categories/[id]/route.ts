@@ -1,12 +1,11 @@
 import { prisma } from '@/lib/db'
+import { getRouteParams } from '@/lib/route-utils'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 
 // GET /api/categories/[id]
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
-  const { id } = (context as { params: Promise<{ id: string }> }).params
-    ? await (context as { params: Promise<{ id: string }> }).params
-    : (context as { params: { id: string } }).params
+  const { id } = await getRouteParams<{ id: string }>(context)
 
   const category = await prisma.category.findUnique({
     where: { id },
@@ -23,9 +22,7 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
 // PUT /api/categories/[id]
 export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   await requireAdmin()
-  const { id } = (context as { params: Promise<{ id: string }> }).params
-    ? await (context as { params: Promise<{ id: string }> }).params
-    : (context as { params: { id: string } }).params
+  const { id } = await getRouteParams<{ id: string }>(context)
 
   const body = await req.json()
 
@@ -45,9 +42,7 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
 // DELETE /api/categories/[id] — soft delete
 export const DELETE = withErrorHandler(async (_req: Request, context: unknown) => {
   await requireAdmin()
-  const { id } = (context as { params: Promise<{ id: string }> }).params
-    ? await (context as { params: Promise<{ id: string }> }).params
-    : (context as { params: { id: string } }).params
+  const { id } = await getRouteParams<{ id: string }>(context)
 
   await prisma.category.update({
     where: { id },

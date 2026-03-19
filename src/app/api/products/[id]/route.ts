@@ -1,12 +1,11 @@
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
+import { getRouteParams } from '@/lib/route-utils'
 
 // GET /api/products/[id] — Full product detail
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
-  const { id } = (context as { params: Promise<{ id: string }> }).params
-    ? await (context as { params: Promise<{ id: string }> }).params
-    : (context as { params: { id: string } }).params
+  const { id } = await getRouteParams<{ id: string }>(context)
 
   const user = await getCurrentUser()
   const role = user?.role
@@ -60,8 +59,14 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     ...(role === 'b2c' ? { isProfessional: false } : {}),
   }
 
+  const relatedFallback = {
+    isActive: true,
+    id: { not: product.id },
+    ...(role === 'b2c' ? { isProfessional: false } : {}),
+  }
+
   const related = await prisma.product.findMany({
-    where: relatedWhere.OR.length > 0 ? relatedWhere : { isActive: true, id: { not: product.id } },
+    where: relatedWhere.OR.length > 0 ? relatedWhere : relatedFallback,
     include: {
       brand: { select: { name: true, slug: true } },
       images: { where: { isPrimary: true }, take: 1 },
@@ -97,9 +102,7 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
 // PUT /api/products/[id] — Update product (admin)
 export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   await requireAdmin()
-  const { id } = (context as { params: Promise<{ id: string }> }).params
-    ? await (context as { params: Promise<{ id: string }> }).params
-    : (context as { params: { id: string } }).params
+  const { id } = await getRouteParams<{ id: string }>(context)
 
   const body = await req.json()
 
@@ -160,9 +163,7 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
 // DELETE /api/products/[id] — Soft delete (admin)
 export const DELETE = withErrorHandler(async (_req: Request, context: unknown) => {
   await requireAdmin()
-  const { id } = (context as { params: Promise<{ id: string }> }).params
-    ? await (context as { params: Promise<{ id: string }> }).params
-    : (context as { params: { id: string } }).params
+  const { id } = await getRouteParams<{ id: string }>(context)
 
   await prisma.product.update({
     where: { id },
