@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useCartStore } from "@/lib/stores/cart-store";
+import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
   ShoppingBag, Heart, Star, ChevronRight, Minus, Plus, Truck,
   RotateCcw, Shield, Sparkles,
@@ -74,18 +76,28 @@ interface Props {
   product: Product;
   related: RelatedProduct[];
   userRole: string | null;
+  initialLiked?: boolean;
+  userExistingRating?: number | null;
 }
 
 const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop";
 
-export default function ProductDetailClient({ product, related, userRole }: Props) {
+export default function ProductDetailClient({ product, related, userRole, initialLiked = false, userExistingRating = null }: Props) {
+  const hasAlreadyReviewed = userExistingRating !== null;
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("opis");
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(initialLiked);
+  const [wishlistMessage, setWishlistMessage] = useState("");
   const [activeThumb, setActiveThumb] = useState(0);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+
+  const { addItem } = useCartStore();
+  const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
 
   const images = product.images.length > 0
     ? product.images.map(img => img.url)
@@ -106,6 +118,76 @@ export default function ProductDetailClient({ product, related, userRole }: Prop
     navigator.clipboard?.writeText(window.location.href);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const handleAddToCart = () => {
+    addItem({
+      productId: product.id,
+      name: product.nameLat,
+      brand: product.brand?.name ?? "",
+      price: product.price,
+      quantity,
+      image: images[0] ?? "",
+      sku: product.sku,
+      stockQuantity: product.stockQuantity,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleToggleWishlist = async () => {
+    const previousState = liked;
+    setLiked(!liked);
+    setWishlistMessage("");
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+      if (!res.ok) {
+        setLiked(previousState);
+        if (res.status === 401) {
+          setWishlistMessage("Prijavite se da biste dodali proizvode na listu želja.");
+          setTimeout(() => setWishlistMessage(""), 4000);
+        }
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        setLiked(data.data.added);
+        if (data.data.added) incWishlist();
+        else decWishlist();
+      }
+    } catch (err) {
+      console.error("Wishlist toggle failed:", err);
+      setLiked(previousState);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (reviewRating === 0) return;
+    setReviewSubmitting(true);
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, rating: reviewRating }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReviewSuccess(true);
+        setTimeout(() => {
+          setShowReviewForm(false);
+          setReviewSuccess(false);
+          setReviewRating(0);
+        }, 1500);
+      }
+    } catch (err) {
+      console.error("Review submission failed:", err);
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   return (
@@ -235,13 +317,30 @@ export default function ProductDetailClient({ product, related, userRole }: Prop
                 <span className="w-12 text-center font-medium">{quantity}</span>
                 <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors"><Plus className="w-4 h-4" /></button>
               </div>
-              <button disabled={product.stockQuantity === 0} className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                <ShoppingBag className="w-5 h-5" /> Dodaj u Korpu
+              <button
+                onClick={handleAddToCart}
+                disabled={product.stockQuantity === 0}
+                className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {addedToCart ? (
+                  <><CheckCircle className="w-5 h-5" /> Dodato!</>
+                ) : (
+                  <><ShoppingBag className="w-5 h-5" /> Dodaj u Korpu</>
+                )}
               </button>
-              <button onClick={() => setLiked(!liked)} className={`w-12 h-12 border rounded flex items-center justify-center transition-colors ${liked ? "border-[#c0392b] bg-red-50" : "border-gray-200 hover:border-[#8c4a5a]"}`}>
+              <button onClick={handleToggleWishlist} className={`w-12 h-12 border rounded flex items-center justify-center transition-colors ${liked ? "border-[#c0392b] bg-red-50" : "border-gray-200 hover:border-[#8c4a5a]"}`}>
                 <Heart className={`w-5 h-5 ${liked ? "fill-[#c0392b] text-[#c0392b]" : "text-gray-400"}`} />
               </button>
             </div>
+
+            {/* Wishlist message */}
+            {wishlistMessage && (
+              <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-700 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {wishlistMessage}
+                <Link href="/account/login" className="ml-auto text-[#8c4a5a] font-medium hover:underline whitespace-nowrap">Prijavite se</Link>
+              </div>
+            )}
 
             {/* Share */}
             <div className="flex items-center gap-3 mb-6">
@@ -302,9 +401,18 @@ export default function ProductDetailClient({ product, related, userRole }: Prop
                     <span className="text-lg font-bold text-[#2d2d2d]">{product.rating.toFixed(1)}</span>
                     <span className="text-sm text-gray-500"> / 5 ({product.reviewCount} recenzija)</span>
                   </div>
-                  <button onClick={() => setShowReviewForm(true)} className="px-4 py-2 bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium rounded transition-colors flex items-center gap-2">
-                    <Star className="w-4 h-4" /> Oceni proizvod
-                  </button>
+                  {hasAlreadyReviewed ? (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-[#faf7f2] text-sm text-[#2d2d2d] rounded border border-[#e0d8cc]">
+                      <span className="text-gray-500">Vaša ocena:</span>
+                      <div className="flex items-center gap-0.5">
+                        {[1,2,3,4,5].map((s) => <Star key={s} className={`w-4 h-4 ${s <= userExistingRating! ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200"}`} />)}
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowReviewForm(true)} className="px-4 py-2 bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium rounded transition-colors flex items-center gap-2">
+                      <Star className="w-4 h-4" /> Oceni proizvod
+                    </button>
+                  )}
                 </div>
                 {product.reviews.length === 0 ? (
                   <p className="text-gray-500 text-sm">Nema recenzija za ovaj proizvod. Budite prvi!</p>
@@ -362,27 +470,41 @@ export default function ProductDetailClient({ product, related, userRole }: Prop
               <button onClick={() => setShowReviewForm(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-gray-400 hover:text-gray-600" /></button>
               <h3 className="text-xl font-bold text-[#2d2d2d] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>Oceni proizvod</h3>
               <p className="text-sm text-gray-500 mb-6">{product.nameLat}</p>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Vaša ocena</label>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} onClick={() => setReviewRating(star)} className="p-1">
-                        <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200 hover:text-[#8c4a5a]"}`} />
-                      </button>
-                    ))}
-                    {reviewRating > 0 && <span className="text-sm text-gray-500 ml-2">{reviewRating}/5</span>}
-                  </div>
+
+              {reviewSuccess ? (
+                <div className="text-center py-8">
+                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                  <p className="text-lg font-semibold text-[#2d2d2d]">Hvala na oceni!</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fotografija (opciono)</label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-[#8c4a5a] transition-colors cursor-pointer">
-                    <Camera className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Kliknite da dodate fotografiju</p>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Vaša ocena</label>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button key={star} onClick={() => setReviewRating(star)} className="p-1">
+                          <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200 hover:text-[#8c4a5a]"}`} />
+                        </button>
+                      ))}
+                      {reviewRating > 0 && <span className="text-sm text-gray-500 ml-2">{reviewRating}/5</span>}
+                    </div>
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Fotografija (opciono)</label>
+                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-[#8c4a5a] transition-colors cursor-pointer">
+                      <Camera className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Kliknite da dodate fotografiju</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={reviewRating === 0 || reviewSubmitting}
+                    className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors disabled:opacity-50"
+                  >
+                    {reviewSubmitting ? "Slanje..." : "Pošalji recenziju"}
+                  </button>
                 </div>
-                <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors">Pošalji recenziju</button>
-              </div>
+              )}
             </div>
           </div>
         </>

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { ZodError } from 'zod'
 import { PAGINATION_DEFAULT_LIMIT, PAGINATION_DEFAULT_PAGE, PAGINATION_MAX_LIMIT } from './constants'
 
 export class ApiError extends Error {
@@ -40,6 +41,11 @@ export function withErrorHandler(
     } catch (error) {
       if (error instanceof ApiError) {
         return errorResponse(error.message, error.statusCode)
+      }
+      if (error instanceof ZodError) {
+        const issues = error.issues ?? error.errors ?? []
+        const message = issues.map((e: { message: string }) => e.message).join(', ')
+        return errorResponse(message || 'Validation error', 400)
       }
       console.error('API Error:', error)
       return errorResponse('Internal server error', 500)

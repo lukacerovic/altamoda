@@ -2,67 +2,53 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useCartStore } from "@/lib/stores/cart-store";
+import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
-  ShoppingBag, Trash2, Minus, Plus, ChevronRight, Tag,
-  Sparkles, Truck, Shield, Star,
-  CheckCircle, XCircle, FileText, Save, MessageSquare, Store,
+  ShoppingBag, Trash2, Minus, Plus, ChevronRight,
+  Truck, Shield, Star,
+  CheckCircle, FileText, Save, MessageSquare, Store, Sparkles,
 } from "lucide-react";
 
-const initialItems = [
-  { id: 1, brand: "L'Oreal", name: "Majirel 7.0 Srednje Plava", price: 890, quantity: 3, image: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=200&h=200&fit=crop" },
-  { id: 2, brand: "Kerastase", name: "Elixir Ultime Serum 100ml", price: 3200, quantity: 1, image: "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=200&h=200&fit=crop" },
-  { id: 3, brand: "Olaplex", name: "No.3 Hair Perfector 100ml", price: 2850, quantity: 2, image: "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?w=200&h=200&fit=crop" },
-];
-
 const recommended = [
-  { id: 5, brand: "L'Oreal", name: "Oxydant Creme 6% 1000ml", price: 1200, rating: 5, image: "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?w=500&h=500&fit=crop" },
-  { id: 6, brand: "Kerastase", name: "Nutritive Bain Satin", price: 3400, rating: 4, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop" },
-  { id: 7, brand: "Olaplex", name: "No.4 Bond Šampon 250ml", price: 3600, rating: 5, image: "https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&h=500&fit=crop" },
-  { id: 8, brand: "Moroccanoil", name: "Treatment Original 100ml", price: 4200, rating: 4, image: "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=500&h=500&fit=crop" },
+  { id: "5", brand: "L'Oreal", name: "Oxydant Creme 6% 1000ml", price: 1200, rating: 5, image: "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?w=500&h=500&fit=crop" },
+  { id: "6", brand: "Kerastase", name: "Nutritive Bain Satin", price: 3400, rating: 4, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop" },
+  { id: "7", brand: "Olaplex", name: "No.4 Bond Šampon 250ml", price: 3600, rating: 5, image: "https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&h=500&fit=crop" },
+  { id: "8", brand: "Moroccanoil", name: "Treatment Original 100ml", price: 4200, rating: 4, image: "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=500&h=500&fit=crop" },
 ];
 
 export default function CartPage() {
-  const [items, setItems] = useState(initialItems);
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [promoError, setPromoError] = useState(false);
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { items, updateQuantity, removeItem, getTotal } = useCartStore();
   const [deliveryMethod, setDeliveryMethod] = useState("standard");
   const [b2bNoOnlinePayment, setB2bNoOnlinePayment] = useState(false);
   const [b2bInvoice, setB2bInvoice] = useState(false);
   const [orderNotes, setOrderNotes] = useState("");
   const [savedNotice, setSavedNotice] = useState(false);
 
-  const updateQty = (id: number, delta: number) => {
-    setItems(items.map((item) => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
-  };
-  const removeItem = (id: number) => setItems(items.filter((item) => item.id !== id));
-
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const promoDiscount = promoApplied ? Math.round(subtotal * 0.1) : 0;
+  const isB2b = session?.user?.role === "b2b";
+  const subtotal = getTotal();
 
   const deliveryOptions = [
-    { key: "standard", label: "Standardna dostava (2-4 dana)", price: subtotal > 5000 ? 0 : 350, note: subtotal > 5000 ? "Besplatno za porudzbine preko 5.000 RSD" : "350 RSD" },
+    { key: "standard", label: "Standardna dostava (2-4 dana)", price: subtotal > FREE_SHIPPING_THRESHOLD ? 0 : 350, note: subtotal > FREE_SHIPPING_THRESHOLD ? "Besplatno za porudzbine preko 5.000 RSD" : "350 RSD" },
     { key: "express", label: "Ekspres dostava (1 dan)", price: 690, note: "690 RSD" },
     { key: "pickup", label: "Preuzimanje u prodavnici", price: 0, note: "Besplatno" },
   ];
 
   const selectedDelivery = deliveryOptions.find((d) => d.key === deliveryMethod)!;
   const shipping = selectedDelivery.price;
-  const total = subtotal - promoDiscount + shipping;
-
-  const handleApplyPromo = () => {
-    if (promoCode.toUpperCase() === "POPUST10") {
-      setPromoApplied(true);
-      setPromoError(false);
-    } else if (promoCode) {
-      setPromoApplied(false);
-      setPromoError(true);
-    }
-  };
+  const total = subtotal + shipping;
 
   const handleSaveCart = () => {
     setSavedNotice(true);
     setTimeout(() => setSavedNotice(false), 3000);
+  };
+
+  const handleCheckout = () => {
+    router.push("/checkout");
   };
 
   return (
@@ -86,9 +72,9 @@ export default function CartPage() {
             {/* CART ITEMS */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm p-4 md:p-6 flex gap-4">
+                <div key={item.productId} className="bg-white rounded-lg shadow-sm p-4 md:p-6 flex gap-4">
                   <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -96,13 +82,13 @@ export default function CartPage() {
                         <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{item.brand}</span>
                         <h3 className="text-sm md:text-base font-medium text-[#2d2d2d] mt-1">{item.name}</h3>
                       </div>
-                      <button onClick={() => removeItem(item.id)} className="text-gray-400 hover:text-[#c0392b] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => removeItem(item.productId)} className="text-gray-400 hover:text-[#c0392b] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center border border-gray-200 rounded">
-                        <button onClick={() => updateQty(item.id, -1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Minus className="w-3 h-3" /></button>
+                        <button onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Minus className="w-3 h-3" /></button>
                         <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
-                        <button onClick={() => updateQty(item.id, 1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Plus className="w-3 h-3" /></button>
+                        <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Plus className="w-3 h-3" /></button>
                       </div>
                       <span className="font-bold text-[#2d2d2d]">{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
                     </div>
@@ -125,33 +111,35 @@ export default function CartPage() {
                       </span>
                     </label>
                   ))}
-                  {deliveryMethod === "standard" && subtotal > 5000 && (
+                  {deliveryMethod === "standard" && subtotal > FREE_SHIPPING_THRESHOLD && (
                     <p className="text-xs text-green-600 flex items-center gap-1 ml-7"><CheckCircle className="w-3 h-3" /> Besplatna dostava za porudzbine preko 5.000 RSD</p>
                   )}
                 </div>
               </div>
 
-              {/* B2B Options Box */}
-              <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-[#8c4a5a]">
-                <h3 className="text-sm font-semibold text-[#8c4a5a] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> B2B Opcije</h3>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
-                    <span className="text-sm text-[#2d2d2d]">Naruci bez online placanja</span>
-                  </label>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-[#2d2d2d]">Placanje po fakturi</span>
+              {/* B2B Options Box — only for B2B users */}
+              {isB2b && (
+                <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-[#8c4a5a]">
+                  <h3 className="text-sm font-semibold text-[#8c4a5a] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> B2B Opcije</h3>
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
+                      <span className="text-sm text-[#2d2d2d]">Naruci bez online placanja</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-[#2d2d2d]">Placanje po fakturi</span>
+                      </div>
+                    </label>
+                    <div className="bg-[#faf7f2] rounded p-3 text-xs text-gray-600 flex items-start gap-2">
+                      <Store className="w-4 h-4 text-[#8c4a5a] flex-shrink-0 mt-0.5" />
+                      <span>Minimalni iznos B2B porudzbine: <strong className="text-[#2d2d2d]">{MIN_B2B_ORDER.toLocaleString("sr-RS")} RSD</strong></span>
                     </div>
-                  </label>
-                  <div className="bg-[#faf7f2] rounded p-3 text-xs text-gray-600 flex items-start gap-2">
-                    <Store className="w-4 h-4 text-[#8c4a5a] flex-shrink-0 mt-0.5" />
-                    <span>Minimalni iznos B2B porudzbine: <strong className="text-[#2d2d2d]">10.000 RSD</strong></span>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Order Notes */}
               <div className="bg-white rounded-lg shadow-sm p-6">
@@ -174,7 +162,6 @@ export default function CartPage() {
                 </button>
               </div>
 
-              {/* Save confirmation */}
               {savedNotice && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2 text-sm text-green-700">
                   <CheckCircle className="w-4 h-4" /> Korpa je sacuvana! Mozete joj pristupiti sa bilo kog uredjaja.
@@ -190,38 +177,13 @@ export default function CartPage() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between"><span className="text-gray-500">Medjuzbir</span><span className="font-medium">{subtotal.toLocaleString("sr-RS")} RSD</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Dostava ({selectedDelivery.label.split("(")[0].trim()})</span><span className="font-medium">{shipping === 0 ? "Besplatno" : `${shipping} RSD`}</span></div>
-                  {promoApplied && <div className="flex justify-between text-green-600"><span>Popust (10%)</span><span>-{promoDiscount.toLocaleString("sr-RS")} RSD</span></div>}
-                </div>
-
-                {/* Promo code */}
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input type="text" value={promoCode} onChange={(e) => { setPromoCode(e.target.value); setPromoError(false); }} placeholder="Promo kod" className="w-full border border-gray-200 rounded pl-9 pr-3 py-2.5 text-sm" />
-                    </div>
-                    <button onClick={handleApplyPromo} className="px-4 py-2.5 border border-[#8c4a5a] text-[#8c4a5a] rounded text-sm font-medium hover:bg-[#8c4a5a] hover:text-white transition-colors">Primeni</button>
-                  </div>
-                  {/* Promo validation states */}
-                  {promoApplied && (
-                    <div className="mt-2 flex items-center gap-2 text-green-600 text-xs">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Kod POPUST10 primenjen! Usteda: {promoDiscount.toLocaleString("sr-RS")} RSD</span>
-                    </div>
-                  )}
-                  {promoError && (
-                    <div className="mt-2 flex items-center gap-2 text-red-500 text-xs">
-                      <XCircle className="w-4 h-4" />
-                      <span>Kod nije validan ili je istekao</span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="flex justify-between text-lg font-bold"><span>Ukupno</span><span>{total.toLocaleString("sr-RS")} RSD</span></div>
                 </div>
 
-                <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2">
+                <button onClick={handleCheckout} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2">
                   Nastavi na placanje <ChevronRight className="w-4 h-4" />
                 </button>
 
@@ -230,7 +192,6 @@ export default function CartPage() {
                   <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#8c4a5a]" /> Sigurno online placanje</div>
                 </div>
 
-                {/* Payment badges */}
                 <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
                   {["Visa", "Mastercard", "PayPal", "Pouzece"].map((p) => (
                     <span key={p} className="px-2 py-1 bg-gray-50 rounded text-[10px] text-gray-400 font-medium">{p}</span>
@@ -259,7 +220,6 @@ export default function CartPage() {
           </div>
         </section>
       </div>
-
     </div>
   );
 }

@@ -5,10 +5,12 @@ import Link from "next/link";
 import {
   Search, Heart, Star, SlidersHorizontal,
   ChevronDown, ChevronRight, Grid3X3, LayoutList,
-  X, ArrowUpDown,
+  X, ArrowUpDown, ShoppingBag, CheckCircle,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useCartStore } from "@/lib/stores/cart-store";
+import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
 /* ─── Types ─── */
 interface ProductBrand {
@@ -98,6 +100,7 @@ interface ProductsPageClientProps {
   categories: CategoryNode[];
   attributes: AttributeFilter[];
   userRole: string | null;
+  wishlistedProductIds?: string[];
 }
 
 /* ─── Helpers ─── */
@@ -114,10 +117,56 @@ function getBadge(product: Product): string | null {
 }
 
 /* ─── ProductCard ─── */
-function ProductCard({ product }: { product: Product }) {
-  const [liked, setLiked] = useState(false);
+function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted?: boolean }) {
+  const [liked, setLiked] = useState(isWishlisted ?? false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addItem } = useCartStore();
+  const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
   const badge = getBadge(product);
   const imgSrc = product.image || PLACEHOLDER_IMG;
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const prev = liked;
+    setLiked(!liked);
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+      if (!res.ok) {
+        setLiked(prev);
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        setLiked(data.data.added);
+        if (data.data.added) incWishlist();
+        else decWishlist();
+      }
+    } catch {
+      setLiked(prev);
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand?.name ?? "",
+      price: product.price,
+      quantity: 1,
+      image: product.image ?? "",
+      sku: product.sku,
+      stockQuantity: product.stockQuantity,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 1500);
+  };
 
   return (
     <Link href={`/products/${product.slug}`} className="group bg-white rounded-2xl overflow-hidden border border-transparent hover:border-[#e0d8cc] hover:shadow-sm transition-all flex flex-col">
@@ -135,12 +184,12 @@ function ProductCard({ product }: { product: Product }) {
             <span className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-[#2d2d2d]/80 text-white backdrop-blur-sm">PRO</span>
           )}
         </div>
-        <button onClick={(e) => { e.preventDefault(); setLiked(!liked); }} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
+        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
           <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#999]"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#2d2d2d] hover:bg-[#2d2d2d] text-white text-sm font-medium py-2.5 rounded-xl transition-colors">
-            Dodaj u korpu
+          <button onClick={handleAddToCart} className={`w-full text-white text-sm font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 ${addedToCart ? "bg-green-600" : "bg-[#2d2d2d] hover:bg-[#1a1a1a]"}`}>
+            {addedToCart ? <><CheckCircle className="w-4 h-4" /> Dodato!</> : <><ShoppingBag className="w-4 h-4" /> Dodaj u korpu</>}
           </button>
         </div>
       </div>
@@ -277,7 +326,9 @@ export default function ProductsPageClient({
   categories,
   attributes,
   userRole,
+  wishlistedProductIds = [],
 }: ProductsPageClientProps) {
+  const wishlistedSet = new Set(wishlistedProductIds);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
   const [loading, setLoading] = useState(false);
@@ -747,7 +798,7 @@ export default function ProductsPageClient({
             {!loading && (
               <div className={gridView ? "grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5" : "space-y-3"}>
                 {products.map((p) => gridView ? (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
                 ) : (
                   <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-white rounded-2xl border border-transparent hover:border-[#e8e2d9] hover:shadow-sm transition-all overflow-hidden group">
                     <div className="w-36 h-36 bg-[#faf7f3] flex-shrink-0 relative overflow-hidden">
