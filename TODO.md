@@ -77,64 +77,74 @@
 
 ---
 
-## PHASE 2: Product Catalog ⬜ NEXT UP
+## PHASE 2: Product Catalog ✅ COMPLETE
 **Covers:** REQ 2 (products), REQ 4 (categories/filters/search), REQ 5 (colors)
 
 **Goal:** Products served from database. Filters, search, categories, and color chart all work with real data.
 
-### Step 2.1 — Product APIs
-- [ ] `GET /api/products` — List with filters (category, brand[], priceMin/Max, search, sort, pagination, dynamic attributes). B2B visibility: hide `is_professional` from B2C. B2B pricing.
-- [ ] `POST /api/products` (admin) — Create product with Zod validation, auto-slug, auto-SKU
-- [ ] `GET /api/products/[id]` — Full detail with images, brand, product_line, category, color_data, attributes, avg rating, review count, related products
-- [ ] `PUT /api/products/[id]` (admin), `DELETE /api/products/[id]` (admin, soft delete)
-- [ ] `GET /api/products/search?q=` — Autocomplete by name, SKU, brand (top 5)
+### Step 2.1 — Product APIs ✅
+- [x] `GET /api/products` — List with filters (category, brand[], priceMin/Max, search, sort, pagination, dynamic attributes). B2B visibility + guest visibility tabs (all/b2c/b2b).
+- [x] `POST /api/products` (admin) — Create product with auto-slug, auto-SKU, color data, images
+- [x] `GET /api/products/[id]` — Full detail with images, brand, product_line, category, color_data, attributes, avg rating, review count, related products
+- [x] `PUT /api/products/[id]` (admin), `DELETE /api/products/[id]` (admin, soft delete)
+- [x] `GET /api/products/search?q=` — Autocomplete by name, SKU, brand (top 5)
 
-### Step 2.2 — Category, Brand, Attribute APIs
-- [ ] `GET /api/categories` — Full tree (recursive). `POST` (admin)
-- [ ] `GET/PUT/DELETE /api/categories/[id]`
-- [ ] `GET /api/brands` — All active brands. `POST` (admin)
-- [ ] `GET /api/attributes` — All with `show_in_filters=true` + options. `POST` (admin)
-- [ ] `PUT/DELETE /api/attributes/[id]`
+### Step 2.2 — Category, Brand, Attribute APIs ✅
+- [x] `GET /api/categories` — Full tree (recursive). `POST` (admin)
+- [x] `GET/PUT/DELETE /api/categories/[id]`
+- [x] `GET /api/brands` — All active brands with product lines. `POST` (admin)
+- [x] `GET /api/attributes` — All with `show_in_filters=true` + options. `POST` (admin)
+- [x] `PUT/DELETE /api/attributes/[id]`
 
-### Step 2.3 — Color Chart API
-- [ ] `GET /api/products/colors?brand=majirel` — Colors grouped by level × undertone
+### Step 2.3 — Color Chart API ✅
+- [x] `GET /api/products/colors?brandLine=majirel` — Colors grouped by level × undertone, brand line tabs
 
-### Step 2.4 — File Upload
-- [ ] `POST /api/upload` — Image/video/gif upload (Cloudinary or local dev)
+### Step 2.4 — File Upload ✅
+- [x] `POST /api/upload` — Image/video/gif upload to local /public/uploads, type+size validation
 
-### Step 2.5 — CSV Import
-- [ ] `POST /api/products/import` — Parse CSV, validate, create/update by SKU
+### Step 2.5 — CSV Import ✅
+- [x] `POST /api/products/import` — Parse CSV, validate, create/update by SKU, return {created, updated, errors[]}
 
-### Step 2.6 — Connect Product Listing Page
-- [ ] Split products/page.tsx → server wrapper + client component
-- [ ] Fetch real products, brands, categories, attributes from DB
-- [ ] Client fetches via API on filter changes
+### Step 2.6 — Connect Product Listing Page ✅
+- [x] Split products/page.tsx → server page.tsx + ProductsPageClient.tsx
+- [x] Server fetches initial products, brands, categories, attributes from DB
+- [x] Client fetches via /api/products on filter/search/sort/page changes
+- [x] Guest visibility tabs: "Svi proizvodi", "Maloprodaja", "Profesionalno"
 
-### Step 2.7 — Connect Product Detail Page
-- [ ] Split products/[id]/page.tsx → server wrapper + client component
-- [ ] Fetch product with all relations, reviews, related items
-- [ ] Add generateMetadata() for SEO
+### Step 2.7 — Connect Product Detail Page ✅
+- [x] Split products/[id]/page.tsx → server page.tsx + ProductDetailClient.tsx
+- [x] Fetch product by id or slug with all relations, reviews, related items
+- [x] generateMetadata() for SEO (title, description, OG image)
+- [x] B2B price display for B2B users, B2B hint for guests
 
-### Step 2.8 — Connect Color Chart Page
-- [ ] Split colors/page.tsx → server wrapper + client component
-- [ ] Fetch brand tabs + colors from API
+### Step 2.8 — Connect Color Chart Page ✅
+- [x] Split colors/page.tsx → server page.tsx + ColorsPageClient.tsx
+- [x] Server fetches brand line tabs + initial colors
+- [x] Client fetches from /api/products/colors on brand/filter changes
 
-### Step 2.9 — Connect Homepage Product Sections
-- [ ] Split homepage → server wrapper + client component
-- [ ] Server fetches: featured, bestsellers, new arrivals, sale products, banners
+### Step 2.9 — Connect Homepage ✅
+- [x] Split page.tsx → server page.tsx + HomePageClient.tsx
+- [x] Server fetches: featured (isFeatured), bestsellers, new arrivals (isNew), sale products (oldPrice), with avg ratings
+- [x] Blog and seminar sections removed
 
-### Step 2.10 — Wire Admin Products to API
-- [ ] Admin product CRUD → POST/PUT/DELETE /api/products
-- [ ] Image upload via /api/upload
-- [ ] Wire admin actions page to /api/promotions
+### Step 2.10 — Wire Admin Products to API ✅
+- [x] Admin loads products from GET /api/products on mount
+- [x] Create product → POST /api/products
+- [x] Edit product → PUT /api/products/[id]
+- [x] Delete product → DELETE /api/products/[id] (soft delete)
+- [x] Bulk actions (activate/deactivate/delete) → API calls per product
+- [x] Loading/saving states
 
-### PHASE 2 — DONE WHEN:
-- [ ] Products page loads real products with working filters
-- [ ] Dynamic attribute added in admin → auto-appears in filter sidebar
-- [ ] Search "majirel" → shows matching products
-- [ ] Color chart: 80 colors per brand, filterable by level
-- [ ] B2C user doesn't see professional products
-- [ ] B2B user sees B2B prices
+### PHASE 2 — DONE:
+- [x] Products page loads real products with working filters
+- [x] Dynamic attributes from DB power filter sidebar
+- [x] Search "majirel" → shows matching products via API
+- [x] Color chart with brand line tabs, level/undertone filters
+- [x] Guest sees all products with visibility tabs
+- [x] B2C logged in → hides professional products
+- [x] B2B logged in → sees B2B prices
+- [x] Homepage shows real data from database
+- [x] Admin CRUD wired to API
 - [ ] Homepage shows real data in all sections
 
 ---

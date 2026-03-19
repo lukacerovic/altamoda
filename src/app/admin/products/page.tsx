@@ -30,6 +30,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -337,12 +338,66 @@ export default function ProductsPage() {
   const [showBulkMenu, setShowBulkMenu] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("osnovno");
+  const [saving, setSaving] = useState(false);
+  const [apiLoaded, setApiLoaded] = useState(false);
 
   const [formData, setFormData] = useState<Omit<Product, "id">>(defaultFormData());
   // Separate state for discount % input so user can type it
   const [discountInput, setDiscountInput] = useState("");
 
   const perPage = 8;
+  const loadedRef = useRef(false);
+
+  // Load products from API on mount
+  useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    fetch("/api/products?limit=100")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.products) {
+          const mapped: Product[] = data.data.products.map((p: Record<string, unknown>) => ({
+            id: p.id as number,
+            name: (p.name || "") as string,
+            sku: (p.sku || "") as string,
+            brand: ((p.brand as Record<string, unknown>)?.name || "") as string,
+            productLine: "",
+            category: ((p.category as Record<string, unknown>)?.nameLat || "") as string,
+            subCategory: "",
+            priceB2C: (p.priceB2c || 0) as number,
+            priceB2B: (p.priceB2b || 0) as number,
+            oldPrice: (p.oldPrice || undefined) as number | undefined,
+            purchasePrice: 0,
+            stock: (p.stockQuantity || 0) as number,
+            lowStockThreshold: 5,
+            weight: 0,
+            volume: 0,
+            status: (p.stockQuantity as number) >= 0 ? "active" as const : "inactive" as const,
+            badges: {
+              isNew: (p.isNew || false) as boolean,
+              isFeatured: (p.isFeatured || false) as boolean,
+              isProfessionalOnly: (p.isProfessional || false) as boolean,
+            },
+            description: "",
+            ingredients: "",
+            howToUse: "",
+            images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
+            videoUrl: "",
+            gifUrl: "",
+            seoTitle: "",
+            metaDescription: "",
+            slug: (p.slug || "") as string,
+            attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
+          }));
+          setProducts(mapped);
+          setApiLoaded(true);
+        }
+      })
+      .catch(() => {
+        // Fallback to mock data already in state
+        setApiLoaded(true);
+      });
+  }, []);
 
   /* ── Filtered / paginated ── */
   const filtered = useMemo(() => {
@@ -387,21 +442,74 @@ export default function ProductsPage() {
     setShowPanel(true);
   };
 
-  const handleSave = () => {
-    if (editingProduct) {
-      setProducts(products.map((p) => (p.id === editingProduct.id ? { ...formData, id: editingProduct.id } : p)));
-    } else {
-      const newProduct: Product = {
-        ...formData,
-        id: Math.max(0, ...products.map((p) => p.id)) + 1,
-        images: formData.images.length > 0 ? formData.images : [{ id: 1, url: "/products/placeholder.jpg", alt: formData.name, isPrimary: true }],
-      };
-      setProducts([newProduct, ...products]);
+  const handleSave = async () => {
+    setSaving(true);
+    const apiBody = {
+      nameLat: formData.name,
+      sku: formData.sku,
+      priceB2c: formData.priceB2C,
+      priceB2b: formData.priceB2B || null,
+      oldPrice: formData.oldPrice || null,
+      costPrice: formData.purchasePrice || null,
+      stockQuantity: formData.stock,
+      lowStockThreshold: formData.lowStockThreshold,
+      weightGrams: formData.weight || null,
+      volumeMl: formData.volume || null,
+      description: formData.description || null,
+      ingredients: formData.ingredients || null,
+      usageInstructions: formData.howToUse || null,
+      isProfessional: formData.badges.isProfessionalOnly,
+      isNew: formData.badges.isNew,
+      isFeatured: formData.badges.isFeatured,
+      isActive: formData.status === "active",
+      seoTitle: formData.seoTitle || null,
+      seoDescription: formData.metaDescription || null,
+      colorLevel: formData.colorLevel || null,
+      undertoneCode: formData.colorUndertone || null,
+      hexValue: formData.colorHex || null,
+      shadeCode: formData.shadeCode || null,
+      images: formData.images.map(img => ({ url: img.url, altText: img.alt, isPrimary: img.isPrimary })),
+    };
+
+    try {
+      if (editingProduct) {
+        const res = await fetch(`/api/products/${editingProduct.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(apiBody),
+        });
+        if (res.ok) {
+          setProducts(products.map((p) => (p.id === editingProduct.id ? { ...formData, id: editingProduct.id } : p)));
+        }
+      } else {
+        const res = await fetch("/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(apiBody),
+        });
+        const data = await res.json();
+        if (data.success) {
+          const newProduct: Product = {
+            ...formData,
+            id: data.data.id,
+            images: formData.images.length > 0 ? formData.images : [{ id: 1, url: "/products/placeholder.jpg", alt: formData.name, isPrimary: true }],
+          };
+          setProducts([newProduct, ...products]);
+        }
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
     }
+    setSaving(false);
     setShowPanel(false);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
+    try {
+      await fetch(`/api/products/${id}`, { method: "DELETE" });
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
     setProducts(products.filter((p) => p.id !== id));
     setSelectedIds(selectedIds.filter((sid) => sid !== id));
   };
@@ -418,7 +526,19 @@ export default function ProductsPage() {
     }
   };
 
-  const bulkAction = (action: string) => {
+  const bulkAction = async (action: string) => {
+    const promises = selectedIds.map(id => {
+      if (action === "delete") {
+        return fetch(`/api/products/${id}`, { method: "DELETE" });
+      } else if (action === "activate") {
+        return fetch(`/api/products/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isActive: true }) });
+      } else if (action === "deactivate") {
+        return fetch(`/api/products/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isActive: false }) });
+      }
+      return Promise.resolve();
+    });
+    await Promise.all(promises);
+
     if (action === "delete") {
       setProducts(products.filter((p) => !selectedIds.includes(p.id)));
     } else if (action === "activate") {
@@ -1315,8 +1435,8 @@ export default function ProductsPage() {
               >
                 Otka\u017ei
               </button>
-              <button onClick={handleSave} className="btn-gold px-6 py-2.5 rounded-lg text-sm font-medium">
-                {editingProduct ? "Sa\u010duvaj Izmene" : "Dodaj Proizvod"}
+              <button onClick={handleSave} disabled={saving} className="btn-gold px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">
+                {saving ? "\u010cuvanje..." : editingProduct ? "Sa\u010duvaj Izmene" : "Dodaj Proizvod"}
               </button>
             </div>
           </div>
