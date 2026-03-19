@@ -142,5 +142,21 @@ export default async function ProductDetailPage({ params }: PageProps) {
     isProfessional: r.isProfessional,
   }))
 
-  return <ProductDetailClient product={serialized} related={related} userRole={role} />
+  // Check if user has this product in wishlist + already reviewed
+  let isInWishlist = false
+  let userExistingRating: number | null = null
+  if (session?.user?.id) {
+    const [wishlistEntry, existingReview] = await Promise.all([
+      prisma.wishlist.findUnique({
+        where: { userId_productId: { userId: session.user.id as string, productId: product.id } },
+      }),
+      prisma.review.findUnique({
+        where: { productId_userId: { productId: product.id, userId: session.user.id as string } },
+      }),
+    ])
+    isInWishlist = !!wishlistEntry
+    userExistingRating = existingReview?.rating ?? null
+  }
+
+  return <ProductDetailClient product={serialized} related={related} userRole={role} initialLiked={isInWishlist} userExistingRating={userExistingRating} />
 }

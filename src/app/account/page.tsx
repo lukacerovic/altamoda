@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -20,12 +20,7 @@ const recentOrders = [
   { id: "ALT-2026-0285", date: "22. feb 2026", items: 12, total: "56.800 RSD", status: "Isporučeno", statusColor: "bg-green-100 text-green-700" },
 ];
 
-const wishlistItems = [
-  { id: 1, name: "Absolut Repair Šampon 300ml", brand: "L'Oréal", price: "2.790 RSD", oldPrice: "3.490 RSD", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200" },
-  { id: 2, name: "No.3 Hair Perfector 100ml", brand: "Olaplex", price: "3.290 RSD", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200" },
-  { id: 3, name: "Elixir Ultime Ulje 100ml", brand: "Kérastase", price: "3.490 RSD", oldPrice: "4.590 RSD", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200" },
-  { id: 4, name: "Oil Reflections Ulje 100ml", brand: "Wella", price: "2.290 RSD", oldPrice: "2.990 RSD", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200" },
-];
+// wishlist items are now fetched from API dynamically
 
 const loyaltyLevels = [
   { name: "Bronzani", min: 0, max: 1000, benefits: ["5% popust na sve proizvode", "Besplatna dostava preko 7.000 RSD", "Pristup newsletter promocijama"] },
@@ -121,10 +116,34 @@ function OrdersSection({ onRepeat }: { onRepeat: (id: string) => void }) {
 }
 
 function WishlistSection() {
+  const [wishlistItems, setWishlistItems] = useState<{
+    productId: string; name: string; brand: string; price: number; oldPrice: number | null; image: string; slug: string; inStock: boolean;
+  }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/wishlist")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setWishlistItems(data.data.items);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Lista Želja</h1>
-      {wishlistItems.length === 0 ? (
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-[#2d2d2d]" style={{ fontFamily: "'Playfair Display', serif" }}>Lista Želja</h1>
+        <Link href="/wishlist" className="text-sm text-[#8c4a5a] hover:text-[#6e3848] font-medium flex items-center gap-1">
+          Pogledaj sve <ChevronRight className="w-4 h-4" />
+        </Link>
+      </div>
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <p className="text-sm text-gray-500">Učitavanje...</p>
+        </div>
+      ) : wishlistItems.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm p-12 text-center">
           <Heart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-[#2d2d2d] mb-2">Lista želja je prazna</h3>
@@ -134,23 +153,27 @@ function WishlistSection() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {wishlistItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden group">
+            <Link key={item.productId} href={`/products/${item.slug}`} className="bg-white rounded-lg shadow-sm overflow-hidden group">
               <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <button className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:bg-red-50 transition-colors">
+                {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />}
+                <div className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
                   <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-                </button>
+                </div>
+                {!item.inStock && (
+                  <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                    <span className="px-4 py-2 bg-[#333] text-white text-xs font-semibold rounded-full">Nema na lageru</span>
+                  </div>
+                )}
               </div>
               <div className="p-4">
                 <span className="text-xs text-gray-400">{item.brand}</span>
                 <h4 className="text-sm font-medium text-[#2d2d2d] mt-1">{item.name}</h4>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-sm font-bold text-[#8c4a5a]">{item.price}</span>
-                  {item.oldPrice && <span className="text-xs text-gray-400 line-through">{item.oldPrice}</span>}
+                  <span className="text-sm font-bold text-[#8c4a5a]">{item.price.toLocaleString("sr-RS")} RSD</span>
+                  {item.oldPrice && item.oldPrice > item.price && <span className="text-xs text-gray-400 line-through">{item.oldPrice.toLocaleString("sr-RS")} RSD</span>}
                 </div>
-                <button className="w-full mt-3 px-4 py-2 bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-xs font-medium rounded transition-colors">Dodaj u korpu</button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

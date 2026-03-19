@@ -164,6 +164,16 @@ export default async function ProductsPage() {
     orderBy: { sortOrder: "asc" },
   });
 
+  // Fetch user's wishlisted product IDs
+  let wishlistedIds: string[] = [];
+  if (session?.user?.id) {
+    const wishlisted = await prisma.wishlist.findMany({
+      where: { userId: session.user.id as string },
+      select: { productId: true },
+    });
+    wishlistedIds = wishlisted.map((w) => w.productId);
+  }
+
   return (
     <ProductsPageClient
       initialProducts={initialProducts}
@@ -172,6 +182,7 @@ export default async function ProductsPage() {
       categories={categories}
       attributes={attributes}
       userRole={userRole}
+      wishlistedProductIds={wishlistedIds}
     />
   );
 }

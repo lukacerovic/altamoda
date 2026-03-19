@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useCartStore } from "@/lib/stores/cart-store";
+import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
   Search,
   ShoppingBag,
@@ -114,6 +116,8 @@ export default function Header() {
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: session } = useSession();
+  const cartItemCount = useCartStore((s) => s.getItemCount());
+  const wishlistCount = useWishlistStore((s) => s.count);
 
   useEffect(() => {
     const handleResize = () => {
@@ -242,15 +246,22 @@ export default function Header() {
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#8c4a5a] transition-colors">
               <Search className="w-5 h-5 text-[#2d2d2d]" />
             </button>
-            <span className="relative hidden sm:block cursor-pointer hover:text-[#8c4a5a] transition-colors">
+            <Link href="/wishlist" className="relative hidden sm:block hover:text-[#8c4a5a] transition-colors">
               <Heart className="w-5 h-5 text-[#2d2d2d]" />
-            </span>
-            <span className="relative cursor-pointer hover:text-[#8c4a5a] transition-colors">
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#8c4a5a] text-white text-[10px] rounded-full flex items-center justify-center">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
+            </Link>
+            <Link href="/cart" className="relative hover:text-[#8c4a5a] transition-colors">
               <ShoppingBag className="w-5 h-5 text-[#2d2d2d]" />
-              <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#8c4a5a] text-white text-[10px] rounded-full flex items-center justify-center">
-                2
-              </span>
-            </span>
+              {cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#8c4a5a] text-white text-[10px] rounded-full flex items-center justify-center">
+                  {cartItemCount > 99 ? "99+" : cartItemCount}
+                </span>
+              )}
+            </Link>
             <button onClick={() => setMobileMenu(true)} className="md:hidden">
               <Menu className="w-6 h-6 text-[#2d2d2d]" />
             </button>

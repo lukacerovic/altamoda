@@ -37,9 +37,8 @@ export const authConfig: NextAuthConfig = {
       if (pathname.startsWith('/quick-order')) {
         return user?.role === 'b2b' || user?.role === 'admin'
       }
-      if (pathname.startsWith('/checkout')) {
-        return !!user
-      }
+      // /checkout is accessible to guests (they fill in contact info)
+      // The API will handle auth requirements when placing the order
       return true
     },
   },
