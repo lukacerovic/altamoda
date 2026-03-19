@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -85,9 +86,7 @@ type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe" | "boja" | "s
 
 /* ───────────────────────── Constants ───────────────────────── */
 
-const brands = ["Svi brendovi", "L'Or\u00e9al", "Schwarzkopf", "K\u00e9rastase", "Wella", "Moroccanoil"];
-const categories = ["Sve kategorije", "Nega kose", "Boje za kosu", "Styling", "Ulja i serumi"];
-const statuses = ["Svi statusi", "Aktivan", "Neaktivan"];
+const brandNames = ["L'Oréal", "Schwarzkopf", "Kérastase", "Wella", "Moroccanoil"];
 
 const brandProductLines: Record<string, string[]> = {
   "L'Or\u00e9al": ["Majirel", "Serie Expert", "Tecni Art", "Blond Studio", "Inoa"],
@@ -104,18 +103,7 @@ const categoryHierarchy: Record<string, string[]> = {
   "Ulja i serumi": ["Ulja", "Serumi", "Eliksiri"],
 };
 
-const colorUndertones = [
-  { value: "N", label: "N - Neutralni" },
-  { value: "A", label: "A - Pepeljasti" },
-  { value: "G", label: "G - Zlatni" },
-  { value: "C", label: "C - Bakarni" },
-  { value: "R", label: "R - Crveni" },
-  { value: "V", label: "V - Ljubi\u010dasti" },
-  { value: "M", label: "M - Mahagoni" },
-  { value: "B", label: "B - Braon" },
-];
-
-const hairTypeOptions = ["Normalna", "Suva", "Masna", "Farbana", "O\u0161te\u0107ena", "Kovrd\u017eava"];
+/* colorUndertones and hairTypeOptions moved inside component to use t() */
 
 /* ───────────────────────── Mock Data ───────────────────────── */
 
@@ -326,11 +314,12 @@ function slugify(text: string): string {
 /* ───────────────────────── Component ───────────────────────── */
 
 export default function ProductsPage() {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [search, setSearch] = useState("");
-  const [brandFilter, setBrandFilter] = useState("Svi brendovi");
-  const [categoryFilter, setCategoryFilter] = useState("Sve kategorije");
-  const [statusFilter, setStatusFilter] = useState("Svi statusi");
+  const [brandFilter, setBrandFilter] = useState(t("admin.allBrands"));
+  const [categoryFilter, setCategoryFilter] = useState(t("admin.allCategories"));
+  const [statusFilter, setStatusFilter] = useState(t("admin.allStatuses"));
   const [currentPage, setCurrentPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -344,6 +333,31 @@ export default function ProductsPage() {
   const [formData, setFormData] = useState<Omit<Product, "id">>(defaultFormData());
   // Separate state for discount % input so user can type it
   const [discountInput, setDiscountInput] = useState("");
+
+  // Translated filter options
+  const brands = [t("admin.allBrands"), ...brandNames];
+  const categories = [t("admin.allCategories"), "Nega kose", "Boje za kosu", "Styling", "Ulja i serumi"];
+  const statuses = [t("admin.allStatuses"), t("admin.active"), t("admin.inactive")];
+
+  const colorUndertones = [
+    { value: "N", label: "N - Neutralni" },
+    { value: "A", label: "A - Pepeljasti" },
+    { value: "G", label: "G - Zlatni" },
+    { value: "C", label: "C - Bakarni" },
+    { value: "R", label: "R - Crveni" },
+    { value: "V", label: "V - Ljubičasti" },
+    { value: "M", label: "M - Mahagoni" },
+    { value: "B", label: "B - Braon" },
+  ];
+
+  const hairTypeOptions = [
+    { value: "Normalna", label: t("admin.normal") },
+    { value: "Suva", label: t("admin.dry") },
+    { value: "Masna", label: t("admin.oily") },
+    { value: "Farbana", label: t("admin.colored") },
+    { value: "Oštećena", label: t("admin.damaged") },
+    { value: "Kovrđava", label: t("admin.curly") },
+  ];
 
   const perPage = 8;
   const loadedRef = useRef(false);
@@ -403,15 +417,15 @@ export default function ProductsPage() {
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.brand.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
-      const matchBrand = brandFilter === "Svi brendovi" || p.brand === brandFilter;
-      const matchCategory = categoryFilter === "Sve kategorije" || p.category === categoryFilter;
+      const matchBrand = brandFilter === t("admin.allBrands") || p.brand === brandFilter;
+      const matchCategory = categoryFilter === t("admin.allCategories") || p.category === categoryFilter;
       const matchStatus =
-        statusFilter === "Svi statusi" ||
-        (statusFilter === "Aktivan" && p.status === "active") ||
-        (statusFilter === "Neaktivan" && p.status === "inactive");
+        statusFilter === t("admin.allStatuses") ||
+        (statusFilter === t("admin.active") && p.status === "active") ||
+        (statusFilter === t("admin.inactive") && p.status === "inactive");
       return matchSearch && matchBrand && matchCategory && matchStatus;
     });
-  }, [products, search, brandFilter, categoryFilter, statusFilter]);
+  }, [products, search, brandFilter, categoryFilter, statusFilter, t]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -587,14 +601,14 @@ export default function ProductsPage() {
   const showColorTab = formData.category === "Boje za kosu";
 
   const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-    { key: "osnovno", label: "Osnovno", icon: <Layers size={16} /> },
-    { key: "cene", label: "Cene", icon: <BarChart3 size={16} /> },
-    { key: "sadrzaj", label: "Sadr\u017eaj", icon: <FileImage size={16} /> },
-    { key: "mediji", label: "Mediji", icon: <ImageIcon size={16} /> },
-    { key: "zalihe", label: "Zalihe", icon: <Package size={16} /> },
-    ...(showColorTab ? [{ key: "boja" as TabKey, label: "Boja", icon: <Palette size={16} /> }] : []),
+    { key: "osnovno", label: t("admin.productName"), icon: <Layers size={16} /> },
+    { key: "cene", label: t("admin.priceB2c").replace(/ B2C/, ""), icon: <BarChart3 size={16} /> },
+    { key: "sadrzaj", label: t("admin.productDescription"), icon: <FileImage size={16} /> },
+    { key: "mediji", label: t("admin.productImages"), icon: <ImageIcon size={16} /> },
+    { key: "zalihe", label: t("admin.stock"), icon: <Package size={16} /> },
+    ...(showColorTab ? [{ key: "boja" as TabKey, label: t("admin.colorLevel").split(" ")[0], icon: <Palette size={16} /> }] : []),
     { key: "seo", label: "SEO", icon: <Globe size={16} /> },
-    { key: "atributi", label: "Atributi", icon: <ShieldCheck size={16} /> },
+    { key: "atributi", label: t("admin.productAttributes"), icon: <ShieldCheck size={16} /> },
   ];
 
   /* ── Common input class ── */
@@ -609,8 +623,8 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">Proizvodi</h1>
-          <p className="text-sm text-[#666] mt-1">{products.length} ukupno proizvoda</p>
+          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">{t("admin.products")}</h1>
+          <p className="text-sm text-[#666] mt-1">{products.length} {t("admin.totalProducts")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -618,21 +632,21 @@ export default function ProductsPage() {
             className="btn-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2"
           >
             <Plus size={18} />
-            Dodaj Proizvod
+            {t("admin.addProduct")}
           </button>
           <Link
             href="/admin/import"
             className="px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 border border-[#e0d8cc] text-[#2d2d2d] hover:bg-[#f5f0e8] transition-colors"
           >
             <Upload size={16} />
-            Uvezi CSV/Excel
+            {t("admin.importCsv")}
           </Link>
           <button
-            onClick={() => alert("Upravljanje kategorijama \u0107e uskoro biti dostupno.")}
+            onClick={() => alert(t("admin.categoriesComingSoon"))}
             className="px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 border border-[#e0d8cc] text-[#2d2d2d] hover:bg-[#f5f0e8] transition-colors"
           >
             <FolderTree size={16} />
-            Upravljaj kategorijama
+            {t("admin.manageCategories")}
           </button>
         </div>
       </div>
@@ -644,7 +658,7 @@ export default function ProductsPage() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
             <input
               type="text"
-              placeholder="Pretra\u017ei po nazivu, brendu ili SKU..."
+              placeholder={t("admin.searchProducts")}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a] focus:outline-none"
@@ -655,7 +669,7 @@ export default function ProductsPage() {
             className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-[#f5f0e8] rounded-lg text-sm text-[#666]"
           >
             <Filter size={16} />
-            Filteri
+            {t("admin.filters")}
           </button>
           <div className={`${showFilters ? "flex" : "hidden"} sm:flex flex-col sm:flex-row gap-3`}>
             <select value={brandFilter} onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm cursor-pointer focus:border-[#8c4a5a] focus:outline-none">
@@ -673,24 +687,24 @@ export default function ProductsPage() {
         {/* Bulk Actions */}
         {selectedIds.length > 0 && (
           <div className="mt-3 pt-3 border-t border-[#f0f0f0] flex items-center gap-3">
-            <span className="text-sm text-[#666]">{selectedIds.length} selektovano</span>
+            <span className="text-sm text-[#666]">{selectedIds.length} {t("admin.selected")}</span>
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
                 className="px-3 py-1.5 bg-[#2d2d2d] text-white rounded-lg text-sm flex items-center gap-1"
               >
-                Akcije <MoreVertical size={14} />
+                {t("admin.actions")} <MoreVertical size={14} />
               </button>
               {showBulkMenu && (
                 <div className="absolute top-full left-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-[#e0d8cc] overflow-hidden z-10">
                   <button onClick={() => bulkAction("activate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#333] hover:bg-[#f5f0e8]">
-                    <Eye size={14} /> Aktiviraj
+                    <Eye size={14} /> {t("admin.activate")}
                   </button>
                   <button onClick={() => bulkAction("deactivate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#333] hover:bg-[#f5f0e8]">
-                    <EyeOff size={14} /> Deaktiviraj
+                    <EyeOff size={14} /> {t("admin.deactivate")}
                   </button>
                   <button onClick={() => bulkAction("delete")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
-                    <Trash2 size={14} /> Obri\u0161i
+                    <Trash2 size={14} /> {t("admin.delete")}
                   </button>
                 </div>
               )}
@@ -710,15 +724,15 @@ export default function ProductsPage() {
                     {selectedIds.length === paginated.length && paginated.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Proizvod</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">SKU</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">Brend</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">Kategorija</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Cena B2C</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">Cena B2B</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">Zalihe</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Akcije</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.product")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">{t("admin.sku")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.brand")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.category")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.priceB2c")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.priceB2b")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.stock")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.status")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f0f0f0]">
@@ -743,7 +757,7 @@ export default function ProductsPage() {
                             </span>
                           )}
                           {product.badges.isNew && (
-                            <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">Novo</span>
+                            <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">{t("admin.new")}</span>
                           )}
                         </div>
                         <p className="text-xs text-[#999] md:hidden">{product.brand}</p>
@@ -774,7 +788,7 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${product.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
-                      {product.status === "active" ? "Aktivan" : "Neaktivan"}
+                      {product.status === "active" ? t("admin.active") : t("admin.inactive")}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -792,7 +806,7 @@ export default function ProductsPage() {
               {paginated.length === 0 && (
                 <tr>
                   <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#999]">
-                    Nema proizvoda koji odgovaraju pretrazi.
+                    {t("admin.noProductsMatch")}
                   </td>
                 </tr>
               )}
@@ -804,7 +818,7 @@ export default function ProductsPage() {
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-[#e0d8cc] flex items-center justify-between">
             <span className="text-sm text-[#666]">
-              Prikazano {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} od {filtered.length}
+              {t("admin.showing")} {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <button
@@ -846,7 +860,7 @@ export default function ProductsPage() {
             {/* Panel Header */}
             <div className="flex-shrink-0 px-6 py-4 border-b border-[#e0d8cc] flex items-center justify-between bg-white">
               <h2 className="text-lg font-serif font-bold text-[#2d2d2d]">
-                {editingProduct ? "Izmeni Proizvod" : "Dodaj Proizvod"}
+                {editingProduct ? t("admin.editProduct") : t("admin.addProduct")}
               </h2>
               <button onClick={() => setShowPanel(false)} className="p-2 text-[#999] hover:text-[#2d2d2d] hover:bg-[#f5f0e8] rounded-lg transition-colors">
                 <X size={20} />
@@ -879,18 +893,18 @@ export default function ProductsPage() {
               {activeTab === "osnovno" && (
                 <div className={sectionCls}>
                   <div>
-                    <label className={labelCls}>Naziv proizvoda *</label>
-                    <input type="text" value={formData.name} onChange={(e) => handleNameChange(e.target.value)} className={inputCls} placeholder="Unesite naziv proizvoda..." />
+                    <label className={labelCls}>{t("admin.productName")} *</label>
+                    <input type="text" value={formData.name} onChange={(e) => handleNameChange(e.target.value)} className={inputCls} placeholder={t("admin.enterProductName")} />
                   </div>
 
                   <div>
-                    <label className={labelCls}>SKU (\u0161ifra) *</label>
+                    <label className={labelCls}>{t("admin.skuCode")} *</label>
                     <input type="text" value={formData.sku} onChange={(e) => updateForm("sku", e.target.value)} className={inputCls} placeholder="npr. LOR-MJ-600" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Brend</label>
+                      <label className={labelCls}>{t("admin.brand")}</label>
                       <select
                         value={formData.brand}
                         onChange={(e) => {
@@ -901,11 +915,11 @@ export default function ProductsPage() {
                         }}
                         className={inputCls + " cursor-pointer"}
                       >
-                        {brands.filter((b) => b !== "Svi brendovi").map((b) => <option key={b}>{b}</option>)}
+                        {brands.filter((b) => b !== t("admin.allBrands")).map((b) => <option key={b}>{b}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className={labelCls}>Linija proizvoda</label>
+                      <label className={labelCls}>{t("admin.productLine")}</label>
                       <select value={formData.productLine} onChange={(e) => updateForm("productLine", e.target.value)} className={inputCls + " cursor-pointer"}>
                         {(brandProductLines[formData.brand] || []).map((l) => <option key={l}>{l}</option>)}
                       </select>
@@ -914,7 +928,7 @@ export default function ProductsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Kategorija</label>
+                      <label className={labelCls}>{t("admin.category")}</label>
                       <select
                         value={formData.category}
                         onChange={(e) => {
@@ -925,11 +939,11 @@ export default function ProductsPage() {
                         }}
                         className={inputCls + " cursor-pointer"}
                       >
-                        {categories.filter((c) => c !== "Sve kategorije").map((c) => <option key={c}>{c}</option>)}
+                        {categories.filter((c) => c !== t("admin.allCategories")).map((c) => <option key={c}>{c}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className={labelCls}>Podkategorija</label>
+                      <label className={labelCls}>{t("admin.subcategory")}</label>
                       <select value={formData.subCategory} onChange={(e) => updateForm("subCategory", e.target.value)} className={inputCls + " cursor-pointer"}>
                         {(categoryHierarchy[formData.category] || []).map((s) => <option key={s}>{s}</option>)}
                       </select>
@@ -938,7 +952,7 @@ export default function ProductsPage() {
 
                   {/* Status toggle */}
                   <div>
-                    <label className={labelCls}>Status</label>
+                    <label className={labelCls}>{t("admin.status")}</label>
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -947,18 +961,18 @@ export default function ProductsPage() {
                       >
                         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.status === "active" ? "translate-x-[26px]" : "translate-x-[2px]"}`} />
                       </button>
-                      <span className="text-sm text-[#666]">{formData.status === "active" ? "Aktivan" : "Neaktivan"}</span>
+                      <span className="text-sm text-[#666]">{formData.status === "active" ? t("admin.active") : t("admin.inactive")}</span>
                     </div>
                   </div>
 
                   {/* Badges */}
                   <div>
-                    <label className={labelCls}>Oznake / Badges</label>
+                    <label className={labelCls}>{t("admin.badgesLabels")}</label>
                     <div className="flex flex-wrap gap-4 mt-1">
                       {([
-                        { key: "isNew" as const, label: "Novo" },
-                        { key: "isFeatured" as const, label: "Izdvojeno" },
-                        { key: "isProfessionalOnly" as const, label: "Profesionalno (samo B2B)" },
+                        { key: "isNew" as const, label: t("admin.new") },
+                        { key: "isFeatured" as const, label: t("admin.featured") },
+                        { key: "isProfessionalOnly" as const, label: t("admin.professionalOnly") },
                       ]).map(({ key, label }) => (
                         <label key={key} className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -980,7 +994,7 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Cena B2C (RSD) *</label>
+                      <label className={labelCls}>{t("admin.priceB2c")} (RSD) *</label>
                       <input
                         type="number"
                         value={formData.priceB2C || ""}
@@ -990,7 +1004,7 @@ export default function ProductsPage() {
                       />
                     </div>
                     <div>
-                      <label className={labelCls}>Cena B2B (RSD) *</label>
+                      <label className={labelCls}>{t("admin.priceB2b")} (RSD) *</label>
                       <input
                         type="number"
                         value={formData.priceB2B || ""}
@@ -1003,23 +1017,23 @@ export default function ProductsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Stara cena (RSD)</label>
+                      <label className={labelCls}>{t("admin.oldPrice")}</label>
                       <input
                         type="number"
                         value={formData.oldPrice || ""}
                         onChange={(e) => handleOldPriceChange(e.target.value)}
                         className={inputCls}
-                        placeholder="Za prikaz popusta"
+                        placeholder={t("admin.forDiscount")}
                       />
                     </div>
                     <div>
-                      <label className={labelCls}>Popust %</label>
+                      <label className={labelCls}>{t("admin.discountPercent")}</label>
                       <input
                         type="number"
                         value={discountInput}
                         onChange={(e) => handleDiscountChange(e.target.value)}
                         className={inputCls}
-                        placeholder="Auto ili unesite %"
+                        placeholder={t("admin.autoOrEnter")}
                         min={0}
                         max={99}
                       />
@@ -1027,7 +1041,7 @@ export default function ProductsPage() {
                   </div>
 
                   <div>
-                    <label className={labelCls}>Nabavna cena (RSD)</label>
+                    <label className={labelCls}>{t("admin.purchasePrice")}</label>
                     <input
                       type="number"
                       value={formData.purchasePrice || ""}
@@ -1040,16 +1054,16 @@ export default function ProductsPage() {
                   {/* Margin info */}
                   {formData.purchasePrice > 0 && formData.priceB2C > 0 && (
                     <div className="p-3 bg-[#f5f0e8] rounded-lg text-sm text-[#666]">
-                      Mar\u017ea B2C: <strong className="text-[#2d2d2d]">{Math.round(((formData.priceB2C - formData.purchasePrice) / formData.priceB2C) * 100)}%</strong>
+                      {t("admin.marginB2c")}: <strong className="text-[#2d2d2d]">{Math.round(((formData.priceB2C - formData.purchasePrice) / formData.priceB2C) * 100)}%</strong>
                       {formData.priceB2B > 0 && (
-                        <span className="ml-4">Mar\u017ea B2B: <strong className="text-[#2d2d2d]">{Math.round(((formData.priceB2B - formData.purchasePrice) / formData.priceB2B) * 100)}%</strong></span>
+                        <span className="ml-4">{t("admin.marginB2b")}: <strong className="text-[#2d2d2d]">{Math.round(((formData.priceB2B - formData.purchasePrice) / formData.priceB2B) * 100)}%</strong></span>
                       )}
                     </div>
                   )}
 
                   {/* Price Preview */}
                   <div>
-                    <label className={labelCls}>Pregled cene na sajtu</label>
+                    <label className={labelCls}>{t("admin.pricePreview")}</label>
                     <div className="border border-[#e0d8cc] rounded-lg p-4 bg-[#faf8f4]">
                       <div className="flex items-baseline gap-3">
                         <span className="text-2xl font-bold text-[#2d2d2d]">{(formData.priceB2C || 0).toLocaleString()} RSD</span>
@@ -1061,7 +1075,7 @@ export default function ProductsPage() {
                         )}
                       </div>
                       {formData.badges.isProfessionalOnly && (
-                        <p className="text-xs text-[#8c4a5a] mt-1 flex items-center gap-1"><ShieldCheck size={12} /> Samo za profesionalce</p>
+                        <p className="text-xs text-[#8c4a5a] mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
                       )}
                     </div>
                   </div>
@@ -1072,17 +1086,17 @@ export default function ProductsPage() {
               {activeTab === "sadrzaj" && (
                 <div className={sectionCls}>
                   <div>
-                    <label className={labelCls}>Opis proizvoda</label>
+                    <label className={labelCls}>{t("admin.productDescription")}</label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => updateForm("description", e.target.value)}
                       rows={6}
                       className={inputCls + " resize-y"}
-                      placeholder="Detaljni opis proizvoda..."
+                      placeholder={t("admin.detailedDescription")}
                     />
                   </div>
                   <div>
-                    <label className={labelCls}>Sastojci / Sastav</label>
+                    <label className={labelCls}>{t("admin.ingredients")}</label>
                     <textarea
                       value={formData.ingredients}
                       onChange={(e) => updateForm("ingredients", e.target.value)}
@@ -1092,7 +1106,7 @@ export default function ProductsPage() {
                     />
                   </div>
                   <div>
-                    <label className={labelCls}>Na\u010din upotrebe</label>
+                    <label className={labelCls}>{t("admin.howToUse")}</label>
                     <textarea
                       value={formData.howToUse}
                       onChange={(e) => updateForm("howToUse", e.target.value)}
@@ -1108,8 +1122,8 @@ export default function ProductsPage() {
               {activeTab === "mediji" && (
                 <div className={sectionCls}>
                   <div>
-                    <label className={labelCls}>Slike proizvoda</label>
-                    <p className="text-xs text-[#999] mb-3">Prevucite slike ili kliknite za upload. Prva slika je glavna.</p>
+                    <label className={labelCls}>{t("admin.productImages")}</label>
+                    <p className="text-xs text-[#999] mb-3">{t("admin.dragImages")}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-[#e0d8cc] rounded-lg overflow-hidden aspect-square bg-[#f5f0e8] flex items-center justify-center">
@@ -1119,7 +1133,7 @@ export default function ProductsPage() {
                           </div>
                           {img.isPrimary && (
                             <div className="absolute top-1 left-1 bg-[#8c4a5a] text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
-                              <Star size={10} /> Glavna
+                              <Star size={10} /> {t("admin.mainImage")}
                             </div>
                           )}
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -1129,14 +1143,14 @@ export default function ProductsPage() {
                                 updateForm("images", updated);
                               }}
                               className="p-1.5 bg-white rounded-lg text-[#8c4a5a] hover:bg-[#f5f0e8]"
-                              title="Postavi kao glavnu"
+                              title={t("admin.setAsMain")}
                             >
                               <Star size={14} />
                             </button>
                             <button
                               onClick={() => updateForm("images", formData.images.filter((_, i) => i !== idx))}
                               className="p-1.5 bg-white rounded-lg text-red-500 hover:bg-red-50"
-                              title="Ukloni"
+                              title={t("admin.remove")}
                             >
                               <Trash2 size={14} />
                             </button>
@@ -1156,7 +1170,7 @@ export default function ProductsPage() {
                         className="border-2 border-dashed border-[#e0d8cc] rounded-lg aspect-square flex flex-col items-center justify-center gap-2 text-[#999] hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors cursor-pointer"
                       >
                         <Upload size={24} />
-                        <span className="text-xs">Dodaj sliku</span>
+                        <span className="text-xs">{t("admin.addImage")}</span>
                       </button>
                     </div>
                   </div>
@@ -1164,7 +1178,7 @@ export default function ProductsPage() {
                   {/* Alt texts */}
                   {formData.images.length > 0 && (
                     <div>
-                      <label className={labelCls}>Alt tekstovi slika</label>
+                      <label className={labelCls}>{t("admin.altTexts")}</label>
                       <div className="space-y-2">
                         {formData.images.map((img, idx) => (
                           <div key={img.id} className="flex items-center gap-2">
@@ -1178,7 +1192,7 @@ export default function ProductsPage() {
                                 updateForm("images", updated);
                               }}
                               className={inputCls}
-                              placeholder="Alt tekst..."
+                              placeholder={t("admin.altText")}
                             />
                           </div>
                         ))}
@@ -1189,13 +1203,13 @@ export default function ProductsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className={labelCls}>
-                        <span className="flex items-center gap-1.5"><Film size={14} /> Video URL</span>
+                        <span className="flex items-center gap-1.5"><Film size={14} /> {t("admin.videoUrl")}</span>
                       </label>
                       <input type="url" value={formData.videoUrl} onChange={(e) => updateForm("videoUrl", e.target.value)} className={inputCls} placeholder="https://youtube.com/..." />
                     </div>
                     <div>
                       <label className={labelCls}>
-                        <span className="flex items-center gap-1.5"><FileImage size={14} /> GIF URL</span>
+                        <span className="flex items-center gap-1.5"><FileImage size={14} /> {t("admin.gifUrl")}</span>
                       </label>
                       <input type="url" value={formData.gifUrl} onChange={(e) => updateForm("gifUrl", e.target.value)} className={inputCls} placeholder="https://..." />
                     </div>
@@ -1208,11 +1222,11 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Koli\u010dina na zalihama *</label>
+                      <label className={labelCls}>{t("admin.stockQuantity")} *</label>
                       <input type="number" value={formData.stock || ""} onChange={(e) => updateForm("stock", Number(e.target.value) || 0)} className={inputCls} placeholder="0" min={0} />
                     </div>
                     <div>
-                      <label className={labelCls}>Upozorenje za nisku zalihu</label>
+                      <label className={labelCls}>{t("admin.lowStockWarning")}</label>
                       <input type="number" value={formData.lowStockThreshold || ""} onChange={(e) => updateForm("lowStockThreshold", Number(e.target.value) || 0)} className={inputCls} placeholder="10" min={0} />
                     </div>
                   </div>
@@ -1226,11 +1240,11 @@ export default function ProductsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Te\u017eina (grami)</label>
+                      <label className={labelCls}>{t("admin.weight")}</label>
                       <input type="number" value={formData.weight || ""} onChange={(e) => updateForm("weight", Number(e.target.value) || 0)} className={inputCls} placeholder="0" min={0} />
                     </div>
                     <div>
-                      <label className={labelCls}>Zapremina (ml)</label>
+                      <label className={labelCls}>{t("admin.volume")}</label>
                       <input type="number" value={formData.volume || ""} onChange={(e) => updateForm("volume", Number(e.target.value) || 0)} className={inputCls} placeholder="0" min={0} />
                     </div>
                   </div>
@@ -1247,18 +1261,18 @@ export default function ProductsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Nivo boje (1-10)</label>
+                      <label className={labelCls}>{t("admin.colorLevel")}</label>
                       <select value={formData.colorLevel || ""} onChange={(e) => updateForm("colorLevel", Number(e.target.value) || undefined)} className={inputCls + " cursor-pointer"}>
-                        <option value="">Izaberite...</option>
+                        <option value="">{t("admin.select")}</option>
                         {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                           <option key={n} value={n}>{n}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className={labelCls}>Podton</label>
+                      <label className={labelCls}>{t("admin.undertone")}</label>
                       <select value={formData.colorUndertone || ""} onChange={(e) => updateForm("colorUndertone", e.target.value || undefined)} className={inputCls + " cursor-pointer"}>
-                        <option value="">Izaberite...</option>
+                        <option value="">{t("admin.select")}</option>
                         {colorUndertones.map((u) => (
                           <option key={u.value} value={u.value}>{u.label}</option>
                         ))}
@@ -1268,7 +1282,7 @@ export default function ProductsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>Hex vrednost boje</label>
+                      <label className={labelCls}>{t("admin.hexColor")}</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="color"
@@ -1286,7 +1300,7 @@ export default function ProductsPage() {
                       </div>
                     </div>
                     <div>
-                      <label className={labelCls}>\u0160ifra nijanse</label>
+                      <label className={labelCls}>{t("admin.shadeCode")}</label>
                       <input type="text" value={formData.shadeCode || ""} onChange={(e) => updateForm("shadeCode", e.target.value)} className={inputCls} placeholder="npr. 7-0" />
                     </div>
                   </div>
@@ -1311,7 +1325,7 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div>
                     <label className={labelCls}>
-                      SEO naslov
+                      {t("admin.seoTitle")}
                       <span className={`ml-2 text-xs ${(formData.seoTitle.length) > 60 ? "text-red-500" : "text-[#999]"}`}>
                         {formData.seoTitle.length}/60
                       </span>
@@ -1321,14 +1335,14 @@ export default function ProductsPage() {
                       value={formData.seoTitle}
                       onChange={(e) => updateForm("seoTitle", e.target.value)}
                       className={inputCls}
-                      placeholder="Naziv proizvoda | Alta Moda"
+                      placeholder={`${t("admin.productName")} | Alta Moda`}
                       maxLength={80}
                     />
                   </div>
 
                   <div>
                     <label className={labelCls}>
-                      Meta opis
+                      {t("admin.metaDescription")}
                       <span className={`ml-2 text-xs ${(formData.metaDescription.length) > 160 ? "text-red-500" : "text-[#999]"}`}>
                         {formData.metaDescription.length}/160
                       </span>
@@ -1338,13 +1352,13 @@ export default function ProductsPage() {
                       onChange={(e) => updateForm("metaDescription", e.target.value)}
                       rows={3}
                       className={inputCls + " resize-y"}
-                      placeholder="Kratak opis za pretra\u017eiva\u010de..."
+                      placeholder={t("admin.shortDescSearch")}
                       maxLength={200}
                     />
                   </div>
 
                   <div>
-                    <label className={labelCls}>URL slug</label>
+                    <label className={labelCls}>{t("admin.urlSlug")}</label>
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-[#999]">/proizvodi/</span>
                       <input
@@ -1352,17 +1366,17 @@ export default function ProductsPage() {
                         value={formData.slug}
                         onChange={(e) => updateForm("slug", e.target.value)}
                         className={inputCls}
-                        placeholder="auto-generisan-slug"
+                        placeholder={t("admin.autoGenerated")}
                       />
                     </div>
-                    <p className="text-xs text-[#999] mt-1">Automatski generisan iz naziva. Mo\u017eete ru\u010dno izmeniti.</p>
+                    <p className="text-xs text-[#999] mt-1">{t("admin.autoGenerated")}</p>
                   </div>
 
                   {/* SEO Preview */}
                   <div>
-                    <label className={labelCls}>Pregled u pretra\u017eiva\u010du</label>
+                    <label className={labelCls}>{t("admin.searchPreview")}</label>
                     <div className="border border-[#e0d8cc] rounded-lg p-4 bg-white space-y-1">
-                      <p className="text-blue-700 text-base font-medium truncate">{formData.seoTitle || formData.name || "Naziv proizvoda"}</p>
+                      <p className="text-blue-700 text-base font-medium truncate">{formData.seoTitle || formData.name || t("admin.productName")}</p>
                       <p className="text-green-700 text-xs">altamoda.rs/proizvodi/{formData.slug || "..."}</p>
                       <p className="text-sm text-[#555] line-clamp-2">{formData.metaDescription || formData.description || "Meta opis proizvoda..."}</p>
                     </div>
@@ -1374,13 +1388,13 @@ export default function ProductsPage() {
               {activeTab === "atributi" && (
                 <div className={sectionCls}>
                   <div>
-                    <label className={labelCls}>Svojstva proizvoda</label>
+                    <label className={labelCls}>{t("admin.productAttributes")}</label>
                     <div className="space-y-3 mt-1">
                       {([
-                        { key: "sulfateFree" as const, label: "Bez sulfata" },
-                        { key: "parabenFree" as const, label: "Bez parabena" },
-                        { key: "ammoniaFree" as const, label: "Bez amonijaka" },
-                        { key: "vegan" as const, label: "Vegan" },
+                        { key: "sulfateFree" as const, label: t("admin.sulfateFree") },
+                        { key: "parabenFree" as const, label: t("admin.parabenFree") },
+                        { key: "ammoniaFree" as const, label: t("admin.ammoniaFree") },
+                        { key: "vegan" as const, label: t("admin.vegan") },
                       ]).map(({ key, label }) => (
                         <div key={key} className="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
                           <span className="text-sm text-[#333]">{label}</span>
@@ -1397,18 +1411,18 @@ export default function ProductsPage() {
                   </div>
 
                   <div>
-                    <label className={labelCls}>Tip kose (vi\u0161estruki izbor)</label>
+                    <label className={labelCls}>{t("admin.hairType")}</label>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {hairTypeOptions.map((ht) => {
-                        const selected = formData.attributes.hairTypes.includes(ht);
+                        const selected = formData.attributes.hairTypes.includes(ht.value);
                         return (
                           <button
-                            key={ht}
+                            key={ht.value}
                             type="button"
                             onClick={() => {
                               const newTypes = selected
-                                ? formData.attributes.hairTypes.filter((t) => t !== ht)
-                                : [...formData.attributes.hairTypes, ht];
+                                ? formData.attributes.hairTypes.filter((t) => t !== ht.value)
+                                : [...formData.attributes.hairTypes, ht.value];
                               updateForm("attributes", { ...formData.attributes, hairTypes: newTypes });
                             }}
                             className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
@@ -1417,7 +1431,7 @@ export default function ProductsPage() {
                                 : "bg-white text-[#666] border-[#e0d8cc] hover:border-[#8c4a5a] hover:text-[#8c4a5a]"
                             }`}
                           >
-                            {ht}
+                            {ht.label}
                           </button>
                         );
                       })}
@@ -1433,10 +1447,10 @@ export default function ProductsPage() {
                 onClick={() => setShowPanel(false)}
                 className="px-5 py-2.5 rounded-lg text-sm font-medium text-[#666] hover:bg-[#f5f0e8] transition-colors"
               >
-                Otka\u017ei
+                {t("admin.cancel")}
               </button>
               <button onClick={handleSave} disabled={saving} className="btn-gold px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">
-                {saving ? "\u010cuvanje..." : editingProduct ? "Sa\u010duvaj Izmene" : "Dodaj Proizvod"}
+                {saving ? t("admin.saving") : editingProduct ? t("admin.saveChanges") : t("admin.addProduct")}
               </button>
             </div>
           </div>

@@ -7,8 +7,9 @@ import { redirect } from "next/navigation";
 import {
   Package, Heart, ChevronRight, RotateCcw, LogOut,
   CreditCard, TrendingUp, Award, Percent, CheckCircle,
-  BarChart3, AlertTriangle,
+  BarChart3, AlertTriangle, Globe,
 } from "lucide-react";
+import { useLanguage, languageLabels, languageFlags, type Language } from "@/lib/i18n/LanguageContext";
 
 // ─── Mock Data ───
 
@@ -355,6 +356,7 @@ function B2bLoyaltySection() {
 
 export default function AccountPage() {
   const { data: session, status } = useSession();
+  const { t, language, setLanguage } = useLanguage();
   const [activeSection, setActiveSection] = useState("orders");
   const [repeatConfirm, setRepeatConfirm] = useState<string | null>(null);
 
@@ -419,11 +421,34 @@ export default function AccountPage() {
               </Link>
             )}
 
+            {/* Language selector */}
+            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5" /> {t("common.language")}
+              </h4>
+              <div className="space-y-1">
+                {(["sr", "en", "ru"] as Language[]).map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => setLanguage(lang)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
+                      language === lang
+                        ? "bg-[#faf7f2] text-[#8c4a5a] font-medium"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <span>{languageFlags[lang]}</span>
+                    <span>{languageLabels[lang]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <button
               onClick={() => signOut({ callbackUrl: "/account/login" })}
               className="w-full flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-[#c0392b] transition-colors py-2"
             >
-              <LogOut className="w-4 h-4" /> Odjavite se
+              <LogOut className="w-4 h-4" /> {t("account.logout")}
             </button>
           </aside>
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Phone,
   Mail,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 
 export default function Footer() {
+  const { t } = useLanguage();
   const [footerEmail, setFooterEmail] = useState("");
   const [footerStatus, setFooterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [footerMessage, setFooterMessage] = useState("");
@@ -52,7 +54,7 @@ export default function Footer() {
           <div>
             <img src="/logo.png" alt="Alta Moda" className="h-6 brightness-0 invert mb-5" />
             <p className="text-sm leading-relaxed text-white/50">
-              Vaš pouzdani partner za profesionalnu frizersku opremu i kozmetiku od 2005. godine.
+              {t("footer.description")}
             </p>
             <div className="flex items-center gap-3 mt-5">
               <a
@@ -77,72 +79,72 @@ export default function Footer() {
           </div>
           <div>
             <h4 className="text-white/90 font-medium text-sm tracking-wider mb-5" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '15px' }}>
-              Kupovina
+              {t("footer.shopping")}
             </h4>
             <div className="space-y-2.5 text-sm">
               <Link href="/products" className="block hover:text-[#b07a87] transition-colors">
-                Svi Proizvodi
+                {t("footer.allProducts")}
               </Link>
               <Link href="/colors" className="block hover:text-[#b07a87] transition-colors">
-                Boje za Kosu
+                {t("footer.hairColors")}
               </Link>
               <Link href="/outlet" className="block hover:text-[#b07a87] transition-colors">
-                Akcije
+                {t("footer.sales")}
               </Link>
               <Link href="/products" className="block hover:text-[#b07a87] transition-colors">
-                Brendovi
+                {t("footer.brands")}
               </Link>
               <Link href="/quick-order" className="block hover:text-[#b07a87] transition-colors">
-                Brza Narudžbina
+                {t("footer.quickOrder")}
               </Link>
             </div>
           </div>
           <div>
             <h4 className="text-white/90 font-medium text-sm tracking-wider mb-5" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '15px' }}>
-              Informacije
+              {t("footer.information")}
             </h4>
             <div className="space-y-2.5 text-sm">
               <Link href="/faq" className="block hover:text-[#b07a87] transition-colors">
-                Česta Pitanja
+                {t("footer.faq")}
               </Link>
               <Link href="/blog" className="block hover:text-[#b07a87] transition-colors">
-                Blog
+                {t("footer.blog")}
               </Link>
               <Link href="/seminars" className="block hover:text-[#b07a87] transition-colors">
-                Seminari
+                {t("footer.seminars")}
               </Link>
               <Link href="/salon-locator" className="block hover:text-[#b07a87] transition-colors">
-                Pronađi Salon
+                {t("footer.findSalon")}
               </Link>
               <a href="#" className="block hover:text-[#b07a87] transition-colors">
-                Uslovi Korišćenja
+                {t("footer.termsOfUse")}
               </a>
             </div>
           </div>
           <div>
             <h4 className="text-white/90 font-medium text-sm tracking-wider mb-5" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '15px' }}>
-              Kontakt
+              {t("footer.contactTitle")}
             </h4>
             <div className="space-y-3.5 text-sm">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 mt-0.5 text-[#b07a87]" />
                 <span>
-                  Knez Mihailova 22,
+                  {t("footer.address")}
                   <br />
-                  11000 Beograd
+                  {t("footer.city")}
                 </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#b07a87]" />
-                <span>+381 11 123 4567</span>
+                <span>{t("footer.phone")}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#b07a87]" />
-                <span>info@altamoda.rs</span>
+                <span>{t("footer.email")}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-[#b07a87]" />
-                <span>Pon-Pet: 09-18h</span>
+                <span>{t("footer.workHours")}</span>
               </div>
             </div>
           </div>
@@ -150,12 +152,12 @@ export default function Footer() {
         {/* Newsletter */}
         <div className="border-t border-white/10 pt-10 pb-10">
           <div className="max-w-xl mx-auto text-center">
-            <h4 className="text-white/90 font-medium text-lg mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Newsletter</h4>
-            <p className="text-white/40 text-sm mb-4">Prijavite se i budite u toku sa novim proizvodima i akcijama.</p>
+            <h4 className="text-white/90 font-medium text-lg mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("footer.newsletter")}</h4>
+            <p className="text-white/40 text-sm mb-4">{t("footer.newsletterText")}</p>
             <form onSubmit={handleFooterSubmit} className="flex gap-2">
               <input
                 type="email"
-                placeholder="Vaša email adresa"
+                placeholder={t("footer.emailPlaceholder")}
                 value={footerEmail}
                 onChange={(e) => setFooterEmail(e.target.value)}
                 className="flex-1 bg-white/10 border border-white/10 rounded-full px-5 py-2.5 text-white placeholder-white/40 text-sm focus:border-[#8c4a5a] focus:outline-none"
@@ -166,7 +168,7 @@ export default function Footer() {
                 disabled={footerStatus === "loading"}
                 className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-5 py-2.5 rounded-full font-medium transition-colors flex items-center gap-2 text-sm disabled:opacity-60"
               >
-                {footerStatus === "loading" ? "..." : "Prijavite se"}
+                {footerStatus === "loading" ? "..." : t("footer.subscribe")}
                 <Send className="w-3.5 h-3.5" />
               </button>
             </form>
@@ -177,7 +179,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-xs text-white/40">&copy; 2026 Alta Moda. Sva prava zadržana.</span>
+          <span className="text-xs text-white/40">{t("footer.copyright")}</span>
           <div className="flex items-center gap-4 text-xs">
             <span className="px-3 py-1 bg-white/5 rounded border border-white/10">Visa</span>
             <span className="px-3 py-1 bg-white/5 rounded border border-white/10">Mastercard</span>

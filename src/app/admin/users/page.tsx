@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Search,
   Filter,
@@ -115,14 +116,16 @@ const mockUsers: UserData[] = [
   },
 ];
 
-const typeFilters = ["Svi", "B2B", "B2C"];
-const statusFilterOptions = ["Svi statusi", "Aktivan", "Blokiran", "Na čekanju"];
-
 export default function UsersPage() {
+  const { t } = useLanguage();
+
+  const typeFilters = [t("admin.all"), "B2B", "B2C"];
+  const statusFilterOptions = [t("admin.allStatuses"), t("admin.active"), t("admin.blocked"), t("admin.pending")];
+
   const [users, setUsers] = useState<UserData[]>(mockUsers);
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("Svi");
-  const [statusFilter, setStatusFilter] = useState("Svi statusi");
+  const [typeFilter, setTypeFilter] = useState(t("admin.all"));
+  const [statusFilter, setStatusFilter] = useState(t("admin.allStatuses"));
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
@@ -130,12 +133,12 @@ export default function UsersPage() {
 
   const filtered = users.filter((u) => {
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
-    const matchType = typeFilter === "Svi" || u.type === typeFilter;
+    const matchType = typeFilter === t("admin.all") || u.type === typeFilter;
     const matchStatus =
-      statusFilter === "Svi statusi" ||
-      (statusFilter === "Aktivan" && u.status === "active") ||
-      (statusFilter === "Blokiran" && u.status === "blocked") ||
-      (statusFilter === "Na čekanju" && u.status === "pending");
+      statusFilter === t("admin.allStatuses") ||
+      (statusFilter === t("admin.active") && u.status === "active") ||
+      (statusFilter === t("admin.blocked") && u.status === "blocked") ||
+      (statusFilter === t("admin.pending") && u.status === "pending");
     return matchSearch && matchType && matchStatus;
   });
 
@@ -163,9 +166,9 @@ export default function UsersPage() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "active": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Aktivan</span>;
-      case "blocked": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Blokiran</span>;
-      case "pending": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Na čekanju</span>;
+      case "active": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">{t("admin.active")}</span>;
+      case "blocked": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">{t("admin.blocked")}</span>;
+      case "pending": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">{t("admin.pending")}</span>;
       default: return null;
     }
   };
@@ -174,8 +177,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">Korisnici</h1>
-        <p className="text-sm text-[#666] mt-1">{users.length} registrovanih korisnika</p>
+        <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">{t("admin.users")}</h1>
+        <p className="text-sm text-[#666] mt-1">{users.length} {t("admin.registeredUsers")}</p>
       </div>
 
       {/* Filters */}
@@ -185,26 +188,26 @@ export default function UsersPage() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
             <input
               type="text"
-              placeholder="Pretraži po imenu ili emailu..."
+              placeholder={t("admin.searchUsers")}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]"
             />
           </div>
           <button onClick={() => setShowFilters(!showFilters)} className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-[#f5f0e8] rounded-lg text-sm text-[#666]">
-            <Filter size={16} /> Filteri
+            <Filter size={16} /> {t("admin.filters")}
           </button>
           <div className={`${showFilters ? "flex" : "hidden"} sm:flex flex-col sm:flex-row gap-3`}>
             <div className="flex gap-2">
-              {typeFilters.map((t) => (
+              {typeFilters.map((tf) => (
                 <button
-                  key={t}
-                  onClick={() => { setTypeFilter(t); setCurrentPage(1); }}
+                  key={tf}
+                  onClick={() => { setTypeFilter(tf); setCurrentPage(1); }}
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    typeFilter === t ? "bg-[#2d2d2d] text-white" : "bg-[#f5f0e8] text-[#666] hover:bg-[#e0d8cc]"
+                    typeFilter === tf ? "bg-[#2d2d2d] text-white" : "bg-[#f5f0e8] text-[#666] hover:bg-[#e0d8cc]"
                   }`}
                 >
-                  {t}
+                  {tf}
                 </button>
               ))}
             </div>
@@ -223,7 +226,7 @@ export default function UsersPage() {
           <div className="mt-3 pt-3 border-t border-[#f0f0f0] flex items-center gap-2">
             <Shield size={16} className="text-[#8c4a5a]" />
             <span className="text-sm text-[#666]">
-              <span className="font-semibold text-[#8c4a5a]">{users.filter((u) => u.status === "pending").length}</span> B2B zahteva čeka odobrenje
+              <span className="font-semibold text-[#8c4a5a]">{users.filter((u) => u.status === "pending").length}</span> {t("admin.b2bPendingApproval")}
             </span>
           </div>
         )}
@@ -237,12 +240,12 @@ export default function UsersPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Korisnik</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">Tip</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">Registracija</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">Porudžbine</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">Potrošeno</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.user")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.type")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.registration")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.orders")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.spent")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.status")}</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider"></th>
                 </tr>
               </thead>
@@ -284,7 +287,7 @@ export default function UsersPage() {
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-[#e0d8cc] flex items-center justify-between">
               <span className="text-sm text-[#666]">
-                Prikazano {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} od {filtered.length}
+                {t("admin.showing")} {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
               </span>
               <div className="flex items-center gap-1">
                 <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed">
@@ -307,7 +310,7 @@ export default function UsersPage() {
         {selectedUser && (
           <div className="w-full lg:w-96 bg-white rounded-xl border border-[#e0d8cc] overflow-hidden flex-shrink-0">
             <div className="p-6 border-b border-[#e0d8cc] flex items-center justify-between">
-              <h3 className="font-semibold text-[#2d2d2d]">Detalji korisnika</h3>
+              <h3 className="font-semibold text-[#2d2d2d]">{t("admin.userDetails")}</h3>
               <button onClick={() => setSelectedUser(null)} className="p-1 text-[#999] hover:text-[#2d2d2d]">
                 <X size={18} />
               </button>
@@ -343,14 +346,14 @@ export default function UsersPage() {
                 )}
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar size={14} className="text-[#999]" />
-                  <span className="text-[#333]">Registrovan: {selectedUser.registrationDate}</span>
+                  <span className="text-[#333]">{t("admin.registration")}: {selectedUser.registrationDate}</span>
                 </div>
               </div>
 
               {/* B2B Details */}
               {selectedUser.type === "B2B" && (
                 <div className="p-4 rounded-lg bg-[#f5f0e8] border border-[#e0d8cc]">
-                  <h5 className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-3">B2B Podaci</h5>
+                  <h5 className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-3">{t("admin.b2bData")}</h5>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
                       <Building size={14} className="text-[#999]" />
@@ -368,18 +371,18 @@ export default function UsersPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-lg bg-[#f5f0e8] text-center">
                   <p className="text-xl font-bold text-[#2d2d2d]">{selectedUser.ordersCount}</p>
-                  <p className="text-xs text-[#999]">Porudžbine</p>
+                  <p className="text-xs text-[#999]">{t("admin.orders")}</p>
                 </div>
                 <div className="p-3 rounded-lg bg-[#f5f0e8] text-center">
                   <p className="text-xl font-bold text-[#2d2d2d]">{(selectedUser.totalSpent / 1000).toFixed(0)}k</p>
-                  <p className="text-xs text-[#999]">RSD potrošeno</p>
+                  <p className="text-xs text-[#999]">{t("admin.rsdSpent")}</p>
                 </div>
               </div>
 
               {/* Recent Orders */}
               {selectedUser.orders && selectedUser.orders.length > 0 && (
                 <div>
-                  <h5 className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-3">Poslednje porudžbine</h5>
+                  <h5 className="text-xs font-semibold text-[#666] uppercase tracking-wider mb-3">{t("admin.lastOrders")}</h5>
                   <div className="space-y-2">
                     {selectedUser.orders.map((order) => (
                       <div key={order.id} className="flex items-center justify-between p-3 rounded-lg bg-[#f5f0e8]">
@@ -405,7 +408,7 @@ export default function UsersPage() {
                     className="w-full btn-gold px-4 py-2.5 rounded-lg text-sm flex items-center justify-center gap-2"
                   >
                     <ShieldCheck size={16} />
-                    Odobri B2B Pristup
+                    {t("admin.approveB2b")}
                   </button>
                 ) : (
                   <button
@@ -417,9 +420,9 @@ export default function UsersPage() {
                     }`}
                   >
                     {selectedUser.status === "active" ? (
-                      <><ShieldX size={16} /> Blokiraj Korisnika</>
+                      <><ShieldX size={16} /> {t("admin.blockUser")}</>
                     ) : (
-                      <><ShieldCheck size={16} /> Aktiviraj Korisnika</>
+                      <><ShieldCheck size={16} /> {t("admin.activateUser")}</>
                     )}
                   </button>
                 )}

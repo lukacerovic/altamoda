@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import {
   Search,
   ShoppingBag,
@@ -32,84 +34,92 @@ interface MegaMenuData {
   };
 }
 
-const megaMenus: Record<string, MegaMenuData> = {
-  Proizvodi: {
-    columns: [
-      {
-        title: "Nega kose",
-        links: [
-          { name: "Šamponi", href: "/products?category=samponi" },
-          { name: "Maske", href: "/products?category=maske" },
-          { name: "Regeneratori", href: "/products?category=regeneratori" },
-          { name: "Serumi", href: "/products?category=serumi" },
-          { name: "Ulja", href: "/products?category=ulja" },
-        ],
-      },
-      {
-        title: "Styling",
-        links: [
-          { name: "Gelovi", href: "/products?category=gelovi" },
-          { name: "Lakovi", href: "/products?category=lakovi" },
-          { name: "Voskovi", href: "/products?category=voskovi" },
-          { name: "Kreme", href: "/products?category=styling-kreme" },
-          { name: "Sprejevi", href: "/products?category=sprejevi" },
-        ],
-      },
-      {
-        title: "Aparati",
-        links: [
-          { name: "Fen", href: "/products?category=fen" },
-          { name: "Pegle", href: "/products?category=pegle" },
-          { name: "Figaro", href: "/products?category=figaro" },
-          { name: "Trimeri", href: "/products?category=trimeri" },
-        ],
-      },
-    ],
-    featured: {
-      image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
-      title: "Premium nega kose",
-      cta: "Istražite",
-      href: "/products",
-    },
-  },
-  Kolekcije: {
-    columns: [
-      {
-        title: "Boje za kosu",
-        links: [
-          { name: "Permanentne", href: "/colors?type=permanentne" },
-          { name: "Bez amonijaka", href: "/colors?type=bez-amonijaka" },
-          { name: "Demi-permanentne", href: "/colors?type=demi-permanentne" },
-        ],
-      },
-      {
-        title: "Oksidanti & Dekoloranti",
-        links: [
-          { name: "Oksidanti 3%", href: "/colors?type=oksidanti-3" },
-          { name: "Oksidanti 6%", href: "/colors?type=oksidanti-6" },
-          { name: "Oksidanti 9%", href: "/colors?type=oksidanti-9" },
-          { name: "Dekolorant puderi", href: "/colors?type=dekoloranti-puderi" },
-        ],
-      },
-    ],
-    featured: {
-      image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=300&fit=crop",
-      title: "Nova kolekcija boja",
-      cta: "Pogledajte",
-      href: "/colors",
-    },
-  },
-};
+function useMegaMenus() {
+  const { t } = useLanguage();
 
-const navLinks = [
-  { name: "Proizvodi", href: "/products", hasMega: true },
-  { name: "Kolekcije", href: "/colors", hasMega: true },
-  { name: "O Nama", href: "/about", hasMega: false },
-  { name: "Blog", href: "/blog", hasMega: false },
-  { name: "Kontakt", href: "/contact", hasMega: false },
-];
+  const megaMenus: Record<string, MegaMenuData> = {
+    products: {
+      columns: [
+        {
+          title: t("nav.hairCare"),
+          links: [
+            { name: t("nav.shampoos"), href: "/products?category=samponi" },
+            { name: t("nav.masks"), href: "/products?category=maske" },
+            { name: t("nav.conditioners"), href: "/products?category=regeneratori" },
+            { name: t("nav.serums"), href: "/products?category=serumi" },
+            { name: t("nav.oils"), href: "/products?category=ulja" },
+          ],
+        },
+        {
+          title: t("nav.styling"),
+          links: [
+            { name: t("nav.gels"), href: "/products?category=gelovi" },
+            { name: t("nav.sprays_styling"), href: "/products?category=lakovi" },
+            { name: t("nav.waxes"), href: "/products?category=voskovi" },
+            { name: t("nav.creams"), href: "/products?category=styling-kreme" },
+            { name: t("nav.sprays"), href: "/products?category=sprejevi" },
+          ],
+        },
+        {
+          title: t("nav.appliances"),
+          links: [
+            { name: t("nav.dryer"), href: "/products?category=fen" },
+            { name: t("nav.straighteners"), href: "/products?category=pegle" },
+            { name: t("nav.curlers"), href: "/products?category=figaro" },
+            { name: t("nav.trimmers"), href: "/products?category=trimeri" },
+          ],
+        },
+      ],
+      featured: {
+        image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
+        title: t("nav.premiumHairCare"),
+        cta: t("nav.explore"),
+        href: "/products",
+      },
+    },
+    collections: {
+      columns: [
+        {
+          title: t("nav.hairColors"),
+          links: [
+            { name: t("nav.permanent"), href: "/colors?type=permanentne" },
+            { name: t("nav.ammoniaFree"), href: "/colors?type=bez-amonijaka" },
+            { name: t("nav.demiPermanent"), href: "/colors?type=demi-permanentne" },
+          ],
+        },
+        {
+          title: t("nav.oxidantsDecolorants"),
+          links: [
+            { name: t("nav.oxidant3"), href: "/colors?type=oksidanti-3" },
+            { name: t("nav.oxidant6"), href: "/colors?type=oksidanti-6" },
+            { name: t("nav.oxidant9"), href: "/colors?type=oksidanti-9" },
+            { name: t("nav.decolorantPowders"), href: "/colors?type=dekoloranti-puderi" },
+          ],
+        },
+      ],
+      featured: {
+        image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=300&fit=crop",
+        title: t("nav.newColorCollection"),
+        cta: t("nav.view"),
+        href: "/colors",
+      },
+    },
+  };
+
+  const navLinks = [
+    { name: t("nav.products"), href: "/products", hasMega: true, menuKey: "products" },
+    { name: t("nav.collections"), href: "/colors", hasMega: true, menuKey: "collections" },
+    { name: t("nav.about"), href: "/about", hasMega: false, menuKey: "" },
+    { name: t("nav.blog"), href: "/blog", hasMega: false, menuKey: "" },
+    { name: t("nav.contact"), href: "/contact", hasMega: false, menuKey: "" },
+  ];
+
+  return { megaMenus, navLinks };
+}
 
 export default function Header() {
+  const { t } = useLanguage();
+  const { megaMenus, navLinks } = useMegaMenus();
   const [mobileMenu, setMobileMenu] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -150,12 +160,13 @@ export default function Header() {
           {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((l) => {
-              const hasMega = l.hasMega && megaMenus[l.name] !== undefined;
+              const hasMega = l.hasMega && megaMenus[l.menuKey] !== undefined;
+              const menuData = hasMega ? megaMenus[l.menuKey] : null;
               return (
                 <div
-                  key={l.name}
+                  key={l.menuKey || l.name}
                   className="nav-item relative h-16 flex items-center"
-                  onMouseEnter={() => hasMega && handleMenuEnter(l.name)}
+                  onMouseEnter={() => hasMega && handleMenuEnter(l.menuKey)}
                   onMouseLeave={handleMenuLeave}
                 >
                   <Link
@@ -167,20 +178,20 @@ export default function Header() {
                   </Link>
 
                   {/* Mega Menu Dropdown */}
-                  {hasMega && (
+                  {hasMega && menuData && (
                     <div
                       className={`mega-menu absolute top-full left-1/2 -translate-x-1/2 pt-2 ${
-                        activeMenu === l.name ? "!opacity-100 !visible !translate-y-0" : ""
+                        activeMenu === l.menuKey ? "!opacity-100 !visible !translate-y-0" : ""
                       }`}
-                      style={{ minWidth: megaMenus[l.name].columns.length > 1 ? "600px" : "400px" }}
-                      onMouseEnter={() => handleMenuEnter(l.name)}
+                      style={{ minWidth: menuData.columns.length > 1 ? "600px" : "400px" }}
+                      onMouseEnter={() => handleMenuEnter(l.menuKey)}
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-2xl border border-[#e0d8cc] overflow-hidden shadow-lg">
                         <div className="h-0.5 bg-gradient-to-r from-[#8c4a5a] via-[#b07a87] to-[#8c4a5a]" />
                         <div className="p-6 flex gap-8">
                           <div className="flex-1 flex gap-8">
-                            {megaMenus[l.name].columns.map((col) => (
+                            {menuData.columns.map((col) => (
                               <div key={col.title} className="min-w-[140px]">
                                 <h4 className="text-xs font-medium uppercase tracking-wider text-[#8c4a5a] mb-3">
                                   {col.title}
@@ -201,22 +212,22 @@ export default function Header() {
                               </div>
                             ))}
                           </div>
-                          {megaMenus[l.name].featured && (
+                          {menuData.featured && (
                             <div className="w-[200px] flex-shrink-0">
-                              <Link href={megaMenus[l.name].featured!.href} className="block group">
+                              <Link href={menuData.featured.href} className="block group">
                                 <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                                   <img
-                                    src={megaMenus[l.name].featured!.image}
-                                    alt={megaMenus[l.name].featured!.title}
+                                    src={menuData.featured.image}
+                                    alt={menuData.featured.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                                   <div className="absolute bottom-0 left-0 right-0 p-3">
                                     <p className="text-white text-sm font-medium">
-                                      {megaMenus[l.name].featured!.title}
+                                      {menuData.featured.title}
                                     </p>
                                     <span className="text-[#b07a87] text-xs font-medium flex items-center gap-1 mt-1">
-                                      {megaMenus[l.name].featured!.cta}
+                                      {menuData.featured.cta}
                                       <ChevronRight className="w-3 h-3" />
                                     </span>
                                   </div>
@@ -238,8 +249,11 @@ export default function Header() {
             <img src="/logo.png" alt="Alta Moda" className="h-6 md:h-7" />
           </Link>
 
-          {/* Icons - right (Kanva style: user, search, heart, cart) */}
+          {/* Icons - right */}
           <div className="flex items-center gap-5">
+            <div className="hidden sm:block">
+              <LanguageToggle />
+            </div>
             <Link href={session ? "/account" : "/account/login"} className="hidden sm:block hover:text-[#8c4a5a] transition-colors">
               <User className="w-5 h-5 text-[#2d2d2d]" />
             </Link>
@@ -275,7 +289,7 @@ export default function Header() {
               <div className="relative max-w-xl mx-auto">
                 <input
                   type="text"
-                  placeholder="Pretražite proizvode..."
+                  placeholder={t("nav.searchPlaceholder")}
                   autoFocus
                   className="w-full border border-[#e0d8cc] rounded-full pl-5 pr-12 py-3 text-sm focus:border-[#8c4a5a] focus:ring-0 transition-colors bg-transparent"
                 />
@@ -299,10 +313,11 @@ export default function Header() {
             </div>
             <div className="p-4 space-y-1">
               {navLinks.map((l) => {
-                const hasMega = l.hasMega && megaMenus[l.name] !== undefined;
-                const isExpanded = expandedMobile === l.name;
+                const hasMega = l.hasMega && megaMenus[l.menuKey] !== undefined;
+                const menuData = hasMega ? megaMenus[l.menuKey] : null;
+                const isExpanded = expandedMobile === l.menuKey;
                 return (
-                  <div key={l.name}>
+                  <div key={l.menuKey || l.name}>
                     <div className="flex items-center justify-between border-b border-[#f5f0e8]">
                       <Link
                         href={l.href}
@@ -313,7 +328,7 @@ export default function Header() {
                       </Link>
                       {hasMega && (
                         <button
-                          onClick={() => toggleMobileSubmenu(l.name)}
+                          onClick={() => toggleMobileSubmenu(l.menuKey)}
                           className="p-2 hover:text-[#8c4a5a] transition-colors"
                         >
                           <ChevronDown
@@ -324,9 +339,9 @@ export default function Header() {
                         </button>
                       )}
                     </div>
-                    {hasMega && isExpanded && (
+                    {hasMega && isExpanded && menuData && (
                       <div className="pl-4 pb-2 animate-slideDown">
-                        {megaMenus[l.name].columns.map((col) => (
+                        {menuData.columns.map((col) => (
                           <div key={col.title} className="mb-3">
                             <span className="text-xs font-medium uppercase tracking-wider text-[#8c4a5a] block py-1 px-2">
                               {col.title}
@@ -348,6 +363,11 @@ export default function Header() {
                   </div>
                 );
               })}
+
+              {/* Language selector in mobile menu */}
+              <div className="pt-4 border-t border-[#e0d8cc] mt-2">
+                <LanguageToggle />
+              </div>
             </div>
           </div>
         </div>

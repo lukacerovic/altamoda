@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Search,
   Download,
@@ -87,6 +88,7 @@ const iconMap = {
 };
 
 export default function NewsletterPage() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>("subscribers");
   const [search, setSearch] = useState("");
   const [segmentFilter, setSegmentFilter] = useState("all");
@@ -181,12 +183,12 @@ export default function NewsletterPage() {
       const json = await res.json();
       if (!json.success) return;
 
-      const rows = [["Email", "Segment", "Status", "Datum prijave", "Datum odjave"]];
+      const rows = [[t("newsletter.email"), t("newsletter.segment"), t("newsletter.status"), t("newsletter.subscribeDate"), t("newsletter.unsubscribed")]];
       for (const sub of json.data.subscribers) {
         rows.push([
           sub.email,
           sub.segment.toUpperCase(),
-          sub.isSubscribed ? "Aktivan" : "Odjavljen",
+          sub.isSubscribed ? t("newsletter.active") : t("newsletter.unsubscribed"),
           new Date(sub.subscribedAt).toLocaleDateString("sr-RS"),
           sub.unsubscribedAt ? new Date(sub.unsubscribedAt).toLocaleDateString("sr-RS") : "",
         ]);
@@ -252,9 +254,9 @@ export default function NewsletterPage() {
   };
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: "subscribers", label: "Pretplatnici" },
-    { id: "campaigns", label: "Kampanje" },
-    { id: "automations", label: "Automatizacije" },
+    { id: "subscribers", label: t("newsletter.subscribers") },
+    { id: "campaigns", label: t("newsletter.campaigns") },
+    { id: "automations", label: t("newsletter.automations") },
   ];
 
   return (
@@ -262,8 +264,8 @@ export default function NewsletterPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#2d2d2d]">Newsletter</h1>
-          <p className="text-[#666] mt-1">Upravljajte pretplatnicima i kampanjama</p>
+          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#2d2d2d]">{t("newsletter.title")}</h1>
+          <p className="text-[#666] mt-1">{t("newsletter.subtitle")}</p>
         </div>
       </div>
 
@@ -288,7 +290,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#999] uppercase tracking-wider">Ukupno aktivnih</p>
+                  <p className="text-xs text-[#999] uppercase tracking-wider">{t("newsletter.totalActive")}</p>
                   <p className="text-2xl font-bold text-[#2d2d2d] mt-1">{stats.totalActive}</p>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-[#8c4a5a]/10 flex items-center justify-center">
@@ -299,7 +301,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#999] uppercase tracking-wider">B2B pretplatnici</p>
+                  <p className="text-xs text-[#999] uppercase tracking-wider">{t("newsletter.b2bSubscribers")}</p>
                   <p className="text-2xl font-bold text-blue-600 mt-1">{stats.b2bCount}</p>
                 </div>
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">B2B</span>
@@ -308,7 +310,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#999] uppercase tracking-wider">B2C pretplatnici</p>
+                  <p className="text-xs text-[#999] uppercase tracking-wider">{t("newsletter.b2cSubscribers")}</p>
                   <p className="text-2xl font-bold text-green-600 mt-1">{stats.b2cCount}</p>
                 </div>
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">B2C</span>
@@ -321,16 +323,16 @@ export default function NewsletterPage() {
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
-                <input type="text" placeholder="Pretraži pretplatnike..." value={search} onChange={(e) => handleSearchChange(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
+                <input type="text" placeholder={t("newsletter.searchPlaceholder")} value={search} onChange={(e) => handleSearchChange(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
               </div>
               <select value={segmentFilter} onChange={(e) => handleSegmentChange(e.target.value)} className="px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
-                <option value="all">Svi segmenti</option>
+                <option value="all">{t("newsletter.allSegments")}</option>
                 <option value="b2b">B2B</option>
                 <option value="b2c">B2C</option>
               </select>
               <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">
                 <Download size={16} />
-                Izvezi pretplatnike
+                {t("newsletter.exportSubscribers")}
               </button>
             </div>
           </div>
@@ -341,21 +343,21 @@ export default function NewsletterPage() {
               <table className="w-full text-sm">
                 <thead className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Email</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Segment</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Datum prijave</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Akcije</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.email")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.segment")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.subscribeDate")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.status")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-[#999]">Učitavanje...</td>
+                      <td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.loading")}</td>
                     </tr>
                   ) : subscribers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-[#999]">Nema pretplatnika</td>
+                      <td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.noSubscribers")}</td>
                     </tr>
                   ) : (
                     subscribers.map((sub) => (
@@ -374,11 +376,11 @@ export default function NewsletterPage() {
                         <td className="px-4 py-3 text-[#666]">{new Date(sub.subscribedAt).toLocaleDateString("sr-RS")}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sub.isSubscribed ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                            {sub.isSubscribed ? "Aktivan" : "Odjavljen"}
+                            {sub.isSubscribed ? t("newsletter.active") : t("newsletter.unsubscribed")}
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <button onClick={() => handleDelete(sub.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Obriši">
+                          <button onClick={() => handleDelete(sub.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title={t("newsletter.delete")}>
                             <Trash2 size={16} />
                           </button>
                         </td>
@@ -393,7 +395,7 @@ export default function NewsletterPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-4 py-3 border-t border-[#e0d8cc]">
                 <span className="text-sm text-[#666]">
-                  Strana {page} od {totalPages} ({total} ukupno)
+                  {t("newsletter.pageOf")} {page} {t("newsletter.of")} {totalPages} ({total} {t("newsletter.totalLabel")})
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -423,12 +425,12 @@ export default function NewsletterPage() {
           <div className="flex justify-end mb-6">
             <button onClick={openNewCampaign} className="inline-flex items-center gap-2 bg-[#8c4a5a] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm">
               <Plus size={18} />
-              Nova kampanja
+              {t("newsletter.newCampaign")}
             </button>
           </div>
           <div className="space-y-4">
             {campaigns.length === 0 && (
-              <div className="bg-white rounded-xl border border-[#e0d8cc] p-8 text-center text-[#999]">Nema kampanja</div>
+              <div className="bg-white rounded-xl border border-[#e0d8cc] p-8 text-center text-[#999]">{t("newsletter.noCampaigns")}</div>
             )}
             {campaigns.map((campaign) => (
               <div key={campaign.id} className="bg-white rounded-xl border border-[#e0d8cc] p-5 hover:shadow-md transition-shadow">
@@ -442,7 +444,7 @@ export default function NewsletterPage() {
                         campaign.status === "scheduled" ? "bg-blue-100 text-blue-700" :
                         "bg-gray-100 text-gray-500"
                       }`}>
-                        {campaign.status === "sent" ? "Poslato" : campaign.status === "scheduled" ? "Zakazano" : "Nacrt"}
+                        {campaign.status === "sent" ? t("newsletter.sent") : campaign.status === "scheduled" ? t("newsletter.scheduled") : t("newsletter.draft")}
                       </span>
                       {campaign.sentDate && <span className="text-xs text-[#999]">{campaign.sentDate}</span>}
                     </div>
@@ -455,22 +457,22 @@ export default function NewsletterPage() {
                             <Eye size={14} />
                             <span className="text-lg font-bold">{campaign.openRate}%</span>
                           </div>
-                          <p className="text-xs text-[#999]">Otvoreno</p>
+                          <p className="text-xs text-[#999]">{t("newsletter.opened")}</p>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center gap-1 text-[#8c4a5a]">
                             <MousePointer size={14} />
                             <span className="text-lg font-bold">{campaign.clickRate}%</span>
                           </div>
-                          <p className="text-xs text-[#999]">Kliknuto</p>
+                          <p className="text-xs text-[#999]">{t("newsletter.clicked")}</p>
                         </div>
                       </div>
                     )}
                     <div className="flex items-center gap-1">
-                      <button onClick={() => openEditCampaign(campaign)} className="p-1.5 text-[#666] hover:text-[#8c4a5a] hover:bg-[#f5f0e8] rounded-lg transition-colors" title="Izmeni">
+                      <button onClick={() => openEditCampaign(campaign)} className="p-1.5 text-[#666] hover:text-[#8c4a5a] hover:bg-[#f5f0e8] rounded-lg transition-colors" title={t("admin.edit")}>
                         <Pencil size={16} />
                       </button>
-                      <button onClick={() => handleDeleteCampaign(campaign.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Obriši">
+                      <button onClick={() => handleDeleteCampaign(campaign.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title={t("admin.delete")}>
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -498,10 +500,10 @@ export default function NewsletterPage() {
                       <h3 className="font-semibold text-[#2d2d2d] mb-1">{automation.name}</h3>
                       <p className="text-sm text-[#666] mb-2">{automation.description}</p>
                       <div className="flex items-center gap-3 text-xs text-[#999]">
-                        <span className="bg-[#f5f0e8] px-2 py-0.5 rounded">Cilj: {automation.target}</span>
+                        <span className="bg-[#f5f0e8] px-2 py-0.5 rounded">{t("newsletter.target")}: {automation.target}</span>
                         <span className="flex items-center gap-1">
                           <Clock size={12} />
-                          Poslednji put: {automation.lastTriggered}
+                          {t("newsletter.lastTriggered")}: {automation.lastTriggered}
                         </span>
                       </div>
                     </div>
@@ -525,16 +527,16 @@ export default function NewsletterPage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }}>
           <div className="bg-white rounded-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-[#e0d8cc]">
-              <h2 className="font-serif text-xl font-bold text-[#2d2d2d]">{editingCampaign ? "Izmeni kampanju" : "Nova kampanja"}</h2>
+              <h2 className="font-serif text-xl font-bold text-[#2d2d2d]">{editingCampaign ? t("newsletter.editCampaign") : t("newsletter.newCampaign")}</h2>
               <button onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }} className="p-1 hover:bg-[#f5f0e8] rounded-lg"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Naslov</label>
-                <input type="text" value={campaignForm.subject} onChange={(e) => setCampaignForm({ ...campaignForm, subject: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" placeholder="Naslov kampanje..." />
+                <label className="block text-sm font-medium text-[#333] mb-1">{t("newsletter.campaignTitle")}</label>
+                <input type="text" value={campaignForm.subject} onChange={(e) => setCampaignForm({ ...campaignForm, subject: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" placeholder={t("newsletter.campaignTitlePlaceholder")} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Segment</label>
+                <label className="block text-sm font-medium text-[#333] mb-1">{t("newsletter.campaignSegment")}</label>
                 <select value={campaignForm.segment} onChange={(e) => setCampaignForm({ ...campaignForm, segment: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                   <option value="Svi">Svi</option>
                   <option value="B2B">B2B</option>
@@ -542,7 +544,7 @@ export default function NewsletterPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Tip sadržaja</label>
+                <label className="block text-sm font-medium text-[#333] mb-1">{t("newsletter.contentType")}</label>
                 <select value={campaignForm.contentType} onChange={(e) => setCampaignForm({ ...campaignForm, contentType: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                   <option value="Akcije">Akcije</option>
                   <option value="Noviteti">Noviteti</option>
@@ -552,9 +554,9 @@ export default function NewsletterPage() {
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e0d8cc]">
-              <button onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }} className="px-5 py-2.5 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">Otkaži</button>
+              <button onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }} className="px-5 py-2.5 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">{t("newsletter.cancel")}</button>
               <button onClick={handleSaveCampaign} disabled={!campaignForm.subject.trim()} className="px-5 py-2.5 bg-[#8c4a5a] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                {editingCampaign ? "Sačuvaj izmene" : "Kreiraj kampanju"}
+                {editingCampaign ? t("newsletter.saveChanges") : t("newsletter.createCampaign")}
               </button>
             </div>
           </div>

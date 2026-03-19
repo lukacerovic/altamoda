@@ -21,36 +21,13 @@ import {
   Mail,
   Zap,
 } from "lucide-react";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface NavSection {
   title?: string;
   items: { href: string; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[];
 }
-
-const navSections: NavSection[] = [
-  {
-    items: [
-      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/admin/products", label: "Proizvodi", icon: Package },
-      { href: "/admin/orders", label: "Porudžbine", icon: ShoppingCart },
-      { href: "/admin/users", label: "Korisnici", icon: Users },
-    ],
-  },
-  {
-    title: "Prodaja",
-    items: [
-      { href: "/admin/actions", label: "Akcije", icon: Zap },
-      { href: "/admin/bundles", label: "Paketi", icon: PackageOpen },
-    ],
-  },
-  {
-    title: "Sistem",
-    items: [
-      { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
-      { href: "/admin/settings", label: "Podešavanja", icon: Settings },
-    ],
-  },
-];
 
 export default function AdminLayout({
   children,
@@ -59,6 +36,7 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -66,6 +44,31 @@ export default function AdminLayout({
 
   const userName = session?.user?.name || "Admin";
   const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+
+  const navSections: NavSection[] = [
+    {
+      items: [
+        { href: "/admin", label: t("admin.dashboard"), icon: LayoutDashboard },
+        { href: "/admin/products", label: t("admin.products"), icon: Package },
+        { href: "/admin/orders", label: t("admin.orders"), icon: ShoppingCart },
+        { href: "/admin/users", label: t("admin.users"), icon: Users },
+      ],
+    },
+    {
+      title: t("admin.sales"),
+      items: [
+        { href: "/admin/actions", label: t("admin.promotions"), icon: Zap },
+        { href: "/admin/bundles", label: t("admin.bundles"), icon: PackageOpen },
+      ],
+    },
+    {
+      title: t("admin.system"),
+      items: [
+        { href: "/admin/newsletter", label: t("admin.newsletter"), icon: Mail },
+        { href: "/admin/settings", label: t("admin.settings"), icon: Settings },
+      ],
+    },
+  ];
 
   const notifications = [
     { id: 1, text: "Nova porudžbina #1048", time: "Pre 5 min", unread: true },
@@ -255,13 +258,16 @@ export default function AdminLayout({
               />
               <input
                 type="text"
-                placeholder="Pretraži..."
+                placeholder={t("admin.searchPlaceholder")}
                 className="w-full pl-10 pr-4 py-2 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:border-[#8c4a5a] focus:bg-white transition-all"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Language */}
+            <LanguageToggle />
+
             {/* Notifications */}
             <div className="relative">
               <button
@@ -278,7 +284,7 @@ export default function AdminLayout({
               {notificationsOpen && (
                 <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-[#e0d8cc] overflow-hidden animate-slideDown">
                   <div className="p-4 border-b border-[#e0d8cc]">
-                    <h3 className="font-semibold text-sm text-[#2d2d2d]">Obaveštenja</h3>
+                    <h3 className="font-semibold text-sm text-[#2d2d2d]">{t("admin.notifications")}</h3>
                   </div>
                   {notifications.map((n) => (
                     <div
@@ -293,7 +299,7 @@ export default function AdminLayout({
                   ))}
                   <div className="p-3 text-center">
                     <button className="text-sm text-[#8c4a5a] hover:text-[#6e3848] font-medium">
-                      Prikaži sva obaveštenja
+                      {t("admin.showAllNotifications")}
                     </button>
                   </div>
                 </div>
@@ -325,19 +331,19 @@ export default function AdminLayout({
                     className="flex items-center gap-2 px-4 py-3 text-sm text-[#333] hover:bg-[#f5f0e8] transition-colors"
                   >
                     <User size={16} />
-                    Moj Profil
+                    {t("admin.myProfile")}
                   </Link>
                   <Link
                     href="/admin/settings"
                     className="flex items-center gap-2 px-4 py-3 text-sm text-[#333] hover:bg-[#f5f0e8] transition-colors"
                   >
                     <Settings size={16} />
-                    Podešavanja
+                    {t("admin.settings")}
                   </Link>
                   <div className="border-t border-[#e0d8cc]">
                     <button onClick={() => signOut({ callbackUrl: "/account/login" })} className="flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 w-full transition-colors">
                       <LogOut size={16} />
-                      Odjavi se
+                      {t("admin.logout")}
                     </button>
                   </div>
                 </div>

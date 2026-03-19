@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Cookie, ChevronDown, ChevronUp } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface CookieSettings {
   necessary: boolean;
@@ -17,6 +18,7 @@ export default function CookieConsent() {
     analytics: false,
     marketing: false,
   });
+  const { t } = useLanguage();
 
   useEffect(() => {
     const consent = localStorage.getItem("altamoda_cookie_consent");
@@ -58,10 +60,9 @@ export default function CookieConsent() {
                 <Cookie className="w-5 h-5 text-[#8c4a5a]" />
               </div>
               <p className="text-sm text-[#6b6b6b] leading-relaxed">
-                Koristimo kolačiće za poboljšanje vašeg iskustva. Nastavkom korišćenja sajta,
-                prihvatate našu{" "}
+                {t("cookie.text")}{" "}
                 <a href="#" className="text-[#8c4a5a] hover:underline">
-                  politiku kolačića
+                  {t("cookie.cookiePolicy")}
                 </a>
                 .
               </p>
@@ -73,7 +74,7 @@ export default function CookieConsent() {
                 onClick={() => setShowSettings(!showSettings)}
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-[#e0d8cc] text-[#2d2d2d] rounded-full text-sm font-medium hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors"
               >
-                Podešavanja
+                {t("cookie.settings")}
                 {showSettings ? (
                   <ChevronUp className="w-3.5 h-3.5" />
                 ) : (
@@ -84,7 +85,7 @@ export default function CookieConsent() {
                 onClick={acceptAll}
                 className="px-6 py-2.5 bg-[#8c4a5a] hover:bg-[#6e3848] text-white rounded-full text-sm font-medium transition-colors"
               >
-                Prihvatam
+                {t("cookie.acceptAll")}
               </button>
             </div>
           </div>
@@ -96,9 +97,9 @@ export default function CookieConsent() {
                 {/* Necessary */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">Neophodni kolačići</span>
+                    <span className="text-sm font-medium text-[#2d2d2d]">{t("cookie.necessaryCookies")}</span>
                     <p className="text-xs text-[#6b6b6b] mt-0.5">
-                      Potrebni za osnovne funkcije sajta. Ne mogu se isključiti.
+                      {t("cookie.necessaryDesc")}
                     </p>
                   </div>
                   <div className="relative">
@@ -121,9 +122,9 @@ export default function CookieConsent() {
                 {/* Analytics */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">Analitički kolačići</span>
+                    <span className="text-sm font-medium text-[#2d2d2d]">{t("cookie.analyticsCookies")}</span>
                     <p className="text-xs text-[#6b6b6b] mt-0.5">
-                      Pomažu nam da razumemo kako koristite sajt.
+                      {t("cookie.analyticsDesc")}
                     </p>
                   </div>
                   <button
@@ -143,9 +144,9 @@ export default function CookieConsent() {
                 {/* Marketing */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">Marketing kolačići</span>
+                    <span className="text-sm font-medium text-[#2d2d2d]">{t("cookie.marketingCookies")}</span>
                     <p className="text-xs text-[#6b6b6b] mt-0.5">
-                      Koriste se za prikazivanje relevantnih reklama.
+                      {t("cookie.marketingDesc")}
                     </p>
                   </div>
                   <button
@@ -166,7 +167,7 @@ export default function CookieConsent() {
                   onClick={saveSettings}
                   className="mt-2 px-6 py-2.5 bg-[#2d2d2d] hover:bg-[#4a4a4a] text-white rounded-full text-sm font-medium transition-colors self-start"
                 >
-                  Sačuvaj podešavanja
+                  {t("cookie.saveSettings")}
                 </button>
               </div>
             </div>
