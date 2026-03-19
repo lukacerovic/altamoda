@@ -128,18 +128,18 @@ export default function NewsletterPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#1a1a1a]">Newsletter</h1>
+          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#2d2d2d]">Newsletter</h1>
           <p className="text-[#666] mt-1">Upravljajte pretplatnicima i kampanjama</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#f5f5f5] rounded-lg p-1 mb-6 w-fit">
+      <div className="flex gap-1 bg-[#f5f0e8] rounded-lg p-1 mb-6 w-fit">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab.id ? "bg-white text-[#1a1a1a] shadow-sm" : "text-[#666] hover:text-[#333]"}`}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab.id ? "bg-white text-[#2d2d2d] shadow-sm" : "text-[#666] hover:text-[#333]"}`}
           >
             {tab.label}
           </button>
@@ -151,18 +151,18 @@ export default function NewsletterPage() {
         <div>
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-xl border border-[#e5e5e5] p-4">
+            <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-[#999] uppercase tracking-wider">Ukupno aktivnih</p>
-                  <p className="text-2xl font-bold text-[#1a1a1a] mt-1">{totalActive}</p>
+                  <p className="text-2xl font-bold text-[#2d2d2d] mt-1">{totalActive}</p>
                 </div>
-                <div className="w-10 h-10 rounded-lg bg-[#c8a96e]/10 flex items-center justify-center">
-                  <Users size={20} className="text-[#c8a96e]" />
+                <div className="w-10 h-10 rounded-lg bg-[#8c4a5a]/10 flex items-center justify-center">
+                  <Users size={20} className="text-[#8c4a5a]" />
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-xl border border-[#e5e5e5] p-4">
+            <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-[#999] uppercase tracking-wider">B2B pretplatnici</p>
@@ -171,7 +171,7 @@ export default function NewsletterPage() {
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">B2B</span>
               </div>
             </div>
-            <div className="bg-white rounded-xl border border-[#e5e5e5] p-4">
+            <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-[#999] uppercase tracking-wider">B2C pretplatnici</p>
@@ -183,18 +183,18 @@ export default function NewsletterPage() {
           </div>
 
           {/* Filters */}
-          <div className="bg-white rounded-xl border border-[#e5e5e5] p-4 mb-6">
+          <div className="bg-white rounded-xl border border-[#e0d8cc] p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
-                <input type="text" placeholder="Pretraži pretplatnike..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                <input type="text" placeholder="Pretraži pretplatnike..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
               </div>
-              <select value={segmentFilter} onChange={(e) => setSegmentFilter(e.target.value)} className="px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+              <select value={segmentFilter} onChange={(e) => setSegmentFilter(e.target.value)} className="px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                 <option value="Svi">Svi segmenti</option>
                 <option value="B2B">B2B</option>
                 <option value="B2C">B2C</option>
               </select>
-              <button className="inline-flex items-center gap-2 px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm font-medium hover:bg-[#f5f5f5] transition-colors">
+              <button className="inline-flex items-center gap-2 px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">
                 <Download size={16} />
                 Izvezi pretplatnike
               </button>
@@ -202,10 +202,10 @@ export default function NewsletterPage() {
           </div>
 
           {/* Table */}
-          <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-[#fafafa] border-b border-[#e5e5e5]">
+                <thead className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
                   <tr>
                     <th className="text-left px-4 py-3 font-semibold text-[#666]">Email</th>
                     <th className="text-left px-4 py-3 font-semibold text-[#666]">Ime</th>
@@ -216,10 +216,10 @@ export default function NewsletterPage() {
                 </thead>
                 <tbody>
                   {filteredSubscribers.map((sub) => (
-                    <tr key={sub.id} className="border-b border-[#f5f5f5] hover:bg-[#fafafa] transition-colors">
+                    <tr key={sub.id} className="border-b border-[#f5f0e8] hover:bg-[#f5f0e8] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Mail size={14} className="text-[#c8a96e]" />
+                          <Mail size={14} className="text-[#8c4a5a]" />
                           <span className="text-[#333]">{sub.email}</span>
                         </div>
                       </td>
@@ -248,19 +248,19 @@ export default function NewsletterPage() {
       {activeTab === "campaigns" && (
         <div>
           <div className="flex justify-end mb-6">
-            <button onClick={() => setShowCampaignModal(true)} className="inline-flex items-center gap-2 bg-[#c8a96e] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm">
+            <button onClick={() => setShowCampaignModal(true)} className="inline-flex items-center gap-2 bg-[#8c4a5a] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm">
               <Plus size={18} />
               Nova kampanja
             </button>
           </div>
           <div className="space-y-4">
             {initialCampaigns.map((campaign) => (
-              <div key={campaign.id} className="bg-white rounded-xl border border-[#e5e5e5] p-5 hover:shadow-md transition-shadow">
+              <div key={campaign.id} className="bg-white rounded-xl border border-[#e0d8cc] p-5 hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h3 className="font-semibold text-[#1a1a1a] mb-2">{campaign.title}</h3>
+                    <h3 className="font-semibold text-[#2d2d2d] mb-2">{campaign.title}</h3>
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-xs bg-[#f5f5f5] text-[#666] px-2 py-1 rounded">{campaign.segment}</span>
+                      <span className="text-xs bg-[#f5f0e8] text-[#666] px-2 py-1 rounded">{campaign.segment}</span>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         campaign.status === "sent" ? "bg-green-100 text-green-700" :
                         campaign.status === "scheduled" ? "bg-blue-100 text-blue-700" :
@@ -274,14 +274,14 @@ export default function NewsletterPage() {
                   {campaign.status === "sent" && (
                     <div className="flex items-center gap-6">
                       <div className="text-center">
-                        <div className="flex items-center gap-1 text-[#c8a96e]">
+                        <div className="flex items-center gap-1 text-[#8c4a5a]">
                           <Eye size={14} />
                           <span className="text-lg font-bold">{campaign.openRate}%</span>
                         </div>
                         <p className="text-xs text-[#999]">Otvoreno</p>
                       </div>
                       <div className="text-center">
-                        <div className="flex items-center gap-1 text-[#c8a96e]">
+                        <div className="flex items-center gap-1 text-[#8c4a5a]">
                           <MousePointer size={14} />
                           <span className="text-lg font-bold">{campaign.clickRate}%</span>
                         </div>
@@ -302,17 +302,17 @@ export default function NewsletterPage() {
           {automations.map((automation) => {
             const Icon = iconMap[automation.icon];
             return (
-              <div key={automation.id} className="bg-white rounded-xl border border-[#e5e5e5] p-5 hover:shadow-md transition-shadow">
+              <div key={automation.id} className="bg-white rounded-xl border border-[#e0d8cc] p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${automation.enabled ? "bg-[#c8a96e]/10" : "bg-gray-100"}`}>
-                      <Icon size={20} className={automation.enabled ? "text-[#c8a96e]" : "text-gray-400"} />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${automation.enabled ? "bg-[#8c4a5a]/10" : "bg-gray-100"}`}>
+                      <Icon size={20} className={automation.enabled ? "text-[#8c4a5a]" : "text-gray-400"} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#1a1a1a] mb-1">{automation.name}</h3>
+                      <h3 className="font-semibold text-[#2d2d2d] mb-1">{automation.name}</h3>
                       <p className="text-sm text-[#666] mb-2">{automation.description}</p>
                       <div className="flex items-center gap-3 text-xs text-[#999]">
-                        <span className="bg-[#f5f5f5] px-2 py-0.5 rounded">Cilj: {automation.target}</span>
+                        <span className="bg-[#f5f0e8] px-2 py-0.5 rounded">Cilj: {automation.target}</span>
                         <span className="flex items-center gap-1">
                           <Clock size={12} />
                           Poslednji put: {automation.lastTriggered}
@@ -322,7 +322,7 @@ export default function NewsletterPage() {
                   </div>
                   <button onClick={() => toggleAutomation(automation.id)} className="flex-shrink-0">
                     {automation.enabled ? (
-                      <ToggleRight size={32} className="text-[#c8a96e]" />
+                      <ToggleRight size={32} className="text-[#8c4a5a]" />
                     ) : (
                       <ToggleLeft size={32} className="text-[#999]" />
                     )}
@@ -338,18 +338,18 @@ export default function NewsletterPage() {
       {showCampaignModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowCampaignModal(false)}>
           <div className="bg-white rounded-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-[#e5e5e5]">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Nova kampanja</h2>
-              <button onClick={() => setShowCampaignModal(false)} className="p-1 hover:bg-[#f5f5f5] rounded-lg"><X size={20} /></button>
+            <div className="flex items-center justify-between p-6 border-b border-[#e0d8cc]">
+              <h2 className="font-serif text-xl font-bold text-[#2d2d2d]">Nova kampanja</h2>
+              <button onClick={() => setShowCampaignModal(false)} className="p-1 hover:bg-[#f5f0e8] rounded-lg"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Naslov</label>
-                <input type="text" value={campaignForm.subject} onChange={(e) => setCampaignForm({ ...campaignForm, subject: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" placeholder="Naslov kampanje..." />
+                <input type="text" value={campaignForm.subject} onChange={(e) => setCampaignForm({ ...campaignForm, subject: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" placeholder="Naslov kampanje..." />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Segment</label>
-                <select value={campaignForm.segment} onChange={(e) => setCampaignForm({ ...campaignForm, segment: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                <select value={campaignForm.segment} onChange={(e) => setCampaignForm({ ...campaignForm, segment: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                   <option value="Svi">Svi</option>
                   <option value="B2B">B2B</option>
                   <option value="B2C">B2C</option>
@@ -357,7 +357,7 @@ export default function NewsletterPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Tip sadržaja</label>
-                <select value={campaignForm.contentType} onChange={(e) => setCampaignForm({ ...campaignForm, contentType: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                <select value={campaignForm.contentType} onChange={(e) => setCampaignForm({ ...campaignForm, contentType: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                   <option value="Akcije">Akcije</option>
                   <option value="Noviteti">Noviteti</option>
                   <option value="Seminari">Seminari</option>
@@ -365,9 +365,9 @@ export default function NewsletterPage() {
                 </select>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e5e5e5]">
-              <button onClick={() => setShowCampaignModal(false)} className="px-5 py-2.5 border border-[#e5e5e5] rounded-lg text-sm font-medium hover:bg-[#f5f5f5] transition-colors">Otkaži</button>
-              <button onClick={() => setShowCampaignModal(false)} className="px-5 py-2.5 bg-[#c8a96e] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">Kreiraj kampanju</button>
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e0d8cc]">
+              <button onClick={() => setShowCampaignModal(false)} className="px-5 py-2.5 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">Otkaži</button>
+              <button onClick={() => setShowCampaignModal(false)} className="px-5 py-2.5 bg-[#8c4a5a] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">Kreiraj kampanju</button>
             </div>
           </div>
         </div>

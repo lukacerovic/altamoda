@@ -73,19 +73,19 @@ export default function ColorsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f0e8]">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-[#c8a96e]">Pocetna</Link><ChevronRight className="w-3 h-3" /><span className="text-[#1a1a1a]">Boje za Kosu</span>
+          <Link href="/" className="hover:text-[#8c4a5a]">Pocetna</Link><ChevronRight className="w-3 h-3" /><span className="text-[#2d2d2d]">Boje za Kosu</span>
         </nav>
 
-        <h1 className="text-3xl font-bold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Paleta Boja za Kosu</h1>
+        <h1 className="text-3xl font-bold text-[#2d2d2d] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Paleta Boja za Kosu</h1>
         <p className="text-gray-500 mb-8">Odaberite savrsen ton iz nase profesionalne palete boja</p>
 
         {/* Brand tabs */}
         <div className="flex gap-2 mb-8 overflow-x-auto">
           {brandTabs.map((b) => (
-            <button key={b.key} onClick={() => setActiveBrand(b.key)} className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeBrand === b.key ? "bg-[#c8a96e] text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-[#c8a96e]"}`}>{b.label}</button>
+            <button key={b.key} onClick={() => setActiveBrand(b.key)} className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeBrand === b.key ? "bg-[#8c4a5a] text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-[#8c4a5a]"}`}>{b.label}</button>
           ))}
         </div>
 
@@ -94,18 +94,18 @@ export default function ColorsPage() {
           <div>
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Nivo svetloce</span>
             <div className="flex gap-1.5 flex-wrap">
-              <button onClick={() => setFilterLevel(null)} className={`w-8 h-8 rounded text-xs font-medium transition-colors ${!filterLevel ? "bg-[#c8a96e] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#c8a96e]"}`}>Svi</button>
+              <button onClick={() => setFilterLevel(null)} className={`w-8 h-8 rounded text-xs font-medium transition-colors ${!filterLevel ? "bg-[#8c4a5a] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>Svi</button>
               {levels.map((l) => (
-                <button key={l} onClick={() => setFilterLevel(filterLevel === l ? null : l)} className={`w-8 h-8 rounded text-xs font-medium transition-colors ${filterLevel === l ? "bg-[#c8a96e] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#c8a96e]"}`}>{l}</button>
+                <button key={l} onClick={() => setFilterLevel(filterLevel === l ? null : l)} className={`w-8 h-8 rounded text-xs font-medium transition-colors ${filterLevel === l ? "bg-[#8c4a5a] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>{l}</button>
               ))}
             </div>
           </div>
           <div>
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Podton</span>
             <div className="flex gap-1.5 flex-wrap">
-              <button onClick={() => setFilterUndertone(null)} className={`px-3 h-8 rounded text-xs font-medium transition-colors ${!filterUndertone ? "bg-[#c8a96e] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#c8a96e]"}`}>Svi</button>
+              <button onClick={() => setFilterUndertone(null)} className={`px-3 h-8 rounded text-xs font-medium transition-colors ${!filterUndertone ? "bg-[#8c4a5a] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>Svi</button>
               {undertones.map((ut) => (
-                <button key={ut.key} onClick={() => setFilterUndertone(filterUndertone === ut.key ? null : ut.key)} className={`px-3 h-8 rounded text-xs font-medium transition-colors ${filterUndertone === ut.key ? "bg-[#c8a96e] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#c8a96e]"}`}>{ut.label}</button>
+                <button key={ut.key} onClick={() => setFilterUndertone(filterUndertone === ut.key ? null : ut.key)} className={`px-3 h-8 rounded text-xs font-medium transition-colors ${filterUndertone === ut.key ? "bg-[#8c4a5a] text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>{ut.label}</button>
               ))}
             </div>
           </div>
@@ -118,12 +118,12 @@ export default function ColorsPage() {
             <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
               {filtered.map((color) => (
                 <button key={color.code} onClick={() => setSelectedColor(color)} className={`group relative flex flex-col items-center gap-1 ${selectedColor?.code === color.code ? "scale-110" : ""} transition-transform`}>
-                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all hover:scale-110 ${selectedColor?.code === color.code ? "border-[#c8a96e] ring-2 ring-[#c8a96e]/30" : "border-white shadow-sm hover:border-[#c8a96e]"}`} style={{ backgroundColor: color.hex }} />
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all hover:scale-110 ${selectedColor?.code === color.code ? "border-[#8c4a5a] ring-2 ring-[#8c4a5a]/30" : "border-white shadow-sm hover:border-[#8c4a5a]"}`} style={{ backgroundColor: color.hex }} />
                   <span className="text-[10px] text-gray-500 font-medium">{color.code}</span>
                   {/* Tooltip */}
-                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-[#2d2d2d] text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                     {color.name}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1a1a1a] rotate-45 -mt-1" />
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#2d2d2d] rotate-45 -mt-1" />
                   </div>
                 </button>
               ))}
@@ -137,16 +137,16 @@ export default function ColorsPage() {
                 <button onClick={() => setSelectedColor(null)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 shadow-lg border-4 border-white" style={{ backgroundColor: selectedColor.hex }} />
                 <div className="text-center mb-4">
-                  <span className="text-xs text-[#c8a96e] font-medium uppercase tracking-wider">{brandTabs.find((b) => b.key === activeBrand)?.label}</span>
-                  <h3 className="text-lg font-bold text-[#1a1a1a] mt-1">{selectedColor.code}</h3>
+                  <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{brandTabs.find((b) => b.key === activeBrand)?.label}</span>
+                  <h3 className="text-lg font-bold text-[#2d2d2d] mt-1">{selectedColor.code}</h3>
                   <p className="text-sm text-gray-500">{selectedColor.name}</p>
                 </div>
                 <div className="space-y-2 text-sm mb-6">
                   <div className="flex justify-between"><span className="text-gray-500">Nivo</span><span className="font-medium">{selectedColor.level}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Podton</span><span className="font-medium">{undertones.find((u) => u.key === selectedColor.undertone)?.label}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Cena</span><span className="font-bold text-[#1a1a1a]">{selectedColor.price} RSD</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Cena</span><span className="font-bold text-[#2d2d2d]">{selectedColor.price} RSD</span></div>
                 </div>
-                <button className="w-full bg-[#c8a96e] hover:bg-[#a8894e] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
+                <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> Dodaj u Korpu
                 </button>
               </div>

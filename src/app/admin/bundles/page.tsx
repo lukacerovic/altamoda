@@ -212,12 +212,12 @@ export default function BundlesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#1a1a1a]">Paketi</h1>
+          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#2d2d2d]">Paketi</h1>
           <p className="text-[#666] mt-1">Kreirajte i upravljajte paketima proizvoda</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 bg-[#c8a96e] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm"
+          className="inline-flex items-center gap-2 bg-[#8c4a5a] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm"
         >
           <Plus size={18} />
           Novi paket
@@ -227,10 +227,10 @@ export default function BundlesPage() {
       {/* Bundle Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {bundles.map((bundle) => (
-          <div key={bundle.id} className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden hover:shadow-lg transition-shadow">
+          <div key={bundle.id} className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden hover:shadow-lg transition-shadow">
             {/* Image placeholder */}
-            <div className="h-40 bg-gradient-to-br from-[#c8a96e]/20 to-[#c8a96e]/5 flex items-center justify-center relative">
-              <Package size={48} className="text-[#c8a96e]/40" />
+            <div className="h-40 bg-gradient-to-br from-[#8c4a5a]/20 to-[#8c4a5a]/5 flex items-center justify-center relative">
+              <Package size={48} className="text-[#8c4a5a]/40" />
               <div className="absolute top-3 right-3">{statusBadge(bundle.status)}</div>
               {getSavings(bundle) > 0 && (
                 <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -239,14 +239,14 @@ export default function BundlesPage() {
               )}
             </div>
             <div className="p-5">
-              <h3 className="font-serif text-lg font-bold text-[#1a1a1a] mb-1">{bundle.name}</h3>
+              <h3 className="font-serif text-lg font-bold text-[#2d2d2d] mb-1">{bundle.name}</h3>
               <p className="text-sm text-[#666] mb-3 line-clamp-2">{bundle.description}</p>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs bg-[#f5f5f5] text-[#666] px-2 py-1 rounded">{bundle.products.length} proizvoda</span>
-                <span className="text-xs bg-[#f5f5f5] text-[#666] px-2 py-1 rounded">{bundle.target}</span>
+                <span className="text-xs bg-[#f5f0e8] text-[#666] px-2 py-1 rounded">{bundle.products.length} proizvoda</span>
+                <span className="text-xs bg-[#f5f0e8] text-[#666] px-2 py-1 rounded">{bundle.target}</span>
               </div>
               <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-xl font-bold text-[#1a1a1a]">{bundle.bundlePrice.toLocaleString()} RSD</span>
+                <span className="text-xl font-bold text-[#2d2d2d]">{bundle.bundlePrice.toLocaleString()} RSD</span>
                 <span className="text-sm text-[#999] line-through">
                   {bundle.products.reduce((s, p) => s + p.price, 0).toLocaleString()} RSD
                 </span>
@@ -255,12 +255,12 @@ export default function BundlesPage() {
                 <Calendar size={12} className="inline mr-1" />
                 {bundle.validFrom} - {bundle.validTo}
               </div>
-              <div className="flex items-center gap-2 pt-3 border-t border-[#f5f5f5]">
-                <button className="flex-1 py-2 text-sm font-medium text-[#c8a96e] hover:bg-[#c8a96e]/5 rounded-lg transition-colors">
+              <div className="flex items-center gap-2 pt-3 border-t border-[#f5f0e8]">
+                <button className="flex-1 py-2 text-sm font-medium text-[#8c4a5a] hover:bg-[#8c4a5a]/5 rounded-lg transition-colors">
                   <Edit3 size={14} className="inline mr-1" />
                   Izmeni
                 </button>
-                <button onClick={() => duplicateBundle(bundle)} className="flex-1 py-2 text-sm font-medium text-[#666] hover:bg-[#f5f5f5] rounded-lg transition-colors">
+                <button onClick={() => duplicateBundle(bundle)} className="flex-1 py-2 text-sm font-medium text-[#666] hover:bg-[#f5f0e8] rounded-lg transition-colors">
                   <Copy size={14} className="inline mr-1" />
                   Dupliraj
                 </button>
@@ -277,37 +277,37 @@ export default function BundlesPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-[#e5e5e5]">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Novi paket</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-[#f5f5f5] rounded-lg"><X size={20} /></button>
+            <div className="flex items-center justify-between p-6 border-b border-[#e0d8cc]">
+              <h2 className="font-serif text-xl font-bold text-[#2d2d2d]">Novi paket</h2>
+              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-[#f5f0e8] rounded-lg"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Naziv paketa</label>
-                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" placeholder="npr. Letnji set za negu" />
+                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" placeholder="npr. Letnji set za negu" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Opis</label>
-                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none resize-none" />
+                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none resize-none" />
               </div>
               {/* Product selection */}
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Proizvodi u paketu</label>
                 <div className="relative mb-2">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
-                  <input type="text" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" placeholder="Pretraži proizvode..." />
+                  <input type="text" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" placeholder="Pretraži proizvode..." />
                 </div>
-                <div className="border border-[#e5e5e5] rounded-lg max-h-48 overflow-y-auto">
+                <div className="border border-[#e0d8cc] rounded-lg max-h-48 overflow-y-auto">
                   {allProducts.filter((p) => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase())).map((product) => {
                     const isSelected = selectedProducts.some((sp) => sp.id === product.id);
                     return (
                       <div
                         key={product.id}
                         onClick={() => toggleProduct(product)}
-                        className={`flex items-center justify-between px-4 py-2.5 cursor-pointer border-b border-[#f5f5f5] last:border-0 hover:bg-[#fafafa] transition-colors ${isSelected ? "bg-[#c8a96e]/5" : ""}`}
+                        className={`flex items-center justify-between px-4 py-2.5 cursor-pointer border-b border-[#f5f0e8] last:border-0 hover:bg-[#f5f0e8] transition-colors ${isSelected ? "bg-[#8c4a5a]/5" : ""}`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isSelected ? "bg-[#c8a96e] border-[#c8a96e]" : "border-[#ddd]"}`}>
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isSelected ? "bg-[#8c4a5a] border-[#8c4a5a]" : "border-[#ddd]"}`}>
                             {isSelected && <Check size={12} className="text-white" />}
                           </div>
                           <span className="text-sm text-[#333]">{product.name}</span>
@@ -325,25 +325,25 @@ export default function BundlesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Cena paketa (RSD)</label>
-                  <input type="number" value={form.bundlePrice} onChange={(e) => handlePriceChange(e.target.value)} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="number" value={form.bundlePrice} onChange={(e) => handlePriceChange(e.target.value)} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Ušteda (%)</label>
-                  <input type="number" value={form.savingsPercent} onChange={(e) => handleSavingsChange(e.target.value)} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="number" value={form.savingsPercent} onChange={(e) => handleSavingsChange(e.target.value)} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
               </div>
               {/* Toggles */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between bg-[#fafafa] rounded-lg p-3">
+                <div className="flex items-center justify-between bg-[#f5f0e8] rounded-lg p-3">
                   <span className="text-sm text-[#333]">Proizvodi se mogu kupiti pojedinačno?</span>
                   <button onClick={() => setForm({ ...form, canBuyIndividually: !form.canBuyIndividually })}>
-                    {form.canBuyIndividually ? <ToggleRight size={28} className="text-[#c8a96e]" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                    {form.canBuyIndividually ? <ToggleRight size={28} className="text-[#8c4a5a]" /> : <ToggleLeft size={28} className="text-[#999]" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between bg-[#fafafa] rounded-lg p-3">
+                <div className="flex items-center justify-between bg-[#f5f0e8] rounded-lg p-3">
                   <span className="text-sm text-[#333]">Mešaj salon + maloprodajne proizvode?</span>
                   <button onClick={() => setForm({ ...form, mixSalonRetail: !form.mixSalonRetail })}>
-                    {form.mixSalonRetail ? <ToggleRight size={28} className="text-[#c8a96e]" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                    {form.mixSalonRetail ? <ToggleRight size={28} className="text-[#8c4a5a]" /> : <ToggleLeft size={28} className="text-[#999]" />}
                   </button>
                 </div>
               </div>
@@ -351,15 +351,15 @@ export default function BundlesPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Važi od</label>
-                  <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Važi do</label>
-                  <input type="date" value={form.validTo} onChange={(e) => setForm({ ...form, validTo: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="date" value={form.validTo} onChange={(e) => setForm({ ...form, validTo: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Ciljna grupa</label>
-                  <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value as "Svi" | "B2B" | "B2C" })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                  <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value as "Svi" | "B2B" | "B2C" })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                     <option value="Svi">Svi</option>
                     <option value="B2B">B2B</option>
                     <option value="B2C">B2C</option>
@@ -368,9 +368,9 @@ export default function BundlesPage() {
               </div>
               <p className="text-xs text-[#999]">Paket će biti automatski deaktiviran nakon isteka datuma.</p>
             </div>
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e5e5e5]">
-              <button onClick={() => setShowModal(false)} className="px-5 py-2.5 border border-[#e5e5e5] rounded-lg text-sm font-medium hover:bg-[#f5f5f5] transition-colors">Otkaži</button>
-              <button onClick={handleCreate} className="px-5 py-2.5 bg-[#c8a96e] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">Kreiraj paket</button>
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e0d8cc]">
+              <button onClick={() => setShowModal(false)} className="px-5 py-2.5 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">Otkaži</button>
+              <button onClick={handleCreate} className="px-5 py-2.5 bg-[#8c4a5a] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">Kreiraj paket</button>
             </div>
           </div>
         </div>

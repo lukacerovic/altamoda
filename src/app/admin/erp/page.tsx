@@ -114,7 +114,7 @@ export default function ErpPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#1a1a1a]">ERP Integracija</h1>
+          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#2d2d2d]">ERP Integracija</h1>
           <p className="text-[#666] mt-1">Pantheon ERP sinhronizacija i podešavanja</p>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function ErpPage() {
               {connected ? <Wifi size={24} className="text-green-600" /> : <WifiOff size={24} className="text-red-600" />}
             </div>
             <div>
-              <h3 className="font-semibold text-[#1a1a1a]">Pantheon ERP</h3>
+              <h3 className="font-semibold text-[#2d2d2d]">Pantheon ERP</h3>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${connected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
                 <span className={`text-sm font-medium ${connected ? "text-green-700" : "text-red-700"}`}>
@@ -146,26 +146,26 @@ export default function ErpPage() {
       {/* Sync Settings */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Inbound */}
-        <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden">
-          <div className="p-4 border-b border-[#e5e5e5] bg-[#fafafa]">
+        <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
+          <div className="p-4 border-b border-[#e0d8cc] bg-[#f5f0e8]">
             <div className="flex items-center gap-2">
               <ArrowLeft size={16} className="text-blue-600" />
-              <h3 className="font-semibold text-[#1a1a1a]">Pantheon → Webshop</h3>
+              <h3 className="font-semibold text-[#2d2d2d]">Pantheon → Webshop</h3>
             </div>
           </div>
-          <div className="divide-y divide-[#f5f5f5]">
+          <div className="divide-y divide-[#f5f0e8]">
             {inbound.map((setting) => {
               const Icon = iconMap[setting.icon];
               return (
                 <div key={setting.id} className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#c8a96e]/10 flex items-center justify-center">
-                        <Icon size={18} className="text-[#c8a96e]" />
+                      <div className="w-9 h-9 rounded-lg bg-[#8c4a5a]/10 flex items-center justify-center">
+                        <Icon size={18} className="text-[#8c4a5a]" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm text-[#1a1a1a]">{setting.name}</span>
+                          <span className="font-medium text-sm text-[#2d2d2d]">{setting.name}</span>
                           {setting.realtime && (
                             <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded-full flex items-center gap-0.5">
                               <Zap size={10} /> Real-time
@@ -179,13 +179,13 @@ export default function ErpPage() {
                       <button
                         onClick={() => syncNow(setting.id)}
                         disabled={syncing === setting.id}
-                        className="px-3 py-1.5 text-xs font-medium bg-[#f5f5f5] hover:bg-[#eee] rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                        className="px-3 py-1.5 text-xs font-medium bg-[#f5f0e8] hover:bg-[#eee] rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
                       >
                         <RefreshCw size={12} className={syncing === setting.id ? "animate-spin" : ""} />
                         Sinhronizuj
                       </button>
                       <button onClick={() => toggleSetting(setting.id)}>
-                        {setting.enabled ? <ToggleRight size={28} className="text-[#c8a96e]" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                        {setting.enabled ? <ToggleRight size={28} className="text-[#8c4a5a]" /> : <ToggleLeft size={28} className="text-[#999]" />}
                       </button>
                     </div>
                   </div>
@@ -196,25 +196,25 @@ export default function ErpPage() {
         </div>
 
         {/* Outbound */}
-        <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden">
-          <div className="p-4 border-b border-[#e5e5e5] bg-[#fafafa]">
+        <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
+          <div className="p-4 border-b border-[#e0d8cc] bg-[#f5f0e8]">
             <div className="flex items-center gap-2">
               <ArrowRight size={16} className="text-green-600" />
-              <h3 className="font-semibold text-[#1a1a1a]">Webshop → Pantheon</h3>
+              <h3 className="font-semibold text-[#2d2d2d]">Webshop → Pantheon</h3>
             </div>
           </div>
-          <div className="divide-y divide-[#f5f5f5]">
+          <div className="divide-y divide-[#f5f0e8]">
             {outbound.map((setting) => {
               const Icon = iconMap[setting.icon];
               return (
                 <div key={setting.id} className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#c8a96e]/10 flex items-center justify-center">
-                        <Icon size={18} className="text-[#c8a96e]" />
+                      <div className="w-9 h-9 rounded-lg bg-[#8c4a5a]/10 flex items-center justify-center">
+                        <Icon size={18} className="text-[#8c4a5a]" />
                       </div>
                       <div>
-                        <span className="font-medium text-sm text-[#1a1a1a]">{setting.name}</span>
+                        <span className="font-medium text-sm text-[#2d2d2d]">{setting.name}</span>
                         <p className="text-xs text-[#999]">Poslednje: {setting.lastSync}</p>
                       </div>
                     </div>
@@ -222,13 +222,13 @@ export default function ErpPage() {
                       <button
                         onClick={() => syncNow(setting.id)}
                         disabled={syncing === setting.id}
-                        className="px-3 py-1.5 text-xs font-medium bg-[#f5f5f5] hover:bg-[#eee] rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                        className="px-3 py-1.5 text-xs font-medium bg-[#f5f0e8] hover:bg-[#eee] rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
                       >
                         <RefreshCw size={12} className={syncing === setting.id ? "animate-spin" : ""} />
                         Sinhronizuj
                       </button>
                       <button onClick={() => toggleSetting(setting.id)}>
-                        {setting.enabled ? <ToggleRight size={28} className="text-[#c8a96e]" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                        {setting.enabled ? <ToggleRight size={28} className="text-[#8c4a5a]" /> : <ToggleLeft size={28} className="text-[#999]" />}
                       </button>
                     </div>
                   </div>
@@ -240,12 +240,12 @@ export default function ErpPage() {
       </div>
 
       {/* Sync Frequency */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] p-5 mb-6">
-        <h3 className="font-semibold text-[#1a1a1a] mb-3">Učestalost sinhronizacije</h3>
+      <div className="bg-white rounded-xl border border-[#e0d8cc] p-5 mb-6">
+        <h3 className="font-semibold text-[#2d2d2d] mb-3">Učestalost sinhronizacije</h3>
         <select
           value={syncFrequency}
           onChange={(e) => setSyncFrequency(e.target.value)}
-          className="w-full sm:w-64 px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none"
+          className="w-full sm:w-64 px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none"
         >
           <option value="realtime">Real-time</option>
           <option value="every5min">Svakih 5 minuta</option>
@@ -256,13 +256,13 @@ export default function ErpPage() {
       </div>
 
       {/* Sync Log */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden mb-6">
-        <div className="p-4 border-b border-[#e5e5e5]">
-          <h3 className="font-semibold text-[#1a1a1a]">Sync Log</h3>
+      <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden mb-6">
+        <div className="p-4 border-b border-[#e0d8cc]">
+          <h3 className="font-semibold text-[#2d2d2d]">Sync Log</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-[#fafafa] border-b border-[#e5e5e5]">
+            <thead className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
               <tr>
                 <th className="text-left px-4 py-3 font-semibold text-[#666]">Vreme</th>
                 <th className="text-left px-4 py-3 font-semibold text-[#666]">Tip</th>
@@ -274,7 +274,7 @@ export default function ErpPage() {
             </thead>
             <tbody>
               {initialLogs.map((log) => (
-                <tr key={log.id} className="border-b border-[#f5f5f5] hover:bg-[#fafafa] transition-colors">
+                <tr key={log.id} className="border-b border-[#f5f0e8] hover:bg-[#f5f0e8] transition-colors">
                   <td className="px-4 py-3 text-[#666] text-xs whitespace-nowrap">{log.timestamp}</td>
                   <td className="px-4 py-3 font-medium text-[#333]">{log.type}</td>
                   <td className="px-4 py-3">
@@ -294,12 +294,12 @@ export default function ErpPage() {
       </div>
 
       {/* API Configuration */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] p-5">
-        <h3 className="font-semibold text-[#1a1a1a] mb-4">API Konfiguracija</h3>
+      <div className="bg-white rounded-xl border border-[#e0d8cc] p-5">
+        <h3 className="font-semibold text-[#2d2d2d] mb-4">API Konfiguracija</h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-[#333] mb-1">API URL</label>
-            <input type="text" value={apiUrl} onChange={(e) => setApiUrl(e.target.value)} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none font-mono" />
+            <input type="text" value={apiUrl} onChange={(e) => setApiUrl(e.target.value)} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none font-mono" />
           </div>
           <div>
             <label className="block text-sm font-medium text-[#333] mb-1">API Ključ</label>
@@ -308,14 +308,14 @@ export default function ErpPage() {
                 type={showApiKey ? "text" : "password"}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none font-mono"
+                className="flex-1 px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none font-mono"
               />
-              <button onClick={() => setShowApiKey(!showApiKey)} className="px-3 py-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-lg hover:bg-[#eee] transition-colors">
+              <button onClick={() => setShowApiKey(!showApiKey)} className="px-3 py-2 bg-[#f5f0e8] border border-[#e0d8cc] rounded-lg hover:bg-[#eee] transition-colors">
                 {showApiKey ? <EyeOff size={16} className="text-[#666]" /> : <Eye size={16} className="text-[#666]" />}
               </button>
             </div>
           </div>
-          <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#c8a96e] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#8c4a5a] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">
             <Play size={16} />
             Testiraj konekciju
           </button>

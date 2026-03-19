@@ -239,7 +239,7 @@ export default function OrdersPage() {
     switch (icon) {
       case "check": return <CheckCircle size={16} className="text-emerald-500" />;
       case "truck": return <Truck size={16} className="text-blue-500" />;
-      case "package": return <Package size={16} className="text-[#c8a96e]" />;
+      case "package": return <Package size={16} className="text-[#8c4a5a]" />;
       case "x": return <XCircle size={16} className="text-red-500" />;
       default: return <Clock size={16} className="text-[#999]" />;
     }
@@ -250,7 +250,7 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#1a1a1a]">Porudžbine</h1>
+          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">Porudžbine</h1>
           <p className="text-sm text-[#666] mt-1">{orders.length} ukupno porudžbina</p>
         </div>
         <button className="btn-outline-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 self-start">
@@ -260,7 +260,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] p-4">
+      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
@@ -269,10 +269,10 @@ export default function OrdersPage() {
               placeholder="Pretraži po broju ili kupcu..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#f5f5f5] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#c8a96e]"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]"
             />
           </div>
-          <button onClick={() => setShowFilters(!showFilters)} className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-[#f5f5f5] rounded-lg text-sm text-[#666]">
+          <button onClick={() => setShowFilters(!showFilters)} className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-[#f5f0e8] rounded-lg text-sm text-[#666]">
             <Filter size={16} /> Filteri
           </button>
         </div>
@@ -286,8 +286,8 @@ export default function OrdersPage() {
                 onClick={() => { setStatusFilter(s); setCurrentPage(1); }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   statusFilter === s
-                    ? "bg-[#1a1a1a] text-white"
-                    : "bg-[#f5f5f5] text-[#666] hover:bg-[#e5e5e5]"
+                    ? "bg-[#2d2d2d] text-white"
+                    : "bg-[#f5f0e8] text-[#666] hover:bg-[#e0d8cc]"
                 }`}
               >
                 {s}
@@ -298,11 +298,11 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-[#fafafa] border-b border-[#e5e5e5]">
+              <tr className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Br.</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Kupac</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">Datum</th>
@@ -316,15 +316,15 @@ export default function OrdersPage() {
             <tbody className="divide-y divide-[#f0f0f0]">
               {paginated.map((order) => (
                 <>
-                  <tr key={order.id} className="hover:bg-[#fafafa] transition-colors cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}>
-                    <td className="px-6 py-4 text-sm font-medium text-[#c8a96e]">{order.id}</td>
+                  <tr key={order.id} className="hover:bg-[#f5f0e8] transition-colors cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}>
+                    <td className="px-6 py-4 text-sm font-medium text-[#8c4a5a]">{order.id}</td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-[#1a1a1a]">{order.customer}</p>
+                      <p className="text-sm font-medium text-[#2d2d2d]">{order.customer}</p>
                       <p className="text-xs text-[#999] md:hidden">{order.date}</p>
                     </td>
                     <td className="px-6 py-4 text-sm text-[#666] hidden md:table-cell">{order.date}</td>
                     <td className="px-6 py-4 text-sm text-[#666] hidden lg:table-cell">{order.items.length} stavki</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-[#1a1a1a]">{order.total.toLocaleString()} RSD</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-[#2d2d2d]">{order.total.toLocaleString()} RSD</td>
                     <td className="px-6 py-4 text-sm text-[#666] hidden sm:table-cell">{order.paymentMethod}</td>
                     <td className="px-6 py-4">
                       <select
@@ -340,7 +340,7 @@ export default function OrdersPage() {
                       </select>
                     </td>
                     <td className="px-6 py-4">
-                      <button className="text-[#999] hover:text-[#1a1a1a] transition-colors">
+                      <button className="text-[#999] hover:text-[#2d2d2d] transition-colors">
                         {expandedOrder === order.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                       </button>
                     </td>
@@ -349,15 +349,15 @@ export default function OrdersPage() {
                   {/* Expanded Detail */}
                   {expandedOrder === order.id && (
                     <tr key={`${order.id}-detail`}>
-                      <td colSpan={8} className="px-6 py-6 bg-[#fafafa]">
+                      <td colSpan={8} className="px-6 py-6 bg-[#f5f0e8]">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                           {/* Items */}
                           <div className="lg:col-span-2">
-                            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-3">Stavke porudžbine</h3>
-                            <div className="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden">
+                            <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3">Stavke porudžbine</h3>
+                            <div className="bg-white rounded-lg border border-[#e0d8cc] overflow-hidden">
                               <table className="w-full">
                                 <thead>
-                                  <tr className="bg-[#f5f5f5]">
+                                  <tr className="bg-[#f5f0e8]">
                                     <th className="px-4 py-2 text-left text-xs font-medium text-[#666]">Proizvod</th>
                                     <th className="px-4 py-2 text-left text-xs font-medium text-[#666]">Kol.</th>
                                     <th className="px-4 py-2 text-left text-xs font-medium text-[#666]">Cena</th>
@@ -370,22 +370,22 @@ export default function OrdersPage() {
                                       <td className="px-4 py-2.5 text-sm text-[#333]">{item.name}</td>
                                       <td className="px-4 py-2.5 text-sm text-[#666]">{item.quantity}</td>
                                       <td className="px-4 py-2.5 text-sm text-[#666]">{item.price.toLocaleString()} RSD</td>
-                                      <td className="px-4 py-2.5 text-sm font-medium text-[#1a1a1a]">{(item.quantity * item.price).toLocaleString()} RSD</td>
+                                      <td className="px-4 py-2.5 text-sm font-medium text-[#2d2d2d]">{(item.quantity * item.price).toLocaleString()} RSD</td>
                                     </tr>
                                   ))}
                                 </tbody>
                                 <tfoot>
-                                  <tr className="bg-[#f5f5f5]">
-                                    <td colSpan={3} className="px-4 py-2.5 text-sm font-semibold text-[#1a1a1a] text-right">Ukupno:</td>
-                                    <td className="px-4 py-2.5 text-sm font-bold text-[#c8a96e]">{order.total.toLocaleString()} RSD</td>
+                                  <tr className="bg-[#f5f0e8]">
+                                    <td colSpan={3} className="px-4 py-2.5 text-sm font-semibold text-[#2d2d2d] text-right">Ukupno:</td>
+                                    <td className="px-4 py-2.5 text-sm font-bold text-[#8c4a5a]">{order.total.toLocaleString()} RSD</td>
                                   </tr>
                                 </tfoot>
                               </table>
                             </div>
 
                             {/* Customer Info */}
-                            <h3 className="text-sm font-semibold text-[#1a1a1a] mt-4 mb-3">Podaci o kupcu</h3>
-                            <div className="bg-white rounded-lg border border-[#e5e5e5] p-4 space-y-2">
+                            <h3 className="text-sm font-semibold text-[#2d2d2d] mt-4 mb-3">Podaci o kupcu</h3>
+                            <div className="bg-white rounded-lg border border-[#e0d8cc] p-4 space-y-2">
                               <div className="flex items-center gap-2 text-sm text-[#333]">
                                 <Mail size={14} className="text-[#999]" /> {order.email}
                               </div>
@@ -400,15 +400,15 @@ export default function OrdersPage() {
 
                           {/* Timeline */}
                           <div>
-                            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-3">Tok porudžbine</h3>
-                            <div className="bg-white rounded-lg border border-[#e5e5e5] p-4">
+                            <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3">Tok porudžbine</h3>
+                            <div className="bg-white rounded-lg border border-[#e0d8cc] p-4">
                               <div className="space-y-4">
                                 {order.timeline.map((event, idx) => (
                                   <div key={idx} className="flex gap-3">
                                     <div className="flex flex-col items-center">
                                       {getTimelineIcon(event.icon)}
                                       {idx < order.timeline.length - 1 && (
-                                        <div className="w-px h-full bg-[#e5e5e5] mt-1" />
+                                        <div className="w-px h-full bg-[#e0d8cc] mt-1" />
                                       )}
                                     </div>
                                     <div className="pb-4">
@@ -432,20 +432,20 @@ export default function OrdersPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-[#e5e5e5] flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-[#e0d8cc] flex items-center justify-between">
             <span className="text-sm text-[#666]">
               Prikazano {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} od {filtered.length}
             </span>
             <div className="flex items-center gap-1">
-              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f5f5] disabled:opacity-30 disabled:cursor-not-allowed">
+              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronLeft size={18} />
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${page === currentPage ? "bg-[#c8a96e] text-white" : "text-[#666] hover:bg-[#f5f5f5]"}`}>
+                <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${page === currentPage ? "bg-[#8c4a5a] text-white" : "text-[#666] hover:bg-[#f5f0e8]"}`}>
                   {page}
                 </button>
               ))}
-              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f5f5] disabled:opacity-30 disabled:cursor-not-allowed">
+              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronRight size={18} />
               </button>
             </div>

@@ -138,12 +138,12 @@ export default function PromoCodesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#1a1a1a]">Promo Kodovi</h1>
+          <h1 className="font-serif text-2xl lg:text-3xl font-bold text-[#2d2d2d]">Promo Kodovi</h1>
           <p className="text-[#666] mt-1">Upravljajte promotivnim kodovima i popustima</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 bg-[#c8a96e] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm"
+          className="inline-flex items-center gap-2 bg-[#8c4a5a] text-white px-5 py-2.5 rounded-lg hover:bg-[#b8994e] transition-colors font-medium text-sm"
         >
           <Plus size={18} />
           Novi promo kod
@@ -153,12 +153,12 @@ export default function PromoCodesPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Ukupno kodova", value: codes.length, color: "text-[#1a1a1a]" },
+          { label: "Ukupno kodova", value: codes.length, color: "text-[#2d2d2d]" },
           { label: "Aktivni", value: codes.filter((c) => c.status === "active").length, color: "text-green-600" },
           { label: "Zakazani", value: codes.filter((c) => c.status === "scheduled").length, color: "text-blue-600" },
           { label: "Istekli", value: codes.filter((c) => c.status === "expired").length, color: "text-red-600" },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl border border-[#e5e5e5] p-4">
+          <div key={stat.label} className="bg-white rounded-xl border border-[#e0d8cc] p-4">
             <p className="text-xs text-[#999] uppercase tracking-wider">{stat.label}</p>
             <p className={`text-2xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
           </div>
@@ -166,7 +166,7 @@ export default function PromoCodesPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] p-4 mb-6">
+      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
@@ -175,13 +175,13 @@ export default function PromoCodesPage() {
               placeholder="Pretraži kodove..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-10 pr-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none"
+              className="w-full pl-10 pr-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-            className="px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none"
+            className="px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none"
           >
             <option value="Svi">Svi statusi</option>
             <option value="active">Aktivni</option>
@@ -191,7 +191,7 @@ export default function PromoCodesPage() {
           <select
             value={typeFilter}
             onChange={(e) => { setTypeFilter(e.target.value); setCurrentPage(1); }}
-            className="px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none"
+            className="px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none"
           >
             <option value="Svi">Svi tipovi</option>
             <option value="procentualni">Procentualni</option>
@@ -201,10 +201,10 @@ export default function PromoCodesPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-[#fafafa] border-b border-[#e5e5e5]">
+            <thead className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
               <tr>
                 <th className="text-left px-4 py-3 font-semibold text-[#666]">Kod</th>
                 <th className="text-left px-4 py-3 font-semibold text-[#666]">Tip</th>
@@ -219,15 +219,15 @@ export default function PromoCodesPage() {
             </thead>
             <tbody>
               {paginated.map((code) => (
-                <tr key={code.id} className="border-b border-[#f5f5f5] hover:bg-[#fafafa] transition-colors">
+                <tr key={code.id} className="border-b border-[#f5f0e8] hover:bg-[#f5f0e8] transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Ticket size={16} className="text-[#c8a96e]" />
-                      <span className="font-mono font-semibold text-[#1a1a1a]">{code.code}</span>
+                      <Ticket size={16} className="text-[#8c4a5a]" />
+                      <span className="font-mono font-semibold text-[#2d2d2d]">{code.code}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-[#666] capitalize">{code.type}</td>
-                  <td className="px-4 py-3 font-semibold text-[#1a1a1a]">
+                  <td className="px-4 py-3 font-semibold text-[#2d2d2d]">
                     {code.type === "procentualni" ? `${code.value}%` : `${code.value.toLocaleString()} RSD`}
                   </td>
                   <td className="px-4 py-3 text-[#666]">{code.minOrder.toLocaleString()} RSD</td>
@@ -237,14 +237,14 @@ export default function PromoCodesPage() {
                     <div>{code.validTo}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-[#f5f5f5] text-[#666]">{code.target}</span>
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-[#f5f0e8] text-[#666]">{code.target}</span>
                   </td>
                   <td className="px-4 py-3">{statusBadge(code.status)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => toggleStatus(code.id)}
-                        className="p-1.5 hover:bg-[#f5f5f5] rounded-lg transition-colors"
+                        className="p-1.5 hover:bg-[#f5f0e8] rounded-lg transition-colors"
                         title={code.status === "active" ? "Deaktiviraj" : "Aktiviraj"}
                       >
                         {code.status === "active" ? (
@@ -255,7 +255,7 @@ export default function PromoCodesPage() {
                       </button>
                       <button
                         onClick={() => duplicateCode(code)}
-                        className="p-1.5 hover:bg-[#f5f5f5] rounded-lg transition-colors"
+                        className="p-1.5 hover:bg-[#f5f0e8] rounded-lg transition-colors"
                         title="Dupliraj"
                       >
                         <Copy size={16} className="text-[#666]" />
@@ -268,18 +268,18 @@ export default function PromoCodesPage() {
           </table>
         </div>
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#e5e5e5]">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[#e0d8cc]">
             <p className="text-sm text-[#666]">Prikazano {paginated.length} od {filtered.length} kodova</p>
             <div className="flex items-center gap-1">
-              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-1.5 rounded-lg hover:bg-[#f5f5f5] disabled:opacity-30">
+              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-1.5 rounded-lg hover:bg-[#f5f0e8] disabled:opacity-30">
                 <ChevronLeft size={18} />
               </button>
               {Array.from({ length: totalPages }, (_, i) => (
-                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg text-sm font-medium ${currentPage === i + 1 ? "bg-[#c8a96e] text-white" : "hover:bg-[#f5f5f5] text-[#666]"}`}>
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg text-sm font-medium ${currentPage === i + 1 ? "bg-[#8c4a5a] text-white" : "hover:bg-[#f5f0e8] text-[#666]"}`}>
                   {i + 1}
                 </button>
               ))}
-              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="p-1.5 rounded-lg hover:bg-[#f5f5f5] disabled:opacity-30">
+              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="p-1.5 rounded-lg hover:bg-[#f5f0e8] disabled:opacity-30">
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -291,9 +291,9 @@ export default function PromoCodesPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-[#e5e5e5]">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Novi promo kod</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-[#f5f5f5] rounded-lg"><X size={20} /></button>
+            <div className="flex items-center justify-between p-6 border-b border-[#e0d8cc]">
+              <h2 className="font-serif text-xl font-bold text-[#2d2d2d]">Novi promo kod</h2>
+              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-[#f5f0e8] rounded-lg"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">
               {/* Code */}
@@ -304,12 +304,12 @@ export default function PromoCodesPage() {
                     type="text"
                     value={form.code}
                     onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                    className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none font-mono"
+                    className="flex-1 px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none font-mono"
                     placeholder="PROMO2026"
                   />
                   <button
                     onClick={() => setForm({ ...form, code: generateCode() })}
-                    className="px-3 py-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-lg hover:bg-[#eee] transition-colors"
+                    className="px-3 py-2 bg-[#f5f0e8] border border-[#e0d8cc] rounded-lg hover:bg-[#eee] transition-colors"
                   >
                     <RefreshCw size={16} className="text-[#666]" />
                   </button>
@@ -319,67 +319,67 @@ export default function PromoCodesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Tip popusta</label>
-                  <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as "procentualni" | "fiksni" })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                  <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as "procentualni" | "fiksni" })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                     <option value="procentualni">Procentualni (%)</option>
                     <option value="fiksni">Fiksni iznos (RSD)</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Vrednost {form.type === "procentualni" ? "(%)" : "(RSD)"}</label>
-                  <input type="number" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="number" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
               </div>
               {/* Min order */}
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Minimalni iznos porudzbine (RSD)</label>
-                <input type="number" value={form.minOrder} onChange={(e) => setForm({ ...form, minOrder: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                <input type="number" value={form.minOrder} onChange={(e) => setForm({ ...form, minOrder: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
               </div>
               {/* Max uses */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Maks. koriscenja ukupno</label>
-                  <input type="number" value={form.maxUses} onChange={(e) => setForm({ ...form, maxUses: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="number" value={form.maxUses} onChange={(e) => setForm({ ...form, maxUses: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Maks. po korisniku</label>
-                  <input type="number" value={form.maxUsesPerUser} onChange={(e) => setForm({ ...form, maxUsesPerUser: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="number" value={form.maxUsesPerUser} onChange={(e) => setForm({ ...form, maxUsesPerUser: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
               </div>
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Vazi od</label>
-                  <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Vazi do</label>
-                  <input type="date" value={form.validTo} onChange={(e) => setForm({ ...form, validTo: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none" />
+                  <input type="date" value={form.validTo} onChange={(e) => setForm({ ...form, validTo: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none" />
                 </div>
               </div>
               {/* Target */}
               <div>
                 <label className="block text-sm font-medium text-[#333] mb-1">Ciljna grupa</label>
-                <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value as "Svi" | "B2B" | "B2C" })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value as "Svi" | "B2B" | "B2C" })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                   <option value="Svi">Svi</option>
                   <option value="B2B">B2B</option>
                   <option value="B2C">B2C</option>
                 </select>
               </div>
               {/* Combinable */}
-              <div className="flex items-center justify-between bg-[#fafafa] rounded-lg p-3">
+              <div className="flex items-center justify-between bg-[#f5f0e8] rounded-lg p-3">
                 <span className="text-sm text-[#333]">Kombinovati sa drugim kodovima?</span>
                 <button
                   onClick={() => setForm({ ...form, combinable: !form.combinable })}
                   className="transition-colors"
                 >
-                  {form.combinable ? <ToggleRight size={28} className="text-[#c8a96e]" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                  {form.combinable ? <ToggleRight size={28} className="text-[#8c4a5a]" /> : <ToggleLeft size={28} className="text-[#999]" />}
                 </button>
               </div>
               {/* Applies to */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">Primenjuje se na</label>
-                  <select value={form.appliesTo} onChange={(e) => setForm({ ...form, appliesTo: e.target.value as "Sve" | "Kategorija" | "Brend" | "Proizvod" })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                  <select value={form.appliesTo} onChange={(e) => setForm({ ...form, appliesTo: e.target.value as "Sve" | "Kategorija" | "Brend" | "Proizvod" })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                     <option value="Sve">Sve</option>
                     <option value="Kategorija">Kategorija</option>
                     <option value="Brend">Brend</option>
@@ -389,7 +389,7 @@ export default function PromoCodesPage() {
                 {form.appliesTo !== "Sve" && (
                   <div>
                     <label className="block text-sm font-medium text-[#333] mb-1">Izaberite {form.appliesTo.toLowerCase()}</label>
-                    <select value={form.appliesToValue} onChange={(e) => setForm({ ...form, appliesToValue: e.target.value })} className="w-full px-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:border-[#c8a96e] focus:outline-none">
+                    <select value={form.appliesToValue} onChange={(e) => setForm({ ...form, appliesToValue: e.target.value })} className="w-full px-4 py-2 border border-[#e0d8cc] rounded-lg text-sm focus:border-[#8c4a5a] focus:outline-none">
                       <option value="">Izaberite...</option>
                       {form.appliesTo === "Kategorija" && ["Nega kose", "Boje za kosu", "Styling", "Ulja i serumi"].map((c) => <option key={c} value={c}>{c}</option>)}
                       {form.appliesTo === "Brend" && ["L'Oreal", "Schwarzkopf", "Kerastase", "Wella", "Moroccanoil"].map((b) => <option key={b} value={b}>{b}</option>)}
@@ -399,9 +399,9 @@ export default function PromoCodesPage() {
                 )}
               </div>
             </div>
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e5e5e5]">
-              <button onClick={() => setShowModal(false)} className="px-5 py-2.5 border border-[#e5e5e5] rounded-lg text-sm font-medium hover:bg-[#f5f5f5] transition-colors">Otkaži</button>
-              <button onClick={handleCreate} className="px-5 py-2.5 bg-[#c8a96e] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">Kreiraj kod</button>
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#e0d8cc]">
+              <button onClick={() => setShowModal(false)} className="px-5 py-2.5 border border-[#e0d8cc] rounded-lg text-sm font-medium hover:bg-[#f5f0e8] transition-colors">Otkaži</button>
+              <button onClick={handleCreate} className="px-5 py-2.5 bg-[#8c4a5a] text-white rounded-lg text-sm font-medium hover:bg-[#b8994e] transition-colors">Kreiraj kod</button>
             </div>
           </div>
         </div>

@@ -66,20 +66,20 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f0e8]">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-[#c8a96e]">Pocetna</Link><ChevronRight className="w-3 h-3" /><span className="text-[#1a1a1a]">Korpa</span>
+          <Link href="/" className="hover:text-[#8c4a5a]">Pocetna</Link><ChevronRight className="w-3 h-3" /><span className="text-[#2d2d2d]">Korpa</span>
         </nav>
 
-        <h1 className="text-3xl font-bold text-[#1a1a1a] mb-8" style={{ fontFamily: "'Playfair Display', serif" }}>Vasa Korpa ({items.length})</h1>
+        <h1 className="text-3xl font-bold text-[#2d2d2d] mb-8" style={{ fontFamily: "'Playfair Display', serif" }}>Vasa Korpa ({items.length})</h1>
 
         {items.length === 0 ? (
           <div className="text-center py-20">
             <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-[#1a1a1a] mb-2">Vasa korpa je prazna</h2>
+            <h2 className="text-xl font-semibold text-[#2d2d2d] mb-2">Vasa korpa je prazna</h2>
             <p className="text-gray-500 mb-6">Dodajte proizvode u korpu i nastavite sa kupovinom.</p>
-            <Link href="/products" className="inline-flex items-center gap-2 bg-[#c8a96e] hover:bg-[#a8894e] text-white px-6 py-3 rounded font-medium transition-colors">Nastavite Kupovinu</Link>
+            <Link href="/products" className="inline-flex items-center gap-2 bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded font-medium transition-colors">Nastavite Kupovinu</Link>
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
@@ -93,8 +93,8 @@ export default function CartPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-xs text-[#c8a96e] font-medium uppercase tracking-wider">{item.brand}</span>
-                        <h3 className="text-sm md:text-base font-medium text-[#1a1a1a] mt-1">{item.name}</h3>
+                        <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{item.brand}</span>
+                        <h3 className="text-sm md:text-base font-medium text-[#2d2d2d] mt-1">{item.name}</h3>
                       </div>
                       <button onClick={() => removeItem(item.id)} className="text-gray-400 hover:text-[#c0392b] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                     </div>
@@ -104,7 +104,7 @@ export default function CartPage() {
                         <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
                         <button onClick={() => updateQty(item.id, 1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Plus className="w-3 h-3" /></button>
                       </div>
-                      <span className="font-bold text-[#1a1a1a]">{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                      <span className="font-bold text-[#2d2d2d]">{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
                     </div>
                   </div>
                 </div>
@@ -112,15 +112,15 @@ export default function CartPage() {
 
               {/* Delivery Options */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-sm font-semibold text-[#1a1a1a] mb-4 flex items-center gap-2"><Truck className="w-4 h-4 text-[#c8a96e]" /> Nacin dostave</h3>
+                <h3 className="text-sm font-semibold text-[#2d2d2d] mb-4 flex items-center gap-2"><Truck className="w-4 h-4 text-[#8c4a5a]" /> Nacin dostave</h3>
                 <div className="space-y-3">
                   {deliveryOptions.map((opt) => (
-                    <label key={opt.key} className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${deliveryMethod === opt.key ? "border-[#c8a96e] bg-[#faf7f2]" : "border-gray-100 hover:border-gray-200"}`}>
-                      <input type="radio" name="delivery" checked={deliveryMethod === opt.key} onChange={() => setDeliveryMethod(opt.key)} className="w-4 h-4 text-[#c8a96e] focus:ring-[#c8a96e]" />
+                    <label key={opt.key} className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${deliveryMethod === opt.key ? "border-[#8c4a5a] bg-[#faf7f2]" : "border-gray-100 hover:border-gray-200"}`}>
+                      <input type="radio" name="delivery" checked={deliveryMethod === opt.key} onChange={() => setDeliveryMethod(opt.key)} className="w-4 h-4 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-[#1a1a1a]">{opt.label}</span>
+                        <span className="text-sm font-medium text-[#2d2d2d]">{opt.label}</span>
                       </div>
-                      <span className={`text-sm font-semibold ${opt.price === 0 ? "text-green-600" : "text-[#1a1a1a]"}`}>
+                      <span className={`text-sm font-semibold ${opt.price === 0 ? "text-green-600" : "text-[#2d2d2d]"}`}>
                         {opt.price === 0 ? "Besplatno" : `${opt.price} RSD`}
                       </span>
                     </label>
@@ -132,44 +132,44 @@ export default function CartPage() {
               </div>
 
               {/* B2B Options Box */}
-              <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-[#c8a96e]">
-                <h3 className="text-sm font-semibold text-[#c8a96e] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> B2B Opcije</h3>
+              <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-[#8c4a5a]">
+                <h3 className="text-sm font-semibold text-[#8c4a5a] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> B2B Opcije</h3>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#c8a96e] focus:ring-[#c8a96e]" />
-                    <span className="text-sm text-[#1a1a1a]">Naruci bez online placanja</span>
+                    <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
+                    <span className="text-sm text-[#2d2d2d]">Naruci bez online placanja</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#c8a96e] focus:ring-[#c8a96e]" />
+                    <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" />
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-[#1a1a1a]">Placanje po fakturi</span>
+                      <span className="text-sm text-[#2d2d2d]">Placanje po fakturi</span>
                     </div>
                   </label>
                   <div className="bg-[#faf7f2] rounded p-3 text-xs text-gray-600 flex items-start gap-2">
-                    <Store className="w-4 h-4 text-[#c8a96e] flex-shrink-0 mt-0.5" />
-                    <span>Minimalni iznos B2B porudzbine: <strong className="text-[#1a1a1a]">10.000 RSD</strong></span>
+                    <Store className="w-4 h-4 text-[#8c4a5a] flex-shrink-0 mt-0.5" />
+                    <span>Minimalni iznos B2B porudzbine: <strong className="text-[#2d2d2d]">10.000 RSD</strong></span>
                   </div>
                 </div>
               </div>
 
               {/* Order Notes */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-sm font-semibold text-[#1a1a1a] mb-3 flex items-center gap-2"><MessageSquare className="w-4 h-4 text-[#c8a96e]" /> Napomena uz porudzbinu</h3>
+                <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3 flex items-center gap-2"><MessageSquare className="w-4 h-4 text-[#8c4a5a]" /> Napomena uz porudzbinu</h3>
                 <textarea
                   value={orderNotes}
                   onChange={(e) => setOrderNotes(e.target.value)}
                   rows={3}
                   placeholder="Unesite dodatne napomene za vasu porudzbinu (opciono)..."
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus:border-[#c8a96e] focus:outline-none"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus:border-[#8c4a5a] focus:outline-none"
                 />
               </div>
 
               <div className="flex items-center justify-between">
-                <Link href="/products" className="inline-flex items-center gap-2 text-[#c8a96e] hover:text-[#a8894e] text-sm font-medium transition-colors">
+                <Link href="/products" className="inline-flex items-center gap-2 text-[#8c4a5a] hover:text-[#6e3848] text-sm font-medium transition-colors">
                   &larr; Nastavite kupovinu
                 </Link>
-                <button onClick={handleSaveCart} className="inline-flex items-center gap-2 text-gray-500 hover:text-[#c8a96e] text-sm font-medium transition-colors border border-gray-200 hover:border-[#c8a96e] px-4 py-2 rounded">
+                <button onClick={handleSaveCart} className="inline-flex items-center gap-2 text-gray-500 hover:text-[#8c4a5a] text-sm font-medium transition-colors border border-gray-200 hover:border-[#8c4a5a] px-4 py-2 rounded">
                   <Save className="w-4 h-4" /> Sacuvaj korpu za kasnije
                 </button>
               </div>
@@ -185,7 +185,7 @@ export default function CartPage() {
             {/* ORDER SUMMARY */}
             <div>
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-                <h3 className="text-lg font-bold text-[#1a1a1a] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Pregled porudzbine</h3>
+                <h3 className="text-lg font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Pregled porudzbine</h3>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between"><span className="text-gray-500">Medjuzbir</span><span className="font-medium">{subtotal.toLocaleString("sr-RS")} RSD</span></div>
@@ -200,7 +200,7 @@ export default function CartPage() {
                       <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input type="text" value={promoCode} onChange={(e) => { setPromoCode(e.target.value); setPromoError(false); }} placeholder="Promo kod" className="w-full border border-gray-200 rounded pl-9 pr-3 py-2.5 text-sm" />
                     </div>
-                    <button onClick={handleApplyPromo} className="px-4 py-2.5 border border-[#c8a96e] text-[#c8a96e] rounded text-sm font-medium hover:bg-[#c8a96e] hover:text-white transition-colors">Primeni</button>
+                    <button onClick={handleApplyPromo} className="px-4 py-2.5 border border-[#8c4a5a] text-[#8c4a5a] rounded text-sm font-medium hover:bg-[#8c4a5a] hover:text-white transition-colors">Primeni</button>
                   </div>
                   {/* Promo validation states */}
                   {promoApplied && (
@@ -221,13 +221,13 @@ export default function CartPage() {
                   <div className="flex justify-between text-lg font-bold"><span>Ukupno</span><span>{total.toLocaleString("sr-RS")} RSD</span></div>
                 </div>
 
-                <button className="w-full bg-[#c8a96e] hover:bg-[#a8894e] text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2">
+                <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2">
                   Nastavi na placanje <ChevronRight className="w-4 h-4" />
                 </button>
 
                 <div className="mt-4 space-y-2 text-xs text-gray-500">
-                  <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#c8a96e]" /> Besplatna dostava preko 5.000 RSD</div>
-                  <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#c8a96e]" /> Sigurno online placanje</div>
+                  <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#8c4a5a]" /> Besplatna dostava preko 5.000 RSD</div>
+                  <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#8c4a5a]" /> Sigurno online placanje</div>
                 </div>
 
                 {/* Payment badges */}
@@ -243,16 +243,16 @@ export default function CartPage() {
 
         {/* RECOMMENDED */}
         <section className="mt-16 mb-16">
-          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Preporuceni proizvodi</h2>
+          <h2 className="text-2xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Preporuceni proizvodi</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {recommended.map((p) => (
               <Link key={p.id} href={`/products/${p.id}`} className="product-card bg-white rounded-lg shadow-sm hover:shadow-md transition-all group overflow-hidden">
                 <div className="aspect-square overflow-hidden"><img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /></div>
                 <div className="p-4">
-                  <span className="text-xs text-[#c8a96e] font-medium uppercase tracking-wider">{p.brand}</span>
-                  <h3 className="text-sm font-medium text-[#1a1a1a] mt-1 line-clamp-2">{p.name}</h3>
-                  <div className="flex items-center gap-0.5 mt-2">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < p.rating ? "fill-[#c8a96e] text-[#c8a96e]" : "text-gray-200"}`} />)}</div>
-                  <span className="text-base font-bold text-[#1a1a1a] mt-2 block">{p.price.toLocaleString("sr-RS")} RSD</span>
+                  <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{p.brand}</span>
+                  <h3 className="text-sm font-medium text-[#2d2d2d] mt-1 line-clamp-2">{p.name}</h3>
+                  <div className="flex items-center gap-0.5 mt-2">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < p.rating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200"}`} />)}</div>
+                  <span className="text-base font-bold text-[#2d2d2d] mt-2 block">{p.price.toLocaleString("sr-RS")} RSD</span>
                 </div>
               </Link>
             ))}

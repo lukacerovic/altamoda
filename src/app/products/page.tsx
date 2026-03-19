@@ -106,7 +106,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#999]"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#2d2d2d] hover:bg-[#1a1a1a] text-white text-sm font-medium py-2.5 rounded-xl transition-colors">
+          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#2d2d2d] hover:bg-[#2d2d2d] text-white text-sm font-medium py-2.5 rounded-xl transition-colors">
             Dodaj u korpu
           </button>
         </div>
@@ -297,7 +297,7 @@ export default function ProductsPage() {
             <input type="number" placeholder="Do" className="w-full border border-[#e8e2d9] rounded-xl px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-[#8c4a5a] focus:outline-none transition-all placeholder-[#bbb]" />
           </div>
         </div>
-        <button className="mt-3 w-full bg-[#2d2d2d] hover:bg-[#1a1a1a] text-white text-sm py-2.5 rounded-xl font-medium transition-colors">
+        <button className="mt-3 w-full bg-[#2d2d2d] hover:bg-[#2d2d2d] text-white text-sm py-2.5 rounded-xl font-medium transition-colors">
           Primeni
         </button>
       </FilterSection>
@@ -536,7 +536,7 @@ export default function ProductsPage() {
               <button onClick={() => setMobileFilter(false)} className="flex-1 border border-[#e8e2d9] text-[#2d2d2d] py-3 rounded-xl font-medium text-sm transition-colors hover:bg-[#faf7f3]">
                 Resetuj
               </button>
-              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-[#2d2d2d] hover:bg-[#1a1a1a] text-white py-3 rounded-xl font-medium text-sm transition-colors">
+              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-[#2d2d2d] hover:bg-[#2d2d2d] text-white py-3 rounded-xl font-medium text-sm transition-colors">
                 Primeni
               </button>
             </div>

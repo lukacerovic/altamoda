@@ -42,16 +42,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f0e8;
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b07a87;
+  background: var(--color-accent-light);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8c4a5a;
+  background: var(--color-accent);
 }
 
 /* Animations */
@@ -104,7 +104,7 @@ body {
 .animate-pulse-accent { animation: pulse-accent 2s infinite; }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, #efe8de 25%, #e8e0d4 50%, #efe8de 75%);
+  background: linear-gradient(90deg, var(--color-background) 25%, var(--color-light-accent) 50%, var(--color-background) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -128,16 +128,16 @@ body {
 }
 
 .gradient-accent {
-  background: linear-gradient(135deg, #8c4a5a 0%, #b07a87 50%, #8c4a5a 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 50%, var(--color-accent) 100%);
 }
 
 .gradient-dark {
-  background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 100%);
+  background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-light) 100%);
 }
 
 /* Button styles */
 .btn-accent {
-  background-color: #8c4a5a;
+  background-color: var(--color-accent);
   color: white;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -146,13 +146,13 @@ body {
 }
 
 .btn-accent:hover {
-  background-color: #6e3848;
+  background-color: var(--color-accent-dark);
   transform: translateY(-1px);
 }
 
 .btn-outline-accent {
-  border: 1.5px solid #8c4a5a;
-  color: #8c4a5a;
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
   background: transparent;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -161,13 +161,13 @@ body {
 }
 
 .btn-outline-accent:hover {
-  background-color: #8c4a5a;
+  background-color: var(--color-accent);
   color: white;
 }
 
 /* Legacy class names mapped to new colors */
 .btn-gold {
-  background-color: #8c4a5a;
+  background-color: var(--color-accent);
   color: white;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -176,13 +176,13 @@ body {
 }
 
 .btn-gold:hover {
-  background-color: #6e3848;
+  background-color: var(--color-accent-dark);
   transform: translateY(-1px);
 }
 
 .btn-outline-gold {
-  border: 1.5px solid #8c4a5a;
-  color: #8c4a5a;
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
   background: transparent;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -191,12 +191,12 @@ body {
 }
 
 .btn-outline-gold:hover {
-  background-color: #8c4a5a;
+  background-color: var(--color-accent);
   color: white;
 }
 
 .btn-dark {
-  background-color: #2d2d2d;
+  background-color: var(--color-dark);
   color: white;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -204,20 +204,20 @@ body {
 }
 
 .btn-dark:hover {
-  background-color: #4a4a4a;
+  background-color: var(--color-dark-light);
   transform: translateY(-1px);
 }
 
 /* Product card hover */
 .product-card {
   transition: all 0.3s ease;
-  border: 1px solid #e0d8cc;
+  border: 1px solid var(--color-border);
   border-radius: 1rem;
 }
 
 .product-card:hover {
   transform: translateY(-2px);
-  border-color: #b07a87;
+  border-color: var(--color-accent-light);
 }
 
 .product-card .product-image {
@@ -230,23 +230,23 @@ body {
 
 /* Badge styles */
 .badge-sale {
-  background-color: #b5453a;
+  background-color: var(--color-error);
   color: white;
 }
 
 .badge-new {
-  background-color: #8c4a5a;
+  background-color: var(--color-accent);
   color: white;
 }
 
 .badge-b2b {
-  background-color: #2d2d2d;
-  color: #b07a87;
+  background-color: var(--color-dark);
+  color: var(--color-accent-light);
 }
 
 /* Star rating */
-.star-filled { color: #8c4a5a; }
-.star-empty { color: #e0d8cc; }
+.star-filled { color: var(--color-accent); }
+.star-empty { color: var(--color-border); }
 
 /* Mega menu */
 .mega-menu {
@@ -274,20 +274,20 @@ body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #8c4a5a;
+  background-color: var(--color-accent);
   animation: scaleIn 0.3s ease-out;
 }
 
 /* Selection color */
 ::selection {
   background-color: rgba(176, 122, 135, 0.3);
-  color: #2d2d2d;
+  color: var(--color-text);
 }
 
 /* Focus styles */
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #8c4a5a;
+  border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(140, 74, 90, 0.1);
 }
 

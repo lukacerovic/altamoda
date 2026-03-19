@@ -27,14 +27,14 @@ export default function SeminarsPage() {
   const selectedSeminar = seminars.find((s) => s.id === showRegistration);
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f0e8]">
       {/* Hero */}
       <section className="relative h-[280px] md:h-[350px] overflow-hidden">
         <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1600&h=600&fit=crop" alt="Seminari" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#1a1a1a]/70" />
+        <div className="absolute inset-0 bg-[#2d2d2d]/70" />
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center justify-center text-center">
           <div>
-            <span className="text-[#c8a96e] text-xs uppercase tracking-[0.25em] font-medium">Edukacija</span>
+            <span className="text-[#8c4a5a] text-xs uppercase tracking-[0.25em] font-medium">Edukacija</span>
             <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-4 text-white" style={{ fontFamily: "'Playfair Display', serif" }}>Seminari i Radionice</h1>
             <p className="text-white/60 max-w-lg mx-auto">Unapredite svoje veštine uz naše profesionalne seminare sa vrhunskim edukatorima.</p>
           </div>
@@ -43,17 +43,17 @@ export default function SeminarsPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-[#c8a96e]">Početna</Link><ChevronRight className="w-3 h-3" /><span className="text-[#1a1a1a]">Seminari</span>
+          <Link href="/" className="hover:text-[#8c4a5a]">Početna</Link><ChevronRight className="w-3 h-3" /><span className="text-[#2d2d2d]">Seminari</span>
         </nav>
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Playfair Display', serif" }}>Predstojeći seminari</h2>
+            <h2 className="text-2xl font-bold text-[#2d2d2d]" style={{ fontFamily: "'Playfair Display', serif" }}>Predstojeći seminari</h2>
             <p className="text-gray-500 mt-1">{seminars.length} seminara u ponudi</p>
           </div>
           <div className="hidden sm:flex items-center border border-gray-200 rounded overflow-hidden">
-            <button onClick={() => setViewMode("list")} className={`p-2 ${viewMode === "list" ? "bg-[#c8a96e] text-white" : "text-gray-400 hover:text-[#1a1a1a]"}`}><List className="w-4 h-4" /></button>
-            <button onClick={() => setViewMode("calendar")} className={`p-2 ${viewMode === "calendar" ? "bg-[#c8a96e] text-white" : "text-gray-400 hover:text-[#1a1a1a]"}`}><Grid3X3 className="w-4 h-4" /></button>
+            <button onClick={() => setViewMode("list")} className={`p-2 ${viewMode === "list" ? "bg-[#8c4a5a] text-white" : "text-gray-400 hover:text-[#2d2d2d]"}`}><List className="w-4 h-4" /></button>
+            <button onClick={() => setViewMode("calendar")} className={`p-2 ${viewMode === "calendar" ? "bg-[#8c4a5a] text-white" : "text-gray-400 hover:text-[#2d2d2d]"}`}><Grid3X3 className="w-4 h-4" /></button>
           </div>
         </div>
 
@@ -64,24 +64,24 @@ export default function SeminarsPage() {
               <div className="flex-shrink-0 relative w-full md:w-56 h-44 md:h-full overflow-hidden">
                 <img src={seminar.image} alt={seminar.title} className="w-full h-full object-cover" />
                 <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-center">
-                  <span className="text-lg font-bold text-[#c8a96e] block leading-tight">{seminar.date.split(".")[0]}</span>
+                  <span className="text-lg font-bold text-[#8c4a5a] block leading-tight">{seminar.date.split(".")[0]}</span>
                   <span className="text-[10px] text-gray-500 uppercase">{seminar.date.split(" ")[1]?.replace(".", "")}</span>
                 </div>
               </div>
               <div className="p-6 flex flex-col md:flex-row md:items-center gap-6 flex-1">
                 <div className="flex-1">
-                  <span className="text-xs text-[#c8a96e] font-medium uppercase tracking-wider">{seminar.category}</span>
-                  <h3 className="text-lg font-bold text-[#1a1a1a] mt-1">{seminar.title}</h3>
+                  <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{seminar.category}</span>
+                  <h3 className="text-lg font-bold text-[#2d2d2d] mt-1">{seminar.title}</h3>
                   <p className="text-sm text-gray-500 mt-1">Predavač: <strong>{seminar.instructor}</strong></p>
                   <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
-                    <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5 text-[#c8a96e]" /> {seminar.location}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-[#c8a96e]" /> {seminar.time}</span>
-                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-[#c8a96e]" /> Slobodnih mesta: {seminar.spots}/{seminar.totalSpots}</span>
+                    <span className="flex items-center gap-1"><MapPinIcon className="w-3.5 h-3.5 text-[#8c4a5a]" /> {seminar.location}</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-[#8c4a5a]" /> {seminar.time}</span>
+                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-[#8c4a5a]" /> Slobodnih mesta: {seminar.spots}/{seminar.totalSpots}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <span className="text-xl font-bold text-[#1a1a1a]">{seminar.price.toLocaleString("sr-RS")} RSD</span>
-                  <button onClick={() => setShowRegistration(seminar.id)} className="bg-[#c8a96e] hover:bg-[#a8894e] text-white px-6 py-2.5 rounded font-medium text-sm transition-colors">Prijavite se</button>
+                  <span className="text-xl font-bold text-[#2d2d2d]">{seminar.price.toLocaleString("sr-RS")} RSD</span>
+                  <button onClick={() => setShowRegistration(seminar.id)} className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-2.5 rounded font-medium text-sm transition-colors">Prijavite se</button>
                 </div>
               </div>
             </div>
@@ -90,7 +90,7 @@ export default function SeminarsPage() {
 
         {/* Past seminars */}
         <div>
-          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Prosli Seminari</h2>
+          <h2 className="text-2xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Prosli Seminari</h2>
           <div className="grid md:grid-cols-3 gap-4">
             {pastSeminars.map((s) => (
               <div key={s.title} className="bg-white rounded-lg shadow-sm overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
@@ -120,8 +120,8 @@ export default function SeminarsPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl max-w-md w-full p-6 relative animate-scaleIn">
               <button onClick={() => setShowRegistration(null)} className="absolute top-4 right-4"><X className="w-5 h-5 text-gray-400 hover:text-gray-600" /></button>
-              <h3 className="text-xl font-bold text-[#1a1a1a] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>Prijava na Seminar</h3>
-              <p className="text-sm text-[#c8a96e] mb-6">{selectedSeminar.title} - {selectedSeminar.date}</p>
+              <h3 className="text-xl font-bold text-[#2d2d2d] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>Prijava na Seminar</h3>
+              <p className="text-sm text-[#8c4a5a] mb-6">{selectedSeminar.title} - {selectedSeminar.date}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Ime</label><input type="text" className="w-full border border-gray-200 rounded px-3 py-2.5 text-sm" /></div>
@@ -132,8 +132,8 @@ export default function SeminarsPage() {
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Naziv salona (opciono)</label><input type="text" className="w-full border border-gray-200 rounded px-3 py-2.5 text-sm" /></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Napomena</label><textarea rows={2} className="w-full border border-gray-200 rounded px-3 py-2.5 text-sm resize-none" /></div>
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                  <span className="text-lg font-bold text-[#1a1a1a]">{selectedSeminar.price.toLocaleString("sr-RS")} RSD</span>
-                  <button className="bg-[#c8a96e] hover:bg-[#a8894e] text-white px-6 py-3 rounded font-medium transition-colors">Potvrdite Prijavu</button>
+                  <span className="text-lg font-bold text-[#2d2d2d]">{selectedSeminar.price.toLocaleString("sr-RS")} RSD</span>
+                  <button className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded font-medium transition-colors">Potvrdite Prijavu</button>
                 </div>
               </div>
             </div>

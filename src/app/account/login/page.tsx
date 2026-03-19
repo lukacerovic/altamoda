@@ -11,21 +11,21 @@ export default function LoginPage() {
   const [registerType, setRegisterType] = useState<"b2c" | "b2b">("b2c");
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f0e8]">
       <div className="max-w-lg mx-auto px-4 py-12 md:py-20">
         {/* Card */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-100">
-            <button onClick={() => setActiveTab("login")} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#c8a96e] border-b-2 border-[#c8a96e]" : "text-gray-400 hover:text-gray-600"}`}>Prijava</button>
-            <button onClick={() => setActiveTab("register")} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#c8a96e] border-b-2 border-[#c8a96e]" : "text-gray-400 hover:text-gray-600"}`}>Registracija</button>
+            <button onClick={() => setActiveTab("login")} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#8c4a5a] border-b-2 border-[#8c4a5a]" : "text-gray-400 hover:text-gray-600"}`}>Prijava</button>
+            <button onClick={() => setActiveTab("register")} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#8c4a5a] border-b-2 border-[#8c4a5a]" : "text-gray-400 hover:text-gray-600"}`}>Registracija</button>
           </div>
 
           <div className="p-6 md:p-8">
             {activeTab === "login" ? (
               /* LOGIN FORM */
               <div>
-                <h2 className="text-2xl font-bold text-[#1a1a1a] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Dobrodosli nazad</h2>
+                <h2 className="text-2xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Dobrodosli nazad</h2>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Email adresa</label>
@@ -46,11 +46,11 @@ export default function LoginPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#c8a96e] focus:ring-[#c8a96e]" /> Zapamti me
+                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" /> Zapamti me
                     </label>
-                    <a href="#" className="text-sm text-[#c8a96e] hover:text-[#a8894e]">Zaboravili ste lozinku?</a>
+                    <a href="#" className="text-sm text-[#8c4a5a] hover:text-[#6e3848]">Zaboravili ste lozinku?</a>
                   </div>
-                  <button className="w-full bg-[#c8a96e] hover:bg-[#a8894e] text-white py-3 rounded font-medium transition-colors">Prijavite se</button>
+                  <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors">Prijavite se</button>
                 </div>
 
                 {/* Divider */}
@@ -75,14 +75,14 @@ export default function LoginPage() {
             ) : (
               /* REGISTER FORM */
               <div>
-                <h2 className="text-2xl font-bold text-[#1a1a1a] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Kreirajte nalog</h2>
+                <h2 className="text-2xl font-bold text-[#2d2d2d] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Kreirajte nalog</h2>
 
                 {/* B2C / B2B toggle */}
                 <div className="flex gap-2 mb-6">
-                  <button onClick={() => setRegisterType("b2c")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#c8a96e] text-white" : "border border-gray-200 text-gray-600 hover:border-[#c8a96e]"}`}>
+                  <button onClick={() => setRegisterType("b2c")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#8c4a5a] text-white" : "border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>
                     <User className="w-4 h-4 inline mr-1" /> Kupac
                   </button>
-                  <button onClick={() => setRegisterType("b2b")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#c8a96e] text-white" : "border border-gray-200 text-gray-600 hover:border-[#c8a96e]"}`}>
+                  <button onClick={() => setRegisterType("b2b")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#8c4a5a] text-white" : "border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>
                     <Building2 className="w-4 h-4 inline mr-1" /> Salon / B2B
                   </button>
                 </div>
@@ -110,7 +110,7 @@ export default function LoginPage() {
                   {registerType === "b2b" && (
                     <>
                       <div className="border-t border-gray-100 pt-4">
-                        <h3 className="text-sm font-semibold text-[#1a1a1a] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-[#c8a96e]" /> Podaci o salonu</h3>
+                        <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-[#8c4a5a]" /> Podaci o salonu</h3>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Naziv salona</label>
@@ -141,11 +141,11 @@ export default function LoginPage() {
                   </div>
 
                   <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#c8a96e] focus:ring-[#c8a96e] mt-0.5" />
-                    <span>Slazem se sa <a href="#" className="text-[#c8a96e] hover:underline">uslovima koriscenja</a> i <a href="#" className="text-[#c8a96e] hover:underline">politikom privatnosti</a></span>
+                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a] mt-0.5" />
+                    <span>Slazem se sa <a href="#" className="text-[#8c4a5a] hover:underline">uslovima koriscenja</a> i <a href="#" className="text-[#8c4a5a] hover:underline">politikom privatnosti</a></span>
                   </label>
 
-                  <button className="w-full bg-[#c8a96e] hover:bg-[#a8894e] text-white py-3 rounded font-medium transition-colors">
+                  <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors">
                     {registerType === "b2b" ? "Posaljite zahtev za B2B nalog" : "Registrujte se"}
                   </button>
 

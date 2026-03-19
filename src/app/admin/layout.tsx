@@ -91,10 +91,10 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex">
+    <div className="min-h-screen bg-[#f5f0e8] flex">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col fixed top-0 left-0 h-full bg-[#1a1a1a] text-white z-40 transition-all duration-300 ${
+        className={`hidden lg:flex flex-col fixed top-0 left-0 h-full bg-[#2d2d2d] text-white z-40 transition-all duration-300 ${
           sidebarOpen ? "w-64" : "w-20"
         }`}
       >
@@ -103,7 +103,7 @@ export default function AdminLayout({
           {sidebarOpen ? (
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="Alta Moda" className="h-6 brightness-0 invert" />
-              <span className="text-[10px] font-semibold bg-[#c8a96e] text-[#1a1a1a] px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-[10px] font-semibold bg-[#8c4a5a] text-[#2d2d2d] px-2 py-0.5 rounded-full uppercase tracking-wider">
                 Admin
               </span>
             </div>
@@ -137,16 +137,16 @@ export default function AdminLayout({
                     href={item.href}
                     className={`flex items-center gap-3 px-6 py-3 mx-2 rounded-lg transition-all duration-200 group ${
                       active
-                        ? "bg-[#c8a96e]/15 text-[#c8a96e]"
+                        ? "bg-[#8c4a5a]/15 text-[#8c4a5a]"
                         : "text-white/60 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    <Icon size={20} className={active ? "text-[#c8a96e]" : "text-white/60 group-hover:text-white"} />
+                    <Icon size={20} className={active ? "text-[#8c4a5a]" : "text-white/60 group-hover:text-white"} />
                     {sidebarOpen && (
                       <span className="text-sm font-medium">{item.label}</span>
                     )}
                     {active && sidebarOpen && (
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#c8a96e]" />
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#8c4a5a]" />
                     )}
                   </Link>
                 );
@@ -158,7 +158,7 @@ export default function AdminLayout({
         {/* User section at bottom */}
         <div className="p-4 border-t border-white/10">
           <div className={`flex items-center gap-3 ${sidebarOpen ? "" : "justify-center"}`}>
-            <div className="w-9 h-9 rounded-full bg-[#c8a96e] flex items-center justify-center text-[#1a1a1a] font-semibold text-sm flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-[#8c4a5a] flex items-center justify-center text-[#2d2d2d] font-semibold text-sm flex-shrink-0">
               AM
             </div>
             {sidebarOpen && (
@@ -181,14 +181,14 @@ export default function AdminLayout({
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-[#1a1a1a] text-white z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed top-0 left-0 h-full w-72 bg-[#2d2d2d] text-white z-50 transform transition-transform duration-300 lg:hidden ${
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="p-6 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Alta Moda" className="h-6 brightness-0 invert" />
-            <span className="text-[10px] font-semibold bg-[#c8a96e] text-[#1a1a1a] px-2 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="text-[10px] font-semibold bg-[#8c4a5a] text-[#2d2d2d] px-2 py-0.5 rounded-full uppercase tracking-wider">
               Admin
             </span>
           </div>
@@ -217,7 +217,7 @@ export default function AdminLayout({
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-6 py-3 mx-2 rounded-lg transition-all duration-200 ${
                       active
-                        ? "bg-[#c8a96e]/15 text-[#c8a96e]"
+                        ? "bg-[#8c4a5a]/15 text-[#8c4a5a]"
                         : "text-white/60 hover:text-white hover:bg-white/5"
                     }`}
                   >
@@ -231,7 +231,7 @@ export default function AdminLayout({
         </nav>
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#c8a96e] flex items-center justify-center text-[#1a1a1a] font-semibold text-sm">
+            <div className="w-9 h-9 rounded-full bg-[#8c4a5a] flex items-center justify-center text-[#2d2d2d] font-semibold text-sm">
               AM
             </div>
             <div>
@@ -249,11 +249,11 @@ export default function AdminLayout({
         }`}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-[#e5e5e5] px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-30 bg-white border-b border-[#e0d8cc] px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-[#1a1a1a] hover:text-[#c8a96e] transition-colors"
+            className="lg:hidden text-[#2d2d2d] hover:text-[#8c4a5a] transition-colors"
           >
             <Menu size={24} />
           </button>
@@ -268,7 +268,7 @@ export default function AdminLayout({
               <input
                 type="text"
                 placeholder="Pretraži..."
-                className="w-full pl-10 pr-4 py-2 bg-[#f5f5f5] border border-transparent rounded-lg text-sm focus:border-[#c8a96e] focus:bg-white transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:border-[#8c4a5a] focus:bg-white transition-all"
               />
             </div>
           </div>
@@ -281,22 +281,22 @@ export default function AdminLayout({
                   setNotificationsOpen(!notificationsOpen);
                   setUserDropdownOpen(false);
                 }}
-                className="relative p-2 text-[#666] hover:text-[#1a1a1a] hover:bg-[#f5f5f5] rounded-lg transition-colors"
+                className="relative p-2 text-[#666] hover:text-[#2d2d2d] hover:bg-[#f5f0e8] rounded-lg transition-colors"
               >
                 <Bell size={20} />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-[#e5e5e5] overflow-hidden animate-slideDown">
-                  <div className="p-4 border-b border-[#e5e5e5]">
-                    <h3 className="font-semibold text-sm text-[#1a1a1a]">Obaveštenja</h3>
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-[#e0d8cc] overflow-hidden animate-slideDown">
+                  <div className="p-4 border-b border-[#e0d8cc]">
+                    <h3 className="font-semibold text-sm text-[#2d2d2d]">Obaveštenja</h3>
                   </div>
                   {notifications.map((n) => (
                     <div
                       key={n.id}
-                      className={`p-4 border-b border-[#f5f5f5] hover:bg-[#fafafa] cursor-pointer transition-colors ${
-                        n.unread ? "bg-[#c8a96e]/5" : ""
+                      className={`p-4 border-b border-[#f5f0e8] hover:bg-[#f5f0e8] cursor-pointer transition-colors ${
+                        n.unread ? "bg-[#8c4a5a]/5" : ""
                       }`}
                     >
                       <p className="text-sm text-[#333]">{n.text}</p>
@@ -304,7 +304,7 @@ export default function AdminLayout({
                     </div>
                   ))}
                   <div className="p-3 text-center">
-                    <button className="text-sm text-[#c8a96e] hover:text-[#a8894e] font-medium">
+                    <button className="text-sm text-[#8c4a5a] hover:text-[#6e3848] font-medium">
                       Prikaži sva obaveštenja
                     </button>
                   </div>
@@ -319,9 +319,9 @@ export default function AdminLayout({
                   setUserDropdownOpen(!userDropdownOpen);
                   setNotificationsOpen(false);
                 }}
-                className="flex items-center gap-2 p-2 hover:bg-[#f5f5f5] rounded-lg transition-colors"
+                className="flex items-center gap-2 p-2 hover:bg-[#f5f0e8] rounded-lg transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-[#c8a96e] flex items-center justify-center text-white font-semibold text-xs">
+                <div className="w-8 h-8 rounded-full bg-[#8c4a5a] flex items-center justify-center text-white font-semibold text-xs">
                   AM
                 </div>
                 <span className="hidden sm:block text-sm font-medium text-[#333]">
@@ -331,22 +331,22 @@ export default function AdminLayout({
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-[#e5e5e5] overflow-hidden animate-slideDown">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-[#e0d8cc] overflow-hidden animate-slideDown">
                   <Link
                     href="/admin/settings"
-                    className="flex items-center gap-2 px-4 py-3 text-sm text-[#333] hover:bg-[#f5f5f5] transition-colors"
+                    className="flex items-center gap-2 px-4 py-3 text-sm text-[#333] hover:bg-[#f5f0e8] transition-colors"
                   >
                     <User size={16} />
                     Moj Profil
                   </Link>
                   <Link
                     href="/admin/settings"
-                    className="flex items-center gap-2 px-4 py-3 text-sm text-[#333] hover:bg-[#f5f5f5] transition-colors"
+                    className="flex items-center gap-2 px-4 py-3 text-sm text-[#333] hover:bg-[#f5f0e8] transition-colors"
                   >
                     <Settings size={16} />
                     Podešavanja
                   </Link>
-                  <div className="border-t border-[#e5e5e5]">
+                  <div className="border-t border-[#e0d8cc]">
                     <button className="flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50 w-full transition-colors">
                       <LogOut size={16} />
                       Odjavi se

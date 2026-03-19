@@ -32,7 +32,7 @@ export default function BlogAdminPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#1a1a1a]">Blog</h1>
+          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">Blog</h1>
           <p className="text-sm text-[#666] mt-1">{posts.length} objava ukupno</p>
         </div>
         <button className="btn-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 self-start">
@@ -41,7 +41,7 @@ export default function BlogAdminPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#e5e5e5] p-4">
+      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
         <div className="relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
           <input
@@ -49,16 +49,16 @@ export default function BlogAdminPage() {
             placeholder="Pretraži objave..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#f5f5f5] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#c8a96e]"
+            className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#e5e5e5] overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-[#fafafa] border-b border-[#e5e5e5]">
+              <tr className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">Naslov</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">Autor</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">Kategorija</th>
@@ -70,13 +70,13 @@ export default function BlogAdminPage() {
             </thead>
             <tbody className="divide-y divide-[#f0f0f0]">
               {filtered.map((post) => (
-                <tr key={post.id} className="hover:bg-[#fafafa] transition-colors">
+                <tr key={post.id} className="hover:bg-[#f5f0e8] transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#f5f5f5] flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-[#f5f0e8] flex items-center justify-center flex-shrink-0">
                         <FileText size={18} className="text-[#999]" />
                       </div>
-                      <span className="text-sm font-medium text-[#1a1a1a] line-clamp-1">{post.title}</span>
+                      <span className="text-sm font-medium text-[#2d2d2d] line-clamp-1">{post.title}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-[#666] hidden md:table-cell">{post.author}</td>
@@ -90,7 +90,7 @@ export default function BlogAdminPage() {
                   <td className="px-6 py-4 text-sm text-[#666] hidden sm:table-cell">{post.views.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1">
-                      <button className="p-1.5 text-[#999] hover:text-[#c8a96e] hover:bg-[#c8a96e]/10 rounded-lg transition-colors"><Edit3 size={15} /></button>
+                      <button className="p-1.5 text-[#999] hover:text-[#8c4a5a] hover:bg-[#8c4a5a]/10 rounded-lg transition-colors"><Edit3 size={15} /></button>
                       <button className="p-1.5 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={15} /></button>
                     </div>
                   </td>

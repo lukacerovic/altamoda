@@ -36,12 +36,12 @@ export default function SalonLocatorPage() {
   const selected = salons.find((s) => s.id === selectedSalon);
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#f5f0e8]">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Title */}
         <div className="text-center mb-10">
-          <MapPin className="w-12 h-12 text-[#c8a96e] mx-auto mb-4" />
-          <h1 className="text-3xl md:text-4xl font-bold text-[#1a1a1a] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <MapPin className="w-12 h-12 text-[#8c4a5a] mx-auto mb-4" />
+          <h1 className="text-3xl md:text-4xl font-bold text-[#2d2d2d] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
             Pronađite Salon
           </h1>
           <p className="text-[#666]">Otkrijte Alta Moda partnerske salone u vašoj blizini</p>
@@ -55,7 +55,7 @@ export default function SalonLocatorPage() {
               placeholder="Pretražite salone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-[#e5e5e5] rounded-xl text-sm focus:border-[#c8a96e] transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-[#e0d8cc] rounded-xl text-sm focus:border-[#8c4a5a] transition-all"
             />
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999]" />
           </div>
@@ -63,7 +63,7 @@ export default function SalonLocatorPage() {
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="appearance-none w-full sm:w-48 px-4 py-3 bg-white border border-[#e5e5e5] rounded-xl text-sm focus:border-[#c8a96e] pr-10 cursor-pointer"
+              className="appearance-none w-full sm:w-48 px-4 py-3 bg-white border border-[#e0d8cc] rounded-xl text-sm focus:border-[#8c4a5a] pr-10 cursor-pointer"
             >
               {cities.map((city) => (
                 <option key={city} value={city}>{city}</option>
@@ -76,7 +76,7 @@ export default function SalonLocatorPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Map */}
           <div className="flex-1">
-            <div className="bg-white rounded-2xl border border-[#e5e5e5] overflow-hidden shadow-sm relative" style={{ height: "500px" }}>
+            <div className="bg-white rounded-2xl border border-[#e0d8cc] overflow-hidden shadow-sm relative" style={{ height: "500px" }}>
               {/* Mock map background */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#e8f4e8] to-[#d4e8d4]">
                 {/* Grid lines for map effect */}
@@ -94,10 +94,10 @@ export default function SalonLocatorPage() {
                     style={{ left: `${salon.x}%`, top: `${salon.y}%` }}
                   >
                     <div className={`flex flex-col items-center`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg ${selectedSalon === salon.id ? "bg-[#c8a96e]" : salon.partner ? "bg-[#1a1a1a]" : "bg-[#666]"}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg ${selectedSalon === salon.id ? "bg-[#8c4a5a]" : salon.partner ? "bg-[#2d2d2d]" : "bg-[#666]"}`}>
                         <MapPin className="w-4 h-4 text-white" />
                       </div>
-                      <div className={`mt-1 px-2 py-0.5 rounded text-[10px] font-medium whitespace-nowrap ${selectedSalon === salon.id ? "bg-[#c8a96e] text-white" : "bg-white text-[#333] shadow-sm"}`}>
+                      <div className={`mt-1 px-2 py-0.5 rounded text-[10px] font-medium whitespace-nowrap ${selectedSalon === salon.id ? "bg-[#8c4a5a] text-white" : "bg-white text-[#333] shadow-sm"}`}>
                         {salon.name}
                       </div>
                     </div>
@@ -108,13 +108,13 @@ export default function SalonLocatorPage() {
 
             {/* Selected salon detail */}
             {selected && (
-              <div className="mt-4 bg-white rounded-xl border border-[#c8a96e]/30 p-6 animate-slideUp">
+              <div className="mt-4 bg-white rounded-xl border border-[#8c4a5a]/30 p-6 animate-slideUp">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-semibold text-[#1a1a1a]">{selected.name}</h3>
+                      <h3 className="text-lg font-semibold text-[#2d2d2d]">{selected.name}</h3>
                       {selected.partner && (
-                        <span className="flex items-center gap-1 px-2 py-0.5 bg-[#c8a96e]/10 text-[#c8a96e] text-[10px] font-semibold rounded-full">
+                        <span className="flex items-center gap-1 px-2 py-0.5 bg-[#8c4a5a]/10 text-[#8c4a5a] text-[10px] font-semibold rounded-full">
                           <Award className="w-3 h-3" /> PARTNER
                         </span>
                       )}
@@ -122,14 +122,14 @@ export default function SalonLocatorPage() {
                     <p className="text-sm text-[#666] flex items-center gap-1"><MapPin className="w-3 h-3" /> {selected.address}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-[#c8a96e] text-[#c8a96e]" />
+                    <Star className="w-4 h-4 fill-[#8c4a5a] text-[#8c4a5a]" />
                     <span className="font-semibold text-sm">{selected.rating}</span>
                     <span className="text-xs text-[#999]">({selected.reviews})</span>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-4 mt-4 text-sm text-[#666]">
-                  <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-[#c8a96e]" /> {selected.phone}</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-[#c8a96e]" /> {selected.hours}</span>
+                  <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-[#8c4a5a]" /> {selected.phone}</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-[#8c4a5a]" /> {selected.hours}</span>
                 </div>
               </div>
             )}
@@ -143,21 +143,21 @@ export default function SalonLocatorPage() {
                 key={salon.id}
                 onClick={() => setSelectedSalon(salon.id)}
                 className={`w-full text-left bg-white rounded-xl border p-4 hover:shadow-sm transition-all ${
-                  selectedSalon === salon.id ? "border-[#c8a96e] shadow-sm" : "border-[#e5e5e5]"
+                  selectedSalon === salon.id ? "border-[#8c4a5a] shadow-sm" : "border-[#e0d8cc]"
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-sm text-[#1a1a1a]">{salon.name}</h3>
+                      <h3 className="font-semibold text-sm text-[#2d2d2d]">{salon.name}</h3>
                       {salon.partner && (
-                        <span className="px-1.5 py-0.5 bg-[#c8a96e]/10 text-[#c8a96e] text-[9px] font-bold rounded">PARTNER</span>
+                        <span className="px-1.5 py-0.5 bg-[#8c4a5a]/10 text-[#8c4a5a] text-[9px] font-bold rounded">PARTNER</span>
                       )}
                     </div>
                     <p className="text-xs text-[#999] mt-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> {salon.address}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-[#c8a96e] text-[#c8a96e]" />
+                    <Star className="w-3 h-3 fill-[#8c4a5a] text-[#8c4a5a]" />
                     <span className="text-xs font-semibold">{salon.rating}</span>
                   </div>
                 </div>
