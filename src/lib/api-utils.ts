@@ -20,13 +20,12 @@ export function errorResponse(message: string, status = 400) {
 }
 
 export function getPaginationParams(searchParams: URLSearchParams) {
-  const page = Math.max(
-    1,
-    parseInt(searchParams.get('page') || String(PAGINATION_DEFAULT_PAGE))
-  )
+  const rawPage = parseInt(searchParams.get('page') || String(PAGINATION_DEFAULT_PAGE))
+  const rawLimit = parseInt(searchParams.get('limit') || String(PAGINATION_DEFAULT_LIMIT))
+  const page = Math.max(1, isNaN(rawPage) ? PAGINATION_DEFAULT_PAGE : rawPage)
   const limit = Math.min(
     PAGINATION_MAX_LIMIT,
-    Math.max(1, parseInt(searchParams.get('limit') || String(PAGINATION_DEFAULT_LIMIT)))
+    Math.max(1, isNaN(rawLimit) ? PAGINATION_DEFAULT_LIMIT : rawLimit)
   )
   const skip = (page - 1) * limit
   return { page, limit, skip }
