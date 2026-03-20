@@ -112,11 +112,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
   if (items.length === 0 && step !== 'review') {
     return (
-      <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center">
+      <div className="min-h-screen bg-stone-100 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-[#2d2d2d] mb-2">Vaša korpa je prazna</h2>
+          <h2 className="text-xl font-bold text-black mb-2">Vaša korpa je prazna</h2>
           <p className="text-gray-500 mb-4">Dodajte proizvode pre nastavka na plaćanje.</p>
-          <Link href="/products" className="px-6 py-3 bg-[#8c4a5a] text-white rounded font-medium hover:bg-[#6e3848]">
+          <Link href="/products" className="px-6 py-3 bg-black text-white rounded font-medium hover:bg-stone-800">
             Nastavi kupovinu
           </Link>
         </div>
@@ -189,31 +189,31 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-stone-100">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-[#8c4a5a]">Početna</Link>
+          <Link href="/" className="hover:text-secondary">Početna</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/cart" className="hover:text-[#8c4a5a]">Korpa</Link>
+          <Link href="/cart" className="hover:text-secondary">Korpa</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-[#2d2d2d]">Plaćanje</span>
+          <span className="text-black">Plaćanje</span>
         </nav>
 
-        <h1 className="text-3xl font-bold text-[#2d2d2d] mb-8" style={{ fontFamily: "'Playfair Display', serif" }}>Plaćanje</h1>
+        <h1 className="text-3xl font-bold text-black mb-8" style={{ fontFamily: "'Noto Serif', serif" }}>Plaćanje</h1>
 
         {/* Step indicator */}
         <div className="flex items-center justify-between mb-8">
           {STEPS.map((s, i) => (
             <div key={s.key} className="flex items-center flex-1">
-              <div className={`flex items-center gap-2 ${i <= stepIndex ? 'text-[#8c4a5a]' : 'text-gray-300'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i < stepIndex ? 'bg-[#8c4a5a] text-white' : i === stepIndex ? 'border-2 border-[#8c4a5a] text-[#8c4a5a]' : 'border-2 border-gray-200 text-gray-300'}`}>
+              <div className={`flex items-center gap-2 ${i <= stepIndex ? 'text-secondary' : 'text-gray-300'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i < stepIndex ? 'bg-black text-white' : i === stepIndex ? 'border-2 border-black text-secondary' : 'border-2 border-gray-200 text-gray-300'}`}>
                   {i < stepIndex ? <CheckCircle className="w-4 h-4" /> : i + 1}
                 </div>
                 <span className="text-sm font-medium hidden sm:inline">{s.label}</span>
               </div>
               {i < STEPS.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-3 ${i < stepIndex ? 'bg-[#8c4a5a]' : 'bg-gray-200'}`} />
+                <div className={`flex-1 h-0.5 mx-3 ${i < stepIndex ? 'bg-black' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
@@ -225,8 +225,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
             {/* STEP: Contact (guest only) */}
             {step === 'contact' && isGuest && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-bold text-[#2d2d2d] mb-4">Vaši podaci</h2>
+              <div className="bg-white rounded-sm shadow-sm p-6">
+                <h2 className="text-lg font-bold text-black mb-4">Vaši podaci</h2>
                 <p className="text-sm text-gray-500 mb-4">Unesite vaše kontakt podatke za porudžbinu.</p>
 
                 <div className="space-y-3">
@@ -237,7 +237,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       value={guestInfo.name}
                       onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
                       placeholder="Unesite ime i prezime"
-                      className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-[#8c4a5a] focus:outline-none"
+                      className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
                     />
                   </div>
                   <div>
@@ -247,7 +247,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       value={guestInfo.email}
                       onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
                       placeholder="vasa@email.com"
-                      className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-[#8c4a5a] focus:outline-none"
+                      className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
                     />
                   </div>
                   <div>
@@ -257,14 +257,14 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       value={guestInfo.phone}
                       onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
                       placeholder="+381 6x xxx xxxx"
-                      className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-[#8c4a5a] focus:outline-none"
+                      className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 bg-[#faf7f2] rounded-lg text-sm text-gray-600">
+                <div className="mt-4 p-3 bg-stone-50 rounded-sm text-sm text-gray-600">
                   Imate nalog?{' '}
-                  <Link href="/account/login?callbackUrl=/checkout" className="text-[#8c4a5a] font-medium hover:underline">
+                  <Link href="/account/login?callbackUrl=/checkout" className="text-secondary font-medium hover:underline">
                     Prijavite se
                   </Link>{' '}
                   za brže naručivanje i praćenje porudžbina.
@@ -273,7 +273,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 <button
                   onClick={goNext}
                   disabled={!canProceedContact}
-                  className="mt-6 w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="mt-6 w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   Nastavi <ChevronRight className="w-4 h-4" />
                 </button>
@@ -282,22 +282,22 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
             {/* STEP: Address */}
             {step === 'address' && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-bold text-[#2d2d2d] mb-4">Adresa za dostavu</h2>
+              <div className="bg-white rounded-sm shadow-sm p-6">
+                <h2 className="text-lg font-bold text-black mb-4">Adresa za dostavu</h2>
 
                 {addresses.length > 0 && (
                   <div className="space-y-3 mb-4">
                     {addresses.map((addr) => (
-                      <label key={addr.id} className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${!useNewAddress && selectedAddressId === addr.id ? 'border-[#8c4a5a] bg-[#faf7f2]' : 'border-gray-100 hover:border-gray-200'}`}>
-                        <input type="radio" name="address" checked={!useNewAddress && selectedAddressId === addr.id} onChange={() => { setSelectedAddressId(addr.id); setUseNewAddress(false) }} className="mt-1 text-[#8c4a5a]" />
+                      <label key={addr.id} className={`flex items-start gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${!useNewAddress && selectedAddressId === addr.id ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
+                        <input type="radio" name="address" checked={!useNewAddress && selectedAddressId === addr.id} onChange={() => { setSelectedAddressId(addr.id); setUseNewAddress(false) }} className="mt-1 text-secondary" />
                         <div>
                           <span className="font-medium text-sm">{addr.label}</span>
                           <p className="text-sm text-gray-500">{addr.street}, {addr.postalCode} {addr.city}, {addr.country}</p>
                         </div>
                       </label>
                     ))}
-                    <label className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${useNewAddress ? 'border-[#8c4a5a] bg-[#faf7f2]' : 'border-gray-100 hover:border-gray-200'}`}>
-                      <input type="radio" name="address" checked={useNewAddress} onChange={() => setUseNewAddress(true)} className="text-[#8c4a5a]" />
+                    <label className={`flex items-center gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${useNewAddress ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
+                      <input type="radio" name="address" checked={useNewAddress} onChange={() => setUseNewAddress(true)} className="text-secondary" />
                       <span className="text-sm font-medium">Nova adresa</span>
                     </label>
                   </div>
@@ -305,10 +305,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
                 {useNewAddress && (
                   <div className="space-y-3">
-                    <input type="text" placeholder="Ulica i broj" value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-[#8c4a5a] focus:outline-none" />
+                    <input type="text" placeholder="Ulica i broj" value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" placeholder="Grad" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-[#8c4a5a] focus:outline-none" />
-                      <input type="text" placeholder="Poštanski broj" value={newAddress.postalCode} onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-[#8c4a5a] focus:outline-none" />
+                      <input type="text" placeholder="Grad" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
+                      <input type="text" placeholder="Poštanski broj" value={newAddress.postalCode} onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
                     </div>
                   </div>
                 )}
@@ -319,7 +319,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       <ChevronLeft className="w-4 h-4" /> Nazad
                     </button>
                   )}
-                  <button onClick={goNext} disabled={!canProceedAddress} className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  <button onClick={goNext} disabled={!canProceedAddress} className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                     Nastavi <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -328,17 +328,17 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
             {/* STEP: Shipping */}
             {step === 'shipping' && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-bold text-[#2d2d2d] mb-4">Način dostave</h2>
+              <div className="bg-white rounded-sm shadow-sm p-6">
+                <h2 className="text-lg font-bold text-black mb-4">Način dostave</h2>
                 <div className="space-y-3">
                   {[
                     { key: 'standard', label: 'Standardna dostava (2-4 dana)', price: subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350 },
                     { key: 'express', label: 'Ekspres dostava (1 dan)', price: 690 },
                     { key: 'pickup', label: 'Preuzimanje u prodavnici', price: 0 },
                   ].map((opt) => (
-                    <label key={opt.key} className={`flex items-center justify-between gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${shippingMethod === opt.key ? 'border-[#8c4a5a] bg-[#faf7f2]' : 'border-gray-100 hover:border-gray-200'}`}>
+                    <label key={opt.key} className={`flex items-center justify-between gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${shippingMethod === opt.key ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
                       <div className="flex items-center gap-3">
-                        <input type="radio" name="shipping" checked={shippingMethod === opt.key} onChange={() => setShippingMethod(opt.key)} className="text-[#8c4a5a]" />
+                        <input type="radio" name="shipping" checked={shippingMethod === opt.key} onChange={() => setShippingMethod(opt.key)} className="text-secondary" />
                         <span className="text-sm font-medium">{opt.label}</span>
                       </div>
                       <span className={`text-sm font-semibold ${opt.price === 0 ? 'text-green-600' : ''}`}>
@@ -351,7 +351,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> Nazad
                   </button>
-                  <button onClick={goNext} className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium flex items-center justify-center gap-2">
+                  <button onClick={goNext} className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium flex items-center justify-center gap-2">
                     Nastavi <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -360,12 +360,12 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
             {/* STEP: Payment */}
             {step === 'payment' && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-bold text-[#2d2d2d] mb-4">Način plaćanja</h2>
+              <div className="bg-white rounded-sm shadow-sm p-6">
+                <h2 className="text-lg font-bold text-black mb-4">Način plaćanja</h2>
                 <div className="space-y-3">
                   {paymentOptions.map((opt) => (
-                    <label key={opt.key} className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${paymentMethod === opt.key ? 'border-[#8c4a5a] bg-[#faf7f2]' : 'border-gray-100 hover:border-gray-200'}`}>
-                      <input type="radio" name="payment" checked={paymentMethod === opt.key} onChange={() => setPaymentMethod(opt.key)} className="text-[#8c4a5a]" />
+                    <label key={opt.key} className={`flex items-center gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${paymentMethod === opt.key ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
+                      <input type="radio" name="payment" checked={paymentMethod === opt.key} onChange={() => setPaymentMethod(opt.key)} className="text-secondary" />
                       <span className="text-sm font-medium">{opt.label}</span>
                     </label>
                   ))}
@@ -373,14 +373,14 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Napomena (opciono)</label>
-                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Dodatne napomene..." className="w-full border border-gray-200 rounded px-4 py-3 text-sm resize-none focus:border-[#8c4a5a] focus:outline-none" />
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Dodatne napomene..." className="w-full border border-gray-200 rounded px-4 py-3 text-sm resize-none focus:border-black focus:outline-none" />
                 </div>
 
                 <div className="flex gap-3 mt-6">
                   <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> Nazad
                   </button>
-                  <button onClick={goNext} className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium flex items-center justify-center gap-2">
+                  <button onClick={goNext} className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium flex items-center justify-center gap-2">
                     Nastavi <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -390,15 +390,15 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {/* STEP: Review */}
             {step === 'review' && (
               <div className="space-y-4">
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h2 className="text-lg font-bold text-[#2d2d2d] mb-4">Pregled porudžbine</h2>
+                <div className="bg-white rounded-sm shadow-sm p-6">
+                  <h2 className="text-lg font-bold text-black mb-4">Pregled porudžbine</h2>
 
                   {/* Guest contact summary */}
                   {isGuest && (
-                    <div className="mb-4 p-4 bg-[#faf7f2] rounded-lg">
+                    <div className="mb-4 p-4 bg-stone-50 rounded-sm">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-[#2d2d2d]">Kontakt podaci</span>
-                        <button onClick={() => setStep('contact')} className="text-xs text-[#8c4a5a] hover:underline">Izmeni</button>
+                        <span className="text-sm font-semibold text-black">Kontakt podaci</span>
+                        <button onClick={() => setStep('contact')} className="text-xs text-secondary hover:underline">Izmeni</button>
                       </div>
                       <p className="text-sm text-gray-600">{guestInfo.name}</p>
                       <p className="text-sm text-gray-600">{guestInfo.email} | {guestInfo.phone}</p>
@@ -406,10 +406,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   )}
 
                   {/* Address summary */}
-                  <div className="mb-4 p-4 bg-[#faf7f2] rounded-lg">
+                  <div className="mb-4 p-4 bg-stone-50 rounded-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-[#2d2d2d]">Adresa za dostavu</span>
-                      <button onClick={() => setStep('address')} className="text-xs text-[#8c4a5a] hover:underline">Izmeni</button>
+                      <span className="text-sm font-semibold text-black">Adresa za dostavu</span>
+                      <button onClick={() => setStep('address')} className="text-xs text-secondary hover:underline">Izmeni</button>
                     </div>
                     <p className="text-sm text-gray-600">
                       {shippingAddress?.street}, {shippingAddress?.postalCode} {shippingAddress?.city}
@@ -417,10 +417,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
 
                   {/* Shipping summary */}
-                  <div className="mb-4 p-4 bg-[#faf7f2] rounded-lg">
+                  <div className="mb-4 p-4 bg-stone-50 rounded-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-[#2d2d2d]">Dostava</span>
-                      <button onClick={() => setStep('shipping')} className="text-xs text-[#8c4a5a] hover:underline">Izmeni</button>
+                      <span className="text-sm font-semibold text-black">Dostava</span>
+                      <button onClick={() => setStep('shipping')} className="text-xs text-secondary hover:underline">Izmeni</button>
                     </div>
                     <p className="text-sm text-gray-600">
                       {shippingMethod === 'standard' ? 'Standardna (2-4 dana)' : shippingMethod === 'express' ? 'Ekspres (1 dan)' : 'Preuzimanje'}
@@ -430,10 +430,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
 
                   {/* Payment summary */}
-                  <div className="p-4 bg-[#faf7f2] rounded-lg">
+                  <div className="p-4 bg-stone-50 rounded-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-[#2d2d2d]">Plaćanje</span>
-                      <button onClick={() => setStep('payment')} className="text-xs text-[#8c4a5a] hover:underline">Izmeni</button>
+                      <span className="text-sm font-semibold text-black">Plaćanje</span>
+                      <button onClick={() => setStep('payment')} className="text-xs text-secondary hover:underline">Izmeni</button>
                     </div>
                     <p className="text-sm text-gray-600">
                       {paymentOptions.find((o) => o.key === paymentMethod)?.label}
@@ -442,8 +442,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
 
                 {/* Items */}
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-[#2d2d2d] mb-4">Proizvodi ({items.length})</h3>
+                <div className="bg-white rounded-sm shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-black mb-4">Proizvodi ({items.length})</h3>
                   <div className="space-y-3">
                     {items.map((item) => (
                       <div key={item.productId} className="flex items-center gap-4">
@@ -451,7 +451,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                           {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#2d2d2d] truncate">{item.name}</p>
+                          <p className="text-sm font-medium text-black truncate">{item.name}</p>
                           <p className="text-xs text-gray-500">x{item.quantity}</p>
                         </div>
                         <span className="text-sm font-semibold">{(item.price * item.quantity).toLocaleString('sr-RS')} RSD</span>
@@ -461,16 +461,16 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                  <div className="bg-red-50 border border-red-200 rounded-sm p-3 text-sm text-red-700">
                     <div className="flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
                     </div>
                     {isGuest && error.includes('prijavljeni') && (
                       <div className="mt-2 flex gap-2">
-                        <Link href="/account/login?callbackUrl=/checkout" className="px-4 py-2 bg-[#8c4a5a] text-white text-sm rounded font-medium hover:bg-[#6e3848]">
+                        <Link href="/account/login?callbackUrl=/checkout" className="px-4 py-2 bg-black text-white text-sm rounded font-medium hover:bg-stone-800">
                           Prijavite se
                         </Link>
-                        <Link href="/account/register?callbackUrl=/checkout" className="px-4 py-2 border border-[#8c4a5a] text-[#8c4a5a] text-sm rounded font-medium hover:bg-[#faf7f2]">
+                        <Link href="/account/register?callbackUrl=/checkout" className="px-4 py-2 border border-black text-secondary text-sm rounded font-medium hover:bg-stone-50">
                           Kreirajte nalog
                         </Link>
                       </div>
@@ -479,7 +479,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 )}
 
                 {!b2bMinimumMet && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-center gap-2 text-sm text-orange-700">
+                  <div className="bg-orange-50 border border-orange-200 rounded-sm p-3 flex items-center gap-2 text-sm text-orange-700">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     Minimalni iznos B2B porudžbine je {MIN_B2B_ORDER.toLocaleString('sr-RS')} RSD
                   </div>
@@ -489,7 +489,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> Nazad
                   </button>
-                  <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
+                  <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-black hover:bg-stone-800 text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
                     {isSubmitting ? 'Obrada...' : 'Poruči'}
                   </button>
                 </div>
@@ -499,8 +499,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
           {/* Order summary sidebar */}
           <div>
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-              <h3 className="text-lg font-bold text-[#2d2d2d] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Pregled</h3>
+            <div className="bg-white rounded-sm shadow-sm p-6 sticky top-24">
+              <h3 className="text-lg font-bold text-black mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>Pregled</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Međuzbir ({items.length} stavki)</span>
@@ -516,8 +516,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-500">
-                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#8c4a5a]" /> Sigurno online plaćanje</div>
-                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#8c4a5a]" /> Besplatna dostava preko 5.000 RSD</div>
+                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-secondary" /> Sigurno online plaćanje</div>
+                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> Besplatna dostava preko 5.000 RSD</div>
               </div>
             </div>
           </div>

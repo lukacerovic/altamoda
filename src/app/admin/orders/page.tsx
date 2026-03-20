@@ -237,7 +237,7 @@ export default function OrdersPage() {
     switch (icon) {
       case "check": return <CheckCircle size={16} className="text-emerald-500" />;
       case "truck": return <Truck size={16} className="text-blue-500" />;
-      case "package": return <Package size={16} className="text-[#8c4a5a]" />;
+      case "package": return <Package size={16} className="text-secondary" />;
       case "x": return <XCircle size={16} className="text-red-500" />;
       default: return <Clock size={16} className="text-[#999]" />;
     }
@@ -248,17 +248,17 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">{t("admin.orders")}</h1>
+          <h1 className="text-2xl font-serif font-bold text-black">{t("admin.orders")}</h1>
           <p className="text-sm text-[#666] mt-1">{orders.length} {t("admin.totalOrders")}</p>
         </div>
-        <button className="btn-outline-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 self-start">
+        <button className="btn-outline-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
           <Download size={18} />
           {t("admin.export")}
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+      <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
@@ -267,10 +267,10 @@ export default function OrdersPage() {
               placeholder={t("admin.searchOrders")}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]"
+              className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black"
             />
           </div>
-          <button onClick={() => setShowFilters(!showFilters)} className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-[#f5f0e8] rounded-lg text-sm text-[#666]">
+          <button onClick={() => setShowFilters(!showFilters)} className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#666]">
             <Filter size={16} /> {t("admin.filters")}
           </button>
         </div>
@@ -282,10 +282,10 @@ export default function OrdersPage() {
               <button
                 key={s.key}
                 onClick={() => { setStatusFilter(s.key); setCurrentPage(1); }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors ${
                   statusFilter === s.key
-                    ? "bg-[#2d2d2d] text-white"
-                    : "bg-[#f5f0e8] text-[#666] hover:bg-[#e0d8cc]"
+                    ? "bg-stone-900 text-white"
+                    : "bg-stone-100 text-[#666] hover:bg-[#c4c7c7]"
                 }`}
               >
                 {s.label}
@@ -296,11 +296,11 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
+      <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
+              <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.orderNo")}</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.customer")}</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.date")}</th>
@@ -314,15 +314,15 @@ export default function OrdersPage() {
             <tbody className="divide-y divide-[#f0f0f0]">
               {paginated.map((order) => (
                 <>
-                  <tr key={order.id} className="hover:bg-[#f5f0e8] transition-colors cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}>
-                    <td className="px-6 py-4 text-sm font-medium text-[#8c4a5a]">{order.id}</td>
+                  <tr key={order.id} className="hover:bg-stone-100 transition-colors cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}>
+                    <td className="px-6 py-4 text-sm font-medium text-secondary">{order.id}</td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-[#2d2d2d]">{order.customer}</p>
+                      <p className="text-sm font-medium text-black">{order.customer}</p>
                       <p className="text-xs text-[#999] md:hidden">{order.date}</p>
                     </td>
                     <td className="px-6 py-4 text-sm text-[#666] hidden md:table-cell">{order.date}</td>
                     <td className="px-6 py-4 text-sm text-[#666] hidden lg:table-cell">{order.items.length} {t("admin.itemsCount")}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-[#2d2d2d]">{order.total.toLocaleString()} RSD</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-black">{order.total.toLocaleString()} RSD</td>
                     <td className="px-6 py-4 text-sm text-[#666] hidden sm:table-cell">{order.paymentMethod}</td>
                     <td className="px-6 py-4">
                       <select
@@ -338,7 +338,7 @@ export default function OrdersPage() {
                       </select>
                     </td>
                     <td className="px-6 py-4">
-                      <button className="text-[#999] hover:text-[#2d2d2d] transition-colors">
+                      <button className="text-[#999] hover:text-black transition-colors">
                         {expandedOrder === order.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                       </button>
                     </td>
@@ -347,15 +347,15 @@ export default function OrdersPage() {
                   {/* Expanded Detail */}
                   {expandedOrder === order.id && (
                     <tr key={`${order.id}-detail`}>
-                      <td colSpan={8} className="px-6 py-6 bg-[#f5f0e8]">
+                      <td colSpan={8} className="px-6 py-6 bg-stone-100">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                           {/* Items */}
                           <div className="lg:col-span-2">
-                            <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3">{t("admin.orderItems")}</h3>
-                            <div className="bg-white rounded-lg border border-[#e0d8cc] overflow-hidden">
+                            <h3 className="text-sm font-semibold text-black mb-3">{t("admin.orderItems")}</h3>
+                            <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
                               <table className="w-full">
                                 <thead>
-                                  <tr className="bg-[#f5f0e8]">
+                                  <tr className="bg-stone-100">
                                     <th className="px-4 py-2 text-left text-xs font-medium text-[#666]">{t("admin.product")}</th>
                                     <th className="px-4 py-2 text-left text-xs font-medium text-[#666]">{t("admin.qty")}</th>
                                     <th className="px-4 py-2 text-left text-xs font-medium text-[#666]">{t("admin.price")}</th>
@@ -368,22 +368,22 @@ export default function OrdersPage() {
                                       <td className="px-4 py-2.5 text-sm text-[#333]">{item.name}</td>
                                       <td className="px-4 py-2.5 text-sm text-[#666]">{item.quantity}</td>
                                       <td className="px-4 py-2.5 text-sm text-[#666]">{item.price.toLocaleString()} RSD</td>
-                                      <td className="px-4 py-2.5 text-sm font-medium text-[#2d2d2d]">{(item.quantity * item.price).toLocaleString()} RSD</td>
+                                      <td className="px-4 py-2.5 text-sm font-medium text-black">{(item.quantity * item.price).toLocaleString()} RSD</td>
                                     </tr>
                                   ))}
                                 </tbody>
                                 <tfoot>
-                                  <tr className="bg-[#f5f0e8]">
-                                    <td colSpan={3} className="px-4 py-2.5 text-sm font-semibold text-[#2d2d2d] text-right">{t("admin.total")}:</td>
-                                    <td className="px-4 py-2.5 text-sm font-bold text-[#8c4a5a]">{order.total.toLocaleString()} RSD</td>
+                                  <tr className="bg-stone-100">
+                                    <td colSpan={3} className="px-4 py-2.5 text-sm font-semibold text-black text-right">{t("admin.total")}:</td>
+                                    <td className="px-4 py-2.5 text-sm font-bold text-secondary">{order.total.toLocaleString()} RSD</td>
                                   </tr>
                                 </tfoot>
                               </table>
                             </div>
 
                             {/* Customer Info */}
-                            <h3 className="text-sm font-semibold text-[#2d2d2d] mt-4 mb-3">{t("admin.customerData")}</h3>
-                            <div className="bg-white rounded-lg border border-[#e0d8cc] p-4 space-y-2">
+                            <h3 className="text-sm font-semibold text-black mt-4 mb-3">{t("admin.customerData")}</h3>
+                            <div className="bg-white rounded-sm border border-stone-200 p-4 space-y-2">
                               <div className="flex items-center gap-2 text-sm text-[#333]">
                                 <Mail size={14} className="text-[#999]" /> {order.email}
                               </div>
@@ -398,15 +398,15 @@ export default function OrdersPage() {
 
                           {/* Timeline */}
                           <div>
-                            <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3">{t("admin.orderTimeline")}</h3>
-                            <div className="bg-white rounded-lg border border-[#e0d8cc] p-4">
+                            <h3 className="text-sm font-semibold text-black mb-3">{t("admin.orderTimeline")}</h3>
+                            <div className="bg-white rounded-sm border border-stone-200 p-4">
                               <div className="space-y-4">
                                 {order.timeline.map((event, idx) => (
                                   <div key={idx} className="flex gap-3">
                                     <div className="flex flex-col items-center">
                                       {getTimelineIcon(event.icon)}
                                       {idx < order.timeline.length - 1 && (
-                                        <div className="w-px h-full bg-[#e0d8cc] mt-1" />
+                                        <div className="w-px h-full bg-[#c4c7c7] mt-1" />
                                       )}
                                     </div>
                                     <div className="pb-4">
@@ -430,20 +430,20 @@ export default function OrdersPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-[#e0d8cc] flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
             <span className="text-sm text-[#666]">
               {t("admin.showing")} {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
             </span>
             <div className="flex items-center gap-1">
-              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed">
+              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-2 rounded-sm text-[#666] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronLeft size={18} />
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${page === currentPage ? "bg-[#8c4a5a] text-white" : "text-[#666] hover:bg-[#f5f0e8]"}`}>
+                <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#666] hover:bg-stone-100"}`}>
                   {page}
                 </button>
               ))}
-              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed">
+              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="p-2 rounded-sm text-[#666] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronRight size={18} />
               </button>
             </div>

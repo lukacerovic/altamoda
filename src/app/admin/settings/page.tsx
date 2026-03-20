@@ -25,7 +25,7 @@ function Toggle({ enabled, onChange }: ToggleProps) {
   return (
     <button
       onClick={onChange}
-      className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? "bg-[#8c4a5a]" : "bg-gray-300"}`}
+      className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? "bg-black" : "bg-gray-300"}`}
     >
       <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${enabled ? "translate-x-5.5" : "translate-x-0.5"}`} />
     </button>
@@ -119,7 +119,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">{t("admin.settings")}</h1>
+          <h1 className="text-2xl font-serif font-bold text-black">{t("admin.settings")}</h1>
           <p className="text-sm text-[#666] mt-1">{t("admin.settingsDesc")}</p>
         </div>
         <button
@@ -135,7 +135,7 @@ export default function SettingsPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tabs */}
         <div className="lg:w-56 flex-shrink-0">
-          <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
+          <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
             <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -145,8 +145,8 @@ export default function SettingsPage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-3 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                       activeTab === tab.id
-                        ? "bg-[#8c4a5a]/10 text-[#8c4a5a] border-b-2 lg:border-b-0 lg:border-l-2 border-[#8c4a5a]"
-                        : "text-[#666] hover:text-[#2d2d2d] hover:bg-[#f5f0e8]"
+                        ? "bg-black/10 text-secondary border-b-2 lg:border-b-0 lg:border-l-2 border-black"
+                        : "text-[#666] hover:text-black hover:bg-stone-100"
                     }`}
                   >
                     <Icon size={18} />
@@ -159,12 +159,12 @@ export default function SettingsPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 bg-white rounded-xl border border-[#e0d8cc] p-6">
+        <div className="flex-1 bg-white rounded-sm border border-stone-200 p-6">
           {/* General */}
           {activeTab === "general" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-[#2d2d2d] mb-1">{t("admin.generalSettings")}</h2>
+                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.generalSettings")}</h2>
                 <p className="text-sm text-[#666]">{t("admin.generalSettingsDesc")}</p>
               </div>
 
@@ -174,28 +174,28 @@ export default function SettingsPage() {
                     <Globe size={14} className="inline mr-1.5 text-[#999]" />
                     {t("admin.storeName")}
                   </label>
-                  <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
                     <Mail size={14} className="inline mr-1.5 text-[#999]" />
                     {t("admin.emailAddress")}
                   </label>
-                  <input type="email" value={storeEmail} onChange={(e) => setStoreEmail(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="email" value={storeEmail} onChange={(e) => setStoreEmail(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
                     <Phone size={14} className="inline mr-1.5 text-[#999]" />
                     {t("admin.phone")}
                   </label>
-                  <input type="text" value={storePhone} onChange={(e) => setStorePhone(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="text" value={storePhone} onChange={(e) => setStorePhone(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
                     <MapPin size={14} className="inline mr-1.5 text-[#999]" />
                     {t("admin.address")}
                   </label>
-                  <input type="text" value={storeAddress} onChange={(e) => setStoreAddress(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="text" value={storeAddress} onChange={(e) => setStoreAddress(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                 </div>
               </div>
 
@@ -204,14 +204,14 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.currency")}</label>
-                    <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm cursor-pointer">
+                    <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm cursor-pointer">
                       <option value="RSD">{t("admin.rsd")}</option>
                       <option value="EUR">{t("admin.eur")}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.language")}</label>
-                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm cursor-pointer">
+                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm cursor-pointer">
                       <option value="sr">{t("admin.serbian")}</option>
                       <option value="en">{t("admin.english")}</option>
                     </select>
@@ -225,18 +225,18 @@ export default function SettingsPage() {
           {activeTab === "shipping" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-[#2d2d2d] mb-1">{t("admin.deliverySettings")}</h2>
+                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.deliverySettings")}</h2>
                 <p className="text-sm text-[#666]">{t("admin.deliverySettingsDesc")}</p>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#8c4a5a]/5 border border-[#8c4a5a]/20">
+              <div className="p-4 rounded-lg bg-black/5 border border-black/20">
                 <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.freeShippingOver")}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
                     value={freeShippingThreshold}
                     onChange={(e) => setFreeShippingThreshold(e.target.value)}
-                    className="w-32 px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm"
+                    className="w-32 px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
                   />
                   <span className="text-sm text-[#666]">RSD</span>
                 </div>
@@ -246,10 +246,10 @@ export default function SettingsPage() {
                 <h3 className="text-sm font-semibold text-[#333] mb-4">{t("admin.shippingZones")}</h3>
                 <div className="space-y-3">
                   {shippingZones.map((zone, i) => (
-                    <div key={zone.name} className={`flex items-center justify-between p-4 rounded-lg border ${zone.enabled ? "border-[#e0d8cc] bg-white" : "border-[#f0f0f0] bg-[#f5f0e8]"}`}>
+                    <div key={zone.name} className={`flex items-center justify-between p-4 rounded-lg border ${zone.enabled ? "border-stone-200 bg-white" : "border-[#f0f0f0] bg-stone-100"}`}>
                       <div className="flex items-center gap-4">
                         <Toggle enabled={zone.enabled} onChange={() => toggleShippingZone(i)} />
-                        <span className={`text-sm font-medium ${zone.enabled ? "text-[#2d2d2d]" : "text-[#999]"}`}>{zone.name}</span>
+                        <span className={`text-sm font-medium ${zone.enabled ? "text-black" : "text-[#999]"}`}>{zone.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <input
@@ -257,7 +257,7 @@ export default function SettingsPage() {
                           value={zone.rate}
                           onChange={(e) => updateShippingRate(i, e.target.value)}
                           disabled={!zone.enabled}
-                          className="w-20 px-3 py-1.5 border border-[#e0d8cc] rounded-lg text-sm text-right disabled:opacity-50 disabled:bg-[#f5f0e8]"
+                          className="w-20 px-3 py-1.5 border border-stone-200 rounded-lg text-sm text-right disabled:opacity-50 disabled:bg-stone-100"
                         />
                         <span className="text-xs text-[#999]">RSD</span>
                       </div>
@@ -272,19 +272,19 @@ export default function SettingsPage() {
           {activeTab === "payment" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-[#2d2d2d] mb-1">{t("admin.paymentMethods")}</h2>
+                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.paymentMethods")}</h2>
                 <p className="text-sm text-[#666]">{t("admin.paymentMethodsDesc")}</p>
               </div>
 
               <div className="space-y-3">
                 {paymentMethods.map((method, i) => (
-                  <div key={method.nameKey} className={`flex items-center justify-between p-5 rounded-lg border ${method.enabled ? "border-[#8c4a5a]/30 bg-[#8c4a5a]/5" : "border-[#e0d8cc] bg-white"}`}>
+                  <div key={method.nameKey} className={`flex items-center justify-between p-5 rounded-lg border ${method.enabled ? "border-black/30 bg-black/5" : "border-stone-200 bg-white"}`}>
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${method.enabled ? "bg-[#8c4a5a] text-white" : "bg-[#f5f0e8] text-[#999]"}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${method.enabled ? "bg-black text-white" : "bg-stone-100 text-[#999]"}`}>
                         <CreditCard size={20} />
                       </div>
                       <div>
-                        <p className={`text-sm font-medium ${method.enabled ? "text-[#2d2d2d]" : "text-[#999]"}`}>{t(`admin.${method.nameKey}`)}</p>
+                        <p className={`text-sm font-medium ${method.enabled ? "text-black" : "text-[#999]"}`}>{t(`admin.${method.nameKey}`)}</p>
                         <p className="text-xs text-[#999]">{t(`admin.${method.descKey}`)}</p>
                       </div>
                     </div>
@@ -299,14 +299,14 @@ export default function SettingsPage() {
           {activeTab === "notifications" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-[#2d2d2d] mb-1">{t("admin.notificationSettings")}</h2>
+                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.notificationSettings")}</h2>
                 <p className="text-sm text-[#666]">{t("admin.notificationSettingsDesc")}</p>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#e0d8cc]">
+                    <tr className="border-b border-stone-200">
                       <th className="pb-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.notification")}</th>
                       <th className="pb-3 text-center text-xs font-semibold text-[#666] uppercase tracking-wider w-24">{t("admin.email")}</th>
                       <th className="pb-3 text-center text-xs font-semibold text-[#666] uppercase tracking-wider w-24">{t("admin.push")}</th>
@@ -316,7 +316,7 @@ export default function SettingsPage() {
                     {notifications.map((notif, i) => (
                       <tr key={notif.nameKey}>
                         <td className="py-4">
-                          <p className="text-sm font-medium text-[#2d2d2d]">{t(`admin.${notif.nameKey}`)}</p>
+                          <p className="text-sm font-medium text-black">{t(`admin.${notif.nameKey}`)}</p>
                           <p className="text-xs text-[#999]">{t(`admin.${notif.descKey}`)}</p>
                         </td>
                         <td className="py-4 text-center">
@@ -341,24 +341,24 @@ export default function SettingsPage() {
           {activeTab === "b2b" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-[#2d2d2d] mb-1">{t("admin.b2bSettings")}</h2>
+                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.b2bSettings")}</h2>
                 <p className="text-sm text-[#666]">{t("admin.b2bSettingsDesc")}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.defaultDiscount")}</label>
-                  <input type="number" value={b2bDiscount} onChange={(e) => setB2bDiscount(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="number" value={b2bDiscount} onChange={(e) => setB2bDiscount(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                   <p className="text-xs text-[#999] mt-1">{t("admin.defaultDiscountDesc")}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.minOrder")}</label>
-                  <input type="number" value={b2bMinOrder} onChange={(e) => setB2bMinOrder(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="number" value={b2bMinOrder} onChange={(e) => setB2bMinOrder(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                   <p className="text-xs text-[#999] mt-1">{t("admin.minOrderDesc")}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.paymentTerms")}</label>
-                  <input type="number" value={b2bPaymentDays} onChange={(e) => setB2bPaymentDays(e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <input type="number" value={b2bPaymentDays} onChange={(e) => setB2bPaymentDays(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
                   <p className="text-xs text-[#999] mt-1">{t("admin.paymentTermsDesc")}</p>
                 </div>
               </div>
@@ -366,17 +366,17 @@ export default function SettingsPage() {
               <div className="pt-4 border-t border-[#f0f0f0] space-y-4">
                 <h3 className="text-sm font-semibold text-[#333]">{t("admin.automation")}</h3>
 
-                <div className="flex items-center justify-between p-4 rounded-lg border border-[#e0d8cc]">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-stone-200">
                   <div>
-                    <p className="text-sm font-medium text-[#2d2d2d]">{t("admin.autoApproveB2b")}</p>
+                    <p className="text-sm font-medium text-black">{t("admin.autoApproveB2b")}</p>
                     <p className="text-xs text-[#999]">{t("admin.autoApproveDesc")}</p>
                   </div>
                   <Toggle enabled={b2bAutoApprove} onChange={() => setB2bAutoApprove(!b2bAutoApprove)} />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg border border-[#e0d8cc]">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-stone-200">
                   <div>
-                    <p className="text-sm font-medium text-[#2d2d2d]">{t("admin.requiredPib")}</p>
+                    <p className="text-sm font-medium text-black">{t("admin.requiredPib")}</p>
                     <p className="text-xs text-[#999]">{t("admin.requiredPibDesc")}</p>
                   </div>
                   <Toggle enabled={b2bRequirePib} onChange={() => setB2bRequirePib(!b2bRequirePib)} />
@@ -384,7 +384,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="p-4 rounded-lg bg-[#2d2d2d] text-white">
-                <h4 className="text-sm font-semibold text-[#8c4a5a] mb-2">{t("admin.b2bStats")}</h4>
+                <h4 className="text-sm font-semibold text-secondary mb-2">{t("admin.b2bStats")}</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-xl font-bold text-white">48</p>
@@ -395,7 +395,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-white/50">{t("admin.pending")}</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-[#8c4a5a]">15%</p>
+                    <p className="text-xl font-bold text-secondary">15%</p>
                     <p className="text-xs text-white/50">{t("admin.avgDiscount")}</p>
                   </div>
                 </div>

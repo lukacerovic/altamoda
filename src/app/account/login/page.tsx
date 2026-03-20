@@ -125,14 +125,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-stone-100">
       <div className="max-w-lg mx-auto px-4 py-12 md:py-20">
         {/* Card */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-sm shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-100">
-            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#8c4a5a] border-b-2 border-[#8c4a5a]" : "text-gray-400 hover:text-gray-600"}`}>{t("auth.login")}</button>
-            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#8c4a5a] border-b-2 border-[#8c4a5a]" : "text-gray-400 hover:text-gray-600"}`}>{t("auth.register")}</button>
+            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-secondary border-b-2 border-black" : "text-gray-400 hover:text-gray-600"}`}>{t("auth.login")}</button>
+            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-secondary border-b-2 border-black" : "text-gray-400 hover:text-gray-600"}`}>{t("auth.register")}</button>
           </div>
 
           <div className="p-6 md:p-8">
@@ -151,7 +151,7 @@ export default function LoginPage() {
             {activeTab === "login" ? (
               /* LOGIN FORM */
               <form onSubmit={handleLogin}>
-                <h2 className="text-2xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>{t("auth.welcomeBack")}</h2>
+                <h2 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.welcomeBack")}</h2>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("auth.emailAddress")}</label>
@@ -172,11 +172,11 @@ export default function LoginPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a]" /> {t("auth.rememberMe")}
+                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-secondary focus:ring-black" /> {t("auth.rememberMe")}
                     </label>
-                    <a href="#" className="text-sm text-[#8c4a5a] hover:text-[#6e3848]">{t("auth.forgotPassword")}</a>
+                    <a href="#" className="text-sm text-secondary hover:text-black">{t("auth.forgotPassword")}</a>
                   </div>
-                  <button type="submit" disabled={loading} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={loading} className="w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.loggingIn") : t("auth.loginButton")}
                   </button>
                 </div>
@@ -203,14 +203,14 @@ export default function LoginPage() {
             ) : (
               /* REGISTER FORM */
               <form onSubmit={handleRegister}>
-                <h2 className="text-2xl font-bold text-[#2d2d2d] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{t("auth.createAccount")}</h2>
+                <h2 className="text-2xl font-bold text-black mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.createAccount")}</h2>
 
                 {/* B2C / B2B toggle */}
                 <div className="flex gap-2 mb-6">
-                  <button type="button" onClick={() => setRegisterType("b2c")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#8c4a5a] text-white" : "border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>
+                  <button type="button" onClick={() => setRegisterType("b2c")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-black text-white" : "border border-gray-200 text-gray-600 hover:border-black"}`}>
                     <User className="w-4 h-4 inline mr-1" /> {t("auth.buyer")}
                   </button>
-                  <button type="button" onClick={() => setRegisterType("b2b")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#8c4a5a] text-white" : "border border-gray-200 text-gray-600 hover:border-[#8c4a5a]"}`}>
+                  <button type="button" onClick={() => setRegisterType("b2b")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-black text-white" : "border border-gray-200 text-gray-600 hover:border-black"}`}>
                     <Building2 className="w-4 h-4 inline mr-1" /> {t("auth.salonB2b")}
                   </button>
                 </div>
@@ -238,7 +238,7 @@ export default function LoginPage() {
                   {registerType === "b2b" && (
                     <>
                       <div className="border-t border-gray-100 pt-4">
-                        <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-[#8c4a5a]" /> {t("auth.salonDetails")}</h3>
+                        <h3 className="text-sm font-semibold text-black mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-secondary" /> {t("auth.salonDetails")}</h3>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("auth.salonName")}</label>
@@ -269,11 +269,11 @@ export default function LoginPage() {
                   </div>
 
                   <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
-                    <input type="checkbox" checked={regTerms} onChange={(e) => setRegTerms(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-[#8c4a5a] focus:ring-[#8c4a5a] mt-0.5" />
-                    <span>{t("auth.agreeTerms")} <a href="#" className="text-[#8c4a5a] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#8c4a5a] hover:underline">{t("auth.privacyPolicy")}</a></span>
+                    <input type="checkbox" checked={regTerms} onChange={(e) => setRegTerms(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-secondary focus:ring-black mt-0.5" />
+                    <span>{t("auth.agreeTerms")} <a href="#" className="text-secondary hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-secondary hover:underline">{t("auth.privacyPolicy")}</a></span>
                   </label>
 
-                  <button type="submit" disabled={loading} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={loading} className="w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.processing") : registerType === "b2b" ? t("auth.submitB2b") : t("auth.registerButton")}
                   </button>
 

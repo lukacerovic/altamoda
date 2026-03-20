@@ -164,6 +164,46 @@ export default async function ProductsPage() {
     orderBy: { sortOrder: "asc" },
   });
 
+  // Fetch available color facets (only colors that exist on active products)
+  const colorProducts = await prisma.colorProduct.findMany({
+    where: { product: { isActive: true } },
+    select: {
+      colorLevel: true,
+      undertoneCode: true,
+      undertoneName: true,
+      hexValue: true,
+    },
+  });
+
+  const colorLevelMap = new Map<number, { count: number; hexSamples: string[] }>();
+  const colorUndertoneMap = new Map<string, { name: string; count: number; hexSamples: string[] }>();
+
+  for (const cp of colorProducts) {
+    const lv = colorLevelMap.get(cp.colorLevel);
+    if (lv) {
+      lv.count++;
+      if (lv.hexSamples.length < 3 && !lv.hexSamples.includes(cp.hexValue)) lv.hexSamples.push(cp.hexValue);
+    } else {
+      colorLevelMap.set(cp.colorLevel, { count: 1, hexSamples: [cp.hexValue] });
+    }
+
+    const ut = colorUndertoneMap.get(cp.undertoneCode);
+    if (ut) {
+      ut.count++;
+      if (ut.hexSamples.length < 3 && !ut.hexSamples.includes(cp.hexValue)) ut.hexSamples.push(cp.hexValue);
+    } else {
+      colorUndertoneMap.set(cp.undertoneCode, { name: cp.undertoneName, count: 1, hexSamples: [cp.hexValue] });
+    }
+  }
+
+  const availableColorLevels = Array.from(colorLevelMap.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([level, data]) => ({ level, count: data.count, hexSamples: data.hexSamples }));
+
+  const availableColorUndertones = Array.from(colorUndertoneMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([code, data]) => ({ code, name: data.name, count: data.count, hexSamples: data.hexSamples }));
+
   // Fetch user's wishlisted product IDs
   let wishlistedIds: string[] = [];
   if (session?.user?.id) {
@@ -183,6 +223,8 @@ export default async function ProductsPage() {
       attributes={attributes}
       userRole={userRole}
       wishlistedProductIds={wishlistedIds}
+      availableColorLevels={availableColorLevels}
+      availableColorUndertones={availableColorUndertones}
     />
   );
 }

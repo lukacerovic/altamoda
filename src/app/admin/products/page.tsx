@@ -59,7 +59,7 @@ interface Product {
   weight: number;
   volume: number;
   status: "active" | "inactive";
-  badges: { isNew: boolean; isFeatured: boolean; isProfessionalOnly: boolean };
+  badges: { isNew: boolean; isFeatured: boolean; isBestseller: boolean; isProfessionalOnly: boolean };
   description: string;
   ingredients: string;
   howToUse: string;
@@ -70,6 +70,7 @@ interface Product {
   colorUndertone?: string;
   colorHex?: string;
   shadeCode?: string;
+  removeColor?: boolean;
   seoTitle: string;
   metaDescription: string;
   slug: string;
@@ -112,7 +113,7 @@ const initialProducts: Product[] = [
     id: 1, name: "Serie Expert Gold Quinoa", sku: "LOR-SE-GQ001", brand: "L'Or\u00e9al", productLine: "Serie Expert",
     category: "Nega kose", subCategory: "\u0160amponi", priceB2C: 2500, priceB2B: 1800, oldPrice: 3200, purchasePrice: 1200,
     stock: 45, lowStockThreshold: 10, weight: 300, volume: 300, status: "active",
-    badges: { isNew: false, isFeatured: true, isProfessionalOnly: false },
+    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
     description: "Profesionalni \u0161ampon za o\u0161te\u0107enu kosu sa zlatnim kvinojom.",
     ingredients: "Aqua, Sodium Laureth Sulfate, Gold Quinoa Extract...",
     howToUse: "Nanesite na mokru kosu, upenite i isperite. Ponovite po potrebi.",
@@ -125,7 +126,7 @@ const initialProducts: Product[] = [
     id: 2, name: "BC Bonacure Peptide Repair", sku: "SCH-BC-PR001", brand: "Schwarzkopf", productLine: "BC Bonacure",
     category: "Nega kose", subCategory: "\u0160amponi", priceB2C: 1800, priceB2B: 1300, purchasePrice: 900,
     stock: 32, lowStockThreshold: 10, weight: 250, volume: 250, status: "active",
-    badges: { isNew: true, isFeatured: false, isProfessionalOnly: false },
+    badges: { isNew: true, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
     description: "Rescue \u0161ampon za finu i o\u0161te\u0107enu kosu.",
     ingredients: "Aqua, Sodium Laureth Sulfate, Peptide Complex...",
     howToUse: "Nanesite na mokru kosu, masirajte i isperite.",
@@ -138,7 +139,7 @@ const initialProducts: Product[] = [
     id: 3, name: "Elixir Ultime Serum", sku: "KER-EU-S001", brand: "K\u00e9rastase", productLine: "Elixir Ultime",
     category: "Ulja i serumi", subCategory: "Serumi", priceB2C: 4200, priceB2B: 3200, oldPrice: 4800, purchasePrice: 2200,
     stock: 3, lowStockThreshold: 5, weight: 100, volume: 100, status: "active",
-    badges: { isNew: false, isFeatured: true, isProfessionalOnly: false },
+    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
     description: "Luksuzno ulje za izvanredan sjaj kose.",
     ingredients: "Cyclopentasiloxane, Dimethiconol, Argan Oil...",
     howToUse: "Nanesite 1-2 pumpe na suvu ili vla\u017enu kosu.",
@@ -151,7 +152,7 @@ const initialProducts: Product[] = [
     id: 4, name: "Oil Reflections \u0160ampon", sku: "WEL-OR-S001", brand: "Wella", productLine: "Oil Reflections",
     category: "Nega kose", subCategory: "\u0160amponi", priceB2C: 1950, priceB2B: 1400, purchasePrice: 950,
     stock: 28, lowStockThreshold: 10, weight: 250, volume: 250, status: "active",
-    badges: { isNew: false, isFeatured: false, isProfessionalOnly: false },
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
     description: "\u0160ampon za blistavu i glatku kosu.",
     ingredients: "Aqua, Sodium Laureth Sulfate, Camellia Oil...",
     howToUse: "Nanesite na mokru kosu, masirajte teme i isperite.",
@@ -164,7 +165,7 @@ const initialProducts: Product[] = [
     id: 5, name: "Moroccanoil Treatment 100ml", sku: "MOR-TR-001", brand: "Moroccanoil", productLine: "Treatment",
     category: "Ulja i serumi", subCategory: "Ulja", priceB2C: 3500, priceB2B: 2600, purchasePrice: 1800,
     stock: 15, lowStockThreshold: 5, weight: 120, volume: 100, status: "active",
-    badges: { isNew: false, isFeatured: true, isProfessionalOnly: false },
+    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
     description: "Originalni Moroccanoil tretman za kosu sa arganovim uljem.",
     ingredients: "Cyclomethicone, Dimethicone, Argania Spinosa Kernel Oil...",
     howToUse: "Nanesite malu koli\u010dinu na vla\u017enu ili suvu kosu.",
@@ -177,7 +178,7 @@ const initialProducts: Product[] = [
     id: 6, name: "Igora Royal 60ml - 7.0", sku: "SCH-IR-700", brand: "Schwarzkopf", productLine: "Igora Royal",
     category: "Boje za kosu", subCategory: "Permanentne", priceB2C: 850, priceB2B: 580, purchasePrice: 350,
     stock: 120, lowStockThreshold: 20, weight: 80, volume: 60, status: "active",
-    badges: { isNew: false, isFeatured: false, isProfessionalOnly: true },
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
     description: "Permanentna profesionalna boja za kosu. Nivo 7, prirodno plava.",
     ingredients: "Aqua, Cetearyl Alcohol, Propylene Glycol...",
     howToUse: "Pome\u0161ajte 1:1 sa razvo\u010diva\u010dem. Nanesite i ostavite 30-45 min.",
@@ -191,7 +192,7 @@ const initialProducts: Product[] = [
     id: 7, name: "Majirel 50ml - 6.0", sku: "LOR-MJ-600", brand: "L'Or\u00e9al", productLine: "Majirel",
     category: "Boje za kosu", subCategory: "Permanentne", priceB2C: 900, priceB2B: 620, purchasePrice: 380,
     stock: 5, lowStockThreshold: 15, weight: 70, volume: 50, status: "active",
-    badges: { isNew: false, isFeatured: false, isProfessionalOnly: true },
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
     description: "L'Or\u00e9al Majirel permanentna boja. Nivo 6, tamno plava.",
     ingredients: "Aqua, Cetearyl Alcohol, Hexylene Glycol...",
     howToUse: "Pome\u0161ajte sa oksidansom u srazmeri 1:1.5. Vreme delovanja 35 min.",
@@ -205,7 +206,7 @@ const initialProducts: Product[] = [
     id: 8, name: "OSIS+ Dust It", sku: "SCH-OS-DI01", brand: "Schwarzkopf", productLine: "OSIS+",
     category: "Styling", subCategory: "Puderi", priceB2C: 1200, priceB2B: 850, purchasePrice: 550,
     stock: 42, lowStockThreshold: 10, weight: 10, volume: 10, status: "inactive",
-    badges: { isNew: false, isFeatured: false, isProfessionalOnly: true },
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
     description: "Matirajuc\u0301i puder za volumen i teksturu.",
     ingredients: "Silica, Magnesium Stearate...",
     howToUse: "Nanesite malu koli\u010dinu na korenove kose i umasirajte.",
@@ -218,7 +219,7 @@ const initialProducts: Product[] = [
     id: 9, name: "Tecni Art Pli Shaper", sku: "LOR-TA-PS01", brand: "L'Or\u00e9al", productLine: "Tecni Art",
     category: "Styling", subCategory: "Gelovi", priceB2C: 1450, priceB2B: 1050, purchasePrice: 680,
     stock: 18, lowStockThreshold: 8, weight: 190, volume: 190, status: "active",
-    badges: { isNew: true, isFeatured: false, isProfessionalOnly: true },
+    badges: { isNew: true, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
     description: "Termo-aktivni gel za dugotrajno oblikovanje.",
     ingredients: "Aqua, VP/VA Copolymer, PEG-40 Hydrogenated Castor Oil...",
     howToUse: "Nanesite na vla\u017enu kosu pre feniranja.",
@@ -231,7 +232,7 @@ const initialProducts: Product[] = [
     id: 10, name: "Koleston Perfect 60ml - 8/0", sku: "WEL-KP-800", brand: "Wella", productLine: "Koleston Perfect",
     category: "Boje za kosu", subCategory: "Permanentne", priceB2C: 950, priceB2B: 650, purchasePrice: 400,
     stock: 4, lowStockThreshold: 15, weight: 80, volume: 60, status: "active",
-    badges: { isNew: false, isFeatured: false, isProfessionalOnly: true },
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
     description: "Profesionalna permanentna boja za kosu. Svetlo plava.",
     ingredients: "Aqua, Cetearyl Alcohol, Propylene Glycol...",
     howToUse: "Pome\u0161ajte sa Welloxon Perfect. Nanesite i ostavite 30 min.",
@@ -245,7 +246,7 @@ const initialProducts: Product[] = [
     id: 11, name: "BlondMe Premium Lift", sku: "SCH-BM-PL01", brand: "Schwarzkopf", productLine: "BlondMe",
     category: "Boje za kosu", subCategory: "Posvetliva\u010di", priceB2C: 1100, priceB2B: 780, purchasePrice: 480,
     stock: 55, lowStockThreshold: 15, weight: 450, volume: 450, status: "active",
-    badges: { isNew: false, isFeatured: true, isProfessionalOnly: true },
+    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: true },
     description: "Premium puder za posvetljivanje do 9 nivoa.",
     ingredients: "Potassium Persulfate, Sodium Silicate, Magnesium Carbonate...",
     howToUse: "Pome\u0161ajte 1:2 sa razvo\u010diva\u010dem. Ne koristiti na ko\u017ei glave.",
@@ -258,7 +259,7 @@ const initialProducts: Product[] = [
     id: 12, name: "Mythic Oil Huile", sku: "LOR-MO-H001", brand: "L'Or\u00e9al", productLine: "Serie Expert",
     category: "Ulja i serumi", subCategory: "Ulja", priceB2C: 2800, priceB2B: 2100, purchasePrice: 1400,
     stock: 22, lowStockThreshold: 8, weight: 120, volume: 100, status: "active",
-    badges: { isNew: false, isFeatured: false, isProfessionalOnly: false },
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
     description: "Hranljivo ulje za kosu na bazi arganovog ulja.",
     ingredients: "Cyclomethicone, Dimethiconol, Argania Spinosa Oil...",
     howToUse: "Nanesite 1-2 kapi na krajeve kose. Mo\u017ee se koristiti na suvu ili vla\u017enu kosu.",
@@ -287,7 +288,7 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   weight: 0,
   volume: 0,
   status: "active",
-  badges: { isNew: false, isFeatured: false, isProfessionalOnly: false },
+  badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
   description: "",
   ingredients: "",
   howToUse: "",
@@ -390,6 +391,7 @@ export default function ProductsPage() {
             badges: {
               isNew: (p.isNew || false) as boolean,
               isFeatured: (p.isFeatured || false) as boolean,
+              isBestseller: (p.isBestseller || false) as boolean,
               isProfessionalOnly: (p.isProfessional || false) as boolean,
             },
             description: "",
@@ -475,13 +477,20 @@ export default function ProductsPage() {
       isProfessional: formData.badges.isProfessionalOnly,
       isNew: formData.badges.isNew,
       isFeatured: formData.badges.isFeatured,
+      isBestseller: formData.badges.isBestseller,
       isActive: formData.status === "active",
       seoTitle: formData.seoTitle || null,
       seoDescription: formData.metaDescription || null,
-      colorLevel: formData.colorLevel || null,
-      undertoneCode: formData.colorUndertone || null,
-      hexValue: formData.colorHex || null,
-      shadeCode: formData.shadeCode || null,
+      // Color data — only include if a color level is actually set
+      ...(formData.colorLevel ? {
+        colorLevel: formData.colorLevel,
+        undertoneCode: formData.colorUndertone || "N",
+        undertoneName: colorUndertones.find(u => u.value === formData.colorUndertone)?.label.split(" - ")[1] || "Neutralni",
+        hexValue: formData.colorHex || "#000000",
+        shadeCode: formData.shadeCode || "",
+      } : {
+        ...(formData.removeColor ? { removeColor: true } : {}),
+      }),
       images: formData.images.map(img => ({ url: img.url, altText: img.alt, isPrimary: img.isPrimary })),
     };
 
@@ -598,21 +607,19 @@ export default function ProductsPage() {
       ? Math.round(((formData.oldPrice - formData.priceB2C) / formData.oldPrice) * 100)
       : 0;
 
-  const showColorTab = formData.category === "Boje za kosu";
-
   const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
     { key: "osnovno", label: t("admin.productName"), icon: <Layers size={16} /> },
     { key: "cene", label: t("admin.priceB2c").replace(/ B2C/, ""), icon: <BarChart3 size={16} /> },
     { key: "sadrzaj", label: t("admin.productDescription"), icon: <FileImage size={16} /> },
     { key: "mediji", label: t("admin.productImages"), icon: <ImageIcon size={16} /> },
     { key: "zalihe", label: t("admin.stock"), icon: <Package size={16} /> },
-    ...(showColorTab ? [{ key: "boja" as TabKey, label: t("admin.colorLevel").split(" ")[0], icon: <Palette size={16} /> }] : []),
+    { key: "boja", label: t("admin.colorLevel").split(" ")[0] || "Boja", icon: <Palette size={16} /> },
     { key: "seo", label: "SEO", icon: <Globe size={16} /> },
     { key: "atributi", label: t("admin.productAttributes"), icon: <ShieldCheck size={16} /> },
   ];
 
   /* ── Common input class ── */
-  const inputCls = "w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm focus:outline-none focus:border-[#8c4a5a] bg-white text-[#2d2d2d] placeholder:text-[#aaa]";
+  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#aaa]";
   const labelCls = "block text-sm font-medium text-[#333] mb-1.5";
   const sectionCls = "space-y-5";
 
@@ -623,27 +630,27 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">{t("admin.products")}</h1>
+          <h1 className="text-2xl font-serif font-bold text-black">{t("admin.products")}</h1>
           <p className="text-sm text-[#666] mt-1">{products.length} {t("admin.totalProducts")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={openAddPanel}
-            className="btn-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2"
+            className="btn-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2"
           >
             <Plus size={18} />
             {t("admin.addProduct")}
           </button>
           <Link
             href="/admin/import"
-            className="px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 border border-[#e0d8cc] text-[#2d2d2d] hover:bg-[#f5f0e8] transition-colors"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-200 text-black hover:bg-stone-100 transition-colors"
           >
             <Upload size={16} />
             {t("admin.importCsv")}
           </Link>
           <button
             onClick={() => alert(t("admin.categoriesComingSoon"))}
-            className="px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 border border-[#e0d8cc] text-[#2d2d2d] hover:bg-[#f5f0e8] transition-colors"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-200 text-black hover:bg-stone-100 transition-colors"
           >
             <FolderTree size={16} />
             {t("admin.manageCategories")}
@@ -652,7 +659,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+      <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
@@ -661,24 +668,24 @@ export default function ProductsPage() {
               placeholder={t("admin.searchProducts")}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a] focus:outline-none"
+              className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black focus:outline-none"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-[#f5f0e8] rounded-lg text-sm text-[#666]"
+            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#666]"
           >
             <Filter size={16} />
             {t("admin.filters")}
           </button>
           <div className={`${showFilters ? "flex" : "hidden"} sm:flex flex-col sm:flex-row gap-3`}>
-            <select value={brandFilter} onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm cursor-pointer focus:border-[#8c4a5a] focus:outline-none">
+            <select value={brandFilter} onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
               {brands.map((b) => <option key={b}>{b}</option>)}
             </select>
-            <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm cursor-pointer focus:border-[#8c4a5a] focus:outline-none">
+            <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
               {categories.map((c) => <option key={c}>{c}</option>)}
             </select>
-            <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm cursor-pointer focus:border-[#8c4a5a] focus:outline-none">
+            <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
               {statuses.map((s) => <option key={s}>{s}</option>)}
             </select>
           </div>
@@ -691,16 +698,16 @@ export default function ProductsPage() {
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
-                className="px-3 py-1.5 bg-[#2d2d2d] text-white rounded-lg text-sm flex items-center gap-1"
+                className="px-3 py-1.5 bg-black text-white rounded-sm text-sm flex items-center gap-1"
               >
                 {t("admin.actions")} <MoreVertical size={14} />
               </button>
               {showBulkMenu && (
-                <div className="absolute top-full left-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-[#e0d8cc] overflow-hidden z-10">
-                  <button onClick={() => bulkAction("activate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#333] hover:bg-[#f5f0e8]">
+                <div className="absolute top-full left-0 mt-1 w-40 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden z-10">
+                  <button onClick={() => bulkAction("activate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#333] hover:bg-stone-100">
                     <Eye size={14} /> {t("admin.activate")}
                   </button>
-                  <button onClick={() => bulkAction("deactivate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#333] hover:bg-[#f5f0e8]">
+                  <button onClick={() => bulkAction("deactivate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#333] hover:bg-stone-100">
                     <EyeOff size={14} /> {t("admin.deactivate")}
                   </button>
                   <button onClick={() => bulkAction("delete")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
@@ -714,13 +721,13 @@ export default function ProductsPage() {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden">
+      <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-[#f5f0e8] border-b border-[#e0d8cc]">
+              <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
-                  <button onClick={selectAll} className="text-[#999] hover:text-[#2d2d2d]">
+                  <button onClick={selectAll} className="text-[#999] hover:text-black">
                     {selectedIds.length === paginated.length && paginated.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
@@ -737,22 +744,22 @@ export default function ProductsPage() {
             </thead>
             <tbody className="divide-y divide-[#f0f0f0]">
               {paginated.map((product) => (
-                <tr key={product.id} className="hover:bg-[#f5f0e8] transition-colors">
+                <tr key={product.id} className="hover:bg-stone-100 transition-colors">
                   <td className="px-4 py-3">
-                    <button onClick={() => toggleSelect(product.id)} className="text-[#999] hover:text-[#2d2d2d]">
-                      {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-[#8c4a5a]" /> : <Square size={18} />}
+                    <button onClick={() => toggleSelect(product.id)} className="text-[#999] hover:text-black">
+                      {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
                     </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#f5f0e8] flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-sm bg-stone-100 flex items-center justify-center flex-shrink-0">
                         <Package size={18} className="text-[#999]" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-[#2d2d2d] truncate max-w-[200px]">{product.name}</p>
+                          <p className="text-sm font-medium text-black truncate max-w-[200px]">{product.name}</p>
                           {product.badges.isProfessionalOnly && (
-                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-[#8c4a5a]/10 text-[#8c4a5a]">
+                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-black/10 text-secondary">
                               <ShieldCheck size={10} /> B2B
                             </span>
                           )}
@@ -769,7 +776,7 @@ export default function ProductsPage() {
                   <td className="px-4 py-3 text-sm text-[#333] hidden lg:table-cell">{product.category}</td>
                   <td className="px-4 py-3">
                     <div>
-                      <span className="text-sm font-medium text-[#2d2d2d]">{product.priceB2C.toLocaleString()} RSD</span>
+                      <span className="text-sm font-medium text-black">{product.priceB2C.toLocaleString()} RSD</span>
                       {product.oldPrice && (
                         <span className="block text-xs text-[#999] line-through">{product.oldPrice.toLocaleString()} RSD</span>
                       )}
@@ -793,10 +800,10 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => openEditPanel(product)} className="p-1.5 text-[#999] hover:text-[#8c4a5a] hover:bg-[#8c4a5a]/10 rounded-lg transition-colors">
+                      <button onClick={() => openEditPanel(product)} className="p-1.5 text-[#999] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
                         <Edit3 size={15} />
                       </button>
-                      <button onClick={() => handleDelete(product.id)} className="p-1.5 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                      <button onClick={() => handleDelete(product.id)} className="p-1.5 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -816,7 +823,7 @@ export default function ProductsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-[#e0d8cc] flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
             <span className="text-sm text-[#666]">
               {t("admin.showing")} {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
             </span>
@@ -824,7 +831,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#666] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -832,7 +839,7 @@ export default function ProductsPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${page === currentPage ? "bg-[#8c4a5a] text-white" : "text-[#666] hover:bg-[#f5f0e8]"}`}
+                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#666] hover:bg-stone-100"}`}
                 >
                   {page}
                 </button>
@@ -840,7 +847,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg text-[#666] hover:bg-[#f5f0e8] disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#666] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight size={18} />
               </button>
@@ -858,17 +865,17 @@ export default function ProductsPage() {
           {/* Panel */}
           <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[75%] lg:w-[60%] bg-white shadow-2xl flex flex-col animate-slideInRight">
             {/* Panel Header */}
-            <div className="flex-shrink-0 px-6 py-4 border-b border-[#e0d8cc] flex items-center justify-between bg-white">
-              <h2 className="text-lg font-serif font-bold text-[#2d2d2d]">
+            <div className="flex-shrink-0 px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-white">
+              <h2 className="text-lg font-serif font-bold text-black">
                 {editingProduct ? t("admin.editProduct") : t("admin.addProduct")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-2 text-[#999] hover:text-[#2d2d2d] hover:bg-[#f5f0e8] rounded-lg transition-colors">
+              <button onClick={() => setShowPanel(false)} className="p-2 text-[#999] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
                 <X size={20} />
               </button>
             </div>
 
             {/* Tab Bar */}
-            <div className="flex-shrink-0 border-b border-[#e0d8cc] bg-[#faf8f4] overflow-x-auto">
+            <div className="flex-shrink-0 border-b border-stone-200 bg-[#faf8f4] overflow-x-auto">
               <div className="flex min-w-max px-4">
                 {tabs.map((tab) => (
                   <button
@@ -876,8 +883,8 @@ export default function ProductsPage() {
                     onClick={() => setActiveTab(tab.key)}
                     className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.key
-                        ? "border-[#8c4a5a] text-[#8c4a5a]"
-                        : "border-transparent text-[#666] hover:text-[#2d2d2d] hover:border-[#ccc]"
+                        ? "border-black text-secondary"
+                        : "border-transparent text-[#666] hover:text-black hover:border-[#ccc]"
                     }`}
                   >
                     {tab.icon}
@@ -957,7 +964,7 @@ export default function ProductsPage() {
                       <button
                         type="button"
                         onClick={() => updateForm("status", formData.status === "active" ? "inactive" : "active")}
-                        className={`relative w-12 h-6 rounded-full transition-colors ${formData.status === "active" ? "bg-[#8c4a5a]" : "bg-gray-300"}`}
+                        className={`relative w-12 h-6 rounded-full transition-colors ${formData.status === "active" ? "bg-black" : "bg-gray-300"}`}
                       >
                         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.status === "active" ? "translate-x-[26px]" : "translate-x-[2px]"}`} />
                       </button>
@@ -972,6 +979,7 @@ export default function ProductsPage() {
                       {([
                         { key: "isNew" as const, label: t("admin.new") },
                         { key: "isFeatured" as const, label: t("admin.featured") },
+                        { key: "isBestseller" as const, label: t("admin.bestseller") },
                         { key: "isProfessionalOnly" as const, label: t("admin.professionalOnly") },
                       ]).map(({ key, label }) => (
                         <label key={key} className="flex items-center gap-2 cursor-pointer">
@@ -979,7 +987,7 @@ export default function ProductsPage() {
                             type="checkbox"
                             checked={formData.badges[key]}
                             onChange={(e) => updateForm("badges", { ...formData.badges, [key]: e.target.checked })}
-                            className="w-4 h-4 rounded border-[#e0d8cc] text-[#8c4a5a] accent-[#8c4a5a]"
+                            className="w-4 h-4 rounded border-stone-200 text-secondary accent-[#735b28]"
                           />
                           <span className="text-sm text-[#333]">{label}</span>
                         </label>
@@ -1053,10 +1061,10 @@ export default function ProductsPage() {
 
                   {/* Margin info */}
                   {formData.purchasePrice > 0 && formData.priceB2C > 0 && (
-                    <div className="p-3 bg-[#f5f0e8] rounded-lg text-sm text-[#666]">
-                      {t("admin.marginB2c")}: <strong className="text-[#2d2d2d]">{Math.round(((formData.priceB2C - formData.purchasePrice) / formData.priceB2C) * 100)}%</strong>
+                    <div className="p-3 bg-stone-100 rounded-sm text-sm text-[#666]">
+                      {t("admin.marginB2c")}: <strong className="text-black">{Math.round(((formData.priceB2C - formData.purchasePrice) / formData.priceB2C) * 100)}%</strong>
                       {formData.priceB2B > 0 && (
-                        <span className="ml-4">{t("admin.marginB2b")}: <strong className="text-[#2d2d2d]">{Math.round(((formData.priceB2B - formData.purchasePrice) / formData.priceB2B) * 100)}%</strong></span>
+                        <span className="ml-4">{t("admin.marginB2b")}: <strong className="text-black">{Math.round(((formData.priceB2B - formData.purchasePrice) / formData.priceB2B) * 100)}%</strong></span>
                       )}
                     </div>
                   )}
@@ -1064,9 +1072,9 @@ export default function ProductsPage() {
                   {/* Price Preview */}
                   <div>
                     <label className={labelCls}>{t("admin.pricePreview")}</label>
-                    <div className="border border-[#e0d8cc] rounded-lg p-4 bg-[#faf8f4]">
+                    <div className="border border-stone-200 rounded-sm p-4 bg-[#faf8f4]">
                       <div className="flex items-baseline gap-3">
-                        <span className="text-2xl font-bold text-[#2d2d2d]">{(formData.priceB2C || 0).toLocaleString()} RSD</span>
+                        <span className="text-2xl font-bold text-black">{(formData.priceB2C || 0).toLocaleString()} RSD</span>
                         {formData.oldPrice && formData.oldPrice > formData.priceB2C && (
                           <>
                             <span className="text-lg text-[#999] line-through">{formData.oldPrice.toLocaleString()} RSD</span>
@@ -1075,7 +1083,7 @@ export default function ProductsPage() {
                         )}
                       </div>
                       {formData.badges.isProfessionalOnly && (
-                        <p className="text-xs text-[#8c4a5a] mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
+                        <p className="text-xs text-secondary mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
                       )}
                     </div>
                   </div>
@@ -1126,13 +1134,13 @@ export default function ProductsPage() {
                     <p className="text-xs text-[#999] mb-3">{t("admin.dragImages")}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
-                        <div key={img.id} className="relative group border border-[#e0d8cc] rounded-lg overflow-hidden aspect-square bg-[#f5f0e8] flex items-center justify-center">
+                        <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
                           <div className="text-center p-2">
                             <ImageIcon size={28} className="mx-auto text-[#bbb] mb-1" />
                             <p className="text-[10px] text-[#999] truncate max-w-full">{img.url.split("/").pop()}</p>
                           </div>
                           {img.isPrimary && (
-                            <div className="absolute top-1 left-1 bg-[#8c4a5a] text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
+                            <div className="absolute top-1 left-1 bg-black text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
                               <Star size={10} /> {t("admin.mainImage")}
                             </div>
                           )}
@@ -1142,14 +1150,14 @@ export default function ProductsPage() {
                                 const updated = formData.images.map((im) => ({ ...im, isPrimary: im.id === img.id }));
                                 updateForm("images", updated);
                               }}
-                              className="p-1.5 bg-white rounded-lg text-[#8c4a5a] hover:bg-[#f5f0e8]"
+                              className="p-1.5 bg-white rounded-sm text-secondary hover:bg-stone-100"
                               title={t("admin.setAsMain")}
                             >
                               <Star size={14} />
                             </button>
                             <button
                               onClick={() => updateForm("images", formData.images.filter((_, i) => i !== idx))}
-                              className="p-1.5 bg-white rounded-lg text-red-500 hover:bg-red-50"
+                              className="p-1.5 bg-white rounded-sm text-red-500 hover:bg-red-50"
                               title={t("admin.remove")}
                             >
                               <Trash2 size={14} />
@@ -1167,7 +1175,7 @@ export default function ProductsPage() {
                             { id: newId, url: `/products/new-${newId}.jpg`, alt: formData.name, isPrimary: formData.images.length === 0 },
                           ]);
                         }}
-                        className="border-2 border-dashed border-[#e0d8cc] rounded-lg aspect-square flex flex-col items-center justify-center gap-2 text-[#999] hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors cursor-pointer"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#999] hover:border-black hover:text-secondary transition-colors cursor-pointer"
                       >
                         <Upload size={24} />
                         <span className="text-xs">{t("admin.addImage")}</span>
@@ -1232,7 +1240,7 @@ export default function ProductsPage() {
                   </div>
 
                   {formData.stock > 0 && formData.stock <= formData.lowStockThreshold && (
-                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-sm text-sm text-red-600">
                       <AlertTriangle size={16} />
                       Zalihe su ispod praga upozorenja ({formData.lowStockThreshold}).
                     </div>
@@ -1252,31 +1260,59 @@ export default function ProductsPage() {
               )}
 
               {/* ── Tab: Boja ── */}
-              {activeTab === "boja" && showColorTab && (
+              {activeTab === "boja" && (
                 <div className={sectionCls}>
-                  <div className="p-3 bg-[#f5f0e8] rounded-lg text-sm text-[#666] flex items-center gap-2">
-                    <Palette size={16} className="text-[#8c4a5a]" />
-                    Ovaj tab je dostupan samo za kategoriju &quot;Boje za kosu&quot;.
+                  <div className="p-3 bg-stone-100 rounded-sm text-xs text-stone-500 flex items-center gap-2">
+                    <Palette size={16} className="text-secondary" />
+                    Dodelite boju proizvodu — podaci se koriste za vizuelni prikaz i filtriranje na sajtu.
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>{t("admin.colorLevel")}</label>
-                      <select value={formData.colorLevel || ""} onChange={(e) => updateForm("colorLevel", Number(e.target.value) || undefined)} className={inputCls + " cursor-pointer"}>
-                        <option value="">{t("admin.select")}</option>
-                        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                          <option key={n} value={n}>{n}</option>
-                        ))}
-                      </select>
+                  {/* Level selector — visual */}
+                  <div>
+                    <label className={labelCls}>{t("admin.colorLevel")} (1-10)</label>
+                    <div className="flex gap-1.5">
+                      {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+                        const levelHex = [
+                          "#1a1a1a", "#2d1f1a", "#3d2b1a", "#5a3825", "#6b4226",
+                          "#7a5533", "#8B6914", "#B8860B", "#D4A843", "#F5E6B8",
+                        ][n - 1];
+                        return (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => { updateForm("colorLevel", formData.colorLevel === n ? undefined : n); updateForm("removeColor", undefined); }}
+                            className={`w-9 h-9 rounded-sm text-xs font-bold transition-all border-2 ${
+                              formData.colorLevel === n
+                                ? "border-black ring-2 ring-black/20 scale-110"
+                                : "border-transparent hover:border-stone-400"
+                            }`}
+                            style={{ backgroundColor: levelHex, color: n <= 5 ? "#fff" : "#000" }}
+                          >
+                            {n}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <div>
-                      <label className={labelCls}>{t("admin.undertone")}</label>
-                      <select value={formData.colorUndertone || ""} onChange={(e) => updateForm("colorUndertone", e.target.value || undefined)} className={inputCls + " cursor-pointer"}>
-                        <option value="">{t("admin.select")}</option>
-                        {colorUndertones.map((u) => (
-                          <option key={u.value} value={u.value}>{u.label}</option>
-                        ))}
-                      </select>
+                  </div>
+
+                  {/* Undertone selector — visual chips */}
+                  <div>
+                    <label className={labelCls}>{t("admin.undertone")}</label>
+                    <div className="flex flex-wrap gap-2">
+                      {colorUndertones.map((u) => (
+                        <button
+                          key={u.value}
+                          type="button"
+                          onClick={() => updateForm("colorUndertone", formData.colorUndertone === u.value ? undefined : u.value)}
+                          className={`px-3 py-1.5 text-xs font-medium border transition-all rounded-sm ${
+                            formData.colorUndertone === u.value
+                              ? "bg-black text-white border-black"
+                              : "bg-white text-stone-600 border-stone-200 hover:border-black"
+                          }`}
+                        >
+                          {u.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
@@ -1288,7 +1324,7 @@ export default function ProductsPage() {
                           type="color"
                           value={formData.colorHex || "#000000"}
                           onChange={(e) => updateForm("colorHex", e.target.value)}
-                          className="w-10 h-10 rounded-lg border border-[#e0d8cc] cursor-pointer p-0.5"
+                          className="w-10 h-10 rounded-sm border border-stone-200 cursor-pointer p-0.5"
                         />
                         <input
                           type="text"
@@ -1301,20 +1337,38 @@ export default function ProductsPage() {
                     </div>
                     <div>
                       <label className={labelCls}>{t("admin.shadeCode")}</label>
-                      <input type="text" value={formData.shadeCode || ""} onChange={(e) => updateForm("shadeCode", e.target.value)} className={inputCls} placeholder="npr. 7-0" />
+                      <input type="text" value={formData.shadeCode || ""} onChange={(e) => updateForm("shadeCode", e.target.value)} className={inputCls} placeholder="npr. 7-0, 8/1, 6.44" />
                     </div>
                   </div>
 
-                  {/* Color preview */}
-                  {formData.colorHex && (
-                    <div className="flex items-center gap-3 p-3 bg-[#f5f0e8] rounded-lg">
-                      <div className="w-12 h-12 rounded-lg border border-[#e0d8cc] shadow-inner" style={{ backgroundColor: formData.colorHex }} />
+                  {/* Live color preview */}
+                  {(formData.colorHex || formData.colorLevel) && (
+                    <div className="flex items-center gap-4 p-4 bg-stone-50 rounded-sm border border-stone-200">
+                      <div
+                        className="w-14 h-14 rounded-full border-2 border-white shadow-md flex-shrink-0"
+                        style={{ backgroundColor: formData.colorHex || "#888" }}
+                      />
                       <div>
-                        <p className="text-sm font-medium text-[#2d2d2d]">
-                          {formData.shadeCode || "?"} &mdash; Nivo {formData.colorLevel || "?"} / {colorUndertones.find((u) => u.value === formData.colorUndertone)?.label || "?"}
+                        <p className="text-sm font-bold text-black">
+                          {formData.shadeCode || "—"} &mdash; Nivo {formData.colorLevel || "?"} / {colorUndertones.find((u) => u.value === formData.colorUndertone)?.label || "—"}
                         </p>
-                        <p className="text-xs text-[#999]">{formData.colorHex}</p>
+                        <p className="text-xs text-stone-400 mt-0.5 font-mono">{formData.colorHex || "Bez boje"}</p>
                       </div>
+                      {formData.colorHex && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateForm("colorLevel", undefined);
+                            updateForm("colorUndertone", undefined);
+                            updateForm("colorHex", undefined);
+                            updateForm("shadeCode", undefined);
+                            updateForm("removeColor", true);
+                          }}
+                          className="ml-auto text-xs text-stone-400 hover:text-red-500 transition-colors"
+                        >
+                          Ukloni boju
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1375,7 +1429,7 @@ export default function ProductsPage() {
                   {/* SEO Preview */}
                   <div>
                     <label className={labelCls}>{t("admin.searchPreview")}</label>
-                    <div className="border border-[#e0d8cc] rounded-lg p-4 bg-white space-y-1">
+                    <div className="border border-stone-200 rounded-sm p-4 bg-white space-y-1">
                       <p className="text-blue-700 text-base font-medium truncate">{formData.seoTitle || formData.name || t("admin.productName")}</p>
                       <p className="text-green-700 text-xs">altamoda.rs/proizvodi/{formData.slug || "..."}</p>
                       <p className="text-sm text-[#555] line-clamp-2">{formData.metaDescription || formData.description || "Meta opis proizvoda..."}</p>
@@ -1401,7 +1455,7 @@ export default function ProductsPage() {
                           <button
                             type="button"
                             onClick={() => updateForm("attributes", { ...formData.attributes, [key]: !formData.attributes[key] })}
-                            className={`relative w-11 h-6 rounded-full transition-colors ${formData.attributes[key] ? "bg-[#8c4a5a]" : "bg-gray-300"}`}
+                            className={`relative w-11 h-6 rounded-full transition-colors ${formData.attributes[key] ? "bg-black" : "bg-gray-300"}`}
                           >
                             <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.attributes[key] ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
                           </button>
@@ -1427,8 +1481,8 @@ export default function ProductsPage() {
                             }}
                             className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                               selected
-                                ? "bg-[#8c4a5a] text-white border-[#8c4a5a]"
-                                : "bg-white text-[#666] border-[#e0d8cc] hover:border-[#8c4a5a] hover:text-[#8c4a5a]"
+                                ? "bg-black text-white border-black"
+                                : "bg-white text-[#666] border-stone-200 hover:border-black hover:text-secondary"
                             }`}
                           >
                             {ht.label}
@@ -1442,14 +1496,14 @@ export default function ProductsPage() {
             </div>
 
             {/* Panel Footer (fixed) */}
-            <div className="flex-shrink-0 px-6 py-4 border-t border-[#e0d8cc] bg-white flex items-center justify-between">
+            <div className="flex-shrink-0 px-6 py-4 border-t border-stone-200 bg-white flex items-center justify-between">
               <button
                 onClick={() => setShowPanel(false)}
-                className="px-5 py-2.5 rounded-lg text-sm font-medium text-[#666] hover:bg-[#f5f0e8] transition-colors"
+                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors"
               >
                 {t("admin.cancel")}
               </button>
-              <button onClick={handleSave} disabled={saving} className="btn-gold px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">
+              <button onClick={handleSave} disabled={saving} className="btn-gold px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
                 {saving ? t("admin.saving") : editingProduct ? t("admin.saveChanges") : t("admin.addProduct")}
               </button>
             </div>

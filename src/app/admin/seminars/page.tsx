@@ -43,7 +43,7 @@ export default function SeminarsAdminPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">{t("admin.seminars")}</h1>
+          <h1 className="text-2xl font-serif font-bold text-black">{t("admin.seminars")}</h1>
           <p className="text-sm text-[#666] mt-1">{seminars.length} {t("admin.totalSeminars")}</p>
         </div>
         <button className="btn-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 self-start">
@@ -52,7 +52,7 @@ export default function SeminarsAdminPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+      <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
           <input
@@ -60,22 +60,22 @@ export default function SeminarsAdminPage() {
             placeholder={t("admin.searchSeminars")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]"
+            className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-lg text-sm focus:bg-white focus:border-black"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((seminar) => (
-          <div key={seminar.id} className="bg-white rounded-xl border border-[#e0d8cc] overflow-hidden hover:shadow-md transition-shadow">
+          <div key={seminar.id} className="bg-white rounded-sm border border-stone-200 overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-5">
               <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-lg bg-[#8c4a5a]/10">
-                  <GraduationCap size={20} className="text-[#8c4a5a]" />
+                <div className="p-2 rounded-lg bg-black/10">
+                  <GraduationCap size={20} className="text-secondary" />
                 </div>
                 {statusBadge(seminar.status)}
               </div>
-              <h3 className="text-base font-semibold text-[#2d2d2d] mb-1">{seminar.title}</h3>
+              <h3 className="text-base font-semibold text-black mb-1">{seminar.title}</h3>
               <p className="text-sm text-[#666] mb-4">{seminar.instructor}</p>
 
               <div className="space-y-2 text-sm text-[#666]">
@@ -100,17 +100,17 @@ export default function SeminarsAdminPage() {
               {/* Capacity bar */}
               <div className="mt-3 w-full h-1.5 bg-[#f0f0f0] rounded-full">
                 <div
-                  className={`h-full rounded-full ${seminar.registered >= seminar.capacity ? "bg-red-400" : "bg-[#8c4a5a]"}`}
+                  className={`h-full rounded-full ${seminar.registered >= seminar.capacity ? "bg-red-400" : "bg-black"}`}
                   style={{ width: `${(seminar.registered / seminar.capacity) * 100}%` }}
                 />
               </div>
 
               <div className="mt-4 pt-4 border-t border-[#f0f0f0] flex items-center justify-between">
-                <span className="text-sm font-semibold text-[#2d2d2d]">
+                <span className="text-sm font-semibold text-black">
                   {seminar.price === 0 ? t("admin.free") : `${seminar.price.toLocaleString()} RSD`}
                 </span>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 text-[#999] hover:text-[#8c4a5a] hover:bg-[#8c4a5a]/10 rounded-lg transition-colors"><Edit3 size={15} /></button>
+                  <button className="p-1.5 text-[#999] hover:text-secondary hover:bg-black/10 rounded-lg transition-colors"><Edit3 size={15} /></button>
                   <button className="p-1.5 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={15} /></button>
                 </div>
               </div>

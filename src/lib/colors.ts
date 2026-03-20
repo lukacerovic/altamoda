@@ -11,14 +11,14 @@
 
 export const colors = {
   // ── Brand Accent (Burgundy/Mauve) ──────────────────────────
-  accent:      '#8c4a5a',  // Primary brand color — buttons, links, highlights
+  accent:      '#735b28',  // Primary brand color — buttons, links, highlights
   accentLight: '#b07a87',  // Hover states, subtle accents, scrollbar
-  accentDark:  '#6e3848',  // Active/pressed states, deeper emphasis
+  accentDark:  '#594312',  // Active/pressed states, deeper emphasis
 
   // ── Backgrounds ────────────────────────────────────────────
-  background:  '#f5f0e8',  // Page background, warm beige
+  background:  '#f3f3f3',  // Page background, warm beige
   surface:     '#ffffff',  // Cards, modals, elevated surfaces
-  muted:       '#f5f0e8',  // Muted/disabled backgrounds (same as background)
+  muted:       '#f3f3f3',  // Muted/disabled backgrounds (same as background)
   lightAccent: '#e8e0d4',  // Subtle section dividers, shimmer base
 
   // ── Text ───────────────────────────────────────────────────
@@ -31,7 +31,7 @@ export const colors = {
   darkLight:   '#4a4a4a',  // Dark hover states, gradients
 
   // ── Borders ────────────────────────────────────────────────
-  border:      '#e0d8cc',  // Default border color (warm taupe)
+  border:      '#c4c7c7',  // Default border color (warm taupe)
 
   // ── Status / Feedback ──────────────────────────────────────
   success:     '#2d7a3a',  // Success messages, confirmations
@@ -42,22 +42,22 @@ export const colors = {
 /**
  * Tailwind class reference (available via @theme inline in globals.css):
  *
- *   bg-accent / text-accent / border-accent          → #8c4a5a
+ *   bg-accent / text-accent / border-accent          → #735b28
  *   bg-accent-light / text-accent-light               → #b07a87
- *   bg-accent-dark / text-accent-dark                 → #6e3848
- *   bg-background                                     → #f5f0e8
+ *   bg-accent-dark / text-accent-dark                 → #594312
+ *   bg-background                                     → #f3f3f3
  *   bg-surface                                        → #ffffff
- *   bg-muted                                          → #f5f0e8
+ *   bg-muted                                          → #f3f3f3
  *   bg-light-accent                                   → #e8e0d4
  *   text-foreground / text-text                       → #2d2d2d
  *   text-text-light                                   → #6b6b6b
  *   bg-dark / text-dark                               → #2d2d2d
  *   bg-dark-light                                     → #4a4a4a
- *   border-border                                     → #e0d8cc
+ *   border-border                                     → #c4c7c7
  *   text-success / bg-success                         → #2d7a3a
  *   text-error / bg-error                             → #b5453a
  *   text-warning / bg-warning                         → #c4883a
- *   bg-warm-beige                                     → #f5f0e8
+ *   bg-warm-beige                                     → #f3f3f3
  *
  * For opacity variants use Tailwind modifiers:
  *   bg-accent/30  → rgba(140, 74, 90, 0.3)

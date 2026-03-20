@@ -65,11 +65,11 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-stone-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#999] mb-6">
-          <Link href="/" className="hover:text-[#8c4a5a]">Početna</Link>
+          <Link href="/" className="hover:text-secondary">Početna</Link>
           <span>/</span>
           <span className="text-[#333]">Lista želja</span>
         </div>
@@ -79,15 +79,15 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             {/* Title + Actions */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-[#8c4a5a] fill-[#8c4a5a]" />
-                <h1 className="text-3xl font-bold text-[#2d2d2d]" style={{ fontFamily: "'Playfair Display', serif" }}>Lista Želja</h1>
+                <Heart className="w-6 h-6 text-secondary fill-[#735b28]" />
+                <h1 className="text-3xl font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>Lista Želja</h1>
                 <span className="text-sm text-[#999]">({items.length} proizvoda)</span>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 border border-[#e0d8cc] text-[#666] text-sm rounded-lg hover:bg-[#f5f0e8] transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2 border border-stone-200 text-[#666] text-sm rounded-sm hover:bg-stone-100 transition-colors">
                   <Share2 className="w-4 h-4" /> Podeli listu
                 </button>
-                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium rounded-lg transition-colors">
+                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors">
                   <ShoppingCart className="w-4 h-4" /> Dodaj sve u korpu
                 </button>
               </div>
@@ -98,7 +98,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
               {items.map((item) => {
                 const badge = discountBadge(item);
                 return (
-                  <div key={item.productId} className="bg-white rounded-xl overflow-hidden shadow-sm border border-[#e0d8cc]/50 group hover:shadow-md transition-all">
+                  <div key={item.productId} className="bg-white rounded-sm overflow-hidden shadow-sm border border-stone-200/50 group hover:shadow-md transition-all">
                     <div className="relative overflow-hidden aspect-square">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {badge && (
@@ -117,11 +117,11 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       </button>
                     </div>
                     <div className="p-4">
-                      <p className="text-[10px] font-semibold tracking-widest uppercase text-[#8c4a5a] mb-1">{item.brand}</p>
-                      <h3 className="text-sm font-medium text-[#2d2d2d] mb-2 line-clamp-2 leading-snug">{item.name}</h3>
+                      <p className="text-[10px] font-semibold tracking-widest uppercase text-secondary mb-1">{item.brand}</p>
+                      <h3 className="text-sm font-medium text-black mb-2 line-clamp-2 leading-snug">{item.name}</h3>
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#e0d8cc]"}`} />
+                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#735b28] text-secondary" : "text-[#c4c7c7]"}`} />
                         ))}
                       </div>
                       <div className="flex items-center gap-2 mb-3">
@@ -131,16 +131,16 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                             <span className="text-xs text-[#999] line-through">{item.oldPrice.toLocaleString()} RSD</span>
                           </>
                         ) : (
-                          <span className="text-base font-bold text-[#2d2d2d]">{item.price.toLocaleString()} RSD</span>
+                          <span className="text-base font-bold text-black">{item.price.toLocaleString()} RSD</span>
                         )}
                       </div>
                       <button
                         disabled={!item.inStock}
                         onClick={() => addToCart(item)}
-                        className={`w-full py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                        className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
-                            ? "bg-[#8c4a5a] hover:bg-[#6e3848] text-white"
-                            : "bg-[#e0d8cc] text-[#999] cursor-not-allowed"
+                            ? "bg-black hover:bg-stone-800 text-white"
+                            : "bg-[#c4c7c7] text-[#999] cursor-not-allowed"
                         }`}
                       >
                         {item.inStock ? "Dodaj u korpu" : "Nedostupno"}
@@ -154,10 +154,10 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
         ) : (
           /* Empty State */
           <div className="text-center py-20">
-            <Heart className="w-16 h-16 text-[#e0d8cc] mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-[#2d2d2d] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Vaša lista želja je prazna</h2>
+            <Heart className="w-16 h-16 text-[#c4c7c7] mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>Vaša lista želja je prazna</h2>
             <p className="text-[#666] mb-6">Dodajte proizvode koje želite da sačuvate za kasnije</p>
-            <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#8c4a5a] hover:bg-[#6e3848] text-white font-medium rounded-lg transition-colors">
+            <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-black hover:bg-stone-800 text-white font-medium rounded-sm transition-colors">
               Istraži proizvode
             </Link>
           </div>

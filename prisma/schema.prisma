@@ -226,6 +226,7 @@ model Product {
   isActive          Boolean  @default(true) @map("is_active")
   isNew             Boolean  @default(false) @map("is_new")
   isFeatured        Boolean  @default(false) @map("is_featured")
+  isBestseller      Boolean  @default(false) @map("is_bestseller")
   erpId             String?  @map("erp_id")
   seoTitle          String?  @map("seo_title")
   seoDescription    String?  @map("seo_description")

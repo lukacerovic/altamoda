@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sr">
-      <body className="antialiased" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <body className="bg-surface font-body text-on-surface antialiased">
         <LanguageProvider>
           <AuthProvider>
             <CartProvider>{children}</CartProvider>

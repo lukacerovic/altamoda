@@ -191,33 +191,33 @@ export default function ProductDetailClient({ product, related, userRole, initia
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-stone-100">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-          <Link href="/" className="hover:text-[#8c4a5a]">Početna</Link><ChevronRight className="w-3 h-3" />
-          <Link href="/products" className="hover:text-[#8c4a5a]">Proizvodi</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/" className="hover:text-secondary">Početna</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/products" className="hover:text-secondary">Proizvodi</Link><ChevronRight className="w-3 h-3" />
           {product.category && (
             <>
-              <Link href={`/products?category=${product.category.slug}`} className="hover:text-[#8c4a5a]">{product.category.nameLat}</Link>
+              <Link href={`/products?category=${product.category.slug}`} className="hover:text-secondary">{product.category.nameLat}</Link>
               <ChevronRight className="w-3 h-3" />
             </>
           )}
-          <span className="text-[#2d2d2d]">{product.nameLat}</span>
+          <span className="text-black">{product.nameLat}</span>
         </nav>
 
         {/* 2-Column layout */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           {/* IMAGE GALLERY */}
           <div>
-            <div className="aspect-square rounded-lg overflow-hidden mb-4 relative bg-white">
+            <div className="aspect-square rounded-sm overflow-hidden mb-4 relative bg-white">
               <img src={images[activeThumb]} alt={product.nameLat} className="w-full h-full object-cover" />
               {product.images[activeThumb]?.type === 'video' && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center cursor-pointer hover:bg-white transition-colors">
-                    <Play className="w-7 h-7 text-[#2d2d2d] ml-1" />
+                    <Play className="w-7 h-7 text-black ml-1" />
                   </div>
                 </div>
               )}
@@ -225,13 +225,13 @@ export default function ProductDetailClient({ product, related, userRole, initia
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {images.map((img, t) => (
-                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square rounded overflow-hidden border-2 transition-colors relative ${activeThumb === t ? "border-[#8c4a5a]" : "border-transparent hover:border-gray-200"}`}>
+                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square rounded overflow-hidden border-2 transition-colors relative ${activeThumb === t ? "border-black" : "border-transparent hover:border-gray-200"}`}>
                     <img src={img} alt={`View ${t + 1}`} className="w-full h-full object-cover" />
                     {product.images[t]?.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30"><Play className="w-5 h-5 text-white" /></div>
                     )}
                     {product.images[t]?.type === 'gif' && (
-                      <span className="absolute top-1 right-1 bg-[#8c4a5a] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">GIF</span>
+                      <span className="absolute top-1 right-1 bg-black text-white text-[8px] font-bold px-1.5 py-0.5 rounded">GIF</span>
                     )}
                   </button>
                 ))}
@@ -241,24 +241,24 @@ export default function ProductDetailClient({ product, related, userRole, initia
 
           {/* PRODUCT INFO */}
           <div>
-            {product.brand && <span className="text-sm text-[#8c4a5a] font-medium uppercase tracking-wider">{product.brand.name}</span>}
+            {product.brand && <span className="text-sm text-secondary font-medium uppercase tracking-wider">{product.brand.name}</span>}
             {product.productLine && (
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs text-gray-500">Linija proizvoda:</span>
-                <Link href={`/products?line=${product.productLine.slug}`} className="text-xs text-[#8c4a5a] hover:text-[#6e3848] font-medium underline">{product.productLine.name}</Link>
+                <Link href={`/products?line=${product.productLine.slug}`} className="text-xs text-secondary hover:text-black font-medium underline">{product.productLine.name}</Link>
               </div>
             )}
-            <h1 className="text-2xl md:text-3xl font-bold text-[#2d2d2d] mt-2 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>{product.nameLat}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-black mt-2 mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{product.nameLat}</h1>
 
             {product.isProfessional && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2d2d2d] text-white text-xs font-medium rounded mb-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-xs font-medium rounded mb-4">
                 <AlertCircle className="w-3.5 h-3.5" /> Samo za profesionalnu upotrebu
               </div>
             )}
 
             <div className="flex items-center gap-3 mb-4">
               <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.round(product.rating) ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200"}`} />)}
+                {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.round(product.rating) ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}
               </div>
               <span className="text-sm text-gray-500">{product.rating.toFixed(1)} ({product.reviewCount} recenzija)</span>
             </div>
@@ -281,7 +281,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
               {product.oldPrice && (
                 <span className="text-gray-400 line-through text-lg">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>
               )}
-              <span className="text-3xl font-bold text-[#2d2d2d]">{product.price.toLocaleString("sr-RS")} RSD</span>
+              <span className="text-3xl font-bold text-black">{product.price.toLocaleString("sr-RS")} RSD</span>
               {discountPct > 0 && (
                 <span className="bg-[#c0392b] text-white text-xs px-2 py-1 rounded font-semibold">-{discountPct}%</span>
               )}
@@ -289,11 +289,11 @@ export default function ProductDetailClient({ product, related, userRole, initia
 
             {/* B2B Price hint (for guests and B2C) */}
             {userRole !== 'b2b' && product.isProfessional && (
-              <div className="border-2 border-[#8c4a5a] rounded-lg p-4 mb-6 bg-[#faf7f2]">
+              <div className="border-2 border-black rounded-sm p-4 mb-6 bg-stone-50">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#8c4a5a]" />
+                  <Sparkles className="w-5 h-5 text-secondary" />
                   <div>
-                    <span className="text-sm font-semibold text-[#8c4a5a]">B2B Cena</span>
+                    <span className="text-sm font-semibold text-secondary">B2B Cena</span>
                     <p className="text-xs text-gray-500">Prijavite se za posebne cene za profesionalce i salone</p>
                   </div>
                 </div>
@@ -302,7 +302,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
 
             {/* B2B user sees both prices */}
             {userRole === 'b2b' && product.priceB2b && (
-              <div className="border-2 border-green-300 rounded-lg p-4 mb-6 bg-green-50">
+              <div className="border-2 border-green-300 rounded-sm p-4 mb-6 bg-green-50">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-green-700">Vaša B2B cena</span>
                   <span className="text-lg font-bold text-green-700">{product.priceB2b.toLocaleString("sr-RS")} RSD</span>
@@ -320,7 +320,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
               <button
                 onClick={handleAddToCart}
                 disabled={product.stockQuantity === 0}
-                className="flex-1 bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {addedToCart ? (
                   <><CheckCircle className="w-5 h-5" /> Dodato!</>
@@ -328,17 +328,17 @@ export default function ProductDetailClient({ product, related, userRole, initia
                   <><ShoppingBag className="w-5 h-5" /> Dodaj u Korpu</>
                 )}
               </button>
-              <button onClick={handleToggleWishlist} className={`w-12 h-12 border rounded flex items-center justify-center transition-colors ${liked ? "border-[#c0392b] bg-red-50" : "border-gray-200 hover:border-[#8c4a5a]"}`}>
+              <button onClick={handleToggleWishlist} className={`w-12 h-12 border rounded flex items-center justify-center transition-colors ${liked ? "border-[#c0392b] bg-red-50" : "border-gray-200 hover:border-black"}`}>
                 <Heart className={`w-5 h-5 ${liked ? "fill-[#c0392b] text-[#c0392b]" : "text-gray-400"}`} />
               </button>
             </div>
 
             {/* Wishlist message */}
             {wishlistMessage && (
-              <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-700 flex items-center gap-2">
+              <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-sm text-sm text-orange-700 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {wishlistMessage}
-                <Link href="/account/login" className="ml-auto text-[#8c4a5a] font-medium hover:underline whitespace-nowrap">Prijavite se</Link>
+                <Link href="/account/login" className="ml-auto text-secondary font-medium hover:underline whitespace-nowrap">Prijavite se</Link>
               </div>
             )}
 
@@ -351,30 +351,30 @@ export default function ProductDetailClient({ product, related, userRole, initia
             </div>
 
             {/* Delivery info */}
-            <div className="bg-[#faf7f2] rounded-lg p-4 space-y-3">
-              <div className="flex items-center gap-3 text-sm"><Truck className="w-5 h-5 text-[#8c4a5a]" /><span><strong>Besplatna dostava</strong> za porudžbine preko 5.000 RSD</span></div>
-              <div className="flex items-center gap-3 text-sm"><RotateCcw className="w-5 h-5 text-[#8c4a5a]" /><span><strong>Povrat u roku od 14 dana</strong> bez pitanja</span></div>
-              <div className="flex items-center gap-3 text-sm"><Shield className="w-5 h-5 text-[#8c4a5a]" /><span><strong>Originalni proizvodi</strong> sa garancijom autentičnosti</span></div>
+            <div className="bg-stone-50 rounded-sm p-4 space-y-3">
+              <div className="flex items-center gap-3 text-sm"><Truck className="w-5 h-5 text-secondary" /><span><strong>Besplatna dostava</strong> za porudžbine preko 5.000 RSD</span></div>
+              <div className="flex items-center gap-3 text-sm"><RotateCcw className="w-5 h-5 text-secondary" /><span><strong>Povrat u roku od 14 dana</strong> bez pitanja</span></div>
+              <div className="flex items-center gap-3 text-sm"><Shield className="w-5 h-5 text-secondary" /><span><strong>Originalni proizvodi</strong> sa garancijom autentičnosti</span></div>
             </div>
 
             {/* Color Section */}
             {product.colorProduct && (
-              <div className="mt-6 bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="text-sm font-semibold text-[#2d2d2d] mb-3">Informacije o boji</h3>
+              <div className="mt-6 bg-white border border-gray-200 rounded-sm p-5">
+                <h3 className="text-sm font-semibold text-black mb-3">Informacije o boji</h3>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="bg-gray-50 rounded p-3">
                     <span className="text-xs text-gray-500">Nivo (Level)</span>
-                    <p className="text-sm font-semibold text-[#2d2d2d]">{product.colorProduct.colorLevel}</p>
+                    <p className="text-sm font-semibold text-black">{product.colorProduct.colorLevel}</p>
                   </div>
                   <div className="bg-gray-50 rounded p-3">
                     <span className="text-xs text-gray-500">Podton (Undertone)</span>
-                    <p className="text-sm font-semibold text-[#2d2d2d]">{product.colorProduct.undertoneName}</p>
+                    <p className="text-sm font-semibold text-black">{product.colorProduct.undertoneName}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full border-2 border-white shadow" style={{ backgroundColor: product.colorProduct.hexValue }} />
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">{product.colorProduct.shadeCode}</span>
+                    <span className="text-sm font-medium text-black">{product.colorProduct.shadeCode}</span>
                     <p className="text-xs text-gray-500">{product.colorProduct.undertoneName}</p>
                   </div>
                 </div>
@@ -387,7 +387,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
         <div className="mt-16">
           <div className="flex border-b border-gray-200 gap-0">
             {tabs.map((tab) => (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`px-6 py-3 text-sm font-medium transition-colors relative ${activeTab === tab.key ? "text-[#8c4a5a] border-b-2 border-[#8c4a5a]" : "text-gray-500 hover:text-[#2d2d2d]"}`}>{tab.label}</button>
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`px-6 py-3 text-sm font-medium transition-colors relative ${activeTab === tab.key ? "text-secondary border-b-2 border-black" : "text-gray-500 hover:text-black"}`}>{tab.label}</button>
             ))}
           </div>
           <div className="py-8">
@@ -398,18 +398,18 @@ export default function ProductDetailClient({ product, related, userRole, initia
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <span className="text-lg font-bold text-[#2d2d2d]">{product.rating.toFixed(1)}</span>
+                    <span className="text-lg font-bold text-black">{product.rating.toFixed(1)}</span>
                     <span className="text-sm text-gray-500"> / 5 ({product.reviewCount} recenzija)</span>
                   </div>
                   {hasAlreadyReviewed ? (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-[#faf7f2] text-sm text-[#2d2d2d] rounded border border-[#e0d8cc]">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-stone-50 text-sm text-black rounded border border-stone-200">
                       <span className="text-gray-500">Vaša ocena:</span>
                       <div className="flex items-center gap-0.5">
-                        {[1,2,3,4,5].map((s) => <Star key={s} className={`w-4 h-4 ${s <= userExistingRating! ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200"}`} />)}
+                        {[1,2,3,4,5].map((s) => <Star key={s} className={`w-4 h-4 ${s <= userExistingRating! ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}
                       </div>
                     </div>
                   ) : (
-                    <button onClick={() => setShowReviewForm(true)} className="px-4 py-2 bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium rounded transition-colors flex items-center gap-2">
+                    <button onClick={() => setShowReviewForm(true)} className="px-4 py-2 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded transition-colors flex items-center gap-2">
                       <Star className="w-4 h-4" /> Oceni proizvod
                     </button>
                   )}
@@ -419,11 +419,11 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 ) : (
                   <div className="space-y-6">
                     {product.reviews.map((r) => (
-                      <div key={r.id} className="bg-white rounded-lg p-6 shadow-sm">
+                      <div key={r.id} className="bg-white rounded-sm p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <span className="font-semibold text-[#2d2d2d]">{r.user.name}</span>
-                            <div className="flex items-center gap-0.5 mt-1">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < r.rating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200"}`} />)}</div>
+                            <span className="font-semibold text-black">{r.user.name}</span>
+                            <div className="flex items-center gap-0.5 mt-1">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < r.rating ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}</div>
                           </div>
                           <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString("sr-RS")}</span>
                         </div>
@@ -439,19 +439,19 @@ export default function ProductDetailClient({ product, related, userRole, initia
         {/* RELATED */}
         {related.length > 0 && (
           <section className="mt-12 mb-16">
-            <h2 className="text-2xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Povezani proizvodi</h2>
+            <h2 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Povezani proizvodi</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {related.map((p) => (
-                <Link key={p.id} href={`/products/${p.slug}`} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all group overflow-hidden">
+                <Link key={p.id} href={`/products/${p.slug}`} className="bg-white rounded-sm shadow-sm hover:shadow-md transition-all group overflow-hidden">
                   <div className="aspect-square overflow-hidden bg-[#faf7f3]">
                     <img src={p.image || defaultImage} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="p-4">
-                    <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{p.brand?.name}</span>
-                    <h3 className="text-sm font-medium text-[#2d2d2d] mt-1 line-clamp-2">{p.name}</h3>
+                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">{p.brand?.name}</span>
+                    <h3 className="text-sm font-medium text-black mt-1 line-clamp-2">{p.name}</h3>
                     <div className="mt-2 flex items-baseline gap-2">
                       {p.oldPrice && <span className="text-xs text-gray-400 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-                      <span className="text-base font-bold text-[#2d2d2d]">{p.price.toLocaleString("sr-RS")} RSD</span>
+                      <span className="text-base font-bold text-black">{p.price.toLocaleString("sr-RS")} RSD</span>
                     </div>
                   </div>
                 </Link>
@@ -466,15 +466,15 @@ export default function ProductDetailClient({ product, related, userRole, initia
         <>
           <div className="fixed inset-0 bg-black/50 z-50" onClick={() => setShowReviewForm(false)} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-sm max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
               <button onClick={() => setShowReviewForm(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-gray-400 hover:text-gray-600" /></button>
-              <h3 className="text-xl font-bold text-[#2d2d2d] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>Oceni proizvod</h3>
+              <h3 className="text-xl font-bold text-black mb-1" style={{ fontFamily: "'Noto Serif', serif" }}>Oceni proizvod</h3>
               <p className="text-sm text-gray-500 mb-6">{product.nameLat}</p>
 
               {reviewSuccess ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                  <p className="text-lg font-semibold text-[#2d2d2d]">Hvala na oceni!</p>
+                  <p className="text-lg font-semibold text-black">Hvala na oceni!</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -483,7 +483,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button key={star} onClick={() => setReviewRating(star)} className="p-1">
-                          <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200 hover:text-[#8c4a5a]"}`} />
+                          <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? "fill-[#735b28] text-secondary" : "text-gray-200 hover:text-secondary"}`} />
                         </button>
                       ))}
                       {reviewRating > 0 && <span className="text-sm text-gray-500 ml-2">{reviewRating}/5</span>}
@@ -491,7 +491,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Fotografija (opciono)</label>
-                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-[#8c4a5a] transition-colors cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-200 rounded-sm p-6 text-center hover:border-black transition-colors cursor-pointer">
                       <Camera className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                       <p className="text-sm text-gray-500">Kliknite da dodate fotografiju</p>
                     </div>
@@ -499,7 +499,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
                   <button
                     onClick={handleSubmitReview}
                     disabled={reviewRating === 0 || reviewSubmitting}
-                    className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded font-medium transition-colors disabled:opacity-50"
+                    className="w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors disabled:opacity-50"
                   >
                     {reviewSubmitting ? "Slanje..." : "Pošalji recenziju"}
                   </button>
