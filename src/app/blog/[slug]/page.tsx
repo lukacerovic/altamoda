@@ -43,21 +43,21 @@ export default function BlogPostPage() {
   const [commentText, setCommentText] = useState("");
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-stone-100">
       <div className="max-w-4xl mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-          <Link href="/" className="hover:text-[#8c4a5a]">Pocetna</Link><ChevronRight className="w-3 h-3" />
-          <Link href="/blog" className="hover:text-[#8c4a5a]">Blog</Link><ChevronRight className="w-3 h-3" />
-          <span className="text-[#2d2d2d]">{article.title}</span>
+          <Link href="/" className="hover:text-secondary">Pocetna</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/blog" className="hover:text-secondary">Blog</Link><ChevronRight className="w-3 h-3" />
+          <span className="text-black">{article.title}</span>
         </nav>
 
         {/* Article header */}
         <article>
-          <span className="inline-block px-3 py-1 bg-[#8c4a5a]/10 text-[#8c4a5a] rounded-full text-xs font-medium uppercase tracking-wider mb-4">{article.category}</span>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#2d2d2d] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{article.title}</h1>
+          <span className="inline-block px-3 py-1 bg-black/10 text-secondary rounded-full text-xs font-medium uppercase tracking-wider mb-4">{article.category}</span>
+          <h1 className="text-3xl md:text-4xl font-bold text-black mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>{article.title}</h1>
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-8">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#8c4a5a] to-[#6e3848] flex items-center justify-center text-white text-xs font-bold">AP</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#735b28] to-[#594312] flex items-center justify-center text-white text-xs font-bold">AP</div>
               <span>{article.author}</span>
             </div>
             <span>{article.date}</span>
@@ -65,7 +65,7 @@ export default function BlogPostPage() {
           </div>
 
           {/* Hero image */}
-          <div className="aspect-video rounded-xl overflow-hidden mb-8">
+          <div className="aspect-video rounded-sm overflow-hidden mb-8">
             <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=1200&h=600&fit=crop" alt={article.title} className="w-full h-full object-cover" />
           </div>
 
@@ -77,19 +77,19 @@ export default function BlogPostPage() {
           </div>
 
           {/* Inline product recommendations */}
-          <div className="bg-[#faf7f2] rounded-xl p-6 my-8">
-            <h3 className="font-semibold text-[#2d2d2d] mb-4">Preporuceni proizvodi iz clanka</h3>
+          <div className="bg-stone-50 rounded-sm p-6 my-8">
+            <h3 className="font-semibold text-black mb-4">Preporuceni proizvodi iz clanka</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               {inlineProducts.map((p) => (
-                <Link key={p.id} href={`/products/${p.id}`} className="flex gap-4 bg-white rounded-lg p-4 hover:shadow-md transition-all">
+                <Link key={p.id} href={`/products/${p.id}`} className="flex gap-4 bg-white rounded-sm p-4 hover:shadow-md transition-all">
                   <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0">
                     <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <span className="text-xs text-[#8c4a5a] font-medium">{p.brand}</span>
-                    <h4 className="text-sm font-medium text-[#2d2d2d]">{p.name}</h4>
+                    <span className="text-xs text-secondary font-medium">{p.brand}</span>
+                    <h4 className="text-sm font-medium text-black">{p.name}</h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <div className="flex">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < p.rating ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-gray-200"}`} />)}</div>
+                      <div className="flex">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < p.rating ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}</div>
                       <span className="text-sm font-bold">{p.price} RSD</span>
                     </div>
                   </div>
@@ -109,16 +109,16 @@ export default function BlogPostPage() {
 
           {/* Related posts */}
           <div className="mb-12">
-            <h3 className="text-xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Povezani Clanci</h3>
+            <h3 className="text-xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Povezani Clanci</h3>
             <div className="grid md:grid-cols-3 gap-4">
               {relatedPosts.map((post) => (
-                <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all">
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-md transition-all">
                   <div className="aspect-video overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-4">
-                    <span className="text-xs text-[#8c4a5a] font-medium uppercase tracking-wider">{post.category}</span>
-                    <h4 className="text-sm font-semibold text-[#2d2d2d] mt-1 group-hover:text-[#8c4a5a] transition-colors">{post.title}</h4>
+                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">{post.category}</span>
+                    <h4 className="text-sm font-semibold text-black mt-1 group-hover:text-secondary transition-colors">{post.title}</h4>
                     <span className="text-xs text-gray-400 mt-2 block">{post.date}</span>
                   </div>
                 </Link>
@@ -128,28 +128,28 @@ export default function BlogPostPage() {
 
           {/* Comments section */}
           <div className="mb-12">
-            <h3 className="text-xl font-bold text-[#2d2d2d] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>Komentari ({comments.length})</h3>
+            <h3 className="text-xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Komentari ({comments.length})</h3>
             <div className="space-y-4 mb-8">
               {comments.map((c) => (
-                <div key={c.id} className="bg-white rounded-lg p-5 shadow-sm">
+                <div key={c.id} className="bg-white rounded-sm p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">{c.name[0]}</div>
                       <div>
-                        <span className="text-sm font-semibold text-[#2d2d2d]">{c.name}</span>
+                        <span className="text-sm font-semibold text-black">{c.name}</span>
                         <span className="text-xs text-gray-400 ml-2">{c.date}</span>
                       </div>
                     </div>
-                    <button className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#8c4a5a]"><ThumbsUp className="w-3 h-3" /> {c.likes}</button>
+                    <button className="flex items-center gap-1 text-xs text-gray-400 hover:text-secondary"><ThumbsUp className="w-3 h-3" /> {c.likes}</button>
                   </div>
                   <p className="text-sm text-gray-600">{c.text}</p>
                 </div>
               ))}
             </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h4 className="font-semibold text-[#2d2d2d] mb-4">Ostavite komentar</h4>
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} rows={4} placeholder="Vas komentar..." className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm mb-3 resize-none" />
-              <button className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-2.5 rounded font-medium text-sm transition-colors flex items-center gap-2">
+            <div className="bg-white rounded-sm p-6 shadow-sm">
+              <h4 className="font-semibold text-black mb-4">Ostavite komentar</h4>
+              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} rows={4} placeholder="Vas komentar..." className="w-full border border-gray-200 rounded-sm px-4 py-3 text-sm mb-3 resize-none" />
+              <button className="bg-black hover:bg-stone-800 text-white px-6 py-2.5 rounded font-medium text-sm transition-colors flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" /> Posaljite Komentar
               </button>
             </div>

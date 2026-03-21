@@ -928,7 +928,7 @@ export const faqSections: FaqSection[] = [
 export const accountStats: AccountStat[] = [
   { label: "Ukupno porudzbina", value: "47", color: "bg-blue-50 text-blue-600" },
   { label: "Loyalty poeni", value: "2.340", color: "bg-amber-50 text-amber-600" },
-  { label: "B2B Status", value: "Gold", color: "bg-[#faf7f2] text-[#8c4a5a]" },
+  { label: "B2B Status", value: "Gold", color: "bg-stone-50 text-secondary" },
   { label: "Stanje dugovanja", value: "12.500 RSD", color: "bg-green-50 text-green-600" },
 ];
 
@@ -1417,11 +1417,11 @@ export const analyticsRevenueByMonth: AnalyticsRevenueByMonth[] = [
 ];
 
 export const analyticsCategoryData: AnalyticsCategoryData[] = [
-  { name: "Nega kose", value: 35, color: "#8c4a5a" },
+  { name: "Nega kose", value: 35, color: "#735b28" },
   { name: "Boje za kosu", value: 28, color: "#2d2d2d" },
   { name: "Styling", value: 18, color: "#6b6b6b" },
   { name: "Ulja i serumi", value: 12, color: "#b07a87" },
-  { name: "Oprema", value: 7, color: "#6e3848" },
+  { name: "Oprema", value: 7, color: "#594312" },
 ];
 
 export const analyticsBrandPerformance: AnalyticsBrandPerformance[] = [

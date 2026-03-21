@@ -43,7 +43,7 @@ export function withErrorHandler(
         return errorResponse(error.message, error.statusCode)
       }
       if (error instanceof ZodError) {
-        const issues = error.issues ?? error.errors ?? []
+        const issues = error.issues ?? (error as unknown as { errors?: { message: string }[] }).errors ?? []
         const message = issues.map((e: { message: string }) => e.message).join(', ')
         return errorResponse(message || 'Validation error', 400)
       }

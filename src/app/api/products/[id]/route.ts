@@ -128,6 +128,7 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
       isProfessional: body.isProfessional,
       isNew: body.isNew,
       isFeatured: body.isFeatured,
+      isBestseller: body.isBestseller,
       isActive: body.isActive,
       seoTitle: body.seoTitle,
       seoDescription: body.seoDescription,
@@ -135,16 +136,16 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     include: { brand: true, category: true, images: true },
   })
 
-  // Update color product
-  if (body.colorLevel !== undefined) {
+  // Update color product — only if colorLevel is a valid number
+  if (body.colorLevel && typeof body.colorLevel === 'number' && body.colorLevel >= 1 && body.colorLevel <= 10) {
     await prisma.colorProduct.upsert({
       where: { productId: id },
       update: {
         colorLevel: body.colorLevel,
-        undertoneCode: body.undertoneCode,
-        undertoneName: body.undertoneName,
-        hexValue: body.hexValue,
-        shadeCode: body.shadeCode,
+        undertoneCode: body.undertoneCode || 'N',
+        undertoneName: body.undertoneName || 'Neutralni',
+        hexValue: body.hexValue || '#000000',
+        shadeCode: body.shadeCode || '',
       },
       create: {
         productId: id,
@@ -155,6 +156,9 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
         shadeCode: body.shadeCode || '',
       },
     })
+  } else if (body.removeColor === true) {
+    // Allow explicit removal of color data
+    await prisma.colorProduct.deleteMany({ where: { productId: id } })
   }
 
   return successResponse(product)

@@ -793,46 +793,38 @@ SYSTEM
 
 ---
 
-### PHASE 4: Payment & Shipping
-**Duration:** 2 weeks | **Covers:** REQ 12 (card payment), REQ 15 (delivery + emails)
+### PHASE 4: i18n, SEO & Newsletter
+**Duration:** 2 weeks | **Covers:** REQ 13 (multilingual), REQ 10 (SEO), REQ 9 (newsletter automations)
 
-**Goal:** Real card payments, delivery integration, email notifications.
+**Goal:** Latin/Cyrillic toggle works, SEO metadata on all pages, newsletter automations running.
 
-#### Step 4.1 — Serbian PSP Integration (REQ 12)
-- [ ] `src/lib/payment/psp-client.ts` — Allpay.rs or PaySpot client
-- [ ] `POST /api/payment/initiate` — Create payment, return 3DS redirect URL
-- [ ] `POST /api/payment/callback` — Webhook: update payment status
+#### Step 4.1 — i18n (REQ 13)
+- [ ] Install `next-intl`
+- [ ] `src/messages/sr-Latn.json` + `sr-Cyrl.json`
+- [ ] Update middleware for locale routing
+- [ ] Convert hardcoded text in all pages to translation keys
+- [ ] Upgrade `LanguageToggle.tsx` to real switcher
+- [ ] API returns `name_lat` or `name_cyr` based on locale
 
----
+#### Step 4.2 — SEO (REQ 10)
+- [ ] `generateMetadata()` on all server pages (products, categories)
+- [ ] `src/app/sitemap.ts` — dynamic XML sitemap
+- [ ] `src/app/robots.ts`
+- [ ] JSON-LD structured data for products
+- [ ] Image alt tags from DB
 
-#### Step 4.2 — D Express Shipping (REQ 15)
-- [ ] `src/lib/shipping/dexpress-client.ts` — Shipment creation, tracking
-- [ ] `src/lib/shipping/rate-calculator.ts` — Calculate by zone, weight, method
-- [ ] `GET /api/shipping/rates?city=X&weight=Y` — Calculate shipping cost
-- [ ] `GET /api/shipping/track?trackingNumber=X` — Tracking proxy
-
----
-
-#### Step 4.3 — Email Notifications (REQ 15)
-- [ ] Install `resend @react-email/components`
-- [ ] `src/lib/email/send.ts` — sendOrderConfirmation, sendShippingNotification, sendWelcomeEmail, sendB2bApproval
-- [ ] Templates: `src/lib/email/templates/order-confirmation.tsx`, `shipping-notification.tsx`, `welcome.tsx`, `b2b-approval.tsx`
-- [ ] Wire triggers: order created → email, status=shipped → email with tracking, B2B approved → email
-
----
-
-#### Step 4.4 — B2B Invoice
-- [ ] `src/lib/invoice/generate.ts` — PDF invoice (company info, PIB, items, totals, bank details)
-- [ ] `GET /api/orders/[id]/invoice` — Download PDF
+#### Step 4.3 — Newsletter Automations (REQ 9)
+- [ ] First-purchase popup → auto-generated promo code
+- [ ] Campaign sending (segment: B2B or B2C)
+- [ ] Triggers: new promotions, new products
 
 ---
 
 #### PHASE 4 — DONE WHEN:
-- [ ] Card payment completes (test mode) → order confirmed
-- [ ] B2B invoice downloadable as PDF
-- [ ] Shipping rate calculated by city
-- [ ] Order confirmation email arrives
-- [ ] Shipping email arrives with tracking link
+- [ ] Cyrillic toggle → all text switches, URLs update
+- [ ] Page source has correct meta tags + OG data
+- [ ] `/sitemap.xml` valid
+- [ ] Newsletter signup → subscriber in DB → receives campaign
 
 ---
 
@@ -932,38 +924,46 @@ SYSTEM
 
 ---
 
-### PHASE 7: i18n, SEO & Newsletter
-**Duration:** 2 weeks | **Covers:** REQ 13 (multilingual), REQ 10 (SEO), REQ 9 (newsletter automations)
+### PHASE 7: Payment & Shipping
+**Duration:** 2 weeks | **Covers:** REQ 12 (card payment), REQ 15 (delivery + emails)
 
-**Goal:** Latin/Cyrillic toggle works, SEO metadata on all pages, newsletter automations running.
+**Goal:** Real card payments, delivery integration, email notifications.
 
-#### Step 7.1 — i18n (REQ 13)
-- [ ] Install `next-intl`
-- [ ] `src/messages/sr-Latn.json` + `sr-Cyrl.json`
-- [ ] Update middleware for locale routing
-- [ ] Convert hardcoded text in all pages to translation keys
-- [ ] Upgrade `LanguageToggle.tsx` to real switcher
-- [ ] API returns `name_lat` or `name_cyr` based on locale
+#### Step 7.1 — Serbian PSP Integration (REQ 12)
+- [ ] `src/lib/payment/psp-client.ts` — Allpay.rs or PaySpot client
+- [ ] `POST /api/payment/initiate` — Create payment, return 3DS redirect URL
+- [ ] `POST /api/payment/callback` — Webhook: update payment status
 
-#### Step 7.2 — SEO (REQ 10)
-- [ ] `generateMetadata()` on all server pages (products, categories)
-- [ ] `src/app/sitemap.ts` — dynamic XML sitemap
-- [ ] `src/app/robots.ts`
-- [ ] JSON-LD structured data for products
-- [ ] Image alt tags from DB
+---
 
-#### Step 7.3 — Newsletter Automations (REQ 9)
-- [ ] First-purchase popup → auto-generated promo code
-- [ ] Campaign sending (segment: B2B or B2C)
-- [ ] Triggers: new promotions, new products
+#### Step 7.2 — D Express Shipping (REQ 15)
+- [ ] `src/lib/shipping/dexpress-client.ts` — Shipment creation, tracking
+- [ ] `src/lib/shipping/rate-calculator.ts` — Calculate by zone, weight, method
+- [ ] `GET /api/shipping/rates?city=X&weight=Y` — Calculate shipping cost
+- [ ] `GET /api/shipping/track?trackingNumber=X` — Tracking proxy
+
+---
+
+#### Step 7.3 — Email Notifications (REQ 15)
+- [ ] Install `resend @react-email/components`
+- [ ] `src/lib/email/send.ts` — sendOrderConfirmation, sendShippingNotification, sendWelcomeEmail, sendB2bApproval
+- [ ] Templates: `src/lib/email/templates/order-confirmation.tsx`, `shipping-notification.tsx`, `welcome.tsx`, `b2b-approval.tsx`
+- [ ] Wire triggers: order created → email, status=shipped → email with tracking, B2B approved → email
+
+---
+
+#### Step 7.4 — B2B Invoice
+- [ ] `src/lib/invoice/generate.ts` — PDF invoice (company info, PIB, items, totals, bank details)
+- [ ] `GET /api/orders/[id]/invoice` — Download PDF
 
 ---
 
 #### PHASE 7 — DONE WHEN:
-- [ ] Cyrillic toggle → all text switches, URLs update
-- [ ] Page source has correct meta tags + OG data
-- [ ] `/sitemap.xml` valid
-- [ ] Newsletter signup → subscriber in DB → receives campaign
+- [ ] Card payment completes (test mode) → order confirmed
+- [ ] B2B invoice downloadable as PDF
+- [ ] Shipping rate calculated by city
+- [ ] Order confirmation email arrives
+- [ ] Shipping email arrives with tracking link
 
 ---
 
@@ -1026,11 +1026,11 @@ SYSTEM
 | 6 | Frontend (wishlist, reviews) | Phase 3 |
 | 7 | Backend/Admin | Phase 5 |
 | 8 | ERP Pantheon | Phase 6 |
-| 9 | Newsletter | Phase 5.8 + 7.3 |
-| 10 | SEO | Phase 7.2 |
+| 9 | Newsletter | Phase 5.8 + 4.3 |
+| 10 | SEO | Phase 4.2 |
 | 11 | Technical (speed, security, GDPR) | Phase 8 |
-| 12 | Card payment | Phase 4.1 |
-| 13 | Multilingual | Phase 7.1 |
+| 12 | Card payment | Phase 7.1 |
+| 13 | Multilingual | Phase 4.1 |
 | 14 | Quick order B2B | Phase 3.6 |
-| 15 | Orders & delivery | Phase 3.4 + 4 |
+| 15 | Orders & delivery | Phase 3.4 + 7 |
 | 16 | FAQ | Phase 8.5 |

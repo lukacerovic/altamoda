@@ -1,131 +1,108 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Phone,
-  Mail,
-  MapPin,
-  Clock,
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  Instagram,
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  Facebook,
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  Youtube,
-} from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { Globe, AtSign, Play } from "lucide-react";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
-    <footer className="bg-[#2d2d2d] text-white/60">
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
-          <div>
-            <img src="/logo.png" alt="Alta Moda" className="h-6 brightness-0 invert mb-5" />
-            <p className="text-sm leading-relaxed text-white/50">
-              Vaš pouzdani partner za profesionalnu frizersku opremu i kozmetiku od 2005. godine.
-            </p>
-            <div className="flex items-center gap-3 mt-5">
-              <a
-                href="#"
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#8c4a5a] transition-colors"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#8c4a5a] transition-colors"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#8c4a5a] transition-colors"
-              >
-                <Youtube className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white/90 font-medium text-sm tracking-wider mb-5" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '15px' }}>
-              Kupovina
-            </h4>
-            <div className="space-y-2.5 text-sm">
-              <Link href="/products" className="block hover:text-[#b07a87] transition-colors">
-                Svi Proizvodi
-              </Link>
-              <Link href="/colors" className="block hover:text-[#b07a87] transition-colors">
-                Boje za Kosu
-              </Link>
-              <Link href="/outlet" className="block hover:text-[#b07a87] transition-colors">
-                Akcije
-              </Link>
-              <Link href="/products" className="block hover:text-[#b07a87] transition-colors">
-                Brendovi
-              </Link>
-              <Link href="/quick-order" className="block hover:text-[#b07a87] transition-colors">
-                Brza Narudžbina
-              </Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white/90 font-medium text-sm tracking-wider mb-5" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '15px' }}>
-              Informacije
-            </h4>
-            <div className="space-y-2.5 text-sm">
-              <Link href="/faq" className="block hover:text-[#b07a87] transition-colors">
-                Česta Pitanja
-              </Link>
-              <Link href="/blog" className="block hover:text-[#b07a87] transition-colors">
-                Blog
-              </Link>
-              <Link href="/seminars" className="block hover:text-[#b07a87] transition-colors">
-                Seminari
-              </Link>
-              <Link href="/salon-locator" className="block hover:text-[#b07a87] transition-colors">
-                Pronađi Salon
-              </Link>
-              <a href="#" className="block hover:text-[#b07a87] transition-colors">
-                Uslovi Korišćenja
-              </a>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white/90 font-medium text-sm tracking-wider mb-5" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '15px' }}>
-              Kontakt
-            </h4>
-            <div className="space-y-3.5 text-sm">
-              <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 mt-0.5 text-[#b07a87]" />
-                <span>
-                  Knez Mihailova 22,
-                  <br />
-                  11000 Beograd
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#b07a87]" />
-                <span>+381 11 123 4567</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#b07a87]" />
-                <span>info@altamoda.rs</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-[#b07a87]" />
-                <span>Pon-Pet: 09-18h</span>
-              </div>
-            </div>
-          </div>
+    <footer className="bg-stone-100 mt-auto grid grid-cols-1 md:grid-cols-4 gap-12 px-10 md:px-20 py-16 w-full text-stone-900">
+      {/* Column 1: Brand */}
+      <div className="md:col-span-1">
+        <div
+          className="text-2xl text-black mb-6 tracking-[0.15em]"
+          style={{ fontFamily: "'Noto Serif', serif" }}
+        >
+          ALTAMODA
         </div>
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-xs text-white/40">&copy; 2026 Alta Moda. Sva prava zadržana.</span>
-          <div className="flex items-center gap-4 text-xs">
-            <span className="px-3 py-1 bg-white/5 rounded border border-white/10">Visa</span>
-            <span className="px-3 py-1 bg-white/5 rounded border border-white/10">Mastercard</span>
-            <span className="px-3 py-1 bg-white/5 rounded border border-white/10">PayPal</span>
-            <span className="px-3 py-1 bg-white/5 rounded border border-white/10">Pouzeće</span>
-          </div>
+        <p className="text-xs tracking-wider uppercase leading-loose text-stone-600">
+          {t("footer.description")}
+        </p>
+        <div className="flex items-center gap-3 mt-6">
+          <a
+            href="#"
+            className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-amber-700 hover:border-amber-700 transition-colors"
+          >
+            <Globe className="w-3.5 h-3.5" />
+          </a>
+          <a
+            href="#"
+            className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-amber-700 hover:border-amber-700 transition-colors"
+          >
+            <AtSign className="w-3.5 h-3.5" />
+          </a>
+          <a
+            href="#"
+            className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-amber-700 hover:border-amber-700 transition-colors"
+          >
+            <Play className="w-3.5 h-3.5" />
+          </a>
         </div>
+        <p className="text-[10px] text-stone-500 uppercase tracking-widest mt-8">
+          © 2024 ALTAMODA Luxury Hair Care.
+        </p>
+      </div>
+
+      {/* Column 2: Kupovina (Shopping) */}
+      <div className="flex flex-col gap-4">
+        <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2">
+          {t("footer.shopping")}
+        </h5>
+        <Link href="/products" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.allProducts")}
+        </Link>
+        <Link href="/colors" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.hairColors")}
+        </Link>
+        <Link href="/outlet" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.sales")}
+        </Link>
+        <Link href="/products" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.brands")}
+        </Link>
+        <Link href="/quick-order" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.quickOrder")}
+        </Link>
+      </div>
+
+      {/* Column 3: Podrska (Support) */}
+      <div className="flex flex-col gap-4">
+        <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2">
+          {t("footer.information")}
+        </h5>
+        <Link href="/faq" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.faq")}
+        </Link>
+        <Link href="/blog" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.blog")}
+        </Link>
+        <Link href="/seminars" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.seminars")}
+        </Link>
+        <a href="#" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+          {t("footer.termsOfUse")}
+        </a>
+      </div>
+
+      {/* Column 4: Kontakt */}
+      <div className="flex flex-col gap-4">
+        <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2">
+          {t("footer.contactTitle")}
+        </h5>
+        <p className="text-xs uppercase tracking-wider text-stone-600">
+          {t("footer.address")}
+        </p>
+        <p className="text-xs uppercase tracking-wider text-stone-600">
+          {t("footer.phone")}
+        </p>
+        <p className="text-xs uppercase tracking-wider text-stone-600">
+          {t("footer.email")}
+        </p>
+        <p className="text-xs uppercase tracking-wider text-stone-600">
+          {t("footer.workHours")}
+        </p>
       </div>
     </footer>
   );

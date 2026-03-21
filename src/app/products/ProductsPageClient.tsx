@@ -93,6 +93,19 @@ interface SearchResult {
   isProfessional: boolean;
 }
 
+interface ColorLevelFacet {
+  level: number;
+  count: number;
+  hexSamples: string[];
+}
+
+interface ColorUndertoneFacet {
+  code: string;
+  name: string;
+  count: number;
+  hexSamples: string[];
+}
+
 interface ProductsPageClientProps {
   initialProducts: Product[];
   initialPagination: Pagination;
@@ -101,6 +114,8 @@ interface ProductsPageClientProps {
   attributes: AttributeFilter[];
   userRole: string | null;
   wishlistedProductIds?: string[];
+  availableColorLevels?: ColorLevelFacet[];
+  availableColorUndertones?: ColorUndertoneFacet[];
 }
 
 /* ─── Helpers ─── */
@@ -169,39 +184,39 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   };
 
   return (
-    <Link href={`/products/${product.slug}`} className="group bg-white rounded-2xl overflow-hidden border border-transparent hover:border-[#e0d8cc] hover:shadow-sm transition-all flex flex-col">
+    <Link href={`/products/${product.slug}`} className="group bg-white rounded-sm overflow-hidden border border-transparent hover:border-stone-200 hover:shadow-sm transition-all flex flex-col">
       <div className="relative aspect-square overflow-hidden bg-[#faf7f3]">
         <img src={imgSrc} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (
-            <span className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg ${
-              badge === "NOVO" ? "bg-[#8c4a5a] text-white"
-              : badge === "HIT" ? "bg-[#2d2d2d] text-white"
+            <span className={`px-2.5 py-1 text-[11px] font-semibold rounded-sm ${
+              badge === "NOVO" ? "bg-black text-white"
+              : badge === "HIT" ? "bg-black text-white"
               : "bg-[#b5453a] text-white"
             }`}>{badge}</span>
           )}
           {product.isProfessional && (
-            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-[#2d2d2d]/80 text-white backdrop-blur-sm">PRO</span>
+            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">PRO</span>
           )}
         </div>
-        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
-          <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#999]"}`} />
+        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-sm bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
+          <Heart className={`w-4 h-4 ${liked ? "fill-[#735b28] text-secondary" : "text-stone-400"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={handleAddToCart} className={`w-full text-white text-sm font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 ${addedToCart ? "bg-green-600" : "bg-[#2d2d2d] hover:bg-[#1a1a1a]"}`}>
+          <button onClick={handleAddToCart} className={`w-full text-white text-sm font-medium py-2.5 rounded-sm transition-colors flex items-center justify-center gap-2 ${addedToCart ? "bg-green-600" : "bg-black hover:bg-[#1a1a1a]"}`}>
             {addedToCart ? <><CheckCircle className="w-4 h-4" /> Dodato!</> : <><ShoppingBag className="w-4 h-4" /> Dodaj u korpu</>}
           </button>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <span className="text-[11px] text-[#8c4a5a] font-semibold tracking-widest uppercase">{product.brand?.name ?? ""}</span>
-        <h3 className="text-sm font-medium text-[#2d2d2d] mt-1.5 line-clamp-2 flex-1 leading-snug">{product.name}</h3>
+        <span className="text-[11px] text-secondary font-semibold tracking-widest uppercase">{product.brand?.name ?? ""}</span>
+        <h3 className="text-sm font-medium text-black mt-1.5 line-clamp-2 flex-1 leading-snug">{product.name}</h3>
         <div className="flex items-center gap-0.5 mt-2.5">
-          {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(product.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#e0d8cc]"}`} />)}
+          {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(product.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#c4c7c7]"}`} />)}
         </div>
         <div className="mt-2.5 flex items-baseline gap-2">
-          {product.oldPrice && <span className="text-xs text-[#999] line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-          <span className="text-[15px] font-bold text-[#2d2d2d]">{product.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold">RSD</span></span>
+          {product.oldPrice && <span className="text-xs text-stone-400 line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+          <span className="text-[15px] font-bold text-black">{product.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold">RSD</span></span>
         </div>
       </div>
     </Link>
@@ -214,12 +229,12 @@ function FilterSection({ title, children, defaultOpen = true, count }: { title: 
   return (
     <div className="py-5 border-b border-[#f0ebe3]">
       <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full group">
-        <span className="text-[13px] font-semibold text-[#2d2d2d] uppercase tracking-wider">{title}</span>
+        <span className="text-[13px] font-semibold text-black uppercase tracking-wider">{title}</span>
         <div className="flex items-center gap-2">
           {count !== undefined && count > 0 && (
-            <span className="w-5 h-5 rounded-full bg-[#8c4a5a] text-white text-[10px] font-bold flex items-center justify-center">{count}</span>
+            <span className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center">{count}</span>
           )}
-          <ChevronDown className={`w-4 h-4 text-[#999] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </div>
       </button>
       <div className={`overflow-hidden transition-all duration-300 ${open ? "max-h-[500px] opacity-100 mt-4" : "max-h-0 opacity-0 mt-0"}`}>
@@ -241,13 +256,13 @@ function CategoryTreeItem({ item, depth = 0, onSelect, selectedSlug }: { item: C
           if (hasChildren) setExpanded(!expanded);
           onSelect(item.slug);
         }}
-        className={`flex items-center gap-2.5 w-full text-[13px] py-2 rounded-lg hover:bg-[#f5f0e8] px-2 -mx-2 transition-colors ${
-          isSelected ? "font-semibold text-[#8c4a5a] bg-[#fdf5f7]" : depth === 0 ? "font-medium text-[#2d2d2d]" : "text-[#6b6b6b]"
+        className={`flex items-center gap-2.5 w-full text-[13px] py-2 rounded-sm hover:bg-stone-100 px-2 -mx-2 transition-colors ${
+          isSelected ? "font-semibold text-secondary bg-[#fdf5f7]" : depth === 0 ? "font-medium text-black" : "text-stone-500"
         }`}
         style={{ paddingLeft: `${depth * 20 + 8}px` }}
       >
         {hasChildren && (
-          <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 text-[#999] ${expanded ? "rotate-90" : ""}`} />
+          <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 text-stone-400 ${expanded ? "rotate-90" : ""}`} />
         )}
         {!hasChildren && <span className="w-3.5 flex-shrink-0" />}
         {item.nameLat}
@@ -289,24 +304,24 @@ function SortSelect({ value, onChange }: { value: string; onChange: (v: string) 
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-white border border-[#e8e2d9] rounded-xl px-4 py-2.5 text-sm text-[#2d2d2d] hover:border-[#ccc] transition-colors min-w-[180px] justify-between"
+        className="flex items-center gap-2 bg-white border border-[#e8e2d9] rounded-sm px-4 py-2.5 text-sm text-black hover:border-[#ccc] transition-colors min-w-[180px] justify-between"
       >
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-3.5 h-3.5 text-[#999]" />
+          <ArrowUpDown className="w-3.5 h-3.5 text-stone-400" />
           <span>{current?.label}</span>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-[#999] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute top-full right-0 mt-1.5 bg-white rounded-xl border border-[#e8e2d9] shadow-lg z-40 min-w-[200px] overflow-hidden animate-slideDown">
+        <div className="absolute top-full right-0 mt-1.5 bg-white rounded-sm border border-[#e8e2d9] shadow-lg z-40 min-w-[200px] overflow-hidden animate-slideDown">
           {options.map((opt) => (
             <button
               key={opt.value}
               onClick={() => { onChange(opt.value); setOpen(false); }}
               className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                 value === opt.value
-                  ? "bg-[#faf7f3] text-[#8c4a5a] font-medium"
-                  : "text-[#6b6b6b] hover:bg-[#faf7f3] hover:text-[#2d2d2d]"
+                  ? "bg-[#faf7f3] text-secondary font-medium"
+                  : "text-stone-500 hover:bg-[#faf7f3] hover:text-black"
               }`}
             >
               {opt.label}
@@ -327,6 +342,8 @@ export default function ProductsPageClient({
   attributes,
   userRole,
   wishlistedProductIds = [],
+  availableColorLevels = [],
+  availableColorUndertones = [],
 }: ProductsPageClientProps) {
   const wishlistedSet = new Set(wishlistedProductIds);
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -347,6 +364,11 @@ export default function ProductsPageClient({
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [activeToggles, setActiveToggles] = useState<string[]>([]);
+
+  // Color filters
+  const [filterColorLevel, setFilterColorLevel] = useState<number | null>(null);
+  const [filterUndertone, setFilterUndertone] = useState<string | null>(null);
+  const [filterHasColor, setFilterHasColor] = useState(false);
 
   // Visibility tab for guests
   const [visibility, setVisibility] = useState<"all" | "b2c" | "b2b">("all");
@@ -385,8 +407,13 @@ export default function ProductsPageClient({
       params.set("search", searchQuery.trim());
     }
 
+    // Color filters
+    if (filterHasColor) params.set("hasColor", "true");
+    if (filterColorLevel) params.set("colorLevel", String(filterColorLevel));
+    if (filterUndertone) params.set("colorUndertone", filterUndertone);
+
     return params.toString();
-  }, [sortBy, visibility, userRole, selectedCategory, selectedBrands, priceMin, priceMax, activeToggles, searchQuery]);
+  }, [sortBy, visibility, userRole, selectedCategory, selectedBrands, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (page: number) => {
@@ -528,6 +555,9 @@ export default function ProductsPageClient({
     setSelectedBrands([]);
     setActiveToggles([]);
     setSelectedCategory(null);
+    setFilterColorLevel(null);
+    setFilterUndertone(null);
+    setFilterHasColor(false);
   };
 
   // Build toggle filters from attributes + built-in toggles
@@ -561,7 +591,7 @@ export default function ProductsPageClient({
       <FilterSection title="Brend" count={selectedBrands.length}>
         <div className="space-y-1 max-h-52 overflow-y-auto pr-1">
           {brands.map((b) => (
-            <label key={b.slug} className="flex items-center gap-3 text-[13px] text-[#6b6b6b] cursor-pointer hover:text-[#2d2d2d] py-1.5 px-2 -mx-2 rounded-lg hover:bg-[#f5f0e8] transition-colors">
+            <label key={b.slug} className="flex items-center gap-3 text-[13px] text-stone-500 cursor-pointer hover:text-black py-1.5 px-2 -mx-2 rounded-sm hover:bg-stone-100 transition-colors">
               <div className="relative flex items-center">
                 <input
                   type="checkbox"
@@ -569,7 +599,7 @@ export default function ProductsPageClient({
                   checked={selectedBrands.includes(b.slug)}
                   onChange={() => toggleBrand(b.slug)}
                 />
-                <div className="w-[18px] h-[18px] rounded-md border-2 border-[#d5cfc5] peer-checked:border-[#8c4a5a] peer-checked:bg-[#8c4a5a] transition-all flex items-center justify-center">
+                <div className="w-[18px] h-[18px] rounded-md border-2 border-[#d5cfc5] peer-checked:border-black peer-checked:bg-black transition-all flex items-center justify-center">
                   <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
@@ -589,7 +619,7 @@ export default function ProductsPageClient({
               placeholder="Od"
               value={priceMin}
               onChange={(e) => setPriceMin(e.target.value)}
-              className="w-full border border-[#e8e2d9] rounded-xl px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-[#8c4a5a] focus:outline-none transition-all placeholder-[#bbb]"
+              className="w-full border border-[#e8e2d9] rounded-sm px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-black focus:outline-none transition-all placeholder-[#bbb]"
             />
           </div>
           <span className="text-[#ccc] text-sm">—</span>
@@ -599,26 +629,148 @@ export default function ProductsPageClient({
               placeholder="Do"
               value={priceMax}
               onChange={(e) => setPriceMax(e.target.value)}
-              className="w-full border border-[#e8e2d9] rounded-xl px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-[#8c4a5a] focus:outline-none transition-all placeholder-[#bbb]"
+              className="w-full border border-[#e8e2d9] rounded-sm px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-black focus:outline-none transition-all placeholder-[#bbb]"
             />
           </div>
         </div>
         <button
           onClick={handlePriceApply}
-          className="mt-3 w-full bg-[#2d2d2d] hover:bg-[#2d2d2d] text-white text-sm py-2.5 rounded-xl font-medium transition-colors"
+          className="mt-3 w-full bg-black hover:bg-black text-white text-sm py-2.5 rounded-sm font-medium transition-colors"
         >
           Primeni
         </button>
       </FilterSection>
 
+      {/* Color filter — only show if there are color products in the DB */}
+      {(availableColorLevels.length > 0 || availableColorUndertones.length > 0) && (
+        <FilterSection title={`Nijansa boje (${availableColorLevels.reduce((s, l) => s + l.count, 0)})`} defaultOpen={false}>
+          <div className="space-y-5">
+
+            {/* ── Depth / Level ── only levels that exist */}
+            {availableColorLevels.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">Nivo svetloće</p>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {availableColorLevels.map(({ level, count, hexSamples }) => {
+                    const labelMap: Record<number, string> = {
+                      1: "Crna", 2: "Najt. braon", 3: "Tamno braon", 4: "Sred. braon", 5: "Svet. braon",
+                      6: "Tamno plava", 7: "Sred. plava", 8: "Svet. plava", 9: "V. sv. plava", 10: "Ekstra sv.",
+                    };
+                    const displayHex = hexSamples[0] || "#888";
+                    return (
+                      <button
+                        key={level}
+                        onClick={() => setFilterColorLevel(filterColorLevel === level ? null : level)}
+                        className={`flex flex-col items-center gap-1 py-1.5 rounded-sm transition-all ${
+                          filterColorLevel === level ? "bg-stone-100 ring-1 ring-black" : "hover:bg-stone-50"
+                        }`}
+                      >
+                        <div
+                          className={`w-6 h-6 rounded-full border transition-transform ${
+                            filterColorLevel === level ? "border-black scale-110 shadow-md" : "border-stone-200"
+                          }`}
+                          style={{ backgroundColor: displayHex }}
+                        />
+                        <span className="text-[8px] text-stone-500 leading-tight text-center font-medium">{labelMap[level] || `Nivo ${level}`}</span>
+                        <span className="text-[8px] text-stone-300">({count})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ── Color Family (Undertone) ── only undertones that exist */}
+            {availableColorUndertones.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">Porodica boja</p>
+                <div className="space-y-1">
+                  {availableColorUndertones.map((ut) => (
+                    <button
+                      key={ut.code}
+                      onClick={() => setFilterUndertone(filterUndertone === ut.code ? null : ut.code)}
+                      className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-sm transition-all text-left ${
+                        filterUndertone === ut.code ? "bg-stone-100 ring-1 ring-black" : "hover:bg-stone-50"
+                      }`}
+                    >
+                      {/* Show up to 3 sample hex dots */}
+                      <div className="flex -space-x-1 flex-shrink-0">
+                        {ut.hexSamples.slice(0, 3).map((hex, i) => (
+                          <div
+                            key={i}
+                            className={`w-4 h-4 rounded-full border transition-all ${
+                              filterUndertone === ut.code ? "border-black" : "border-white"
+                            }`}
+                            style={{ backgroundColor: hex, zIndex: 3 - i }}
+                          />
+                        ))}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className={`text-[12px] font-medium block leading-tight ${
+                          filterUndertone === ut.code ? "text-black" : "text-stone-600"
+                        }`}>{ut.name}</span>
+                      </div>
+                      <span className="text-[10px] text-stone-300 font-medium">{ut.count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Active color filter tags ── */}
+            {(filterColorLevel || filterUndertone || filterHasColor) && (
+              <div className="pt-3 border-t border-stone-100 space-y-2">
+                <div className="flex flex-wrap gap-1.5">
+                  {filterColorLevel && (
+                    <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-[10px] font-medium px-2 py-1 rounded-sm">
+                      Nivo {filterColorLevel}
+                      <button onClick={() => setFilterColorLevel(null)} className="text-stone-400 hover:text-black ml-0.5">&times;</button>
+                    </span>
+                  )}
+                  {filterUndertone && (
+                    <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-[10px] font-medium px-2 py-1 rounded-sm">
+                      {availableColorUndertones.find(u => u.code === filterUndertone)?.name || filterUndertone}
+                      <button onClick={() => setFilterUndertone(null)} className="text-stone-400 hover:text-black ml-0.5">&times;</button>
+                    </span>
+                  )}
+                  {filterHasColor && (
+                    <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-[10px] font-medium px-2 py-1 rounded-sm">
+                      Samo boje
+                      <button onClick={() => setFilterHasColor(false)} className="text-stone-400 hover:text-black ml-0.5">&times;</button>
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => { setFilterColorLevel(null); setFilterUndertone(null); setFilterHasColor(false); }}
+                  className="text-[10px] text-stone-400 hover:text-black transition-colors uppercase tracking-wider font-medium"
+                >
+                  Resetuj filtere boja
+                </button>
+              </div>
+            )}
+
+            {/* ── Only color products toggle ── */}
+            <label className="flex items-center justify-between cursor-pointer group py-0.5 border-t border-stone-100 pt-3">
+              <span className="text-[12px] text-stone-500 group-hover:text-black transition-colors">Prikaži samo proizvode sa bojom</span>
+              <button
+                onClick={(e) => { e.preventDefault(); setFilterHasColor(!filterHasColor); }}
+                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${filterHasColor ? "bg-black" : "bg-[#c4c7c7]"}`}
+              >
+                <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-transform duration-300 ${filterHasColor ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
+              </button>
+            </label>
+          </div>
+        </FilterSection>
+      )}
+
       <FilterSection title="Osobine">
         <div className="space-y-3">
           {toggleFilters.map((f) => (
             <label key={f.key} className="flex items-center justify-between cursor-pointer group py-0.5">
-              <span className="text-[13px] text-[#6b6b6b] group-hover:text-[#2d2d2d] transition-colors">{f.label}</span>
+              <span className="text-[13px] text-stone-500 group-hover:text-black transition-colors">{f.label}</span>
               <button
                 onClick={(e) => { e.preventDefault(); toggleFilter(f.key); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#8c4a5a]" : "bg-[#e0d8cc]"}`}
+                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-black" : "bg-[#c4c7c7]"}`}
               >
                 <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-transform duration-300 ${activeToggles.includes(f.key) ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
               </button>
@@ -631,7 +783,7 @@ export default function ProductsPageClient({
 
   /* ─── Visibility Tabs (guest only) ─── */
   const visibilityTabs = !userRole ? (
-    <div className="flex items-center gap-1 bg-white border border-[#e8e2d9] rounded-xl p-1 shadow-sm">
+    <div className="flex items-center gap-1 bg-white border border-[#e8e2d9] rounded-sm p-1 shadow-sm">
       {([
         { key: "all" as const, label: "Svi proizvodi" },
         { key: "b2c" as const, label: "Maloprodaja" },
@@ -640,10 +792,10 @@ export default function ProductsPageClient({
         <button
           key={tab.key}
           onClick={() => setVisibility(tab.key)}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+          className={`px-4 py-2 text-sm font-medium rounded-sm transition-all ${
             visibility === tab.key
-              ? "bg-[#2d2d2d] text-white shadow-sm"
-              : "text-[#6b6b6b] hover:text-[#2d2d2d] hover:bg-[#faf7f3]"
+              ? "bg-black text-white shadow-sm"
+              : "text-stone-500 hover:text-black hover:bg-[#faf7f3]"
           }`}
         >
           {tab.label}
@@ -653,25 +805,25 @@ export default function ProductsPageClient({
   ) : null;
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-stone-100">
       <Header />
 
       {/* Page Header */}
       <div className="bg-white border-b border-[#e8e2d9]">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-[#999] mb-4">
-            <Link href="/" className="hover:text-[#2d2d2d] transition-colors">Početna</Link>
+          <nav className="flex items-center gap-2 text-sm text-stone-400 mb-4">
+            <Link href="/" className="hover:text-black transition-colors">Početna</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-[#2d2d2d] font-medium">Svi Proizvodi</span>
+            <span className="text-black font-medium">Svi Proizvodi</span>
           </nav>
 
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              <h1 className="text-3xl md:text-4xl font-light text-black" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                 Svi Proizvodi
               </h1>
-              <p className="text-sm text-[#999] mt-2">{pagination.total} proizvoda</p>
+              <p className="text-sm text-stone-400 mt-2">{pagination.total} proizvoda</p>
             </div>
 
             {/* Visibility tabs */}
@@ -690,24 +842,24 @@ export default function ProductsPageClient({
                   onFocus={() => searchQuery.length >= 2 && setShowSearch(true)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   placeholder="Pretražite proizvode..."
-                  className="w-full border border-[#e8e2d9] rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-[#8c4a5a] focus:outline-none bg-[#faf7f3] focus:bg-white transition-all placeholder-[#bbb]"
+                  className="w-full border border-[#e8e2d9] rounded-sm pl-10 pr-4 py-2.5 text-sm focus:border-black focus:outline-none bg-[#faf7f3] focus:bg-white transition-all placeholder-[#bbb]"
                 />
               </div>
 
               {/* Autocomplete */}
               {showSearch && searchResults.length > 0 && (
-                <div className="absolute mt-1.5 bg-white rounded-xl border border-[#e8e2d9] shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
+                <div className="absolute mt-1.5 bg-white rounded-sm border border-[#e8e2d9] shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
                   <div className="p-3">
-                    <span className="text-[11px] text-[#999] font-semibold tracking-widest uppercase">Proizvodi</span>
+                    <span className="text-[11px] text-stone-400 font-semibold tracking-widest uppercase">Proizvodi</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
-                        <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
-                          <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
+                        <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
+                          <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#2d2d2d] truncate">{p.name}</p>
-                            <p className="text-[11px] text-[#8c4a5a] font-medium">{p.brand}</p>
+                            <p className="text-sm font-medium text-black truncate">{p.name}</p>
+                            <p className="text-[11px] text-secondary font-medium">{p.brand}</p>
                           </div>
-                          <span className="text-sm font-bold text-[#2d2d2d]">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#999]">RSD</span></span>
+                          <span className="text-sm font-bold text-black">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-stone-400">RSD</span></span>
                         </Link>
                       ))}
                     </div>
@@ -730,10 +882,10 @@ export default function ProductsPageClient({
         <div className="flex gap-10">
           {/* SIDEBAR */}
           <aside className="hidden lg:block w-[260px] flex-shrink-0">
-            <div className="sticky top-20 bg-white rounded-2xl border border-[#e8e2d9] p-6 shadow-sm">
+            <div className="sticky top-20 bg-white rounded-sm border border-[#e8e2d9] p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-[13px] font-bold text-[#2d2d2d] uppercase tracking-widest">Filteri</h2>
-                <button onClick={clearAllTags} className="text-[12px] text-[#8c4a5a] hover:underline font-medium">Resetuj</button>
+                <h2 className="text-[13px] font-bold text-black uppercase tracking-widest">Filteri</h2>
+                <button onClick={clearAllTags} className="text-[12px] text-secondary hover:underline font-medium">Resetuj</button>
               </div>
               {filterSidebar}
             </div>
@@ -744,21 +896,21 @@ export default function ProductsPageClient({
             {/* Toolbar */}
             <div className="flex items-center justify-between mb-6 gap-4">
               <div className="flex items-center gap-3">
-                <button onClick={() => setMobileFilter(true)} className="lg:hidden flex items-center gap-2 bg-white border border-[#e8e2d9] px-4 py-2.5 rounded-xl text-sm font-medium hover:border-[#ccc] transition-colors shadow-sm">
-                  <SlidersHorizontal className="w-4 h-4 text-[#999]" /> Filteri
+                <button onClick={() => setMobileFilter(true)} className="lg:hidden flex items-center gap-2 bg-white border border-[#e8e2d9] px-4 py-2.5 rounded-sm text-sm font-medium hover:border-[#ccc] transition-colors shadow-sm">
+                  <SlidersHorizontal className="w-4 h-4 text-stone-400" /> Filteri
                 </button>
 
                 {/* Grid / List toggle */}
-                <div className="hidden sm:flex items-center bg-white border border-[#e8e2d9] rounded-xl overflow-hidden shadow-sm">
+                <div className="hidden sm:flex items-center bg-white border border-[#e8e2d9] rounded-sm overflow-hidden shadow-sm">
                   <button
                     onClick={() => setGridView(true)}
-                    className={`p-2.5 transition-all ${gridView ? "bg-[#2d2d2d] text-white" : "text-[#999] hover:text-[#2d2d2d] hover:bg-[#faf7f3]"}`}
+                    className={`p-2.5 transition-all ${gridView ? "bg-black text-white" : "text-stone-400 hover:text-black hover:bg-[#faf7f3]"}`}
                   >
                     <Grid3X3 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setGridView(false)}
-                    className={`p-2.5 transition-all ${!gridView ? "bg-[#2d2d2d] text-white" : "text-[#999] hover:text-[#2d2d2d] hover:bg-[#faf7f3]"}`}
+                    className={`p-2.5 transition-all ${!gridView ? "bg-black text-white" : "text-stone-400 hover:text-black hover:bg-[#faf7f3]"}`}
                   >
                     <LayoutList className="w-4 h-4" />
                   </button>
@@ -775,13 +927,13 @@ export default function ProductsPageClient({
                   <button
                     key={tag.key}
                     onClick={() => removeTag(tag.key)}
-                    className="group flex items-center gap-1.5 bg-white text-[#2d2d2d] pl-3.5 pr-2.5 py-2 rounded-xl text-[12px] font-medium border border-[#e8e2d9] hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-all shadow-sm"
+                    className="group flex items-center gap-1.5 bg-white text-black pl-3.5 pr-2.5 py-2 rounded-sm text-[12px] font-medium border border-[#e8e2d9] hover:border-black hover:text-secondary transition-all shadow-sm"
                   >
                     {tag.label}
-                    <X className="w-3.5 h-3.5 text-[#ccc] group-hover:text-[#8c4a5a] transition-colors" />
+                    <X className="w-3.5 h-3.5 text-[#ccc] group-hover:text-secondary transition-colors" />
                   </button>
                 ))}
-                <button onClick={clearAllTags} className="text-[12px] text-[#999] hover:text-[#8c4a5a] font-medium ml-1 transition-colors">
+                <button onClick={clearAllTags} className="text-[12px] text-stone-400 hover:text-secondary font-medium ml-1 transition-colors">
                   Obriši sve
                 </button>
               </div>
@@ -790,7 +942,7 @@ export default function ProductsPageClient({
             {/* Loading overlay */}
             {loading && (
               <div className="flex items-center justify-center py-12">
-                <div className="w-8 h-8 border-2 border-[#e0d8cc] border-t-[#8c4a5a] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-stone-200 border-t-[#735b28] rounded-full animate-spin" />
               </div>
             )}
 
@@ -800,27 +952,27 @@ export default function ProductsPageClient({
                 {products.map((p) => gridView ? (
                   <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
                 ) : (
-                  <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-white rounded-2xl border border-transparent hover:border-[#e8e2d9] hover:shadow-sm transition-all overflow-hidden group">
+                  <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-white rounded-sm border border-transparent hover:border-[#e8e2d9] hover:shadow-sm transition-all overflow-hidden group">
                     <div className="w-36 h-36 bg-[#faf7f3] flex-shrink-0 relative overflow-hidden">
                       <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {p.isProfessional && (
-                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-lg bg-[#2d2d2d]/80 text-white backdrop-blur-sm">PRO</span>
+                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">PRO</span>
                       )}
                       {getBadge(p) && (
-                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold rounded-lg ${
-                          getBadge(p) === "NOVO" ? "bg-[#8c4a5a]" : getBadge(p) === "HIT" ? "bg-[#2d2d2d]" : "bg-[#b5453a]"
+                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm ${
+                          getBadge(p) === "NOVO" ? "bg-black" : getBadge(p) === "HIT" ? "bg-black" : "bg-[#b5453a]"
                         } text-white`}>{getBadge(p)}</span>
                       )}
                     </div>
                     <div className="p-5 flex-1 flex flex-col justify-center">
-                      <span className="text-[11px] text-[#8c4a5a] font-semibold tracking-widest uppercase">{p.brand?.name ?? ""}</span>
-                      <h3 className="text-sm font-medium text-[#2d2d2d] mt-1">{p.name}</h3>
+                      <span className="text-[11px] text-secondary font-semibold tracking-widest uppercase">{p.brand?.name ?? ""}</span>
+                      <h3 className="text-sm font-medium text-black mt-1">{p.name}</h3>
                       <div className="flex items-center gap-0.5 mt-2">
-                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(p.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#e0d8cc]"}`} />)}
+                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(p.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#c4c7c7]"}`} />)}
                       </div>
                       <div className="mt-2 flex items-baseline gap-2">
-                        {p.oldPrice && <span className="text-xs text-[#999] line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-                        <span className="text-[15px] font-bold text-[#2d2d2d]">{p.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold text-[#999]">RSD</span></span>
+                        {p.oldPrice && <span className="text-xs text-stone-400 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+                        <span className="text-[15px] font-bold text-black">{p.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold text-stone-400">RSD</span></span>
                       </div>
                     </div>
                   </Link>
@@ -831,7 +983,7 @@ export default function ProductsPageClient({
             {/* Empty state */}
             {!loading && products.length === 0 && (
               <div className="text-center py-16">
-                <p className="text-lg text-[#999]">Nema pronađenih proizvoda</p>
+                <p className="text-lg text-stone-400">Nema pronađenih proizvoda</p>
                 <p className="text-sm text-[#bbb] mt-2">Pokušajte da promenite filtere ili pretražite ponovo.</p>
               </div>
             )}
@@ -843,10 +995,10 @@ export default function ProductsPageClient({
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium transition-all ${
+                    className={`w-10 h-10 rounded-sm flex items-center justify-center text-sm font-medium transition-all ${
                       currentPage === p
-                        ? "bg-[#2d2d2d] text-white shadow-sm"
-                        : "bg-white text-[#6b6b6b] hover:bg-[#faf7f3] border border-[#e8e2d9]"
+                        ? "bg-black text-white shadow-sm"
+                        : "bg-white text-stone-500 hover:bg-[#faf7f3] border border-[#e8e2d9]"
                     }`}
                   >
                     {p}
@@ -855,9 +1007,9 @@ export default function ProductsPageClient({
                 {currentPage < totalPages && (
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-white border border-[#e8e2d9] hover:bg-[#faf7f3] transition-colors"
+                    className="w-10 h-10 rounded-sm flex items-center justify-center bg-white border border-[#e8e2d9] hover:bg-[#faf7f3] transition-colors"
                   >
-                    <ChevronRight className="w-4 h-4 text-[#999]" />
+                    <ChevronRight className="w-4 h-4 text-stone-400" />
                   </button>
                 )}
               </div>
@@ -873,19 +1025,19 @@ export default function ProductsPageClient({
           <div className="fixed left-0 top-0 bottom-0 w-[320px] bg-white z-50 overflow-y-auto animate-slideInLeft flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-[#f0ebe3] flex-shrink-0">
               <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-[#8c4a5a]" />
-                <h3 className="text-[13px] font-bold uppercase tracking-widest text-[#2d2d2d]">Filteri</h3>
+                <SlidersHorizontal className="w-4 h-4 text-secondary" />
+                <h3 className="text-[13px] font-bold uppercase tracking-widest text-black">Filteri</h3>
               </div>
-              <button onClick={() => setMobileFilter(false)} className="w-8 h-8 rounded-lg hover:bg-[#f5f0e8] flex items-center justify-center transition-colors">
-                <X className="w-5 h-5 text-[#999]" />
+              <button onClick={() => setMobileFilter(false)} className="w-8 h-8 rounded-sm hover:bg-stone-100 flex items-center justify-center transition-colors">
+                <X className="w-5 h-5 text-stone-400" />
               </button>
             </div>
             <div className="p-5 flex-1 overflow-y-auto">{filterSidebar}</div>
             <div className="p-5 border-t border-[#f0ebe3] flex-shrink-0 flex gap-3">
-              <button onClick={() => { clearAllTags(); setMobileFilter(false); }} className="flex-1 border border-[#e8e2d9] text-[#2d2d2d] py-3 rounded-xl font-medium text-sm transition-colors hover:bg-[#faf7f3]">
+              <button onClick={() => { clearAllTags(); setMobileFilter(false); }} className="flex-1 border border-[#e8e2d9] text-black py-3 rounded-sm font-medium text-sm transition-colors hover:bg-[#faf7f3]">
                 Resetuj
               </button>
-              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-[#2d2d2d] hover:bg-[#2d2d2d] text-white py-3 rounded-xl font-medium text-sm transition-colors">
+              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-black hover:bg-black text-white py-3 rounded-sm font-medium text-sm transition-colors">
                 Primeni
               </button>
             </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Cookie, ChevronDown, ChevronUp } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface CookieSettings {
   necessary: boolean;
@@ -17,11 +18,11 @@ export default function CookieConsent() {
     analytics: false,
     marketing: false,
   });
+  const { t } = useLanguage();
 
   useEffect(() => {
     const consent = localStorage.getItem("altamoda_cookie_consent");
     if (!consent) {
-      // Small delay so the banner slides in after page load
       const timer = setTimeout(() => setVisible(true), 1500);
       return () => clearTimeout(timer);
     }
@@ -49,19 +50,18 @@ export default function CookieConsent() {
       className="fixed bottom-0 left-0 right-0 z-[55] animate-slideUp"
       style={{ animationDuration: "0.4s" }}
     >
-      <div className="bg-white border-t border-[#e0d8cc]">
-        <div className="max-w-7xl mx-auto px-4 py-5">
+      <div className="bg-white border-t border-stone-200">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-5">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             {/* Icon + Text */}
             <div className="flex items-start gap-3 flex-1">
-              <div className="w-10 h-10 rounded-full bg-[#f5f0e8] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Cookie className="w-5 h-5 text-[#8c4a5a]" />
+              <div className="w-10 h-10 rounded-sm bg-stone-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Cookie className="w-5 h-5 text-stone-600" />
               </div>
-              <p className="text-sm text-[#6b6b6b] leading-relaxed">
-                Koristimo kolačiće za poboljšanje vašeg iskustva. Nastavkom korišćenja sajta,
-                prihvatate našu{" "}
-                <a href="#" className="text-[#8c4a5a] hover:underline">
-                  politiku kolačića
+              <p className="text-xs text-stone-500 leading-relaxed tracking-wide">
+                {t("cookie.text")}{" "}
+                <a href="#" className="text-black hover:underline font-medium">
+                  {t("cookie.cookiePolicy")}
                 </a>
                 .
               </p>
@@ -71,9 +71,9 @@ export default function CookieConsent() {
             <div className="flex items-center gap-3 flex-shrink-0">
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-[#e0d8cc] text-[#2d2d2d] rounded-full text-sm font-medium hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-stone-300 text-stone-700 rounded-sm text-xs font-bold uppercase tracking-widest hover:border-black hover:text-black transition-colors"
               >
-                Podešavanja
+                {t("cookie.settings")}
                 {showSettings ? (
                   <ChevronUp className="w-3.5 h-3.5" />
                 ) : (
@@ -82,23 +82,23 @@ export default function CookieConsent() {
               </button>
               <button
                 onClick={acceptAll}
-                className="px-6 py-2.5 bg-[#8c4a5a] hover:bg-[#6e3848] text-white rounded-full text-sm font-medium transition-colors"
+                className="px-6 py-2.5 bg-black hover:bg-stone-800 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors"
               >
-                Prihvatam
+                {t("cookie.acceptAll")}
               </button>
             </div>
           </div>
 
           {/* Settings Panel */}
           {showSettings && (
-            <div className="mt-5 pt-5 border-t border-[#e0d8cc] animate-slideDown">
+            <div className="mt-5 pt-5 border-t border-stone-200 animate-slideDown">
               <div className="grid gap-4 max-w-xl">
                 {/* Necessary */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">Neophodni kolačići</span>
-                    <p className="text-xs text-[#6b6b6b] mt-0.5">
-                      Potrebni za osnovne funkcije sajta. Ne mogu se isključiti.
+                    <span className="text-sm font-bold text-stone-900">{t("cookie.necessaryCookies")}</span>
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      {t("cookie.necessaryDesc")}
                     </p>
                   </div>
                   <div className="relative">
@@ -111,7 +111,7 @@ export default function CookieConsent() {
                     />
                     <label
                       htmlFor="cookie-necessary"
-                      className="w-11 h-6 bg-[#8c4a5a] rounded-full block cursor-not-allowed opacity-60"
+                      className="w-11 h-6 bg-black rounded-full block cursor-not-allowed opacity-60"
                     >
                       <span className="absolute left-[22px] top-[2px] w-5 h-5 bg-white rounded-full shadow transition-transform" />
                     </label>
@@ -121,15 +121,15 @@ export default function CookieConsent() {
                 {/* Analytics */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">Analitički kolačići</span>
-                    <p className="text-xs text-[#6b6b6b] mt-0.5">
-                      Pomažu nam da razumemo kako koristite sajt.
+                    <span className="text-sm font-bold text-stone-900">{t("cookie.analyticsCookies")}</span>
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      {t("cookie.analyticsDesc")}
                     </p>
                   </div>
                   <button
                     onClick={() => setSettings((s) => ({ ...s, analytics: !s.analytics }))}
                     className={`relative w-11 h-6 rounded-full transition-colors ${
-                      settings.analytics ? "bg-[#8c4a5a]" : "bg-[#e0d8cc]"
+                      settings.analytics ? "bg-black" : "bg-stone-300"
                     }`}
                   >
                     <span
@@ -143,15 +143,15 @@ export default function CookieConsent() {
                 {/* Marketing */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-[#2d2d2d]">Marketing kolačići</span>
-                    <p className="text-xs text-[#6b6b6b] mt-0.5">
-                      Koriste se za prikazivanje relevantnih reklama.
+                    <span className="text-sm font-bold text-stone-900">{t("cookie.marketingCookies")}</span>
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      {t("cookie.marketingDesc")}
                     </p>
                   </div>
                   <button
                     onClick={() => setSettings((s) => ({ ...s, marketing: !s.marketing }))}
                     className={`relative w-11 h-6 rounded-full transition-colors ${
-                      settings.marketing ? "bg-[#8c4a5a]" : "bg-[#e0d8cc]"
+                      settings.marketing ? "bg-black" : "bg-stone-300"
                     }`}
                   >
                     <span
@@ -164,9 +164,9 @@ export default function CookieConsent() {
 
                 <button
                   onClick={saveSettings}
-                  className="mt-2 px-6 py-2.5 bg-[#2d2d2d] hover:bg-[#4a4a4a] text-white rounded-full text-sm font-medium transition-colors self-start"
+                  className="mt-2 px-6 py-2.5 bg-black hover:bg-stone-800 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors self-start"
                 >
-                  Sačuvaj podešavanja
+                  {t("cookie.saveSettings")}
                 </button>
               </div>
             </div>

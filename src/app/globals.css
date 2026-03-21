@@ -1,26 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #f5f0e8;
-  --color-foreground: #2d2d2d;
-  --color-accent: #8c4a5a;
-  --color-accent-light: #b07a87;
-  --color-accent-dark: #6e3848;
-  --color-dark: #2d2d2d;
-  --color-dark-light: #4a4a4a;
-  --color-text: #2d2d2d;
-  --color-text-light: #6b6b6b;
-  --color-border: #e0d8cc;
+  /* ── The Modern Atelier – Design Tokens ── */
+
+  /* Primary: Black – authoritative, elegant */
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1c1b1b;
+  --color-on-primary-container: #858383;
+
+  /* Secondary: Dark Gold – luxury accent */
+  --color-secondary: #735b28;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fedb9c;
+  --color-on-secondary-container: #785f2b;
+
+  /* Surfaces */
+  --color-surface: #f9f9f9;
+  --color-surface-dim: #dadada;
+  --color-surface-bright: #f9f9f9;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f3f3;
+  --color-surface-container: #eeeeee;
+  --color-surface-container-high: #e8e8e8;
+  --color-surface-container-highest: #e2e2e2;
+  --color-surface-variant: #e2e2e2;
+
+  /* Text */
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #444748;
+  --color-on-background: #1a1c1c;
+  --color-background: #f9f9f9;
+  --color-foreground: #1a1c1c;
+
+  /* Outline */
+  --color-outline: #747878;
+  --color-outline-variant: #c4c7c7;
+
+  /* Error */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Inverse */
+  --color-inverse-surface: #2f3131;
+  --color-inverse-on-surface: #f1f1f1;
+  --color-inverse-primary: #c8c6c5;
+
+  /* Legacy aliases for gradual migration */
+  --color-accent: #735b28;
+  --color-accent-light: #e3c285;
+  --color-accent-dark: #594312;
+  --color-dark: #1a1c1c;
+  --color-dark-light: #444748;
+  --color-text: #1a1c1c;
+  --color-text-light: #747878;
+  --color-border: #c4c7c7;
   --color-success: #2d7a3a;
-  --color-error: #b5453a;
   --color-warning: #c4883a;
-  --color-surface: #ffffff;
-  --color-muted: #f5f0e8;
-  --color-warm-beige: #f5f0e8;
-  --color-light-accent: #e8e0d4;
-  --font-sans: 'DM Sans', sans-serif;
-  --font-serif: 'Cormorant Garamond', serif;
+  --color-muted: #f3f3f3;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Noto Serif', Georgia, serif;
+  --font-headline: 'Noto Serif', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-label: 'Inter', system-ui, sans-serif;
 }
 
 html {
@@ -28,31 +76,40 @@ html {
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-accent-light);
-  border-radius: 3px;
+  background: var(--color-outline-variant);
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent);
+  background: var(--color-outline);
 }
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Animations */
 @keyframes fadeIn {
@@ -80,19 +137,9 @@ body {
   to { transform: translateX(0); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes pulse-accent {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(140, 74, 90, 0.3); }
-  50% { box-shadow: 0 0 0 8px rgba(140, 74, 90, 0); }
 }
 
 .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
@@ -101,127 +148,26 @@ body {
 .animate-slideInRight { animation: slideInRight 0.3s ease-out forwards; }
 .animate-slideInLeft { animation: slideInLeft 0.3s ease-out forwards; }
 .animate-scaleIn { animation: scaleIn 0.3s ease-out forwards; }
-.animate-pulse-accent { animation: pulse-accent 2s infinite; }
-
-.animate-shimmer {
-  background: linear-gradient(90deg, var(--color-background) 25%, var(--color-light-accent) 50%, var(--color-background) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
 
 /* Glass effect */
-.glass {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.glass-dark {
-  background: rgba(45, 45, 45, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.bg-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Gradient overlays */
 .gradient-overlay {
-  background: linear-gradient(180deg, transparent 0%, rgba(45, 45, 45, 0.6) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
 }
 
-.gradient-accent {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 50%, var(--color-accent) 100%);
-}
-
-.gradient-dark {
-  background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-light) 100%);
-}
-
-/* Button styles */
-.btn-accent {
-  background-color: var(--color-accent);
-  color: white;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.3s ease;
-  border-radius: 9999px;
-}
-
-.btn-accent:hover {
-  background-color: var(--color-accent-dark);
-  transform: translateY(-1px);
-}
-
-.btn-outline-accent {
-  border: 1.5px solid var(--color-accent);
-  color: var(--color-accent);
-  background: transparent;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.3s ease;
-  border-radius: 9999px;
-}
-
-.btn-outline-accent:hover {
-  background-color: var(--color-accent);
-  color: white;
-}
-
-/* Legacy class names mapped to new colors */
-.btn-gold {
-  background-color: var(--color-accent);
-  color: white;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.3s ease;
-  border-radius: 9999px;
-}
-
-.btn-gold:hover {
-  background-color: var(--color-accent-dark);
-  transform: translateY(-1px);
-}
-
-.btn-outline-gold {
-  border: 1.5px solid var(--color-accent);
-  color: var(--color-accent);
-  background: transparent;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.3s ease;
-  border-radius: 9999px;
-}
-
-.btn-outline-gold:hover {
-  background-color: var(--color-accent);
-  color: white;
-}
-
-.btn-dark {
-  background-color: var(--color-dark);
-  color: white;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.3s ease;
-}
-
-.btn-dark:hover {
-  background-color: var(--color-dark-light);
-  transform: translateY(-1px);
-}
-
-/* Product card hover */
+/* Product card */
 .product-card {
   transition: all 0.3s ease;
-  border: 1px solid var(--color-border);
-  border-radius: 1rem;
-}
-
-.product-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-accent-light);
 }
 
 .product-card .product-image {
-  transition: transform 0.5s ease;
+  transition: transform 0.7s ease;
 }
 
 .product-card:hover .product-image {
@@ -229,24 +175,24 @@ body {
 }
 
 /* Badge styles */
-.badge-sale {
-  background-color: var(--color-error);
-  color: white;
-}
-
 .badge-new {
-  background-color: var(--color-accent);
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
-.badge-b2b {
-  background-color: var(--color-dark);
-  color: var(--color-accent-light);
+.badge-sale {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+.badge-pro {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary);
 }
 
 /* Star rating */
-.star-filled { color: var(--color-accent); }
-.star-empty { color: var(--color-border); }
+.star-filled { color: var(--color-secondary); }
+.star-empty { color: var(--color-outline-variant); }
 
 /* Mega menu */
 .mega-menu {
@@ -262,7 +208,7 @@ body {
   transform: translateY(0);
 }
 
-/* Tab underline animation */
+/* Tab underline */
 .tab-active {
   position: relative;
 }
@@ -274,21 +220,20 @@ body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: var(--color-accent);
-  animation: scaleIn 0.3s ease-out;
+  background-color: var(--color-primary);
 }
 
 /* Selection color */
 ::selection {
-  background-color: rgba(176, 122, 135, 0.3);
-  color: var(--color-text);
+  background-color: rgba(115, 91, 40, 0.2);
+  color: var(--color-on-surface);
 }
 
 /* Focus styles */
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(140, 74, 90, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
 }
 
 /* Number input arrows removal */

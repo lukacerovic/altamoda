@@ -12,6 +12,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import CookieConsent from "@/components/CookieConsent";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 /* ─── Types ─── */
 export interface ProductData {
@@ -39,18 +40,15 @@ const instagramImages = [
   "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=300&h=300&fit=crop",
 ];
 
-const trustBadges = [
-  { icon: Leaf, title: "Prirodna Formula", desc: "Nežna nega za vašu kosu sa premium sastojcima" },
-  { icon: ShieldCheck, title: "Bez Okrutnosti", desc: "Naši proizvodi nisu testirani na životinjama" },
-  { icon: Award, title: "Stručno Odobreno", desc: "Testirano za sigurnost i vidljive rezultate" },
-  { icon: Truck, title: "Besplatna Dostava", desc: "Za porudžbine preko 5.000 RSD, bez dodatnih troškova" },
-];
+const trustBadgeIcons = [Leaf, ShieldCheck, Award, Truck];
 
 /* ─── ProductCard ─── */
 function ProductCard({ product, showOld = false, badge }: { product: ProductData; showOld?: boolean; badge?: string }) {
+  const { t } = useLanguage();
   const [liked, setLiked] = useState(false);
+  const newLabel = t("home.new");
   const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
-  const displayBadge = badge || (product.isNew ? "NOVO" : discountBadge);
+  const displayBadge = badge || (product.isNew ? newLabel : discountBadge);
 
   return (
     <Link href={`/products/${product.slug}`} className="product-card bg-white rounded-2xl border border-[#e0d8cc] hover:border-[#b07a87] transition-all group relative overflow-hidden flex flex-col">
@@ -58,7 +56,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
         <img src={product.image || defaultImg} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         {displayBadge && (
           <span className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-medium rounded-full ${
-            displayBadge === "NOVO" ? "bg-[#8c4a5a] text-white"
+            displayBadge === newLabel ? "bg-[#8c4a5a] text-white"
             : displayBadge.startsWith("#") ? "bg-[#c4883a] text-white"
             : "bg-[#b5453a] text-white"
           }`}>{displayBadge}</span>
@@ -70,7 +68,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
           <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#b07a87]"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium py-2.5 rounded-full transition-colors">Dodaj u korpu</button>
+          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium py-2.5 rounded-full transition-colors">{t("home.addToCart")}</button>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
@@ -150,7 +148,46 @@ interface Props {
 
 /* ─── Main Page ─── */
 export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts }: Props) {
+  const { t } = useLanguage();
+
+  const trustBadges = [
+    { icon: trustBadgeIcons[0], title: t("home.naturalFormula"), desc: t("home.naturalFormulaDesc") },
+    { icon: trustBadgeIcons[1], title: t("home.crueltyFree"), desc: t("home.crueltyFreeDesc") },
+    { icon: trustBadgeIcons[2], title: t("home.expertApproved"), desc: t("home.expertApprovedDesc") },
+    { icon: trustBadgeIcons[3], title: t("home.freeShipping"), desc: t("home.freeShippingDesc") },
+  ];
+
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+  const [popupEmail, setPopupEmail] = useState("");
+  const [popupStatus, setPopupStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const handleNewsletterSubmit = async (email: string, setStatus: (s: "idle" | "loading" | "success" | "error") => void, setMessage: (m: string) => void, onSuccess?: () => void) => {
+    if (!email) return;
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setStatus("success");
+        setMessage(json.data?.message || "Uspešno ste se prijavili!");
+        onSuccess?.();
+      } else {
+        setStatus("error");
+        setMessage(json.error || "Došlo je do greške");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Došlo je do greške");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
@@ -164,13 +201,13 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-light leading-[0.95] mb-6 text-white animate-slideUp" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              Profesionalna{" "}<em className="italic text-[#b07a87]">Nega</em>
+              {t("home.heroTitle1")}{" "}<em className="italic text-[#b07a87]">{t("home.heroTitle2")}</em>
             </h1>
             <p className="text-white/60 text-base md:text-lg mb-8 max-w-lg animate-slideUp leading-relaxed" style={{ animationDelay: "0.1s" }}>
-              Započnite dan sa nežnom negom i hranjivim sastojcima koji su dizajnirani da probudu prirodnu lepotu vaše kose.
+              {t("home.heroSubtitle")}
             </p>
             <div className="flex flex-wrap items-center gap-6 animate-slideUp" style={{ animationDelay: "0.2s" }}>
-              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm tracking-wide">Kupujte Sada</Link>
+              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm tracking-wide">{t("home.shopNow")}</Link>
             </div>
           </div>
         </div>
@@ -194,7 +231,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* EDITORIAL HEADING */}
       <section className="py-16 md:py-20 text-center bg-[#f5f0e8]">
         <p className="text-3xl md:text-4xl lg:text-5xl text-[#2d2d2d] font-light italic max-w-3xl mx-auto px-4 leading-relaxed" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-          Osvežite svoju kosu, negujte sebe, obnovite sjaj.
+          {t("home.editorialHeading")}
         </p>
       </section>
 
@@ -202,12 +239,12 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {featuredProducts.length > 0 && (
         <section className="py-16 bg-white border-y border-[#e0d8cc]">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Izdvojeni Proizvodi</h2>
+            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.featuredProducts")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {featuredProducts.slice(0, 8).map((p) => <ProductCard key={p.id} product={p} showOld={!!p.oldPrice} />)}
             </div>
             <div className="text-center mt-10">
-              <Link href="/products" className="inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">Pogledajte Sve Proizvode</Link>
+              <Link href="/products" className="inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.viewAllProducts")}</Link>
             </div>
           </div>
         </section>
@@ -218,10 +255,10 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <div className="bg-[#38202a] py-20 md:py-28">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-10">
             <div className="flex-1 text-center md:text-left">
-              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">Za Profesionalce</span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Ekološki,{" "}<em className="italic text-[#b07a87]">Prijateljski</em>{" "}za Kosu</h2>
-              <p className="text-white/50 mb-8 max-w-lg text-sm leading-relaxed">Naši proizvodi su napravljeni sa prirodnim sastojcima, bez štetnih hemikalija.</p>
-              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">Saznajte Više <ArrowRight className="w-4 h-4" /></Link>
+              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">{t("home.forProfessionals")}</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.ecoFriendly")},{" "}<em className="italic text-[#b07a87]">{t("home.hairFriendly")}</em>{" "}{t("home.forHair")}</h2>
+              <p className="text-white/50 mb-8 max-w-lg text-sm leading-relaxed">{t("home.ecoDescription")}</p>
+              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">{t("home.learnMore")} <ArrowRight className="w-4 h-4" /></Link>
             </div>
             <div className="flex-1 relative">
               <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=700&fit=crop" alt="Natural products" className="rounded-3xl w-full max-w-md mx-auto object-cover aspect-[4/5]" />
@@ -238,11 +275,11 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex items-center gap-3">
                 <TrendingUp className="w-6 h-6 text-[#c4883a]" />
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Najprodavaniji</h2>
-                  <p className="text-[#b07a87] mt-1 text-sm">Proizvodi koje naši kupci najviše vole</p>
+                  <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.bestsellers")}</h2>
+                  <p className="text-[#b07a87] mt-1 text-sm">{t("home.bestsellersDesc")}</p>
                 </div>
               </div>
-              <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">Pogledaj sve</Link>
+              <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.viewAll")}</Link>
             </div>
             <ProductCarousel products={bestsellers.map((p, i) => ({ ...p, _rank: i + 1 }))} />
           </div>
@@ -255,13 +292,13 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Novo u Ponudi</h2>
-                <p className="text-[#b07a87] mt-1 text-sm">Najnoviji proizvodi iz naše kolekcije</p>
+                <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.newArrivals")}</h2>
+                <p className="text-[#b07a87] mt-1 text-sm">{t("home.newArrivalsDesc")}</p>
               </div>
-              <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">Svi proizvodi</Link>
+              <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.allProducts")}</Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {newArrivals.map((p) => <ProductCard key={p.id} product={p} badge="NOVO" />)}
+              {newArrivals.map((p) => <ProductCard key={p.id} product={p} badge={t("home.new")} />)}
             </div>
           </div>
         </section>
@@ -273,10 +310,10 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Akcijske Ponude</h2>
-                <p className="text-[#b07a87] mt-2 text-sm">Uštedite na omiljenim proizvodima</p>
+                <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.saleProducts")}</h2>
+                <p className="text-[#b07a87] mt-2 text-sm">{t("home.saleProductsDesc")}</p>
               </div>
-              <Link href="/outlet" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">Sve akcije</Link>
+              <Link href="/outlet" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.allSales")}</Link>
             </div>
             <ProductCarousel products={saleProducts} showOld />
           </div>
@@ -291,10 +328,10 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             <div className="absolute inset-0 bg-gradient-to-r from-[#2d2d2d]/85 via-[#2d2d2d]/60 to-[#2d2d2d]/30" />
             <div className="absolute inset-0 flex items-center">
               <div className="max-w-7xl mx-auto px-8 md:px-12">
-                <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">Za Salone</span>
-                <h2 className="text-3xl md:text-5xl font-light text-white mt-3 mb-5" style={{ fontFamily: "'Cormorant Garamond', serif" }}>B2B Program za <em className="italic">Profesionalce</em></h2>
-                <p className="text-white/50 mb-8 max-w-md text-sm leading-relaxed">Ekskluzivne cene, prioritetna dostava i podrška za vaš salon.</p>
-                <Link href="/account/login" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">Registrujte Salon <ArrowRight className="w-4 h-4" /></Link>
+                <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">{t("home.forSalons")}</span>
+                <h2 className="text-3xl md:text-5xl font-light text-white mt-3 mb-5" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.b2bTitle")} <em className="italic">{t("home.b2bProfessionals")}</em></h2>
+                <p className="text-white/50 mb-8 max-w-md text-sm leading-relaxed">{t("home.b2bDescription")}</p>
+                <Link href="/account/login" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">{t("home.registerSalon")} <ArrowRight className="w-4 h-4" /></Link>
               </div>
             </div>
           </div>
@@ -305,8 +342,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       <section className="py-16 bg-white border-y border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>@altamoda.rs</h2>
-            <p className="text-[#b07a87] mt-2 text-sm">Pratite nas na Instagramu za inspiraciju</p>
+            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.instagramHandle")}</h2>
+            <p className="text-[#b07a87] mt-2 text-sm">{t("home.instagramDesc")}</p>
           </div>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
             {instagramImages.map((img, i) => (
@@ -325,12 +362,17 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       <section className="py-16 bg-[#f5f0e8]">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Mail className="w-8 h-8 text-[#8c4a5a] mx-auto mb-4" />
-          <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Prijavite se na <em className="italic">Newsletter</em></h2>
-          <p className="text-[#b07a87] mb-8 max-w-md mx-auto text-sm">Budite prvi koji saznaju za nove proizvode, akcije i ekskluzivne ponude.</p>
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input type="email" placeholder="Vaša email adresa" className="flex-1 bg-white border border-[#e0d8cc] rounded-full px-5 py-3 text-[#2d2d2d] placeholder-[#b07a87] text-sm focus:border-[#8c4a5a] focus:ring-0" />
-            <button className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 text-sm">Prijavite se <Send className="w-4 h-4" /></button>
-          </div>
+          <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.newsletterTitle")} <em className="italic">{t("home.newsletter")}</em></h2>
+          <p className="text-[#b07a87] mb-8 max-w-md mx-auto text-sm">{t("home.newsletterDesc")}</p>
+          <form onSubmit={(e) => { e.preventDefault(); handleNewsletterSubmit(newsletterEmail, setNewsletterStatus, setNewsletterMessage); }} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input type="email" placeholder={t("home.emailPlaceholder")} value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} className="flex-1 bg-white border border-[#e0d8cc] rounded-full px-5 py-3 text-[#2d2d2d] placeholder-[#b07a87] text-sm focus:border-[#8c4a5a] focus:ring-0" required />
+            <button type="submit" disabled={newsletterStatus === "loading"} className="bg-[#8c4a5a] hover:bg-[#6e3848] text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-60">
+              {newsletterStatus === "loading" ? "..." : t("home.subscribe")} <Send className="w-4 h-4" />
+            </button>
+          </form>
+          {newsletterStatus !== "idle" && newsletterStatus !== "loading" && (
+            <p className={`mt-3 text-sm ${newsletterStatus === "success" ? "text-green-600" : "text-red-500"}`}>{newsletterMessage}</p>
+          )}
         </div>
       </section>
 
@@ -344,11 +386,27 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             <button onClick={() => setShowNewsletter(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-[#b07a87] hover:text-[#2d2d2d]" /></button>
             <div className="text-center">
               <div className="w-16 h-16 bg-[#f5f0e8] rounded-full flex items-center justify-center mx-auto mb-4"><Mail className="w-8 h-8 text-[#8c4a5a]" /></div>
-              <h3 className="text-2xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Ostvarite 10% Popusta</h3>
-              <p className="text-[#b07a87] text-sm mb-6">Prijavite se na naš newsletter i dobijte 10% popusta na prvu kupovinu.</p>
-              <input type="email" placeholder="Vaša email adresa" className="w-full border border-[#e0d8cc] rounded-full px-4 py-3 text-sm mb-3 focus:border-[#8c4a5a]" />
-              <button className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded-full font-medium transition-colors">Prijavite se</button>
-              <button onClick={() => setShowNewsletter(false)} className="text-xs text-[#b07a87] mt-3 hover:text-[#2d2d2d] block mx-auto">Ne hvala, možda drugi put</button>
+              <h3 className="text-2xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.popupTitle")}</h3>
+              <p className="text-[#b07a87] text-sm mb-6">{t("home.popupDesc")}</p>
+              {popupStatus === "success" ? (
+                <p className="text-green-600 text-sm py-4">{popupMessage}</p>
+              ) : (
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  handleNewsletterSubmit(popupEmail, setPopupStatus, setPopupMessage, () => {
+                    setTimeout(() => setShowNewsletter(false), 1500);
+                  });
+                }}>
+                  <input type="email" placeholder={t("home.emailPlaceholder")} value={popupEmail} onChange={(e) => setPopupEmail(e.target.value)} className="w-full border border-[#e0d8cc] rounded-full px-4 py-3 text-sm mb-3 focus:border-[#8c4a5a]" required />
+                  <button type="submit" disabled={popupStatus === "loading"} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white py-3 rounded-full font-medium transition-colors disabled:opacity-60">
+                    {popupStatus === "loading" ? t("home.subscribing") : t("home.subscribe")}
+                  </button>
+                  {popupStatus === "error" && (
+                    <p className="text-red-500 text-sm mt-2">{popupMessage}</p>
+                  )}
+                </form>
+              )}
+              <button onClick={() => setShowNewsletter(false)} className="text-xs text-[#b07a87] mt-3 hover:text-[#2d2d2d] block mx-auto">{t("home.noThanks")}</button>
             </div>
           </div>
         </div>

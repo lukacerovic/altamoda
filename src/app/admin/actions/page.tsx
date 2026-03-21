@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Plus, X, Search, Edit3, Trash2, Zap, Tag, Calendar,
   ChevronDown, ChevronRight, Check, Package, Percent,
@@ -77,13 +78,15 @@ const initialActions: SaleAction[] = [
   },
 ];
 
-const brands = ["L'Oréal", "Schwarzkopf", "Kérastase", "Wella", "Moroccanoil", "Olaplex", "Matrix"];
-const categoriesList = ["Nega kose", "Boje za kosu", "Styling", "Ulja i serumi", "Aparati"];
-const badgeOptions = ["AKCIJA", "-10%", "-15%", "-20%", "-25%", "-30%", "NOVO", "RASPRODAJA", "SPECIJALNO"];
-
 // ─── Component ───
 
 export default function ActionsPage() {
+  const { t } = useLanguage();
+
+  const brands = ["L'Oréal", "Schwarzkopf", "Kérastase", "Wella", "Moroccanoil", "Olaplex", "Matrix"];
+  const categoriesList = ["Nega kose", "Boje za kosu", "Styling", "Ulja i serumi", "Aparati"];
+  const badgeOptions = ["AKCIJA", "-10%", "-15%", "-20%", "-25%", "-30%", "NOVO", "RASPRODAJA", "SPECIJALNO"];
+
   const [actions, setActions] = useState<SaleAction[]>(initialActions);
   const [showPanel, setShowPanel] = useState(false);
   const [editingAction, setEditingAction] = useState<SaleAction | null>(null);
@@ -127,10 +130,10 @@ export default function ActionsPage() {
     const now = new Date();
     const start = new Date(a.startDate);
     const end = new Date(a.endDate);
-    if (!a.isActive) return { label: "Neaktivna", color: "bg-gray-100 text-gray-500" };
-    if (end < now) return { label: "Istekla", color: "bg-red-100 text-red-600" };
-    if (start > now) return { label: "Zakazana", color: "bg-blue-100 text-blue-600" };
-    return { label: "Aktivna", color: "bg-emerald-100 text-emerald-700" };
+    if (!a.isActive) return { label: t("admin.inactive"), color: "bg-gray-100 text-gray-500" };
+    if (end < now) return { label: t("admin.expired"), color: "bg-red-100 text-red-600" };
+    if (start > now) return { label: t("admin.scheduled"), color: "bg-blue-100 text-blue-600" };
+    return { label: t("admin.active"), color: "bg-emerald-100 text-emerald-700" };
   };
 
   const calcDiscountedPrice = (original: number) => {
@@ -173,7 +176,7 @@ export default function ActionsPage() {
       type: form.type,
       value: Number(form.value),
       target: form.target,
-      targetLabel: form.target === "all" ? "Svi proizvodi" : form.targetValue,
+      targetLabel: form.target === "all" ? t("admin.allProducts") : form.targetValue,
       audience: form.audience,
       badge: form.badge,
       startDate: form.startDate,
@@ -229,65 +232,65 @@ export default function ActionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-[#2d2d2d]">Akcije i Popusti</h1>
-          <p className="text-sm text-[#666] mt-1">Upravljajte akcijama, popustima i promocijama</p>
+          <h1 className="text-2xl font-serif font-bold text-black">{t("admin.actionsAndDiscounts")}</h1>
+          <p className="text-sm text-[#666] mt-1">{t("admin.manageActionsDesc")}</p>
         </div>
-        <button onClick={openCreate} className="btn-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 self-start">
-          <Plus size={18} /> Nova Akcija
+        <button onClick={openCreate} className="btn-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
+          <Plus size={18} /> {t("admin.newAction")}
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#faf7f2] flex items-center justify-center"><Zap size={20} className="text-[#8c4a5a]" /></div>
+            <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-secondary" /></div>
             <div>
-              <p className="text-xs text-[#999]">Ukupno akcija</p>
-              <p className="text-xl font-bold text-[#2d2d2d]">{actions.length}</p>
+              <p className="text-xs text-[#999]">{t("admin.totalActions")}</p>
+              <p className="text-xl font-bold text-black">{actions.length}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+        <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center"><Check size={20} className="text-emerald-600" /></div>
+            <div className="w-10 h-10 rounded-sm bg-emerald-50 flex items-center justify-center"><Check size={20} className="text-emerald-600" /></div>
             <div>
-              <p className="text-xs text-[#999]">Aktivne</p>
-              <p className="text-xl font-bold text-[#2d2d2d]">{activeCount}</p>
+              <p className="text-xs text-[#999]">{t("admin.activeActions")}</p>
+              <p className="text-xl font-bold text-black">{activeCount}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+        <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center"><Calendar size={20} className="text-blue-600" /></div>
+            <div className="w-10 h-10 rounded-sm bg-blue-50 flex items-center justify-center"><Calendar size={20} className="text-blue-600" /></div>
             <div>
-              <p className="text-xs text-[#999]">Zakazane</p>
-              <p className="text-xl font-bold text-[#2d2d2d]">{scheduledCount}</p>
+              <p className="text-xs text-[#999]">{t("admin.scheduledActions")}</p>
+              <p className="text-xl font-bold text-black">{scheduledCount}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+        <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center"><Package size={20} className="text-purple-600" /></div>
+            <div className="w-10 h-10 rounded-sm bg-purple-50 flex items-center justify-center"><Package size={20} className="text-purple-600" /></div>
             <div>
-              <p className="text-xs text-[#999]">Proizvoda na akciji</p>
-              <p className="text-xl font-bold text-[#2d2d2d]">{totalProducts}</p>
+              <p className="text-xs text-[#999]">{t("admin.productsOnSale")}</p>
+              <p className="text-xl font-bold text-black">{totalProducts}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-white rounded-xl border border-[#e0d8cc] p-4">
+      <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
-            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Pretraži akcije..." className="w-full pl-10 pr-4 py-2.5 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]" />
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t("admin.searchActions")} className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black" />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(["all", "active", "scheduled", "inactive"] as const).map(s => (
-              <button key={s} onClick={() => setStatusFilter(s)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === s ? "bg-[#8c4a5a] text-white" : "bg-[#f5f0e8] text-[#666] hover:bg-[#e0d8cc]"}`}>
-                {s === "all" ? "Sve" : s === "active" ? "Aktivne" : s === "scheduled" ? "Zakazane" : "Neaktivne"}
+              <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 sm:px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-black text-white" : "bg-stone-100 text-[#666] hover:bg-[#c4c7c7]"}`}>
+                {s === "all" ? t("admin.all") : s === "active" ? t("admin.active") : s === "scheduled" ? t("admin.scheduled") : t("admin.inactive")}
               </button>
             ))}
           </div>
@@ -299,44 +302,44 @@ export default function ActionsPage() {
         {filtered.map(action => {
           const status = getStatus(action);
           return (
-            <div key={action.id} className="bg-white rounded-xl border border-[#e0d8cc] p-5 hover:shadow-sm transition-shadow">
+            <div key={action.id} className="bg-white rounded-sm border border-stone-200 p-5 hover:shadow-sm transition-shadow">
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 {/* Left: Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-base font-semibold text-[#2d2d2d] truncate">{action.name}</h3>
+                    <h3 className="text-base font-semibold text-black truncate">{action.name}</h3>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}>{status.label}</span>
                     {action.badge && (
-                      <span className="px-2 py-0.5 rounded bg-[#8c4a5a] text-white text-xs font-bold">{action.badge}</span>
+                      <span className="px-2 py-0.5 rounded bg-black text-white text-xs font-bold">{action.badge}</span>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-[#666]">
                     <span className="flex items-center gap-1">
-                      {action.type === "percentage" && <><Percent size={14} /> {action.value}% popust</>}
+                      {action.type === "percentage" && <><Percent size={14} /> {action.value}% {t("admin.discount")}</>}
                       {action.type === "fixed" && <><Tag size={14} /> -{action.value} RSD</>}
-                      {action.type === "price" && <><Tag size={14} /> Fiksna cena: {action.value} RSD</>}
+                      {action.type === "price" && <><Tag size={14} /> {t("admin.fixedPrice")} {action.value} RSD</>}
                     </span>
                     <span className="flex items-center gap-1">
                       <ShoppingBag size={14} />
-                      {action.target === "all" ? "Svi proizvodi" : action.target === "brand" ? `Brend: ${action.targetLabel}` : action.target === "category" ? `Kategorija: ${action.targetLabel}` : action.targetLabel}
+                      {action.target === "all" ? t("admin.allProducts") : action.target === "brand" ? `${t("admin.brandTarget")} ${action.targetLabel}` : action.target === "category" ? `${t("admin.categoryTarget")} ${action.targetLabel}` : action.targetLabel}
                     </span>
-                    <span className="flex items-center gap-1"><Package size={14} /> {action.products.length} proizvoda</span>
+                    <span className="flex items-center gap-1"><Package size={14} /> {action.products.length} {t("admin.productsCount")}</span>
                     <span className="flex items-center gap-1"><Calendar size={14} /> {action.startDate} → {action.endDate}</span>
                     {action.audience !== "all" && (
-                      <span className="flex items-center gap-1"><Users size={14} /> {action.audience === "b2b" ? "Samo B2B" : "Samo B2C"}</span>
+                      <span className="flex items-center gap-1"><Users size={14} /> {action.audience === "b2b" ? t("admin.b2bOnly") : t("admin.b2cOnly")}</span>
                     )}
                   </div>
                 </div>
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button onClick={() => toggleActive(action.id)} className={`p-2 rounded-lg transition-colors ${action.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-50"}`} title={action.isActive ? "Deaktiviraj" : "Aktiviraj"}>
+                  <button onClick={() => toggleActive(action.id)} className={`p-2 rounded-sm transition-colors ${action.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-50"}`} title={action.isActive ? t("admin.deactivate") : t("admin.activate")}>
                     {action.isActive ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
-                  <button onClick={() => openEdit(action)} className="p-2 text-[#999] hover:text-[#8c4a5a] hover:bg-[#8c4a5a]/10 rounded-lg transition-colors">
+                  <button onClick={() => openEdit(action)} className="p-2 text-[#999] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
                     <Edit3 size={18} />
                   </button>
-                  <button onClick={() => deleteAction(action.id)} className="p-2 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                  <button onClick={() => deleteAction(action.id)} className="p-2 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -353,12 +356,12 @@ export default function ActionsPage() {
                           ? Math.max(0, p.originalPrice - action.value)
                           : action.value;
                       return (
-                        <div key={p.id} className="flex items-center gap-2 bg-[#f5f0e8] rounded-lg px-3 py-2">
+                        <div key={p.id} className="flex items-center gap-2 bg-stone-100 rounded-sm px-3 py-2">
                           <div className="w-8 h-8 bg-white rounded flex items-center justify-center"><Package size={14} className="text-[#999]" /></div>
                           <div>
-                            <p className="text-xs font-medium text-[#2d2d2d] truncate max-w-[150px]">{p.name}</p>
+                            <p className="text-xs font-medium text-black truncate max-w-[150px]">{p.name}</p>
                             <div className="flex items-center gap-1.5">
-                              <span className="text-xs font-bold text-[#8c4a5a]">{discounted.toLocaleString()} RSD</span>
+                              <span className="text-xs font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
                               <span className="text-[10px] text-[#999] line-through">{p.originalPrice.toLocaleString()} RSD</span>
                             </div>
                           </div>
@@ -366,7 +369,7 @@ export default function ActionsPage() {
                       );
                     })}
                     {action.products.length > 5 && (
-                      <div className="flex items-center px-3 py-2 text-xs text-[#8c4a5a] font-medium">
+                      <div className="flex items-center px-3 py-2 text-xs text-secondary font-medium">
                         +{action.products.length - 5} više
                       </div>
                     )}
@@ -378,11 +381,11 @@ export default function ActionsPage() {
         })}
 
         {filtered.length === 0 && (
-          <div className="bg-white rounded-xl border border-[#e0d8cc] p-12 text-center">
+          <div className="bg-white rounded-sm border border-stone-200 p-12 text-center">
             <Zap size={48} className="text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-[#2d2d2d] mb-2">Nema akcija</h3>
-            <p className="text-sm text-[#666] mb-4">Kreirajte novu akciju da biste dodelili popuste proizvodima.</p>
-            <button onClick={openCreate} className="btn-gold px-5 py-2.5 rounded-lg text-sm">Nova Akcija</button>
+            <h3 className="text-lg font-semibold text-black mb-2">{t("admin.noActions")}</h3>
+            <p className="text-sm text-[#666] mb-4">{t("admin.createActionDesc")}</p>
+            <button onClick={openCreate} className="btn-gold px-5 py-2.5 rounded-sm text-sm">{t("admin.newAction")}</button>
           </div>
         )}
       </div>
@@ -393,11 +396,11 @@ export default function ActionsPage() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowPanel(false)} />
           <div className="relative w-full max-w-2xl bg-white shadow-2xl flex flex-col animate-slideInRight">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-[#e0d8cc] flex items-center justify-between flex-shrink-0">
-              <h2 className="text-lg font-serif font-bold text-[#2d2d2d]">
-                {editingAction ? "Izmeni Akciju" : "Nova Akcija"}
+            <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between flex-shrink-0">
+              <h2 className="text-lg font-serif font-bold text-black">
+                {editingAction ? t("admin.editAction") : t("admin.newAction")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-1 text-[#999] hover:text-[#2d2d2d]"><X size={20} /></button>
+              <button onClick={() => setShowPanel(false)} className="p-1 text-[#999] hover:text-black"><X size={20} /></button>
             </div>
 
             {/* Body */}
@@ -405,45 +408,45 @@ export default function ActionsPage() {
 
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1.5">Naziv akcije</label>
-                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" placeholder="npr. Prolećna Akcija -20%" />
+                <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.actionName")}</label>
+                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" placeholder="npr. Prolećna Akcija -20%" />
               </div>
 
               {/* Type & Value */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Tip popusta</label>
-                  <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as typeof form.type })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm">
-                    <option value="percentage">Procenat (%)</option>
-                    <option value="fixed">Fiksni iznos (RSD)</option>
-                    <option value="price">Nova fiksna cena (RSD)</option>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.discountType")}</label>
+                  <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as typeof form.type })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
+                    <option value="percentage">{t("admin.percentage")}</option>
+                    <option value="fixed">{t("admin.fixedAmount")}</option>
+                    <option value="price">{t("admin.newFixedPrice")}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
-                    {form.type === "percentage" ? "Procenat popusta (%)" : form.type === "fixed" ? "Iznos popusta (RSD)" : "Nova cena (RSD)"}
+                    {form.type === "percentage" ? t("admin.percentDiscount") : form.type === "fixed" ? t("admin.amountDiscount") : t("admin.newPrice")}
                   </label>
-                  <input type="number" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" placeholder="0" />
+                  <input type="number" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" placeholder="0" />
                 </div>
               </div>
 
               {/* Target & Audience */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Primeni na</label>
-                  <select value={form.target} onChange={e => handleTargetChange(e.target.value, "")} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm">
-                    <option value="product">Pojedinačne proizvode</option>
-                    <option value="category">Celu kategoriju</option>
-                    <option value="brand">Ceo brend</option>
-                    <option value="all">Sve proizvode</option>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.applyTo")}</label>
+                  <select value={form.target} onChange={e => handleTargetChange(e.target.value, "")} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
+                    <option value="product">{t("admin.individualProducts")}</option>
+                    <option value="category">{t("admin.entireCategory")}</option>
+                    <option value="brand">{t("admin.entireBrand")}</option>
+                    <option value="all">{t("admin.allProductsTarget")}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Ciljna publika</label>
-                  <select value={form.audience} onChange={e => setForm({ ...form, audience: e.target.value as typeof form.audience })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm">
-                    <option value="all">Svi korisnici</option>
-                    <option value="b2b">Samo B2B (saloni)</option>
-                    <option value="b2c">Samo B2C (kupci)</option>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.targetAudience")}</label>
+                  <select value={form.audience} onChange={e => setForm({ ...form, audience: e.target.value as typeof form.audience })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
+                    <option value="all">{t("admin.allUsers")}</option>
+                    <option value="b2b">{t("admin.b2bOnlySalons")}</option>
+                    <option value="b2c">{t("admin.b2cOnlyBuyers")}</option>
                   </select>
                 </div>
               </div>
@@ -451,38 +454,38 @@ export default function ActionsPage() {
               {/* Target Value (brand or category select) */}
               {form.target === "brand" && (
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Izaberite brend</label>
-                  <select value={form.targetValue} onChange={e => handleTargetChange("brand", e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm">
-                    <option value="">-- Izaberite --</option>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.selectBrand")}</label>
+                  <select value={form.targetValue} onChange={e => handleTargetChange("brand", e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
+                    <option value="">{t("admin.selectOption")}</option>
                     {brands.map(b => <option key={b} value={b}>{b}</option>)}
                   </select>
                 </div>
               )}
               {form.target === "category" && (
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Izaberite kategoriju</label>
-                  <select value={form.targetValue} onChange={e => handleTargetChange("category", e.target.value)} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm">
-                    <option value="">-- Izaberite --</option>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.selectCategory")}</label>
+                  <select value={form.targetValue} onChange={e => handleTargetChange("category", e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
+                    <option value="">{t("admin.selectOption")}</option>
                     {categoriesList.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
               )}
 
               {/* Badge & Dates */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Badge/Oznaka</label>
-                  <select value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm">
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.badge")}</label>
+                  <select value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     {badgeOptions.map(b => <option key={b} value={b}>{b}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Datum početka</label>
-                  <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.startDate")}</label>
+                  <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">Datum kraja</label>
-                  <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} className="w-full px-4 py-2.5 border border-[#e0d8cc] rounded-lg text-sm" />
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.endDate")}</label>
+                  <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" />
                 </div>
               </div>
 
@@ -490,41 +493,41 @@ export default function ActionsPage() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium text-[#333]">
-                    Proizvodi ({form.selectedProductIds.length} izabrano)
+                    {`${t("admin.productsSelected")} (${form.selectedProductIds.length})`}
                   </label>
                   {form.target !== "product" && (
-                    <span className="text-xs text-[#8c4a5a]">Auto-selektovano po {form.target === "brand" ? "brendu" : form.target === "category" ? "kategoriji" : "svim"}</span>
+                    <span className="text-xs text-secondary">{t("admin.autoSelectedByScope")}</span>
                   )}
                 </div>
                 <div className="relative mb-3">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
-                  <input type="text" value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Pretraži proizvode..." className="w-full pl-9 pr-4 py-2 bg-[#f5f0e8] border border-transparent rounded-lg text-sm focus:bg-white focus:border-[#8c4a5a]" />
+                  <input type="text" value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder={t("admin.searchProductsList")} className="w-full pl-9 pr-4 py-2 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black" />
                 </div>
-                <div className="max-h-64 overflow-y-auto border border-[#e0d8cc] rounded-lg divide-y divide-[#f0f0f0]">
+                <div className="max-h-64 overflow-y-auto border border-stone-200 rounded-sm divide-y divide-[#f0f0f0]">
                   {filteredProducts.map(p => {
                     const selected = form.selectedProductIds.includes(p.id);
                     const discounted = calcDiscountedPrice(p.originalPrice);
                     return (
-                      <label key={p.id} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#f5f0e8] transition-colors ${selected ? "bg-[#faf7f2]" : ""}`}>
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? "bg-[#8c4a5a] border-[#8c4a5a]" : "border-gray-300"}`}>
+                      <label key={p.id} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-stone-100 transition-colors ${selected ? "bg-stone-50" : ""}`}>
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? "bg-black border-black" : "border-gray-300"}`}>
                           {selected && <Check size={12} className="text-white" />}
                         </div>
                         <input type="checkbox" checked={selected} onChange={() => toggleProduct(p.id)} className="sr-only" />
-                        <div className="w-8 h-8 bg-[#f5f0e8] rounded flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0">
                           <Package size={14} className="text-[#999]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-[#2d2d2d] truncate">{p.name}</p>
+                          <p className="text-sm text-black truncate">{p.name}</p>
                           <p className="text-xs text-[#999]">{p.brand} · {p.category}</p>
                         </div>
                         <div className="text-right flex-shrink-0">
                           {form.value && Number(form.value) > 0 ? (
                             <>
-                              <p className="text-sm font-bold text-[#8c4a5a]">{discounted.toLocaleString()} RSD</p>
+                              <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
                               <p className="text-[10px] text-[#999] line-through">{p.originalPrice.toLocaleString()} RSD</p>
                             </>
                           ) : (
-                            <p className="text-sm text-[#2d2d2d]">{p.originalPrice.toLocaleString()} RSD</p>
+                            <p className="text-sm text-black">{p.originalPrice.toLocaleString()} RSD</p>
                           )}
                         </div>
                       </label>
@@ -535,23 +538,23 @@ export default function ActionsPage() {
 
               {/* Preview */}
               {form.value && Number(form.value) > 0 && form.selectedProductIds.length > 0 && (
-                <div className="bg-[#faf7f2] rounded-xl p-4">
-                  <h4 className="text-sm font-semibold text-[#2d2d2d] mb-3 flex items-center gap-2"><Eye size={16} /> Pregled akcije na sajtu</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="bg-stone-50 rounded-sm p-4">
+                  <h4 className="text-sm font-semibold text-black mb-3 flex items-center gap-2"><Eye size={16} /> {t("admin.actionPreview")}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {allProducts.filter(p => form.selectedProductIds.includes(p.id)).slice(0, 4).map(p => {
                       const discounted = calcDiscountedPrice(p.originalPrice);
                       const pct = Math.round((1 - discounted / p.originalPrice) * 100);
                       return (
-                        <div key={p.id} className="bg-white rounded-lg p-3 relative">
+                        <div key={p.id} className="bg-white rounded-sm p-3 relative">
                           {pct > 0 && (
-                            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-[#8c4a5a] text-white text-[10px] font-bold rounded">-{pct}%</span>
+                            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-black text-white text-[10px] font-bold rounded">-{pct}%</span>
                           )}
-                          <div className="w-full h-16 bg-[#f5f0e8] rounded mb-2 flex items-center justify-center">
+                          <div className="w-full h-16 bg-stone-100 rounded mb-2 flex items-center justify-center">
                             <Package size={20} className="text-[#ccc]" />
                           </div>
-                          <p className="text-xs text-[#2d2d2d] truncate">{p.name}</p>
+                          <p className="text-xs text-black truncate">{p.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-sm font-bold text-[#8c4a5a]">{discounted.toLocaleString()} RSD</span>
+                            <span className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
                             <span className="text-[10px] text-[#999] line-through">{p.originalPrice.toLocaleString()} RSD</span>
                           </div>
                         </div>
@@ -563,10 +566,10 @@ export default function ActionsPage() {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-[#e0d8cc] flex items-center justify-end gap-3 flex-shrink-0">
-              <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-lg text-sm font-medium text-[#666] hover:bg-[#f5f0e8] transition-colors">Otkaži</button>
-              <button onClick={handleSave} disabled={!form.name || !form.value || form.selectedProductIds.length === 0} className="btn-gold px-5 py-2.5 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                {editingAction ? "Sačuvaj Izmene" : "Kreiraj Akciju"}
+            <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-end gap-3 flex-shrink-0">
+              <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
+              <button onClick={handleSave} disabled={!form.name || !form.value || form.selectedProductIds.length === 0} className="btn-gold px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                {editingAction ? t("admin.saveChanges") : t("admin.createAction")}
               </button>
             </div>
           </div>

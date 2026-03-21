@@ -22,8 +22,14 @@ export const GET = withErrorHandler(async (req: Request) => {
   const isNew = searchParams.get('isNew')
   const onSale = searchParams.get('onSale')
   const isFeatured = searchParams.get('isFeatured')
+  const isBestseller = searchParams.get('isBestseller')
   // Guest tab filter: 'all' | 'b2c' | 'b2b'
   const visibility = searchParams.get('visibility') || 'all'
+
+  // Color filters
+  const colorLevel = searchParams.get('colorLevel')
+  const colorUndertone = searchParams.get('colorUndertone')
+  const hasColor = searchParams.get('hasColor')
 
   // Build where clause
   const where: Prisma.ProductWhereInput = {
@@ -84,6 +90,7 @@ export const GET = withErrorHandler(async (req: Request) => {
   if (isNew === 'true') where.isNew = true
   if (onSale === 'true') where.oldPrice = { not: null }
   if (isFeatured === 'true') where.isFeatured = true
+  if (isBestseller === 'true') where.isBestseller = true
 
   // Search
   if (search) {
@@ -92,6 +99,23 @@ export const GET = withErrorHandler(async (req: Request) => {
       { sku: { contains: search, mode: 'insensitive' } },
       { brand: { name: { contains: search, mode: 'insensitive' } } },
     ]
+  }
+
+  // Color filters
+  if (hasColor === 'true') {
+    where.colorProduct = { isNot: null }
+  }
+  if (colorLevel) {
+    where.colorProduct = {
+      ...((where.colorProduct as object) || {}),
+      colorLevel: Number(colorLevel),
+    }
+  }
+  if (colorUndertone) {
+    where.colorProduct = {
+      ...((where.colorProduct as object) || {}),
+      undertoneCode: colorUndertone,
+    }
   }
 
   // Dynamic attribute filters: attr_bez-sulfata=true
@@ -163,6 +187,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     isProfessional: p.isProfessional,
     isNew: p.isNew,
     isFeatured: p.isFeatured,
+    isBestseller: p.isBestseller,
     stockQuantity: p.stockQuantity,
     rating: ratingMap.get(p.id) || 0,
     reviewCount: p._count.reviews,
@@ -221,6 +246,7 @@ export const POST = withErrorHandler(async (req: Request) => {
       isProfessional: body.isProfessional || false,
       isNew: body.isNew || false,
       isFeatured: body.isFeatured || false,
+      isBestseller: body.isBestseller || false,
       seoTitle: body.seoTitle,
       seoDescription: body.seoDescription,
     },
@@ -231,8 +257,8 @@ export const POST = withErrorHandler(async (req: Request) => {
     },
   })
 
-  // Create color product if provided
-  if (body.colorLevel) {
+  // Create color product if provided with a valid level
+  if (body.colorLevel && typeof body.colorLevel === 'number' && body.colorLevel >= 1 && body.colorLevel <= 10) {
     await prisma.colorProduct.create({
       data: {
         productId: product.id,

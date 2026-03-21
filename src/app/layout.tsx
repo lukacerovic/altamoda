@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import AuthProvider from "@/components/providers/AuthProvider";
 import CartProvider from "@/components/providers/CartProvider";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,10 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sr">
-      <body className="antialiased" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-        <AuthProvider>
-          <CartProvider>{children}</CartProvider>
-        </AuthProvider>
+      <body className="bg-surface font-body text-on-surface antialiased">
+        <LanguageProvider>
+          <AuthProvider>
+            <CartProvider>{children}</CartProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { MessageCircle, X, Minus, Send, Sparkles } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface ChatMessage {
   id: number;
@@ -9,26 +10,27 @@ interface ChatMessage {
   sender: "user" | "bot";
 }
 
-const mockResponses = [
-  "Hvala vam na pitanju! Na osnovu vaših potreba, preporučujem L'Oreal Majirel liniju boja za kosu. Izuzetno je kvalitetna i daje dugotrajne rezultate. Možete pogledati celu kolekciju u sekciji Boje za kosu.",
-  "Vaša porudžbina je trenutno u procesu obrade. Očekivana isporuka je u roku od 2-3 radna dana. Za detaljnije informacije, možete proveriti status u sekciji Moj Nalog.",
-  "Dostava je besplatna za sve porudžbine iznad 5.000 RSD. Za porudžbine ispod tog iznosa, cena dostave je 350 RSD. Isporuka se vrši putem kurirske službe u roku od 1-3 radna dana.",
-];
-
-const quickReplies = [
-  "Preporuči proizvod",
-  "Status porudžbine",
-  "Dostava info",
-  "Razgovor sa agentom",
-];
-
 export default function ChatWidget() {
+  const { t } = useLanguage();
+
+  const mockResponses = useMemo(() => [
+    t("chat.response1"),
+    t("chat.response2"),
+    t("chat.response3"),
+  ], [t]);
+
+  const quickReplies = useMemo(() => [
+    t("chat.quickReply1"),
+    t("chat.quickReply2"),
+    t("chat.quickReply3"),
+    t("chat.quickReply4"),
+  ], [t]);
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
-      text: "Zdravo! \u{1F44B} Kako vam mogu pomoći? Pitajte me o proizvodima, dostavi, ili bilo čemu drugom.",
+      text: "",
       sender: "bot",
     },
   ]);
@@ -40,6 +42,16 @@ export default function ChatWidget() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      if (updated.length > 0 && updated[0].id === 1) {
+        updated[0] = { ...updated[0], text: t("chat.welcomeMessage") };
+      }
+      return updated;
+    });
+  }, [t]);
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -53,7 +65,6 @@ export default function ChatWidget() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response after delay
     setTimeout(() => {
       const botMsg: ChatMessage = {
         id: Date.now() + 1,
@@ -79,10 +90,10 @@ export default function ChatWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 w-14 h-14 bg-[#2d2d2d] hover:bg-[#4a4a4a] text-white rounded-full flex items-center justify-center z-40 transition-all hover:scale-110 animate-pulse-accent"
-        aria-label="Otvorite chat"
+        className="fixed bottom-6 left-6 w-12 h-12 bg-black hover:bg-stone-800 text-white rounded-sm flex items-center justify-center z-40 transition-all hover:scale-105"
+        aria-label={t("chat.openChat")}
       >
-        <MessageCircle className="w-6 h-6" />
+        <MessageCircle className="w-5 h-5" />
       </button>
     );
   }
@@ -91,10 +102,10 @@ export default function ChatWidget() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 left-6 w-14 h-14 bg-[#2d2d2d] hover:bg-[#4a4a4a] text-white rounded-full flex items-center justify-center z-40 transition-all hover:scale-110"
-        aria-label="Otvorite chat"
+        className="fixed bottom-6 left-6 w-12 h-12 bg-black hover:bg-stone-800 text-white rounded-sm flex items-center justify-center z-40 transition-all hover:scale-105"
+        aria-label={t("chat.openChat")}
       >
-        <MessageCircle className="w-6 h-6" />
+        <MessageCircle className="w-5 h-5" />
       </button>
     );
   }
@@ -106,33 +117,33 @@ export default function ChatWidget() {
         animation: "slideUp 0.3s ease-out forwards",
       }}
     >
-      <div className="w-[350px] h-[500px] bg-white rounded-2xl flex flex-col overflow-hidden border border-[#e0d8cc]">
+      <div className="w-[350px] h-[500px] bg-white rounded-sm flex flex-col overflow-hidden border border-stone-200 shadow-xl">
         {/* Header */}
-        <div className="bg-[#2d2d2d] px-4 py-3 flex items-center justify-between flex-shrink-0">
+        <div className="bg-black px-4 py-3 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#8c4a5a]/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#b07a87]" />
+            <div className="w-9 h-9 rounded-sm bg-white/10 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-amber-400" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-white font-medium text-sm">Alta Moda Asistent</span>
-                <span className="px-1.5 py-0.5 text-[10px] bg-[#8c4a5a] text-white rounded font-medium">
+                <span className="text-white font-medium text-sm">{t("chat.assistantName")}</span>
+                <span className="px-1.5 py-0.5 text-[9px] bg-secondary text-white rounded-sm font-bold tracking-wider uppercase">
                   AI
                 </span>
               </div>
-              <span className="text-white/50 text-xs">Online</span>
+              <span className="text-white/50 text-xs">{t("chat.online")}</span>
             </div>
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setIsMinimized(true)}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors"
+              className="p-1.5 hover:bg-white/10 rounded-sm transition-colors"
             >
               <Minus className="w-4 h-4 text-white/70" />
             </button>
             <button
               onClick={() => setIsOpen(false)}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors"
+              className="p-1.5 hover:bg-white/10 rounded-sm transition-colors"
             >
               <X className="w-4 h-4 text-white/70" />
             </button>
@@ -140,17 +151,17 @@ export default function ChatWidget() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f5f0e8]">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-stone-50">
           {messages.map((msg) => (
             <div
               key={msg.id}
               className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed ${
                   msg.sender === "user"
-                    ? "bg-[#8c4a5a] text-white rounded-br-sm"
-                    : "bg-white text-[#2d2d2d] border border-[#e0d8cc] rounded-bl-sm"
+                    ? "bg-black text-white rounded-sm rounded-br-none"
+                    : "bg-white text-stone-900 border border-stone-200 rounded-sm rounded-bl-none"
                 }`}
               >
                 {msg.text}
@@ -159,25 +170,24 @@ export default function ChatWidget() {
           ))}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white text-[#6b6b6b] px-4 py-3 rounded-2xl rounded-bl-sm border border-[#e0d8cc]">
+              <div className="bg-white text-stone-500 px-4 py-3 rounded-sm rounded-bl-none border border-stone-200">
                 <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-[#b07a87] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-2 h-2 bg-[#b07a87] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-2 h-2 bg-[#b07a87] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
           )}
           <div ref={messagesEndRef} />
 
-          {/* Quick replies - show only when there's just the welcome message */}
           {messages.length === 1 && (
             <div className="flex flex-wrap gap-2">
               {quickReplies.map((reply) => (
                 <button
                   key={reply}
                   onClick={() => handleQuickReply(reply)}
-                  className="px-3 py-1.5 text-xs font-medium border border-[#8c4a5a] text-[#8c4a5a] rounded-full hover:bg-[#8c4a5a] hover:text-white transition-colors"
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border border-stone-300 text-stone-600 rounded-sm hover:bg-black hover:text-white hover:border-black transition-colors"
                 >
                   {reply}
                 </button>
@@ -189,19 +199,19 @@ export default function ChatWidget() {
         {/* Input */}
         <form
           onSubmit={handleSubmit}
-          className="flex items-center gap-2 p-3 border-t border-[#e0d8cc] bg-white flex-shrink-0"
+          className="flex items-center gap-2 p-3 border-t border-stone-200 bg-white flex-shrink-0"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Unesite poruku..."
-            className="flex-1 bg-[#f5f0e8] border-0 rounded-full px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#8c4a5a] placeholder-[#b07a87]"
+            placeholder={t("chat.inputPlaceholder")}
+            className="flex-1 bg-stone-50 border border-stone-200 rounded-sm px-4 py-2.5 text-sm focus:ring-1 focus:ring-black focus:border-black placeholder-stone-400"
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="w-10 h-10 bg-[#8c4a5a] hover:bg-[#6e3848] disabled:bg-[#e0d8cc] disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+            className="w-10 h-10 bg-black hover:bg-stone-800 disabled:bg-stone-200 disabled:cursor-not-allowed text-white rounded-sm flex items-center justify-center transition-colors flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </button>
