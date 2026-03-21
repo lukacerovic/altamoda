@@ -324,7 +324,7 @@ export default function BundlesPage() {
                 )}
               </div>
               {/* Price */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.bundlePrice")}</label>
                   <input type="number" value={form.bundlePrice} onChange={(e) => handlePriceChange(e.target.value)} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
@@ -350,7 +350,7 @@ export default function BundlesPage() {
                 </div>
               </div>
               {/* Dates and Target */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.validFrom")}</label>
                   <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />

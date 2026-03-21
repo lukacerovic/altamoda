@@ -282,7 +282,7 @@ export default function AdminLayout({
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden animate-slideDown">
+                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden animate-slideDown">
                   <div className="p-4 border-b border-stone-200">
                     <h3 className="font-semibold text-sm text-black">{t("admin.notifications")}</h3>
                   </div>

@@ -430,16 +430,16 @@ export default function OrdersPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
-            <span className="text-sm text-[#666]">
-              {t("admin.showing")} {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
+          <div className="px-4 sm:px-6 py-4 border-t border-stone-200 flex items-center justify-between gap-2">
+            <span className="text-xs sm:text-sm text-[#666] whitespace-nowrap">
+              {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} / {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="p-2 rounded-sm text-[#666] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronLeft size={18} />
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#666] hover:bg-stone-100"}`}>
+                <button key={page} onClick={() => setCurrentPage(page)} className={`w-8 h-8 sm:w-9 sm:h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#666] hover:bg-stone-100"}`}>
                   {page}
                 </button>
               ))}

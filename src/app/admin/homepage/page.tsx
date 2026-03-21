@@ -224,7 +224,7 @@ export default function HomepagePage() {
                         {!section.readOnly && (
                           <button
                             onClick={() => removeProduct(section.key, product.id, section.flagField)}
-                            className="p-1 text-[#999] hover:text-red-500 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                            className="p-1 text-[#999] hover:text-red-500 hover:bg-red-50 rounded sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
                             title={t("admin.removeFromSection")}
                           >
                             <X size={16} />

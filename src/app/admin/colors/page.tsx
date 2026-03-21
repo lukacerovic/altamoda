@@ -216,7 +216,7 @@ export default function AdminColorsPage() {
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: t("admin.totalColors"), value: totalColors, icon: Palette, color: "text-secondary" },
           { label: t("admin.brandLines"), value: brandLines.length, icon: Package, color: "text-blue-600" },
@@ -265,10 +265,10 @@ export default function AdminColorsPage() {
       </div>
 
       {/* Filters & controls */}
-      <div className="bg-white rounded-sm border border-stone-200 p-4">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
+      <div className="bg-white rounded-sm border border-stone-200 p-4 space-y-3">
+        {/* Search + View toggle row */}
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -279,44 +279,8 @@ export default function AdminColorsPage() {
             />
           </div>
 
-          {/* Level filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-gray-500 uppercase">{t("admin.colorLevel")}</span>
-            <div className="flex gap-1">
-              {ALL_LEVELS.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setFilterLevel(filterLevel === l ? null : l)}
-                  className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
-                    filterLevel === l ? "bg-black text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
-                  }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Undertone filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-gray-500 uppercase">{t("admin.undertone")}</span>
-            <div className="flex gap-1 flex-wrap">
-              {Object.entries(UNDERTONE_MAP).map(([key, val]) => (
-                <button
-                  key={key}
-                  onClick={() => setFilterUndertone(filterUndertone === key ? null : key)}
-                  className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                    filterUndertone === key ? "bg-black text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
-                  }`}
-                >
-                  {val.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* View toggle */}
-          <div className="flex border border-stone-200 rounded-sm overflow-hidden">
+          <div className="flex border border-stone-200 rounded-sm overflow-hidden flex-shrink-0">
             <button
               onClick={() => setViewMode("matrix")}
               className={`p-2 ${viewMode === "matrix" ? "bg-black text-white" : "bg-white text-gray-500 hover:bg-stone-100"}`}
@@ -334,11 +298,47 @@ export default function AdminColorsPage() {
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs text-secondary hover:text-black font-medium flex items-center gap-1"
+              className="text-xs text-secondary hover:text-black font-medium flex items-center gap-1 flex-shrink-0"
             >
               <X size={14} /> {t("admin.clearFilters")}
             </button>
           )}
+        </div>
+
+        {/* Level filter */}
+        <div>
+          <span className="text-xs font-semibold text-gray-500 uppercase mb-1.5 block">{t("admin.colorLevel")}</span>
+          <div className="flex gap-1 flex-wrap">
+            {ALL_LEVELS.map((l) => (
+              <button
+                key={l}
+                onClick={() => setFilterLevel(filterLevel === l ? null : l)}
+                className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
+                  filterLevel === l ? "bg-black text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Undertone filter */}
+        <div>
+          <span className="text-xs font-semibold text-gray-500 uppercase mb-1.5 block">{t("admin.undertone")}</span>
+          <div className="flex gap-1 flex-wrap">
+            {Object.entries(UNDERTONE_MAP).map(([key, val]) => (
+              <button
+                key={key}
+                onClick={() => setFilterUndertone(filterUndertone === key ? null : key)}
+                className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
+                  filterUndertone === key ? "bg-black text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                }`}
+              >
+                {val.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -353,7 +353,47 @@ export default function AdminColorsPage() {
       {/* Matrix View */}
       {viewMode === "matrix" && (
         <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Mobile: card-based layout grouped by level */}
+          <div className="sm:hidden divide-y divide-stone-100">
+            {matrixData.levels.map((level) => (
+              <div key={level} className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-sm font-bold">
+                    {level}
+                  </div>
+                  <span className="text-xs font-semibold text-gray-500 uppercase">{t("admin.level")} {level}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {matrixData.undertones.map((ut) => {
+                    const cellColors = matrixData.map[`${level}-${ut}`] || [];
+                    return cellColors.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelectedColor(selectedColor?.id === c.id ? null : c)}
+                        className="relative"
+                        title={`${c.shadeCode} - ${c.name}`}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-full border-2 transition-all cursor-pointer ${
+                            selectedColor?.id === c.id
+                              ? "border-black ring-2 ring-black/30 scale-110"
+                              : "border-white shadow-sm"
+                          } ${!c.isActive ? "opacity-40" : ""}`}
+                          style={{ backgroundColor: c.hexValue }}
+                        />
+                        <span className="text-[9px] text-gray-400 block mt-0.5 text-center">{c.shadeCode}</span>
+                        {c.stock < 10 && (
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full border border-white" />
+                        )}
+                      </button>
+                    ));
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Desktop: table matrix */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-stone-100">
@@ -420,18 +460,67 @@ export default function AdminColorsPage() {
       {/* List View */}
       {viewMode === "list" && (
         <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
+          {/* Mobile card view */}
+          <div className="sm:hidden divide-y divide-stone-100">
+            {filteredColors.map((c) => (
+              <div key={c.id} className="p-4 hover:bg-stone-50 transition-colors" onClick={() => setSelectedColor(selectedColor?.id === c.id ? null : c)}>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0"
+                    style={{ backgroundColor: c.hexValue }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-black truncate">{c.name}</p>
+                    <p className="text-xs text-gray-500">{c.shadeCode} · L{c.level} · {c.undertoneName}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-medium">{c.priceB2c.toLocaleString("sr-RS")} RSD</p>
+                    <p className={`text-xs ${c.stock < 10 ? "text-orange-500" : "text-gray-400"}`}>{t("admin.stock")}: {c.stock}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-stone-50">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">{c.productLine?.name || "—"}</span>
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                        c.isActive ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"
+                      }`}
+                    >
+                      {c.isActive ? t("admin.active") : t("admin.inactive")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEditModal(c); }}
+                      className="p-1.5 text-gray-400 hover:text-secondary hover:bg-stone-100 rounded transition-colors"
+                    >
+                      <Edit3 size={14} />
+                    </button>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Desktop table view */}
+          <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-stone-100 text-left">
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t("admin.color")}</th>
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t("admin.shadeCode")}</th>
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t("admin.level")}</th>
-                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t("admin.undertone")}</th>
-                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t("admin.colorLine")}</th>
-                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">SKU</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">{t("admin.undertone")}</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">{t("admin.colorLine")}</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden xl:table-cell">SKU</th>
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">{t("admin.priceB2c")}</th>
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">{t("admin.stock")}</th>
-                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">{t("admin.status")}</th>
+                <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center hidden md:table-cell">{t("admin.status")}</th>
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">{t("admin.actions")}</th>
               </tr>
             </thead>
@@ -451,14 +540,14 @@ export default function AdminColorsPage() {
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-stone-100 text-xs font-bold">{c.level}</span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{c.undertoneName}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{c.productLine?.name || "—"}</td>
-                  <td className="px-4 py-3 text-xs font-mono text-gray-400">{c.sku}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">{c.undertoneName}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell">{c.productLine?.name || "—"}</td>
+                  <td className="px-4 py-3 text-xs font-mono text-gray-400 hidden xl:table-cell">{c.sku}</td>
                   <td className="px-4 py-3 text-sm text-right font-medium">{c.priceB2c.toLocaleString("sr-RS")} RSD</td>
                   <td className="px-4 py-3 text-sm text-right">
                     <span className={c.stock < 10 ? "text-orange-500 font-medium" : "text-gray-600"}>{c.stock}</span>
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-4 py-3 text-center hidden md:table-cell">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
                         c.isActive ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"
@@ -488,6 +577,7 @@ export default function AdminColorsPage() {
               ))}
             </tbody>
           </table>
+          </div>
           {filteredColors.length === 0 && (
             <div className="p-12 text-center text-gray-400">
               <Palette size={40} className="mx-auto mb-3 opacity-30" />
@@ -498,8 +588,15 @@ export default function AdminColorsPage() {
       )}
 
       {/* Selected Color Detail Panel */}
+      {/* Backdrop for mobile */}
       {selectedColor && (
-        <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 overflow-y-auto border-l border-stone-200 animate-slideIn">
+        <div
+          className="fixed inset-0 bg-black/40 z-40 sm:hidden"
+          onClick={() => setSelectedColor(null)}
+        />
+      )}
+      {selectedColor && (
+        <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 overflow-y-auto border-l border-stone-200 animate-slideIn">
           <div className="sticky top-0 bg-white border-b border-stone-200 p-4 flex items-center justify-between">
             <h3 className="font-semibold text-black">{t("admin.colorDetails")}</h3>
             <button onClick={() => setSelectedColor(null)} className="text-gray-400 hover:text-gray-600">
@@ -616,7 +713,7 @@ export default function AdminColorsPage() {
               {/* Level */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t("admin.colorLevel")}</label>
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5 flex-wrap">
                   {ALL_LEVELS.map((l) => (
                     <button
                       key={l}

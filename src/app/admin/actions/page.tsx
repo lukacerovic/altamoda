@@ -241,7 +241,7 @@ export default function ActionsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-secondary" /></div>
@@ -287,9 +287,9 @@ export default function ActionsPage() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t("admin.searchActions")} className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black" />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(["all", "active", "scheduled", "inactive"] as const).map(s => (
-              <button key={s} onClick={() => setStatusFilter(s)} className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-black text-white" : "bg-stone-100 text-[#666] hover:bg-[#c4c7c7]"}`}>
+              <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 sm:px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-black text-white" : "bg-stone-100 text-[#666] hover:bg-[#c4c7c7]"}`}>
                 {s === "all" ? t("admin.all") : s === "active" ? t("admin.active") : s === "scheduled" ? t("admin.scheduled") : t("admin.inactive")}
               </button>
             ))}
@@ -413,7 +413,7 @@ export default function ActionsPage() {
               </div>
 
               {/* Type & Value */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.discountType")}</label>
                   <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as typeof form.type })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
@@ -431,7 +431,7 @@ export default function ActionsPage() {
               </div>
 
               {/* Target & Audience */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.applyTo")}</label>
                   <select value={form.target} onChange={e => handleTargetChange(e.target.value, "")} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
@@ -472,7 +472,7 @@ export default function ActionsPage() {
               )}
 
               {/* Badge & Dates */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.badge")}</label>
                   <select value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
@@ -540,7 +540,7 @@ export default function ActionsPage() {
               {form.value && Number(form.value) > 0 && form.selectedProductIds.length > 0 && (
                 <div className="bg-stone-50 rounded-sm p-4">
                   <h4 className="text-sm font-semibold text-black mb-3 flex items-center gap-2"><Eye size={16} /> {t("admin.actionPreview")}</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {allProducts.filter(p => form.selectedProductIds.includes(p.id)).slice(0, 4).map(p => {
                       const discounted = calcDiscountedPrice(p.originalPrice);
                       const pct = Math.round((1 - discounted / p.originalPrice) * 100);

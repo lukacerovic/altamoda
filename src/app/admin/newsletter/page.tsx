@@ -449,20 +449,20 @@ export default function NewsletterPage() {
                       {campaign.sentDate && <span className="text-xs text-[#999]">{campaign.sentDate}</span>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     {campaign.status === "sent" && (
-                      <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-3 sm:gap-6">
                         <div className="text-center">
                           <div className="flex items-center gap-1 text-secondary">
                             <Eye size={14} />
-                            <span className="text-lg font-bold">{campaign.openRate}%</span>
+                            <span className="text-base sm:text-lg font-bold">{campaign.openRate}%</span>
                           </div>
                           <p className="text-xs text-[#999]">{t("newsletter.opened")}</p>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center gap-1 text-secondary">
                             <MousePointer size={14} />
-                            <span className="text-lg font-bold">{campaign.clickRate}%</span>
+                            <span className="text-base sm:text-lg font-bold">{campaign.clickRate}%</span>
                           </div>
                           <p className="text-xs text-[#999]">{t("newsletter.clicked")}</p>
                         </div>
