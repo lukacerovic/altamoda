@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Search, Heart, Star, SlidersHorizontal,
@@ -185,8 +186,8 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
 
   return (
     <Link href={`/products/${product.slug}`} className="group bg-white rounded-sm overflow-hidden border border-transparent hover:border-stone-200 hover:shadow-sm transition-all flex flex-col">
-      <div className="relative aspect-square overflow-hidden bg-[#faf7f3]">
-        <img src={imgSrc} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className="relative aspect-square overflow-hidden bg-white">
+        <img src={imgSrc} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (
             <span className={`px-2.5 py-1 text-[11px] font-semibold rounded-sm ${
@@ -345,6 +346,10 @@ export default function ProductsPageClient({
   availableColorLevels = [],
   availableColorUndertones = [],
 }: ProductsPageClientProps) {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+  const searchParam = searchParams.get("search");
+
   const wishlistedSet = new Set(wishlistedProductIds);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
@@ -354,13 +359,28 @@ export default function ProductsPageClient({
   const [mobileFilter, setMobileFilter] = useState(false);
   const [sortBy, setSortBy] = useState("popular");
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParam || "");
   const [showSearch, setShowSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
   // Filters
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
+
+  // Sync category from URL when navigating between menu links
+  useEffect(() => {
+    setSelectedCategory(categoryParam);
+    setCurrentPage(1);
+  }, [categoryParam]);
+
+  // Sync search from URL (e.g. from header search) and auto-submit
+  useEffect(() => {
+    if (searchParam !== null) {
+      setSearchQuery(searchParam);
+      setShowSearch(false);
+      setCurrentPage(1);
+    }
+  }, [searchParam]);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [activeToggles, setActiveToggles] = useState<string[]>([]);
@@ -442,7 +462,7 @@ export default function ProductsPageClient({
     }, 0);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, visibility, selectedCategory, selectedBrands, activeToggles]);
+  }, [sortBy, visibility, selectedCategory, selectedBrands, activeToggles, searchParam]);
 
   // Re-fetch when page changes
   useEffect(() => {
@@ -834,7 +854,6 @@ export default function ProductsPageClient({
             {/* Search */}
             <div className="hidden md:block flex-1 max-w-md ml-8" ref={searchRef}>
               <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#bbb]" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -842,22 +861,23 @@ export default function ProductsPageClient({
                   onFocus={() => searchQuery.length >= 2 && setShowSearch(true)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   placeholder="Pretražite proizvode..."
-                  className="w-full border border-[#e8e2d9] rounded-sm pl-10 pr-4 py-2.5 text-sm focus:border-black focus:outline-none bg-[#faf7f3] focus:bg-white transition-all placeholder-[#bbb]"
+                  className="w-full border border-stone-200 rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
               </div>
 
               {/* Autocomplete */}
               {showSearch && searchResults.length > 0 && (
-                <div className="absolute mt-1.5 bg-white rounded-sm border border-[#e8e2d9] shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
+                <div className="absolute mt-1.5 bg-white rounded-lg border border-stone-200 shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
                   <div className="p-3">
                     <span className="text-[11px] text-stone-400 font-semibold tracking-widest uppercase">Proizvodi</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
-                        <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
+                        <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
                           <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-black truncate">{p.name}</p>
-                            <p className="text-[11px] text-secondary font-medium">{p.brand}</p>
+                            <p className="text-[11px] text-[#874d5d] font-medium">{p.brand}</p>
                           </div>
                           <span className="text-sm font-bold text-black">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-stone-400">RSD</span></span>
                         </Link>

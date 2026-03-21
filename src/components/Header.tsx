@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
@@ -17,6 +18,17 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+
+interface SearchResult {
+  id: string;
+  name: string;
+  slug: string;
+  brand: string | null;
+  price: number;
+  image: string | null;
+}
+
+const PLACEHOLDER_IMG = "https://placehold.co/80x80/faf7f3/ccc?text=No+img";
 
 /* ─── Mega Menu Data ─── */
 interface MegaMenuColumn {
@@ -43,30 +55,27 @@ function useMegaMenus() {
         {
           title: t("nav.hairCare"),
           links: [
-            { name: t("nav.shampoos"), href: "/products?category=samponi" },
-            { name: t("nav.masks"), href: "/products?category=maske" },
-            { name: t("nav.conditioners"), href: "/products?category=regeneratori" },
-            { name: t("nav.serums"), href: "/products?category=serumi" },
-            { name: t("nav.oils"), href: "/products?category=ulja" },
+            { name: t("nav.shampoos"), href: "/products?category=shampoo" },
+            { name: t("nav.masks"), href: "/products?category=masks" },
+            { name: t("nav.conditioners"), href: "/products?category=conditioner" },
+            { name: t("nav.serums"), href: "/products?category=serum" },
+            { name: t("nav.oils"), href: "/products?category=oils" },
           ],
         },
         {
           title: t("nav.styling"),
           links: [
-            { name: t("nav.gels"), href: "/products?category=gelovi" },
-            { name: t("nav.sprays_styling"), href: "/products?category=lakovi" },
-            { name: t("nav.waxes"), href: "/products?category=voskovi" },
-            { name: t("nav.creams"), href: "/products?category=styling-kreme" },
-            { name: t("nav.sprays"), href: "/products?category=sprejevi" },
+            { name: t("nav.sprays_styling"), href: "/products?category=spray" },
+            { name: t("nav.styling"), href: "/products?category=styling" },
+            { name: t("nav.leaveIn"), href: "/products?category=leave-in" },
           ],
         },
         {
           title: t("nav.appliances"),
           links: [
-            { name: t("nav.dryer"), href: "/products?category=fen" },
-            { name: t("nav.straighteners"), href: "/products?category=pegle" },
-            { name: t("nav.curlers"), href: "/products?category=figaro" },
-            { name: t("nav.trimmers"), href: "/products?category=trimeri" },
+            { name: t("nav.tools"), href: "/products?category=tools" },
+            { name: t("nav.brushes"), href: "/products?category=brushes" },
+            { name: t("nav.scissors"), href: "/products?category=scissors" },
           ],
         },
       ],
@@ -110,7 +119,6 @@ function useMegaMenus() {
     { name: t("nav.products"), href: "/products", hasMega: true, menuKey: "products" },
     { name: t("nav.collections"), href: "/colors", hasMega: true, menuKey: "collections" },
     { name: t("nav.about"), href: "/about", hasMega: false, menuKey: "" },
-    { name: t("nav.blog"), href: "/blog", hasMega: false, menuKey: "" },
     { name: t("nav.contact"), href: "/contact", hasMega: false, menuKey: "" },
   ];
 
@@ -122,6 +130,10 @@ export default function Header() {
   const { megaMenus, navLinks } = useMegaMenus();
   const [mobileMenu, setMobileMenu] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -136,6 +148,42 @@ export default function Header() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Search autocomplete
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        const json = await res.json();
+        if (json.success) setSearchResults(json.data);
+      } catch { /* ignore */ }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Close search on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+      setSearchResults([]);
+    }
+  };
 
   const handleMenuEnter = (name: string) => {
     if (menuTimeoutRef.current) clearTimeout(menuTimeoutRef.current);
@@ -180,7 +228,7 @@ export default function Header() {
                   {/* Mega Menu Dropdown */}
                   {hasMega && menuData && (
                     <div
-                      className={`mega-menu absolute top-full left-1/2 -translate-x-1/2 pt-2 ${
+                      className={`mega-menu absolute top-full left-0 pt-2 ${
                         activeMenu === l.menuKey ? "!opacity-100 !visible !translate-y-0" : ""
                       }`}
                       style={{ minWidth: menuData.columns.length > 1 ? "600px" : "400px" }}
@@ -284,17 +332,46 @@ export default function Header() {
 
         {/* Search overlay */}
         {searchOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white border-b border-stone-200 animate-slideDown">
+          <div ref={searchRef} className="absolute top-full left-0 right-0 bg-white border-b border-stone-200 animate-slideDown z-50">
             <div className="max-w-7xl mx-auto px-4 py-4">
               <div className="relative max-w-xl mx-auto">
                 <input
                   type="text"
                   placeholder={t("nav.searchPlaceholder")}
                   autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   className="w-full border border-stone-200 rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
                 <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
               </div>
+              {searchResults.length > 0 && (
+                <div className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-stone-200 shadow-xl overflow-hidden">
+                  <div className="p-3">
+                    <span className="text-[11px] text-stone-400 font-semibold tracking-widest uppercase">Proizvodi</span>
+                    <div className="mt-2 space-y-1">
+                      {searchResults.map((p) => (
+                        <Link
+                          key={p.id}
+                          href={`/products/${p.slug}`}
+                          className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#faf7f3] transition-colors"
+                          onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
+                        >
+                          <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-10 h-10 rounded-sm object-cover" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-black truncate">{p.name}</p>
+                            <p className="text-[11px] text-[#874d5d] font-medium">{p.brand}</p>
+                          </div>
+                          <span className="text-sm font-bold text-black">
+                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-stone-400">RSD</span>
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

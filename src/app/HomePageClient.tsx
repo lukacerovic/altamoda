@@ -52,8 +52,8 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
 
   return (
     <Link href={`/products/${product.slug}`} className="product-card bg-white rounded-2xl border border-[#e0d8cc] hover:border-[#b07a87] transition-all group relative overflow-hidden flex flex-col">
-      <div className="relative aspect-square overflow-hidden bg-[#f5f0e8] rounded-t-2xl">
-        <img src={product.image || defaultImg} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className="relative aspect-square overflow-hidden bg-white rounded-t-2xl">
+        <img src={product.image || defaultImg} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
         {displayBadge && (
           <span className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-medium rounded-full ${
             displayBadge === newLabel ? "bg-[#8c4a5a] text-white"
