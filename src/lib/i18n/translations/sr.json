@@ -245,7 +245,12 @@
     "mustAcceptTerms": "Morate prihvatiti uslove korišćenja",
     "registrationError": "Greška pri registraciji",
     "registrationErrorRetry": "Greška pri registraciji. Pokušajte ponovo.",
-    "comingSoon": "Uskoro dostupno"
+    "comingSoon": "Uskoro dostupno",
+    "accountSuspended": "Vaš nalog je suspendovan. Kontaktirajte podršku za više informacija.",
+    "pendingTitle": "Nalog na čekanju",
+    "pendingMessage": "Vaš B2B nalog je uspešno kreiran i trenutno je u procesu verifikacije. Naš tim pregleda sve B2B zahteve kako bi osigurao najbolju moguću uslugu.",
+    "pendingNotify": "Obavestićemo vas putem emaila čim vaš nalog bude odobren i verifikovan.",
+    "understood": "Razumem"
   },
   "account": {
     "myOrders": "Moje Porudžbine",
@@ -572,8 +577,13 @@
     "rsdSpent": "RSD potrošeno",
     "lastOrders": "Poslednje porudžbine",
     "approveB2b": "Odobri B2B Pristup",
+    "rejectB2b": "Odbij B2B Zahtev",
     "blockUser": "Blokiraj Korisnika",
     "activateUser": "Aktiviraj Korisnika",
+    "showPending": "Prikaži na čekanju",
+    "noUsersFound": "Nema pronađenih korisnika",
+    "approvedOn": "Odobreno:",
+    "maticniBroj": "Matični broj",
 
     "actionsAndDiscounts": "Akcije i Popusti",
     "manageActionsDesc": "Upravljajte akcijama, popustima i promocijama",

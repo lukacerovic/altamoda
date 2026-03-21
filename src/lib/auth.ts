@@ -33,6 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isValidPassword) return null
 
         if (user.status === 'suspended') return null
+        if (user.status === 'pending') return null
 
         return {
           id: user.id,

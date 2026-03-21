@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
-  User, Eye, EyeOff, Mail, Lock, Building2,
+  User, Eye, EyeOff, Mail, Lock, Building2, Clock, X,
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -34,6 +34,7 @@ export default function LoginPage() {
   const [regMaticni, setRegMaticni] = useState("");
   const [regAddress, setRegAddress] = useState("");
   const [regTerms, setRegTerms] = useState(false);
+  const [showPendingModal, setShowPendingModal] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -46,11 +47,32 @@ export default function LoginPage() {
       redirect: false,
     });
 
-    setLoading(false);
-
     if (result?.error) {
+      // Check if the user account is pending approval
+      try {
+        const res = await fetch("/api/users/check-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: loginEmail }),
+        });
+        const data = await res.json();
+        if (data.data?.status === "pending") {
+          setShowPendingModal(true);
+          setLoading(false);
+          return;
+        }
+        if (data.data?.status === "suspended") {
+          setError(t("auth.accountSuspended"));
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Ignore check-status errors, fall through to generic message
+      }
       setError(t("auth.wrongCredentials"));
+      setLoading(false);
     } else {
+      setLoading(false);
       router.push("/account");
       router.refresh();
     }
@@ -287,6 +309,40 @@ export default function LoginPage() {
         </div>
       </div>
 
+      {/* Pending B2B Approval Modal */}
+      {showPendingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
+            <div className="p-6">
+              <div className="flex justify-end">
+                <button onClick={() => setShowPendingModal(false)} className="p-1 text-gray-400 hover:text-gray-600">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="text-center mt-2">
+                <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-8 h-8 text-amber-500" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
+                  {t("auth.pendingTitle")}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                  {t("auth.pendingMessage")}
+                </p>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {t("auth.pendingNotify")}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPendingModal(false)}
+                className="w-full mt-6 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors"
+              >
+                {t("auth.understood")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
