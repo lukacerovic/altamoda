@@ -8,8 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:perf": "vitest run tests/performance",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:stress": "tsx tests/performance/stress-test.ts",
+    "test:stress:light": "STRESS_CONNECTIONS=10 STRESS_DURATION=5 tsx tests/performance/stress-test.ts",
+    "test:stress:heavy": "STRESS_CONNECTIONS=100 STRESS_DURATION=30 tsx tests/performance/stress-test.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -38,6 +43,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.1",
+    "autocannon": "^8.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
     "jsdom": "^29.0.0",
