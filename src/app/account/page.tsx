@@ -77,19 +77,20 @@ const b2bNav = [
 // ─── Sub-components ───
 
 function OrdersSection({ onRepeat }: { onRepeat: (id: string) => void }) {
+  const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Moje Porudžbine</h1>
+      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.myOrders")}</h1>
       <div className="bg-white rounded-sm shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Broj</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Datum</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Stavke</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Ukupno</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Status</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.orderNumber")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.date")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.items")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.total")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.status")}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -98,12 +99,12 @@ function OrdersSection({ onRepeat }: { onRepeat: (id: string) => void }) {
                 <tr key={order.id} className="border-t border-gray-50 hover:bg-gray-50/50">
                   <td className="px-6 py-4 text-sm font-medium text-black">{order.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{order.date}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{order.items} stavki</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{order.items} {t("account.itemsCount")}</td>
                   <td className="px-6 py-4 text-sm font-semibold text-black">{order.total}</td>
                   <td className="px-6 py-4"><span className={`px-2.5 py-1 rounded-full text-xs font-medium ${order.statusColor}`}>{order.status}</span></td>
                   <td className="px-6 py-4">
                     <button onClick={() => onRepeat(order.id)} className="text-xs text-secondary hover:text-black font-medium flex items-center gap-1 px-3 py-1.5 border border-black rounded hover:bg-black hover:text-white transition-colors">
-                      <RotateCcw className="w-3 h-3" /> Ponovi
+                      <RotateCcw className="w-3 h-3" /> {t("account.repeatOrder")}
                     </button>
                   </td>
                 </tr>
@@ -117,6 +118,7 @@ function OrdersSection({ onRepeat }: { onRepeat: (id: string) => void }) {
 }
 
 function WishlistSection() {
+  const { t } = useLanguage();
   const [wishlistItems, setWishlistItems] = useState<{
     productId: string; name: string; brand: string; price: number; oldPrice: number | null; image: string; slug: string; inStock: boolean;
   }[]>([]);
@@ -142,14 +144,14 @@ function WishlistSection() {
       </div>
       {loading ? (
         <div className="bg-white rounded-sm shadow-sm p-12 text-center">
-          <p className="text-sm text-gray-500">Učitavanje...</p>
+          <p className="text-sm text-gray-500">{t("accountPage.loading")}</p>
         </div>
       ) : wishlistItems.length === 0 ? (
         <div className="bg-white rounded-sm shadow-sm p-12 text-center">
           <Heart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-black mb-2">Lista želja je prazna</h3>
-          <p className="text-sm text-gray-500 mb-4">Dodajte proizvode u listu želja klikom na srce.</p>
-          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-stone-800 text-white rounded text-sm font-medium transition-colors">Pregledajte proizvode</Link>
+          <h3 className="text-lg font-semibold text-black mb-2">{t("accountPage.emptyWishlist")}</h3>
+          <p className="text-sm text-gray-500 mb-4">{t("accountPage.emptyWishlistDesc")}</p>
+          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-stone-800 text-white rounded text-sm font-medium transition-colors">{t("accountPage.browseProducts")}</Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -162,7 +164,7 @@ function WishlistSection() {
                 </div>
                 {!item.inStock && (
                   <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                    <span className="px-4 py-2 bg-[#333] text-white text-xs font-semibold rounded-full">Nema na lageru</span>
+                    <span className="px-4 py-2 bg-[#333] text-white text-xs font-semibold rounded-full">{t("accountPage.outOfStock")}</span>
                   </div>
                 )}
               </div>
@@ -183,18 +185,19 @@ function WishlistSection() {
 }
 
 function B2bPricesSection() {
+  const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>B2B Cene i Rabati</h1>
+      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("accountPage.b2bPricesTitle")}</h1>
 
       <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
-        <h3 className="font-semibold text-black flex items-center gap-2 mb-4"><Percent className="w-5 h-5 text-secondary" /> Rabatna Skala</h3>
+        <h3 className="font-semibold text-black flex items-center gap-2 mb-4"><Percent className="w-5 h-5 text-secondary" /> {t("accountPage.rabatScale")}</h3>
         <p className="text-sm text-gray-500 mb-4">Vaši popusti zavise od ukupnog mesečnog prometa. Trenutni mesečni promet: <strong className="text-black">142.500 RSD</strong></p>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Mesečni promet</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">{t("accountPage.monthlyTurnover")}</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Rabat</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
               </tr>
@@ -225,7 +228,7 @@ function B2bPricesSection() {
 
       {/* Monthly Spending Chart */}
       <div className="bg-white rounded-sm shadow-sm p-6">
-        <h3 className="font-semibold text-black flex items-center gap-2 mb-6"><BarChart3 className="w-5 h-5 text-secondary" /> Mesečna potrošnja</h3>
+        <h3 className="font-semibold text-black flex items-center gap-2 mb-6"><BarChart3 className="w-5 h-5 text-secondary" /> {t("accountPage.monthlySpending")}</h3>
         <div className="flex items-end gap-4 h-48">
           {monthlySpending.map((m) => {
             const maxSpending = Math.max(...monthlySpending.map((s) => s.amount));
@@ -250,9 +253,10 @@ function B2bPricesSection() {
 }
 
 function B2bBalanceSection() {
+  const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Stanje i Dugovanja</h1>
+      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.balanceDebts")}</h1>
 
       <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -270,15 +274,15 @@ function B2bBalanceSection() {
           </div>
         </div>
 
-        <h4 className="text-sm font-semibold text-black mb-3">Istorija plaćanja</h4>
+        <h4 className="text-sm font-semibold text-black mb-3">{t("account.paymentHistory")}</h4>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">Datum</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">Iznos</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">Metod</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">Status</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">{t("account.paymentDate")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">{t("account.paymentAmount")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">{t("account.paymentMethod")}</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">{t("account.paymentStatus")}</th>
               </tr>
             </thead>
             <tbody>
@@ -299,9 +303,10 @@ function B2bBalanceSection() {
 }
 
 function B2bLoyaltySection() {
+  const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Loyalty Program</h1>
+      <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.loyaltyProgram")}</h1>
 
       <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -490,7 +495,7 @@ export default function AccountPage() {
             <p className="text-sm text-gray-500 mb-4">Da li želite da kopirate sve stavke iz porudžbine <strong>{repeatConfirm}</strong> u korpu?</p>
             <div className="flex gap-3">
               <button onClick={() => setRepeatConfirm(null)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded text-sm font-medium hover:bg-gray-50 transition-colors">Otkaži</button>
-              <Link href="/cart" onClick={() => setRepeatConfirm(null)} className="flex-1 px-4 py-2.5 bg-black hover:bg-stone-800 text-white rounded text-sm font-medium transition-colors text-center">Dodaj u korpu</Link>
+              <Link href="/cart" onClick={() => setRepeatConfirm(null)} className="flex-1 px-4 py-2.5 bg-black hover:bg-stone-800 text-white rounded text-sm font-medium transition-colors text-center">{t("accountPage.addToCart")}</Link>
             </div>
           </div>
         </div>

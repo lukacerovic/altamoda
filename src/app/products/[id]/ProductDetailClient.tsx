@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface ProductImage {
   id: string;
@@ -83,7 +84,12 @@ interface Props {
 const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop";
 
 export default function ProductDetailClient({ product, related, userRole, initialLiked = false, userExistingRating = null }: Props) {
-  const hasAlreadyReviewed = userExistingRating !== null;
+  const { t } = useLanguage();
+  const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
+  const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
+  const [reviews, setReviews] = useState<Review[]>(product.reviews);
+  const [reviewCount, setReviewCount] = useState(product.reviewCount);
+  const [avgRating, setAvgRating] = useState(product.rating);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("opis");
   const [liked, setLiked] = useState(initialLiked);
@@ -108,10 +114,9 @@ export default function ProductDetailClient({ product, related, userRole, initia
     : 0;
 
   const tabs = [
-    { key: "opis", label: "Opis" },
-    { key: "sastojci", label: "Sastojci" },
-    { key: "upotreba", label: "Način upotrebe" },
-    { key: "recenzije", label: `Recenzije (${product.reviewCount})` },
+    { key: "opis", label: t("productDetail.description") },
+    { key: "sastojci", label: t("productDetail.ingredients") },
+    { key: "upotreba", label: t("productDetail.howToUse") },
   ];
 
   const handleCopyLink = () => {
@@ -148,7 +153,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
       if (!res.ok) {
         setLiked(previousState);
         if (res.status === 401) {
-          setWishlistMessage("Prijavite se da biste dodali proizvode na listu želja.");
+          setWishlistMessage(t("productDetail.loginToWishlist"));
           setTimeout(() => setWishlistMessage(""), 4000);
         }
         return;
@@ -165,6 +170,25 @@ export default function ProductDetailClient({ product, related, userRole, initia
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`/api/reviews?productId=${product.id}&limit=20`);
+      const data = await res.json();
+      if (data.success) {
+        setReviews(data.data.reviews.map((r: Record<string, unknown>) => ({
+          id: r.id as string,
+          rating: r.rating as number,
+          createdAt: r.createdAt as string,
+          user: r.user as { name: string },
+        })));
+        setReviewCount(data.data.count as number);
+        setAvgRating((data.data.avgRating ?? 0) as number);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   const handleSubmitReview = async () => {
     if (reviewRating === 0) return;
     setReviewSubmitting(true);
@@ -177,6 +201,10 @@ export default function ProductDetailClient({ product, related, userRole, initia
       const data = await res.json();
       if (data.success) {
         setReviewSuccess(true);
+        setHasAlreadyReviewed(true);
+        setCurrentUserRating(reviewRating);
+        // Fetch updated reviews from API
+        await fetchReviews();
         setTimeout(() => {
           setShowReviewForm(false);
           setReviewSuccess(false);
@@ -197,8 +225,8 @@ export default function ProductDetailClient({ product, related, userRole, initia
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-          <Link href="/" className="hover:text-secondary">Početna</Link><ChevronRight className="w-3 h-3" />
-          <Link href="/products" className="hover:text-secondary">Proizvodi</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/" className="hover:text-secondary">{t("productDetail.home")}</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/products" className="hover:text-secondary">{t("productDetail.products")}</Link><ChevronRight className="w-3 h-3" />
           {product.category && (
             <>
               <Link href={`/products?category=${product.category.slug}`} className="hover:text-secondary">{product.category.nameLat}</Link>
@@ -244,7 +272,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
             {product.brand && <span className="text-sm text-secondary font-medium uppercase tracking-wider">{product.brand.name}</span>}
             {product.productLine && (
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-gray-500">Linija proizvoda:</span>
+                <span className="text-xs text-gray-500">{t("productDetail.productLine")}</span>
                 <Link href={`/products?line=${product.productLine.slug}`} className="text-xs text-secondary hover:text-black font-medium underline">{product.productLine.name}</Link>
               </div>
             )}
@@ -252,26 +280,26 @@ export default function ProductDetailClient({ product, related, userRole, initia
 
             {product.isProfessional && (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-xs font-medium rounded mb-4">
-                <AlertCircle className="w-3.5 h-3.5" /> Samo za profesionalnu upotrebu
+                <AlertCircle className="w-3.5 h-3.5" /> {t("productDetail.professionalOnly")}
               </div>
             )}
 
             <div className="flex items-center gap-3 mb-4">
               <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.round(product.rating) ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}
+                {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.round(avgRating) ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}
               </div>
-              <span className="text-sm text-gray-500">{product.rating.toFixed(1)} ({product.reviewCount} recenzija)</span>
+              <span className="text-sm text-gray-500">{avgRating.toFixed(1)} ({reviewCount} {t("productDetail.reviews")})</span>
             </div>
 
             {/* Stock */}
             <div className="mb-4">
               {product.stockQuantity > 0 ? (
                 <span className="inline-flex items-center gap-1.5 text-sm text-green-600 font-medium">
-                  <CheckCircle className="w-4 h-4" /> Na stanju ({product.stockQuantity} kom)
+                  <CheckCircle className="w-4 h-4" /> {t("productDetail.inStock")} ({product.stockQuantity} {t("productDetail.pcs")})
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-sm text-red-600 font-medium">
-                  <X className="w-4 h-4" /> Nema na stanju
+                  <X className="w-4 h-4" /> {t("productDetail.outOfStock")}
                 </span>
               )}
             </div>
@@ -323,9 +351,9 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {addedToCart ? (
-                  <><CheckCircle className="w-5 h-5" /> Dodato!</>
+                  <><CheckCircle className="w-5 h-5" /> {t("productDetail.addedToCart")}</>
                 ) : (
-                  <><ShoppingBag className="w-5 h-5" /> Dodaj u Korpu</>
+                  <><ShoppingBag className="w-5 h-5" /> {t("productDetail.addToCart")}</>
                 )}
               </button>
               <button onClick={handleToggleWishlist} className={`w-12 h-12 border rounded flex items-center justify-center transition-colors ${liked ? "border-[#c0392b] bg-red-50" : "border-gray-200 hover:border-black"}`}>
@@ -344,30 +372,30 @@ export default function ProductDetailClient({ product, related, userRole, initia
 
             {/* Share */}
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-xs text-gray-500">Podeli:</span>
+              <span className="text-xs text-gray-500">{t("productDetail.share")}</span>
               <button onClick={handleCopyLink} className={`h-8 px-3 rounded-full flex items-center gap-1.5 text-xs font-medium transition-all ${linkCopied ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                {linkCopied ? <><CheckCircle className="w-3.5 h-3.5" /> Kopirano!</> : <><Link2 className="w-3.5 h-3.5" /> Kopiraj link</>}
+                {linkCopied ? <><CheckCircle className="w-3.5 h-3.5" /> {t("productDetail.linkCopied")}</> : <><Link2 className="w-3.5 h-3.5" /> {t("productDetail.copyLink")}</>}
               </button>
             </div>
 
             {/* Delivery info */}
             <div className="bg-stone-50 rounded-sm p-4 space-y-3">
-              <div className="flex items-center gap-3 text-sm"><Truck className="w-5 h-5 text-secondary" /><span><strong>Besplatna dostava</strong> za porudžbine preko 5.000 RSD</span></div>
-              <div className="flex items-center gap-3 text-sm"><RotateCcw className="w-5 h-5 text-secondary" /><span><strong>Povrat u roku od 14 dana</strong> bez pitanja</span></div>
-              <div className="flex items-center gap-3 text-sm"><Shield className="w-5 h-5 text-secondary" /><span><strong>Originalni proizvodi</strong> sa garancijom autentičnosti</span></div>
+              <div className="flex items-center gap-3 text-sm"><Truck className="w-5 h-5 text-secondary" /><span><strong>{t("productDetail.freeShipping")}</strong> {t("productDetail.freeShippingNote")}</span></div>
+              <div className="flex items-center gap-3 text-sm"><RotateCcw className="w-5 h-5 text-secondary" /><span><strong>{t("productDetail.returnPolicy")}</strong> {t("productDetail.returnPolicyNote")}</span></div>
+              <div className="flex items-center gap-3 text-sm"><Shield className="w-5 h-5 text-secondary" /><span><strong>{t("productDetail.originalProducts")}</strong> {t("productDetail.originalProductsNote")}</span></div>
             </div>
 
             {/* Color Section */}
             {product.colorProduct && (
               <div className="mt-6 bg-white border border-gray-200 rounded-sm p-5">
-                <h3 className="text-sm font-semibold text-black mb-3">Informacije o boji</h3>
+                <h3 className="text-sm font-semibold text-black mb-3">{t("productDetail.colorInfo")}</h3>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="bg-gray-50 rounded p-3">
-                    <span className="text-xs text-gray-500">Nivo (Level)</span>
+                    <span className="text-xs text-gray-500">{t("productDetail.colorLevel")}</span>
                     <p className="text-sm font-semibold text-black">{product.colorProduct.colorLevel}</p>
                   </div>
                   <div className="bg-gray-50 rounded p-3">
-                    <span className="text-xs text-gray-500">Podton (Undertone)</span>
+                    <span className="text-xs text-gray-500">{t("productDetail.colorUndertone")}</span>
                     <p className="text-sm font-semibold text-black">{product.colorProduct.undertoneName}</p>
                   </div>
                 </div>
@@ -391,55 +419,99 @@ export default function ProductDetailClient({ product, related, userRole, initia
             ))}
           </div>
           <div className="py-8">
-            {activeTab === "opis" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.description || "Nema opisa."}</p></div>}
-            {activeTab === "sastojci" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.ingredients || "Sastojci nisu navedeni."}</p></div>}
-            {activeTab === "upotreba" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.usageInstructions || "Uputstvo za upotrebu nije navedeno."}</p></div>}
-            {activeTab === "recenzije" && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <span className="text-lg font-bold text-black">{product.rating.toFixed(1)}</span>
-                    <span className="text-sm text-gray-500"> / 5 ({product.reviewCount} recenzija)</span>
-                  </div>
-                  {hasAlreadyReviewed ? (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-stone-50 text-sm text-black rounded border border-stone-200">
-                      <span className="text-gray-500">Vaša ocena:</span>
-                      <div className="flex items-center gap-0.5">
-                        {[1,2,3,4,5].map((s) => <Star key={s} className={`w-4 h-4 ${s <= userExistingRating! ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}
-                      </div>
+            {activeTab === "opis" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.description || t("productDetail.noDescription")}</p></div>}
+            {activeTab === "sastojci" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.ingredients || t("productDetail.noIngredients")}</p></div>}
+            {activeTab === "upotreba" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.usageInstructions || t("productDetail.noUsageInstructions")}</p></div>}
+          </div>
+        </div>
+
+        {/* REVIEWS SECTION — always visible */}
+        <div className="mt-8 mb-8">
+          <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
+            {/* Review header with rating summary */}
+            <div className="p-6 sm:p-8 border-b border-stone-200 bg-[#faf8f4]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-5">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-black leading-none">{avgRating.toFixed(1)}</p>
+                    <div className="flex items-center gap-0.5 mt-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-5 h-5 ${i < Math.round(avgRating) ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />
+                      ))}
                     </div>
-                  ) : (
-                    <button onClick={() => setShowReviewForm(true)} className="px-4 py-2 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded transition-colors flex items-center gap-2">
-                      <Star className="w-4 h-4" /> Oceni proizvod
+                    <p className="text-xs text-gray-500 mt-1">{reviewCount} {t("productDetail.reviews")}</p>
+                  </div>
+                  <div className="hidden sm:block w-px h-16 bg-stone-200" />
+                  <div>
+                    <h2 className="text-lg font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>{t("productDetail.customerReviews")}</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      {reviewCount === 0 ? t("productDetail.beFirstToReview") : t("productDetail.seeWhatOthersSay")}
+                    </p>
+                  </div>
+                </div>
+                {hasAlreadyReviewed ? (
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-white text-sm text-black rounded-sm border border-stone-200">
+                    <span className="text-gray-500">{t("productDetail.yourRating")}</span>
+                    <div className="flex items-center gap-0.5">
+                      {[1,2,3,4,5].map((s) => <Star key={s} className={`w-4 h-4 ${s <= currentUserRating! ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    className="px-6 py-3 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors flex items-center gap-2 self-start"
+                  >
+                    <Star className="w-4 h-4" /> {t("productDetail.rateProduct")}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Review list */}
+            <div className="p-6 sm:p-8">
+              {reviews.length === 0 ? (
+                <div className="text-center py-8">
+                  <Star className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-500 text-sm">{t("productDetail.noReviews")}</p>
+                  {!hasAlreadyReviewed && (
+                    <button
+                      onClick={() => setShowReviewForm(true)}
+                      className="mt-4 px-5 py-2.5 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors inline-flex items-center gap-2"
+                    >
+                      <Star className="w-4 h-4" /> {t("productDetail.addFirstReview")}
                     </button>
                   )}
                 </div>
-                {product.reviews.length === 0 ? (
-                  <p className="text-gray-500 text-sm">Nema recenzija za ovaj proizvod. Budite prvi!</p>
-                ) : (
-                  <div className="space-y-6">
-                    {product.reviews.map((r) => (
-                      <div key={r.id} className="bg-white rounded-sm p-6 shadow-sm">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <span className="font-semibold text-black">{r.user.name}</span>
-                            <div className="flex items-center gap-0.5 mt-1">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < r.rating ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />)}</div>
-                          </div>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((r) => (
+                    <div key={r.id} className="flex items-start gap-4 p-4 rounded-sm bg-stone-50">
+                      <div className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-bold text-stone-600">{r.user.name.charAt(0).toUpperCase()}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-sm text-black">{r.user.name}</span>
                           <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString("sr-RS")}</span>
                         </div>
+                        <div className="flex items-center gap-0.5 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? "fill-[#735b28] text-secondary" : "text-gray-200"}`} />
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* RELATED */}
         {related.length > 0 && (
           <section className="mt-12 mb-16">
-            <h2 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>Povezani proizvodi</h2>
+            <h2 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("productDetail.relatedProducts")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {related.map((p) => (
                 <Link key={p.id} href={`/products/${p.slug}`} className="bg-white rounded-sm shadow-sm hover:shadow-md transition-all group overflow-hidden">
@@ -468,18 +540,18 @@ export default function ProductDetailClient({ product, related, userRole, initia
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-sm max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
               <button onClick={() => setShowReviewForm(false)} className="absolute top-4 right-4"><X className="w-5 h-5 text-gray-400 hover:text-gray-600" /></button>
-              <h3 className="text-xl font-bold text-black mb-1" style={{ fontFamily: "'Noto Serif', serif" }}>Oceni proizvod</h3>
+              <h3 className="text-xl font-bold text-black mb-1" style={{ fontFamily: "'Noto Serif', serif" }}>{t("productDetail.rateThisProduct")}</h3>
               <p className="text-sm text-gray-500 mb-6">{product.nameLat}</p>
 
               {reviewSuccess ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                  <p className="text-lg font-semibold text-black">Hvala na oceni!</p>
+                  <p className="text-lg font-semibold text-black">{t("productDetail.reviewSuccess")}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Vaša ocena</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t("productDetail.tapToRate")}</label>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button key={star} onClick={() => setReviewRating(star)} className="p-1">
@@ -501,7 +573,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
                     disabled={reviewRating === 0 || reviewSubmitting}
                     className="w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors disabled:opacity-50"
                   >
-                    {reviewSubmitting ? "Slanje..." : "Pošalji recenziju"}
+                    {reviewSubmitting ? t("productDetail.submitting") : t("productDetail.submitReview")}
                   </button>
                 </div>
               )}

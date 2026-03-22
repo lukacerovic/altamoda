@@ -18,6 +18,7 @@ import {
   Trash2,
   AlertCircle,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface RecentOrder {
   id: string;
@@ -42,6 +43,7 @@ interface Props {
 }
 
 export default function QuickOrderPageClient({ recentOrders }: Props) {
+  const { t } = useLanguage();
   const router = useRouter();
   const { addItem } = useCartStore();
   const [activeTab, setActiveTab] = useState<"code" | "list" | "csv">("code");
@@ -236,7 +238,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
             <div className="flex border-b border-stone-200 mb-6">
               {[
                 { key: "code" as const, label: "Po šifri", icon: Hash },
-                { key: "list" as const, label: "Lista proizvoda", icon: List },
+                { key: "list" as const, label: t("quickOrder.productList"), icon: List },
                 { key: "csv" as const, label: "Upload CSV", icon: Upload },
               ].map((tab) => (
                 <button
@@ -350,12 +352,12 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                     <h3 className="text-lg font-semibold text-[#333] mb-2">Fajl uspešno učitan!</h3>
                     <p className="text-sm text-[#666] mb-6">Pronađeno {csvResult.summary.found} od {csvResult.summary.total} proizvoda</p>
                     <div className="bg-stone-100 rounded-sm p-4 text-left max-w-sm mx-auto mb-6">
-                      <div className="flex justify-between text-sm mb-1"><span className="text-[#666]">Pronađeno:</span><span className="font-medium">{csvResult.summary.found} stavki</span></div>
+                      <div className="flex justify-between text-sm mb-1"><span className="text-[#666]">{t("quickOrder.found")}</span><span className="font-medium">{csvResult.summary.found} {t("quickOrder.items")}</span></div>
                       <div className="flex justify-between text-sm mb-1"><span className="text-[#666]">Ukupna vrednost:</span><span className="font-medium">{csvResult.summary.totalValue?.toLocaleString()} RSD</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[#666]">Nedostupno:</span><span className="font-medium text-orange-500">{csvResult.summary.notFound + csvResult.summary.outOfStock} stavki</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[#666]">{t("quickOrder.unavailable")}</span><span className="font-medium text-orange-500">{csvResult.summary.notFound + csvResult.summary.outOfStock} {t("quickOrder.items")}</span></div>
                     </div>
                     <div className="flex gap-3 justify-center">
-                      <button onClick={addCsvToOrder} className="px-6 py-2.5 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors">Dodaj sve u korpu</button>
+                      <button onClick={addCsvToOrder} className="px-6 py-2.5 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors">{t("quickOrder.addAllToCart")}</button>
                       <button onClick={() => { setCsvResult(null); setCsvFile(null); }} className="px-6 py-2.5 border border-stone-200 text-[#666] text-sm font-medium rounded-sm hover:bg-stone-100 transition-colors">Otkaži</button>
                     </div>
                   </div>
@@ -366,7 +368,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
             {/* Recent Orders */}
             {recentOrders.length > 0 && (
               <div className="mt-8">
-                <h3 className="text-lg font-semibold text-black mb-4">Ponovi prethodnu porudžbinu</h3>
+                <h3 className="text-lg font-semibold text-black mb-4">{t("quickOrder.repeatPrevious")}</h3>
                 <div className="grid gap-3">
                   {recentOrders.map((order) => (
                     <div key={order.id} className="bg-white rounded-sm border border-stone-200 p-4 flex items-center justify-between hover:shadow-sm transition-all">
@@ -386,7 +388,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                           disabled={repeatLoading === order.id}
                           className="flex items-center gap-1 px-4 py-2 border border-black text-secondary text-sm font-medium rounded-sm hover:bg-black hover:text-white transition-colors disabled:opacity-50"
                         >
-                          <RefreshCw className={`w-3 h-3 ${repeatLoading === order.id ? "animate-spin" : ""}`} /> Ponovi
+                          <RefreshCw className={`w-3 h-3 ${repeatLoading === order.id ? "animate-spin" : ""}`} /> {t("quickOrder.repeat")}
                         </button>
                       </div>
                     </div>
@@ -399,7 +401,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
           {/* Order Summary Sidebar */}
           <div className="w-full lg:w-80 lg:flex-shrink-0">
             <div className="bg-white rounded-sm border border-stone-200 p-6 sticky top-24">
-              <h3 className="font-semibold text-black mb-4">Pregled narudžbine</h3>
+              <h3 className="font-semibold text-black mb-4">{t("quickOrder.orderPreview")}</h3>
               {orderItems.length > 0 ? (
                 <>
                   <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
@@ -431,7 +433,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                   </button>
                 </>
               ) : (
-                <p className="text-sm text-[#999] text-center py-8">Dodajte proizvode u narudžbinu</p>
+                <p className="text-sm text-[#999] text-center py-8">{t("quickOrder.addProductsToOrder")}</p>
               )}
             </div>
           </div>

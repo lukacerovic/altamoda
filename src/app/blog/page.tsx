@@ -5,8 +5,16 @@ import Link from "next/link";
 import {
   ChevronRight, Clock, ArrowRight,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const categories = ["Sve", "Trendovi", "Nega", "Styling", "Tehnika", "Poslovni saveti"];
+const categoryKeys = [
+  { key: "Sve", i18nKey: "blog.all" },
+  { key: "Trendovi", i18nKey: "blog.trends" },
+  { key: "Nega", i18nKey: "blog.care" },
+  { key: "Styling", i18nKey: "blog.styling" },
+  { key: "Tehnika", i18nKey: "blog.technique" },
+  { key: "Poslovni saveti", i18nKey: "blog.businessTips" },
+];
 
 const posts = [
   { id: 1, slug: "trendovi-boja-prolece-2026", title: "Trendovi boja za kosu - Proleće 2026", excerpt: "Otkrijte najaktuelnije nijanse i tehnike farbanja za predstojeću sezonu. Od mekanih balayage preliva do odvažnih crvenih tonova.", category: "Trendovi", date: "12. mar 2026", readTime: "5 min", image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&h=400&fit=crop" },
@@ -21,6 +29,7 @@ const popularPosts = posts.slice(0, 3);
 const tags = ["Balayage", "Olaplex", "Boja za kosu", "Kerastase", "Nega", "Volumen", "Keratin", "Blonde", "Sampon", "Serum"];
 
 export default function BlogPage() {
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState("Sve");
 
   const filtered = activeCategory === "Sve" ? posts : posts.filter((p) => p.category === activeCategory);
@@ -34,21 +43,21 @@ export default function BlogPage() {
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center justify-center text-center">
           <div>
             <span className="text-secondary text-xs uppercase tracking-[0.25em] font-medium">Alta Moda Blog</span>
-            <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-4 text-white" style={{ fontFamily: "'Noto Serif', serif" }}>Saveti, Trendovi & Inspiracija</h1>
-            <p className="text-white/60 max-w-lg mx-auto">Najnoviji članci o nezi kose, trendovima farbanja, styling tehnikama i poslovnim savetima za profesionalce.</p>
+            <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-4 text-white" style={{ fontFamily: "'Noto Serif', serif" }}>{t("blog.title")}</h1>
+            <p className="text-white/60 max-w-lg mx-auto">{t("blog.subtitle")}</p>
           </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-          <Link href="/" className="hover:text-secondary">Pocetna</Link><ChevronRight className="w-3 h-3" /><span className="text-black">Blog</span>
+          <Link href="/" className="hover:text-secondary">{t("blog.home")}</Link><ChevronRight className="w-3 h-3" /><span className="text-black">Blog</span>
         </nav>
 
         {/* Category filter pills */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {categories.map((c) => (
-            <button key={c} onClick={() => setActiveCategory(c)} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === c ? "bg-black text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-black"}`}>{c}</button>
+          {categoryKeys.map((c) => (
+            <button key={c.key} onClick={() => setActiveCategory(c.key)} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === c.key ? "bg-black text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-black"}`}>{t(c.i18nKey)}</button>
           ))}
         </div>
 
@@ -70,7 +79,7 @@ export default function BlogPage() {
                     <p className="text-sm text-gray-500 line-clamp-2 mb-4">{post.excerpt}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-400">{post.date}</span>
-                      <span className="text-sm text-secondary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">Procitaj vise <ArrowRight className="w-3 h-3" /></span>
+                      <span className="text-sm text-secondary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t("blog.readMore")} <ArrowRight className="w-3 h-3" /></span>
                     </div>
                   </div>
                 </Link>
@@ -81,7 +90,7 @@ export default function BlogPage() {
           {/* Sidebar */}
           <aside className="hidden lg:block w-72 flex-shrink-0 space-y-6">
             <div className="bg-white rounded-sm shadow-sm p-6">
-              <h3 className="font-semibold text-black mb-4">Popularni Clanci</h3>
+              <h3 className="font-semibold text-black mb-4">{t("blog.popularArticles")}</h3>
               <div className="space-y-4">
                 {popularPosts.map((p, i) => (
                   <Link key={p.id} href={`/blog/${p.slug}`} className="flex gap-3 group">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, Star, Sparkles, ShoppingBag, Tag, Package } from "lucide-react";
+import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface SectionProduct {
@@ -28,17 +28,21 @@ export default function HomepagePage() {
 
   const sections: SectionConfig[] = [
     { key: "featured", label: t("admin.featuredSection"), filterParam: "isFeatured=true", flagField: "isFeatured", icon: <Star size={20} /> },
-    { key: "bestsellers", label: t("admin.bestsellersSection"), filterParam: "isBestseller=true", flagField: "isBestseller", icon: <Sparkles size={20} /> },
     { key: "newArrivals", label: t("admin.newArrivalsSection"), filterParam: "isNew=true", flagField: "isNew", icon: <ShoppingBag size={20} /> },
     { key: "sale", label: t("admin.saleSection"), filterParam: "onSale=true", flagField: "", icon: <Tag size={20} />, readOnly: true },
   ];
 
   const [sectionProducts, setSectionProducts] = useState<Record<string, SectionProduct[]>>({});
-  const [searchQueries, setSearchQueries] = useState<Record<string, string>>({});
-  const [searchResults, setSearchResults] = useState<Record<string, SectionProduct[]>>({});
-  const [activeSearch, setActiveSearch] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const searchTimers = useRef<Record<string, NodeJS.Timeout>>({});
+
+  // Add-products modal state
+  const [addModal, setAddModal] = useState<{ sectionKey: string; flagField: string } | null>(null);
+  const [modalSearch, setModalSearch] = useState("");
+  const [modalResults, setModalResults] = useState<SectionProduct[]>([]);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [selectedToAdd, setSelectedToAdd] = useState<Set<string>>(new Set());
+  const [addingProducts, setAddingProducts] = useState(false);
+  const modalSearchTimer = useRef<NodeJS.Timeout | null>(null);
 
   const fetchSectionProducts = useCallback(async () => {
     setLoading(true);
@@ -75,61 +79,84 @@ export default function HomepagePage() {
     fetchSectionProducts();
   }, [fetchSectionProducts]);
 
-  const handleSearch = (sectionKey: string, query: string) => {
-    setSearchQueries((prev) => ({ ...prev, [sectionKey]: query }));
-    setActiveSearch(sectionKey);
+  const openAddModal = (sectionKey: string, flagField: string) => {
+    setAddModal({ sectionKey, flagField });
+    setModalSearch("");
+    setModalResults([]);
+    setSelectedToAdd(new Set());
+    // Load initial results
+    fetchModalResults("", sectionKey);
+  };
 
-    if (searchTimers.current[sectionKey]) {
-      clearTimeout(searchTimers.current[sectionKey]);
-    }
-
-    if (!query.trim()) {
-      setSearchResults((prev) => ({ ...prev, [sectionKey]: [] }));
-      return;
-    }
-
-    searchTimers.current[sectionKey] = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=10`);
-        const data = await res.json();
-        if (data.success) {
-          const currentIds = new Set((sectionProducts[sectionKey] || []).map((p) => p.id));
-          const filtered = data.data.products
-            .filter((p: Record<string, unknown>) => !currentIds.has(p.id as string))
-            .map((p: Record<string, unknown>) => ({
-              id: p.id as string,
-              name: (p.name || "") as string,
-              brand: p.brand as { name: string } | null,
-              price: (p.priceB2c || p.price || 0) as number,
-              oldPrice: (p.oldPrice || null) as number | null,
-              image: (p.image || null) as string | null,
-              sku: (p.sku || "") as string,
-            }));
-          setSearchResults((prev) => ({ ...prev, [sectionKey]: filtered }));
-        }
-      } catch {
-        // ignore
+  const fetchModalResults = async (query: string, sectionKey: string) => {
+    setModalLoading(true);
+    try {
+      const url = query.trim()
+        ? `/api/products?search=${encodeURIComponent(query)}&limit=30`
+        : `/api/products?limit=30`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        const currentIds = new Set((sectionProducts[sectionKey] || []).map((p) => p.id));
+        const filtered = data.data.products
+          .filter((p: Record<string, unknown>) => !currentIds.has(p.id as string))
+          .map((p: Record<string, unknown>) => ({
+            id: p.id as string,
+            name: (p.name || "") as string,
+            brand: p.brand as { name: string } | null,
+            price: (p.priceB2c || p.price || 0) as number,
+            oldPrice: (p.oldPrice || null) as number | null,
+            image: (p.image || null) as string | null,
+            sku: (p.sku || "") as string,
+          }));
+        setModalResults(filtered);
       }
+    } catch {
+      // ignore
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleModalSearch = (query: string) => {
+    setModalSearch(query);
+    if (modalSearchTimer.current) clearTimeout(modalSearchTimer.current);
+    modalSearchTimer.current = setTimeout(() => {
+      if (addModal) fetchModalResults(query, addModal.sectionKey);
     }, 300);
   };
 
-  const addProduct = async (sectionKey: string, product: SectionProduct, flagField: string) => {
-    try {
-      await fetch(`/api/products/${product.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [flagField]: true }),
-      });
-      setSectionProducts((prev) => ({
-        ...prev,
-        [sectionKey]: [...(prev[sectionKey] || []), product],
-      }));
-      setSearchQueries((prev) => ({ ...prev, [sectionKey]: "" }));
-      setSearchResults((prev) => ({ ...prev, [sectionKey]: [] }));
-      setActiveSearch(null);
-    } catch {
-      // ignore
-    }
+  const toggleSelect = (productId: string) => {
+    setSelectedToAdd((prev) => {
+      const next = new Set(prev);
+      if (next.has(productId)) next.delete(productId);
+      else next.add(productId);
+      return next;
+    });
+  };
+
+  const addSelectedProducts = async () => {
+    if (!addModal || selectedToAdd.size === 0) return;
+    setAddingProducts(true);
+    const { sectionKey, flagField } = addModal;
+    const productsToAdd = modalResults.filter((p) => selectedToAdd.has(p.id));
+
+    await Promise.all(
+      productsToAdd.map((product) =>
+        fetch(`/api/products/${product.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [flagField]: true }),
+        })
+      )
+    );
+
+    setSectionProducts((prev) => ({
+      ...prev,
+      [sectionKey]: [...(prev[sectionKey] || []), ...productsToAdd],
+    }));
+    setAddingProducts(false);
+    setAddModal(null);
   };
 
   const removeProduct = async (sectionKey: string, productId: string, flagField: string) => {
@@ -166,8 +193,6 @@ export default function HomepagePage() {
         <div className="space-y-6">
           {sections.map((section) => {
             const products = sectionProducts[section.key] || [];
-            const results = searchResults[section.key] || [];
-            const query = searchQueries[section.key] || "";
 
             return (
               <div
@@ -185,6 +210,15 @@ export default function HomepagePage() {
                       {products.length}
                     </span>
                   </div>
+                  {!section.readOnly && (
+                    <button
+                      onClick={() => openAddModal(section.key, section.flagField)}
+                      className="btn-gold px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2"
+                    >
+                      <Plus size={16} />
+                      {t("admin.addToSection")}
+                    </button>
+                  )}
                 </div>
 
                 {/* Products Grid */}
@@ -234,62 +268,6 @@ export default function HomepagePage() {
                     ))}
                   </div>
 
-                  {/* Search to Add */}
-                  {!section.readOnly && (
-                    <div className="mt-4 relative">
-                      <div className="relative">
-                        <Search
-                          size={16}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]"
-                        />
-                        <input
-                          type="text"
-                          value={query}
-                          onChange={(e) => handleSearch(section.key, e.target.value)}
-                          onFocus={() => setActiveSearch(section.key)}
-                          placeholder={t("admin.searchToAdd")}
-                          className="w-full pl-9 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-lg text-sm focus:bg-white focus:border-black focus:outline-none"
-                        />
-                      </div>
-
-                      {/* Search Results Dropdown */}
-                      {activeSearch === section.key && results.length > 0 && (
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-stone-200 z-10 max-h-60 overflow-y-auto">
-                          {results.map((product) => (
-                            <button
-                              key={product.id}
-                              onClick={() => addProduct(section.key, product, section.flagField)}
-                              className="flex items-center gap-3 w-full px-4 py-3 hover:bg-stone-100 transition-colors text-left border-b border-[#f0f0f0] last:border-b-0"
-                            >
-                              <div className="w-8 h-8 rounded bg-stone-100 flex items-center justify-center flex-shrink-0">
-                                {product.image ? (
-                                  <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-8 h-8 rounded object-cover"
-                                  />
-                                ) : (
-                                  <Package size={14} className="text-[#999]" />
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-black truncate">
-                                  {product.name}
-                                </p>
-                                <p className="text-xs text-[#999]">
-                                  {product.brand?.name || ""} · {product.sku}
-                                </p>
-                              </div>
-                              <span className="text-xs text-secondary font-medium flex-shrink-0">
-                                + {t("admin.addToSection")}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   {/* Sale section note */}
                   {section.readOnly && products.length > 0 && (
                     <p className="mt-4 text-xs text-[#999] italic">{t("admin.saleNote")}</p>
@@ -298,6 +276,111 @@ export default function HomepagePage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Add Products Modal */}
+      {addModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-sm shadow-xl w-full max-w-2xl mx-4 flex flex-col" style={{ maxHeight: "80vh" }}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
+              <div>
+                <h3 className="text-lg font-serif font-bold text-black">{t("admin.addToSection")}</h3>
+                <p className="text-xs text-[#999] mt-0.5">
+                  {selectedToAdd.size > 0
+                    ? `${selectedToAdd.size} ${selectedToAdd.size === 1 ? "proizvod izabran" : "proizvoda izabrano"}`
+                    : t("admin.searchToAdd")}
+                </p>
+              </div>
+              <button onClick={() => setAddModal(null)} className="p-2 text-[#999] hover:text-black hover:bg-stone-100 rounded transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="px-6 py-3 border-b border-stone-100">
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                <input
+                  type="text"
+                  value={modalSearch}
+                  onChange={(e) => handleModalSearch(e.target.value)}
+                  placeholder={t("admin.searchToAdd")}
+                  className="w-full pl-9 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-lg text-sm focus:bg-white focus:border-black focus:outline-none"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Product List */}
+            <div className="flex-1 overflow-y-auto">
+              {modalLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent" />
+                </div>
+              ) : modalResults.length === 0 ? (
+                <p className="text-sm text-[#999] text-center py-12">{t("admin.noProductsMatch")}</p>
+              ) : (
+                <div className="divide-y divide-stone-100">
+                  {modalResults.map((product) => {
+                    const isSelected = selectedToAdd.has(product.id);
+                    return (
+                      <button
+                        key={product.id}
+                        onClick={() => toggleSelect(product.id)}
+                        className={`flex items-center gap-3 w-full px-6 py-3 text-left transition-colors ${
+                          isSelected ? "bg-stone-100" : "hover:bg-stone-50"
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isSelected ? "bg-black border-black" : "border-stone-300"
+                        }`}>
+                          {isSelected && <Check size={12} className="text-white" />}
+                        </div>
+                        <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0">
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} className="w-10 h-10 rounded-lg object-cover" />
+                          ) : (
+                            <Package size={16} className="text-[#999]" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-black truncate">{product.name}</p>
+                          <p className="text-xs text-[#999]">
+                            {product.brand?.name || ""} · {product.sku}
+                            {product.price > 0 && ` · ${product.price.toLocaleString()} RSD`}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-stone-200 bg-white">
+              <button
+                onClick={() => setAddModal(null)}
+                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors"
+              >
+                {t("admin.cancel")}
+              </button>
+              <button
+                onClick={addSelectedProducts}
+                disabled={selectedToAdd.size === 0 || addingProducts}
+                className="btn-gold px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+              >
+                {addingProducts ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Plus size={16} />
+                )}
+                {t("admin.addToSection")} {selectedToAdd.size > 0 && `(${selectedToAdd.size})`}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

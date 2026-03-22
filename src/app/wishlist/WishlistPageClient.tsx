@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Heart,
   Star,
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function WishlistPageClient({ items: initialItems }: Props) {
+  const { t } = useLanguage();
   const [items, setItems] = useState(initialItems);
   const { addItem } = useCartStore();
 
@@ -69,9 +71,9 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#999] mb-6">
-          <Link href="/" className="hover:text-secondary">Početna</Link>
+          <Link href="/" className="hover:text-secondary">{t("wishlist.home")}</Link>
           <span>/</span>
-          <span className="text-[#333]">Lista želja</span>
+          <span className="text-[#333]">{t("wishlist.title")}</span>
         </div>
 
         {items.length > 0 ? (
@@ -80,15 +82,15 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
                 <Heart className="w-6 h-6 text-secondary fill-[#735b28]" />
-                <h1 className="text-3xl font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>Lista Želja</h1>
+                <h1 className="text-3xl font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
                 <span className="text-sm text-[#999]">({items.length} proizvoda)</span>
               </div>
               <div className="flex items-center gap-3">
                 <button className="flex items-center gap-2 px-4 py-2 border border-stone-200 text-[#666] text-sm rounded-sm hover:bg-stone-100 transition-colors">
-                  <Share2 className="w-4 h-4" /> Podeli listu
+                  <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
                 <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors">
-                  <ShoppingCart className="w-4 h-4" /> Dodaj sve u korpu
+                  <ShoppingCart className="w-4 h-4" /> {t("wishlist.addAllToCart")}
                 </button>
               </div>
             </div>
@@ -106,7 +108,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       )}
                       {!item.inStock && (
                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                          <span className="px-4 py-2 bg-[#333] text-white text-xs font-semibold rounded-full">Nema na lageru</span>
+                          <span className="px-4 py-2 bg-[#333] text-white text-xs font-semibold rounded-full">{t("wishlist.unavailable")}</span>
                         </div>
                       )}
                       <button
@@ -143,7 +145,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                             : "bg-[#c4c7c7] text-[#999] cursor-not-allowed"
                         }`}
                       >
-                        {item.inStock ? "Dodaj u korpu" : "Nedostupno"}
+                        {item.inStock ? t("wishlist.addToCart") : t("wishlist.unavailable")}
                       </button>
                     </div>
                   </div>
@@ -155,10 +157,10 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
           /* Empty State */
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-[#c4c7c7] mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>Vaša lista želja je prazna</h2>
-            <p className="text-[#666] mb-6">Dodajte proizvode koje želite da sačuvate za kasnije</p>
+            <h2 className="text-2xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.emptyTitle")}</h2>
+            <p className="text-[#666] mb-6">{t("wishlist.emptyDesc")}</p>
             <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-black hover:bg-stone-800 text-white font-medium rounded-sm transition-colors">
-              Istraži proizvode
+              {t("productDetail.products")}
             </Link>
           </div>
         )}

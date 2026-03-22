@@ -5,14 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
-  LayoutDashboard,
   Package,
   ShoppingCart,
   Users,
   Settings,
   Menu,
   X,
-  Search,
   Bell,
   ChevronDown,
   LogOut,
@@ -50,7 +48,6 @@ export default function AdminLayout({
   const navSections: NavSection[] = [
     {
       items: [
-        { href: "/admin", label: t("admin.dashboard"), icon: LayoutDashboard },
         { href: "/admin/homepage", label: t("admin.homepage"), icon: Home },
         { href: "/admin/products", label: t("admin.products"), icon: Package },
         { href: "/admin/colors", label: t("admin.colors"), icon: Palette },
@@ -80,10 +77,7 @@ export default function AdminLayout({
     { id: 3, text: "Novi B2B korisnik čeka odobrenje", time: "Pre 3h", unread: false },
   ];
 
-  const isActive = (href: string) => {
-    if (href === "/admin") return pathname === "/admin";
-    return pathname.startsWith(href);
-  };
+  const isActive = (href: string) => pathname.startsWith(href);
 
   return (
     <div className="min-h-screen bg-stone-100 flex">
@@ -249,20 +243,7 @@ export default function AdminLayout({
             <Menu size={24} />
           </button>
 
-          {/* Search */}
-          <div className="flex-1 max-w-md hidden sm:block">
-            <div className="relative">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500"
-              />
-              <input
-                type="text"
-                placeholder={t("admin.searchPlaceholder")}
-                className="w-full pl-10 pr-4 py-2 bg-stone-100 border border-transparent rounded-sm text-sm focus:border-black focus:bg-white transition-all"
-              />
-            </div>
-          </div>
+          <div className="flex-1" />
 
           <div className="flex items-center gap-2">
             {/* Language */}

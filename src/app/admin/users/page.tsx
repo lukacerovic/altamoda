@@ -88,6 +88,14 @@ export default function UsersPage() {
     return () => clearTimeout(debounce);
   }, [fetchUsers]);
 
+  // Poll for new registrations every 30s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchUsers();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchUsers]);
+
   const totalPages = Math.ceil(total / perPage);
   const pendingCount = users.filter((u) => u.status === "pending").length;
 
@@ -145,7 +153,7 @@ export default function UsersPage() {
 
   const roleBadge = (role: string) => {
     switch (role) {
-      case "b2b": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-stone-900 text-secondary">B2B</span>;
+      case "b2b": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-stone-900 text-white">B2B</span>;
       case "b2c": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-stone-100 text-[#666]">B2C</span>;
       case "admin": return <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Admin</span>;
       default: return null;

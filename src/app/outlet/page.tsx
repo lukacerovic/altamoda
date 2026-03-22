@@ -8,6 +8,7 @@ import {
   Clock,
   Filter,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const outletProducts = [
   { id: 1, name: "Vitamino Color Šampon 300ml", brand: "L'Oréal Professionnel", regularPrice: 3290, salePrice: 1290, discount: 61, rating: 4.5, image: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&h=500&fit=crop" },
@@ -21,6 +22,7 @@ const outletProducts = [
 ];
 
 export default function OutletPage() {
+  const { t } = useLanguage();
   const [liked, setLiked] = useState<Set<number>>(new Set());
   const [discountFilter, setDiscountFilter] = useState<string>("all");
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 27, seconds: 42 });
@@ -59,29 +61,29 @@ export default function OutletPage() {
         <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Flame className="w-6 h-6 text-secondary" />
-            <span className="text-white/80 text-sm font-semibold tracking-widest uppercase">Posebna Ponuda</span>
+            <span className="text-white/80 text-sm font-semibold tracking-widest uppercase">{t("outlet.specialOffer")}</span>
             <Flame className="w-6 h-6 text-secondary" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>
-            OUTLET — Do <span className="text-secondary">70%</span> Popusta
+            {t("outlet.outletTitle")} <span className="text-secondary">70%</span> {t("outlet.discount")}
           </h1>
-          <p className="text-white/70 text-lg mb-8 max-w-lg mx-auto">Iskoristite neponovljive cene na premium proizvode za negu i styling kose</p>
+          <p className="text-white/70 text-lg mb-8 max-w-lg mx-auto">{t("outlet.subtitle")}</p>
 
           {/* Countdown */}
           <div className="flex items-center justify-center gap-4 mb-6">
             <Clock className="w-5 h-5 text-secondary" />
-            <span className="text-white/80 text-sm font-medium">Ponuda ističe za:</span>
+            <span className="text-white/80 text-sm font-medium">{t("outlet.offerExpires")}</span>
           </div>
           <div className="flex items-center justify-center gap-3">
             {[
-              { value: timeLeft.days, label: "Dana" },
-              { value: timeLeft.hours, label: "Sati" },
-              { value: timeLeft.minutes, label: "Min" },
-              { value: timeLeft.seconds, label: "Sek" },
-            ].map((t) => (
-              <div key={t.label} className="bg-white/10 backdrop-blur-sm rounded-sm px-4 py-3 min-w-[70px]">
-                <p className="text-2xl md:text-3xl font-bold text-white">{String(t.value).padStart(2, "0")}</p>
-                <p className="text-[10px] text-white/60 uppercase tracking-wider">{t.label}</p>
+              { value: timeLeft.days, label: t("outlet.days") },
+              { value: timeLeft.hours, label: t("outlet.hours") },
+              { value: timeLeft.minutes, label: t("outlet.minutes") },
+              { value: timeLeft.seconds, label: t("outlet.seconds") },
+            ].map((item) => (
+              <div key={item.label} className="bg-white/10 backdrop-blur-sm rounded-sm px-4 py-3 min-w-[70px]">
+                <p className="text-2xl md:text-3xl font-bold text-white">{String(item.value).padStart(2, "0")}</p>
+                <p className="text-[10px] text-white/60 uppercase tracking-wider">{item.label}</p>
               </div>
             ))}
           </div>
@@ -91,11 +93,11 @@ export default function OutletPage() {
       {/* Filters + Grid */}
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <p className="text-sm text-stone-500">{filtered.length} proizvoda</p>
+          <p className="text-sm text-stone-500">{filtered.length} {t("outlet.products")}</p>
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-stone-400" />
             {[
-              { key: "all", label: "Svi" },
+              { key: "all", label: t("outlet.all") },
               { key: "50+", label: "50-59%" },
               { key: "60+", label: "60%+" },
             ].map((f) => (
@@ -140,7 +142,7 @@ export default function OutletPage() {
                   <span className="text-xs text-stone-400 line-through">{product.regularPrice.toLocaleString()} RSD</span>
                 </div>
                 <button className="w-full py-2.5 bg-[#c0392b] hover:bg-[#a93226] text-white text-sm font-medium rounded-sm transition-colors">
-                  Dodaj u korpu
+                  {t("outlet.addToCart")}
                 </button>
               </div>
             </div>

@@ -12,6 +12,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 /* ─── Types ─── */
 interface ProductBrand {
@@ -134,6 +135,7 @@ function getBadge(product: Product): string | null {
 
 /* ─── ProductCard ─── */
 function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted?: boolean }) {
+  const { t } = useLanguage();
   const [liked, setLiked] = useState(isWishlisted ?? false);
   const [addedToCart, setAddedToCart] = useState(false);
   const { addItem } = useCartStore();
@@ -205,7 +207,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
           <button onClick={handleAddToCart} className={`w-full text-white text-sm font-medium py-2.5 rounded-sm transition-colors flex items-center justify-center gap-2 ${addedToCart ? "bg-green-600" : "bg-black hover:bg-[#1a1a1a]"}`}>
-            {addedToCart ? <><CheckCircle className="w-4 h-4" /> Dodato!</> : <><ShoppingBag className="w-4 h-4" /> Dodaj u korpu</>}
+            {addedToCart ? <><CheckCircle className="w-4 h-4" /> {t("products.addedToCart")}</> : <><ShoppingBag className="w-4 h-4" /> {t("products.addToCart")}</>}
           </button>
         </div>
       </div>
@@ -281,14 +283,15 @@ function CategoryTreeItem({ item, depth = 0, onSelect, selectedSlug }: { item: C
 
 /* ─── Custom Select ─── */
 function SortSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const options = [
-    { value: "popular", label: "Najpopularnije" },
-    { value: "price_asc", label: "Cena: Najniža" },
-    { value: "price_desc", label: "Cena: Najviša" },
-    { value: "newest", label: "Najnovije" },
-    { value: "name_asc", label: "Ime: A-Ž" },
+    { value: "popular", label: t("products.sortPopular") },
+    { value: "price_asc", label: t("products.sortPriceLow") },
+    { value: "price_desc", label: t("products.sortPriceHigh") },
+    { value: "newest", label: t("products.sortNewest") },
+    { value: "name_asc", label: t("products.sortRating") },
   ];
 
   useEffect(() => {
@@ -346,6 +349,7 @@ export default function ProductsPageClient({
   availableColorLevels = [],
   availableColorUndertones = [],
 }: ProductsPageClientProps) {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
   const searchParam = searchParams.get("search");
@@ -600,7 +604,7 @@ export default function ProductsPageClient({
   const filterSidebar = (
     <div>
       {/* Category Tree */}
-      <FilterSection title="Kategorije">
+      <FilterSection title={t("products.category")}>
         <div className="space-y-0">
           {categories.map((cat) => (
             <CategoryTreeItem key={cat.id} item={cat} onSelect={handleCategorySelect} selectedSlug={selectedCategory} />
@@ -608,7 +612,7 @@ export default function ProductsPageClient({
         </div>
       </FilterSection>
 
-      <FilterSection title="Brend" count={selectedBrands.length}>
+      <FilterSection title={t("products.brand")} count={selectedBrands.length}>
         <div className="space-y-1 max-h-52 overflow-y-auto pr-1">
           {brands.map((b) => (
             <label key={b.slug} className="flex items-center gap-3 text-[13px] text-stone-500 cursor-pointer hover:text-black py-1.5 px-2 -mx-2 rounded-sm hover:bg-stone-100 transition-colors">
@@ -631,7 +635,7 @@ export default function ProductsPageClient({
         </div>
       </FilterSection>
 
-      <FilterSection title="Cena (RSD)" defaultOpen={false}>
+      <FilterSection title={`${t("products.price")} (RSD)`} defaultOpen={false}>
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <input
@@ -669,7 +673,7 @@ export default function ProductsPageClient({
             {/* ── Depth / Level ── only levels that exist */}
             {availableColorLevels.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">Nivo svetloće</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">{t("colorPage.lightnessLevel")}</p>
                 <div className="grid grid-cols-5 gap-1.5">
                   {availableColorLevels.map(({ level, count, hexSamples }) => {
                     const labelMap: Record<number, string> = {
@@ -807,7 +811,7 @@ export default function ProductsPageClient({
       {([
         { key: "all" as const, label: "Svi proizvodi" },
         { key: "b2c" as const, label: "Maloprodaja" },
-        { key: "b2b" as const, label: "Profesionalno" },
+        { key: "b2b" as const, label: t("products.professional") },
       ]).map((tab) => (
         <button
           key={tab.key}
@@ -833,17 +837,17 @@ export default function ProductsPageClient({
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-stone-400 mb-4">
-            <Link href="/" className="hover:text-black transition-colors">Početna</Link>
+            <Link href="/" className="hover:text-black transition-colors">{t("productDetail.home")}</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-black font-medium">Svi Proizvodi</span>
+            <span className="text-black font-medium">{t("products.allProducts")}</span>
           </nav>
 
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
               <h1 className="text-3xl md:text-4xl font-light text-black" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Svi Proizvodi
+                {t("products.allProducts")}
               </h1>
-              <p className="text-sm text-stone-400 mt-2">{pagination.total} proizvoda</p>
+              <p className="text-sm text-stone-400 mt-2">{pagination.total} {t("products.productsLabel")}</p>
             </div>
 
             {/* Visibility tabs */}
@@ -860,7 +864,7 @@ export default function ProductsPageClient({
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length >= 2 && setShowSearch(true)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
-                  placeholder="Pretražite proizvode..."
+                  placeholder={t("nav.searchPlaceholder")}
                   className="w-full border border-stone-200 rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
                 <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
@@ -870,7 +874,7 @@ export default function ProductsPageClient({
               {showSearch && searchResults.length > 0 && (
                 <div className="absolute mt-1.5 bg-white rounded-lg border border-stone-200 shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
                   <div className="p-3">
-                    <span className="text-[11px] text-stone-400 font-semibold tracking-widest uppercase">Proizvodi</span>
+                    <span className="text-[11px] text-stone-400 font-semibold tracking-widest uppercase">{t("nav.products")}</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
                         <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
@@ -904,8 +908,8 @@ export default function ProductsPageClient({
           <aside className="hidden lg:block w-[260px] flex-shrink-0">
             <div className="sticky top-20 bg-white rounded-sm border border-[#e8e2d9] p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-[13px] font-bold text-black uppercase tracking-widest">Filteri</h2>
-                <button onClick={clearAllTags} className="text-[12px] text-secondary hover:underline font-medium">Resetuj</button>
+                <h2 className="text-[13px] font-bold text-black uppercase tracking-widest">{t("products.filters")}</h2>
+                <button onClick={clearAllTags} className="text-[12px] text-secondary hover:underline font-medium">{t("products.resetFilters")}</button>
               </div>
               {filterSidebar}
             </div>
@@ -917,7 +921,7 @@ export default function ProductsPageClient({
             <div className="flex items-center justify-between mb-6 gap-4">
               <div className="flex items-center gap-3">
                 <button onClick={() => setMobileFilter(true)} className="lg:hidden flex items-center gap-2 bg-white border border-[#e8e2d9] px-4 py-2.5 rounded-sm text-sm font-medium hover:border-[#ccc] transition-colors shadow-sm">
-                  <SlidersHorizontal className="w-4 h-4 text-stone-400" /> Filteri
+                  <SlidersHorizontal className="w-4 h-4 text-stone-400" /> {t("products.filters")}
                 </button>
 
                 {/* Grid / List toggle */}
@@ -954,7 +958,7 @@ export default function ProductsPageClient({
                   </button>
                 ))}
                 <button onClick={clearAllTags} className="text-[12px] text-stone-400 hover:text-secondary font-medium ml-1 transition-colors">
-                  Obriši sve
+                  {t("products.clearFilters")}
                 </button>
               </div>
             )}
@@ -1003,8 +1007,7 @@ export default function ProductsPageClient({
             {/* Empty state */}
             {!loading && products.length === 0 && (
               <div className="text-center py-16">
-                <p className="text-lg text-stone-400">Nema pronađenih proizvoda</p>
-                <p className="text-sm text-[#bbb] mt-2">Pokušajte da promenite filtere ili pretražite ponovo.</p>
+                <p className="text-lg text-stone-400">{t("products.noProducts")}</p>
               </div>
             )}
 
@@ -1046,7 +1049,7 @@ export default function ProductsPageClient({
             <div className="flex items-center justify-between p-5 border-b border-[#f0ebe3] flex-shrink-0">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-secondary" />
-                <h3 className="text-[13px] font-bold uppercase tracking-widest text-black">Filteri</h3>
+                <h3 className="text-[13px] font-bold uppercase tracking-widest text-black">{t("products.filters")}</h3>
               </div>
               <button onClick={() => setMobileFilter(false)} className="w-8 h-8 rounded-sm hover:bg-stone-100 flex items-center justify-center transition-colors">
                 <X className="w-5 h-5 text-stone-400" />
@@ -1055,10 +1058,10 @@ export default function ProductsPageClient({
             <div className="p-5 flex-1 overflow-y-auto">{filterSidebar}</div>
             <div className="p-5 border-t border-[#f0ebe3] flex-shrink-0 flex gap-3">
               <button onClick={() => { clearAllTags(); setMobileFilter(false); }} className="flex-1 border border-[#e8e2d9] text-black py-3 rounded-sm font-medium text-sm transition-colors hover:bg-[#faf7f3]">
-                Resetuj
+                {t("products.resetFilters")}
               </button>
               <button onClick={() => setMobileFilter(false)} className="flex-1 bg-black hover:bg-black text-white py-3 rounded-sm font-medium text-sm transition-colors">
-                Primeni
+                {t("products.applyFilters")}
               </button>
             </div>
           </div>

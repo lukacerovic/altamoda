@@ -272,16 +272,36 @@ async function main() {
     }),
 
     // Professional Boje za kosu (B2B only)
-    prisma.product.upsert({
-      where: { sku: 'LOR-MAJ-70' },
-      update: {},
-      create: { sku: 'LOR-MAJ-70', nameLat: 'Majirel 7.0 - Srednje Plava Boja za Kosu', slug: 'majirel-7-0-srednje-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna profesionalna boja za kosu sa dubokim pokrivanjem sedih.', ingredients: 'Aqua, Cetearyl Alcohol, Propylene Glycol, Deceth-3, Laureth-12...', usageInstructions: 'Pomešajte 1:1 sa oksidantom. Nanesite i ostavite 35 minuta.', priceB2c: 890, priceB2b: 650, oldPrice: 1290, stockQuantity: 23, volumeMl: 60, isProfessional: true, isFeatured: true },
-    }),
-    prisma.product.upsert({
-      where: { sku: 'SCH-IR-71' },
-      update: {},
-      create: { sku: 'SCH-IR-71', nameLat: 'Igora Royal 7-1 Pepeljasto Plava 60ml', slug: 'igora-royal-7-1-pepeljasto-plava', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 0, volumeMl: 60, isProfessional: true },
-    }),
+    // Majirel (L'Oréal)
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-70' }, update: {}, create: { sku: 'LOR-MAJ-70', nameLat: 'Majirel 7.0 - Srednje Plava Boja za Kosu', slug: 'majirel-7-0-srednje-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna profesionalna boja za kosu sa dubokim pokrivanjem sedih.', ingredients: 'Aqua, Cetearyl Alcohol, Propylene Glycol, Deceth-3, Laureth-12...', usageInstructions: 'Pomešajte 1:1 sa oksidantom. Nanesite i ostavite 35 minuta.', priceB2c: 890, priceB2b: 650, oldPrice: 1290, stockQuantity: 23, volumeMl: 60, isProfessional: true, isFeatured: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-57' }, update: {}, create: { sku: 'LOR-MAJ-57', nameLat: 'Majirel 5.7 Svetlo Braon', slug: 'majirel-5-7-svetlo-braon', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa toplim braon tonovima.', priceB2c: 890, priceB2b: 650, stockQuantity: 30, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-63' }, update: {}, create: { sku: 'LOR-MAJ-63', nameLat: 'Majirel 6.3 Tamno Zlatna Plava', slug: 'majirel-6-3-tamno-zlatna-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa zlatnim tonom.', priceB2c: 890, priceB2b: 650, stockQuantity: 25, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-62' }, update: {}, create: { sku: 'LOR-MAJ-62', nameLat: 'Majirel 6.2 Tamno Ljubičasta Plava', slug: 'majirel-6-2-tamno-ljubicasta-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa ljubičastim nijansama.', priceB2c: 890, priceB2b: 650, stockQuantity: 20, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-66' }, update: {}, create: { sku: 'LOR-MAJ-66', nameLat: 'Majirel 6.6 Tamno Crvena Plava', slug: 'majirel-6-6-tamno-crvena-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa intenzivnim crvenim tonovima.', priceB2c: 890, priceB2b: 650, stockQuantity: 18, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-74' }, update: {}, create: { sku: 'LOR-MAJ-74', nameLat: 'Majirel 7.4 Srednje Bakarna Plava', slug: 'majirel-7-4-srednje-bakarna-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa bakarnim tonovima.', priceB2c: 890, priceB2b: 650, stockQuantity: 22, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-81' }, update: {}, create: { sku: 'LOR-MAJ-81', nameLat: 'Majirel 8.1 Svetlo Pepeljasta Plava', slug: 'majirel-8-1-svetlo-pepeljasta-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa pepeljastim tonovima.', priceB2c: 890, priceB2b: 650, stockQuantity: 28, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-88' }, update: {}, create: { sku: 'LOR-MAJ-88', nameLat: 'Majirel 8.8 Svetlo Mat Plava', slug: 'majirel-8-8-svetlo-mat-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa mat zelenim tonovima.', priceB2c: 890, priceB2b: 650, stockQuantity: 15, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'LOR-MAJ-93' }, update: {}, create: { sku: 'LOR-MAJ-93', nameLat: 'Majirel 9.3 Vrlo Svetlo Zlatna Plava', slug: 'majirel-9-3-vrlo-svetlo-zlatna-plava', brandId: loreal.id, productLineId: productLines[0].id, categoryId: bojeZaKosu.id, description: 'Permanentna boja sa zlatnim nijansama.', priceB2c: 890, priceB2b: 650, stockQuantity: 20, volumeMl: 60, isProfessional: true } }),
+
+    // Igora Royal (Schwarzkopf)
+    prisma.product.upsert({ where: { sku: 'SCH-IR-71' }, update: {}, create: { sku: 'SCH-IR-71', nameLat: 'Igora Royal 7-1 Pepeljasto Plava 60ml', slug: 'igora-royal-7-1-pepeljasto-plava', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 30, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-30' }, update: {}, create: { sku: 'SCH-IR-30', nameLat: 'Igora Royal 3-0 Tamno Braon', slug: 'igora-royal-3-0-tamno-braon', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 25, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-54' }, update: {}, create: { sku: 'SCH-IR-54', nameLat: 'Igora Royal 5-4 Svetlo Braon Bež', slug: 'igora-royal-5-4-svetlo-braon-bez', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 22, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-67' }, update: {}, create: { sku: 'SCH-IR-67', nameLat: 'Igora Royal 6-7 Tamno Plava Bakar', slug: 'igora-royal-6-7-tamno-plava-bakar', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 18, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-73' }, update: {}, create: { sku: 'SCH-IR-73', nameLat: 'Igora Royal 7-3 Srednje Zlatna Plava', slug: 'igora-royal-7-3-srednje-zlatna-plava', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 28, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-72' }, update: {}, create: { sku: 'SCH-IR-72', nameLat: 'Igora Royal 7-2 Srednje Ljubičasta Plava', slug: 'igora-royal-7-2-srednje-ljubicasta-plava', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 20, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-76' }, update: {}, create: { sku: 'SCH-IR-76', nameLat: 'Igora Royal 7-6 Srednje Crvena Plava', slug: 'igora-royal-7-6-srednje-crvena-plava', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 15, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'SCH-IR-84' }, update: {}, create: { sku: 'SCH-IR-84', nameLat: 'Igora Royal 8-4 Svetlo Bakarna Plava', slug: 'igora-royal-8-4-svetlo-bakarna-plava', brandId: schwarzkopf.id, productLineId: productLines[1].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 790, priceB2b: 580, stockQuantity: 24, volumeMl: 60, isProfessional: true } }),
+
+    // Koleston Perfect (Wella)
+    prisma.product.upsert({ where: { sku: 'WEL-KP-47' }, update: {}, create: { sku: 'WEL-KP-47', nameLat: 'Koleston Perfect 4/7 Srednje Braon', slug: 'koleston-perfect-4-7-srednje-braon', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 20, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-50' }, update: {}, create: { sku: 'WEL-KP-50', nameLat: 'Koleston Perfect 5/0 Svetlo Braon', slug: 'koleston-perfect-5-0-svetlo-braon', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 35, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-52' }, update: {}, create: { sku: 'WEL-KP-52', nameLat: 'Koleston Perfect 5/2 Svetlo Braon Ljubičasta', slug: 'koleston-perfect-5-2-svetlo-braon-ljubicasta', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 18, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-56' }, update: {}, create: { sku: 'WEL-KP-56', nameLat: 'Koleston Perfect 5/6 Svetlo Braon Crvena', slug: 'koleston-perfect-5-6-svetlo-braon-crvena', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 22, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-61' }, update: {}, create: { sku: 'WEL-KP-61', nameLat: 'Koleston Perfect 6/1 Tamno Pepeljasta Plava', slug: 'koleston-perfect-6-1-tamno-pepeljasta-plava', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 28, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-64' }, update: {}, create: { sku: 'WEL-KP-64', nameLat: 'Koleston Perfect 6/4 Tamno Bakarna Plava', slug: 'koleston-perfect-6-4-tamno-bakarna-plava', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 15, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-78' }, update: {}, create: { sku: 'WEL-KP-78', nameLat: 'Koleston Perfect 7/8 Srednje Mat Plava', slug: 'koleston-perfect-7-8-srednje-mat-plava', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 20, volumeMl: 60, isProfessional: true } }),
+    prisma.product.upsert({ where: { sku: 'WEL-KP-83' }, update: {}, create: { sku: 'WEL-KP-83', nameLat: 'Koleston Perfect 8/3 Svetlo Zlatna Plava', slug: 'koleston-perfect-8-3-svetlo-zlatna-plava', brandId: wella.id, productLineId: productLines[2].id, categoryId: bojeZaKosu.id, description: 'Profesionalna permanentna boja za kosu.', priceB2c: 850, priceB2b: 620, stockQuantity: 25, volumeMl: 60, isProfessional: true } }),
 
     // Oksidant
     prisma.product.upsert({
@@ -313,21 +333,52 @@ async function main() {
   console.log('✅ Product Images seeded')
 
   // ==================== COLOR PRODUCTS ====================
-  const majirelProduct = products.find(p => p.sku === 'LOR-MAJ-70')!
-  const igoraProduct = products.find(p => p.sku === 'SCH-IR-71')!
+  // Each entry: [sku, level, undertoneCode, undertoneName, hexValue, shadeCode]
+  const colorData: [string, number, string, string, string, string][] = [
+    // Majirel (L'Oréal)
+    ['LOR-MAJ-57', 5, 'B', 'Braon',      '#604520', '5.7'],
+    ['LOR-MAJ-63', 6, 'G', 'Zlatna',     '#96782a', '6.3'],
+    ['LOR-MAJ-62', 6, 'V', 'Ljubičasta', '#653090', '6.2'],
+    ['LOR-MAJ-66', 6, 'R', 'Crvena',     '#a02020', '6.6'],
+    ['LOR-MAJ-70', 7, 'N', 'Prirodna',   '#8B6914', '7.0'],
+    ['LOR-MAJ-74', 7, 'C', 'Bakarna',    '#c06a28', '7.4'],
+    ['LOR-MAJ-81', 8, 'A', 'Pepeljasta', '#b0aab8', '8.1'],
+    ['LOR-MAJ-88', 8, 'M', 'Mat',        '#829670', '8.8'],
+    ['LOR-MAJ-93', 9, 'G', 'Zlatna',     '#dcc050', '9.3'],
 
-  await prisma.colorProduct.upsert({
-    where: { productId: majirelProduct.id },
-    update: {},
-    create: { productId: majirelProduct.id, colorLevel: 7, undertoneCode: 'N', undertoneName: 'Neutralni', hexValue: '#8B6914', shadeCode: '7.0' },
-  })
-  await prisma.colorProduct.upsert({
-    where: { productId: igoraProduct.id },
-    update: {},
-    create: { productId: igoraProduct.id, colorLevel: 7, undertoneCode: 'A', undertoneName: 'Pepeljasti', hexValue: '#7B7156', shadeCode: '7-1' },
-  })
+    // Igora Royal (Schwarzkopf)
+    ['SCH-IR-30', 3, 'N', 'Prirodna',    '#2d1f12', '3-0'],
+    ['SCH-IR-54', 5, 'C', 'Bakarna',     '#8a4a1a', '5-4'],
+    ['SCH-IR-67', 6, 'B', 'Braon',       '#785528', '6-7'],
+    ['SCH-IR-71', 7, 'A', 'Pepeljasta',  '#7B7156', '7-1'],
+    ['SCH-IR-73', 7, 'G', 'Zlatna',      '#b09035', '7-3'],
+    ['SCH-IR-72', 7, 'V', 'Ljubičasta',  '#7a38a8', '7-2'],
+    ['SCH-IR-76', 7, 'R', 'Crvena',      '#bb2828', '7-6'],
+    ['SCH-IR-84', 8, 'C', 'Bakarna',     '#d88030', '8-4'],
 
-  console.log('✅ Color Products seeded')
+    // Koleston Perfect (Wella)
+    ['WEL-KP-47', 4, 'B', 'Braon',       '#4a3518', '4/7'],
+    ['WEL-KP-50', 5, 'N', 'Prirodna',    '#5a3e25', '5/0'],
+    ['WEL-KP-52', 5, 'V', 'Ljubičasta',  '#502878', '5/2'],
+    ['WEL-KP-56', 5, 'R', 'Crvena',      '#851a1a', '5/6'],
+    ['WEL-KP-61', 6, 'A', 'Pepeljasta',  '#7a7488', '6/1'],
+    ['WEL-KP-64', 6, 'C', 'Bakarna',     '#a55a20', '6/4'],
+    ['WEL-KP-78', 7, 'M', 'Mat',         '#6e8060', '7/8'],
+    ['WEL-KP-83', 8, 'G', 'Zlatna',      '#c8a840', '8/3'],
+  ]
+
+  for (const [sku, level, code, name, hex, shade] of colorData) {
+    const product = products.find(p => p.sku === sku)
+    if (product) {
+      await prisma.colorProduct.upsert({
+        where: { productId: product.id },
+        update: {},
+        create: { productId: product.id, colorLevel: level, undertoneCode: code, undertoneName: name, hexValue: hex, shadeCode: shade },
+      })
+    }
+  }
+
+  console.log('✅ Color Products seeded (25 dyes across 3 brands)')
 
   // ==================== DYNAMIC ATTRIBUTES ====================
   const attrs = await Promise.all([
@@ -473,10 +524,11 @@ async function main() {
   console.log('✅ Orders seeded')
 
   // ==================== REVIEWS ====================
+  const majirelForReview = products.find(p => p.sku === 'LOR-MAJ-70')!
   await Promise.all([
-    prisma.review.create({ data: { productId: majirelProduct.id, userId: b2cUser.id, rating: 5 } }),
-    prisma.review.create({ data: { productId: majirelProduct.id, userId: b2bUser.id, rating: 4 } }),
-    prisma.review.create({ data: { productId: majirelProduct.id, userId: b2cUser2.id, rating: 5 } }),
+    prisma.review.create({ data: { productId: majirelForReview.id, userId: b2cUser.id, rating: 5 } }),
+    prisma.review.create({ data: { productId: majirelForReview.id, userId: b2bUser.id, rating: 4 } }),
+    prisma.review.create({ data: { productId: majirelForReview.id, userId: b2cUser2.id, rating: 5 } }),
     prisma.review.create({ data: { productId: products[9].id, userId: b2cUser.id, rating: 5 } }),
     prisma.review.create({ data: { productId: products[10].id, userId: b2cUser.id, rating: 4 } }),
   ])

@@ -7,6 +7,7 @@ import {
   Star, MessageCircle, ThumbsUp,
   Mail,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const article = {
   title: "Trendovi boja za kosu - Prolece 2026",
@@ -40,13 +41,14 @@ const comments = [
 ];
 
 export default function BlogPostPage() {
+  const { t } = useLanguage();
   const [commentText, setCommentText] = useState("");
 
   return (
     <div className="min-h-screen bg-stone-100">
       <div className="max-w-4xl mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-          <Link href="/" className="hover:text-secondary">Pocetna</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/" className="hover:text-secondary">{t("blog.home")}</Link><ChevronRight className="w-3 h-3" />
           <Link href="/blog" className="hover:text-secondary">Blog</Link><ChevronRight className="w-3 h-3" />
           <span className="text-black">{article.title}</span>
         </nav>
@@ -100,7 +102,7 @@ export default function BlogPostPage() {
 
           {/* Share buttons */}
           <div className="flex items-center gap-4 py-6 border-t border-b border-gray-100 mb-8">
-            <span className="text-sm font-medium text-gray-500">Podelite:</span>
+            <span className="text-sm font-medium text-gray-500">{t("blog.share")}</span>
             <button className="w-9 h-9 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:opacity-80 transition-opacity"><FacebookIcon className="w-4 h-4" /></button>
             <button className="w-9 h-9 rounded-full bg-[#1DA1F2] text-white flex items-center justify-center hover:opacity-80 transition-opacity"><Share2 className="w-4 h-4" /></button>
             <button className="w-9 h-9 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-80 transition-opacity"><Mail className="w-4 h-4" /></button>
@@ -147,8 +149,8 @@ export default function BlogPostPage() {
               ))}
             </div>
             <div className="bg-white rounded-sm p-6 shadow-sm">
-              <h4 className="font-semibold text-black mb-4">Ostavite komentar</h4>
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} rows={4} placeholder="Vas komentar..." className="w-full border border-gray-200 rounded-sm px-4 py-3 text-sm mb-3 resize-none" />
+              <h4 className="font-semibold text-black mb-4">{t("blog.leaveComment")}</h4>
+              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} rows={4} placeholder={t("blog.commentPlaceholder")} className="w-full border border-gray-200 rounded-sm px-4 py-3 text-sm mb-3 resize-none" />
               <button className="bg-black hover:bg-stone-800 text-white px-6 py-2.5 rounded font-medium text-sm transition-colors flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" /> Posaljite Komentar
               </button>

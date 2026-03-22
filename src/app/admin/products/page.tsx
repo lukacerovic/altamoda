@@ -25,7 +25,6 @@ import {
   Palette,
   ShieldCheck,
   BarChart3,
-  Globe,
   Layers,
   AlertTriangle,
 } from "lucide-react";
@@ -83,7 +82,7 @@ interface Product {
   };
 }
 
-type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe" | "boja" | "seo" | "atributi";
+type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe" | "boja" | "atributi";
 
 /* ───────────────────────── Constants ───────────────────────── */
 
@@ -329,7 +328,10 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("osnovno");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [apiLoaded, setApiLoaded] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<Omit<Product, "id">>(defaultFormData());
   // Separate state for discount % input so user can type it
@@ -363,10 +365,7 @@ export default function ProductsPage() {
   const perPage = 8;
   const loadedRef = useRef(false);
 
-  // Load products from API on mount
-  useEffect(() => {
-    if (loadedRef.current) return;
-    loadedRef.current = true;
+  const fetchProducts = useCallback(() => {
     fetch("/api/products?limit=100")
       .then(res => res.json())
       .then(data => {
@@ -410,10 +409,22 @@ export default function ProductsPage() {
         }
       })
       .catch(() => {
-        // Fallback to mock data already in state
         setApiLoaded(true);
       });
   }, []);
+
+  // Load products from API on mount
+  useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Poll for product updates every 30s
+  useEffect(() => {
+    const interval = setInterval(fetchProducts, 30000);
+    return () => clearInterval(interval);
+  }, [fetchProducts]);
 
   /* ── Filtered / paginated ── */
   const filtered = useMemo(() => {
@@ -459,6 +470,19 @@ export default function ProductsPage() {
   };
 
   const handleSave = async () => {
+    // Validate required fields
+    const errors: string[] = [];
+    if (!formData.name.trim()) errors.push(t("admin.productName"));
+    if (!formData.sku.trim()) errors.push(t("admin.skuCode"));
+    if (!formData.priceB2C || formData.priceB2C <= 0) errors.push(t("admin.priceB2c"));
+    if (!formData.priceB2B || formData.priceB2B <= 0) errors.push(t("admin.priceB2b"));
+    if (formData.stock === undefined || formData.stock < 0) errors.push(t("admin.stockQuantity"));
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     setSaving(true);
     const apiBody = {
       nameLat: formData.name,
@@ -479,8 +503,7 @@ export default function ProductsPage() {
       isFeatured: formData.badges.isFeatured,
       isBestseller: formData.badges.isBestseller,
       isActive: formData.status === "active",
-      seoTitle: formData.seoTitle || null,
-      seoDescription: formData.metaDescription || null,
+      slug: formData.slug || null,
       // Color data — only include if a color level is actually set
       ...(formData.colorLevel ? {
         colorLevel: formData.colorLevel,
@@ -614,7 +637,6 @@ export default function ProductsPage() {
     { key: "mediji", label: t("admin.productImages"), icon: <ImageIcon size={16} /> },
     { key: "zalihe", label: t("admin.stock"), icon: <Package size={16} /> },
     { key: "boja", label: t("admin.colorLevel").split(" ")[0] || "Boja", icon: <Palette size={16} /> },
-    { key: "seo", label: "SEO", icon: <Globe size={16} /> },
     { key: "atributi", label: t("admin.productAttributes"), icon: <ShieldCheck size={16} /> },
   ];
 
@@ -1135,26 +1157,20 @@ export default function ProductsPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
-                          <div className="text-center p-2">
-                            <ImageIcon size={28} className="mx-auto text-[#bbb] mb-1" />
-                            <p className="text-[10px] text-[#999] truncate max-w-full">{img.url.split("/").pop()}</p>
-                          </div>
+                          {img.url.startsWith("/uploads/") ? (
+                            <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-center p-2">
+                              <ImageIcon size={28} className="mx-auto text-[#bbb] mb-1" />
+                              <p className="text-[10px] text-[#999] truncate max-w-full">{img.url.split("/").pop()}</p>
+                            </div>
+                          )}
                           {img.isPrimary && (
                             <div className="absolute top-1 left-1 bg-black text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
                               <Star size={10} /> {t("admin.mainImage")}
                             </div>
                           )}
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => {
-                                const updated = formData.images.map((im) => ({ ...im, isPrimary: im.id === img.id }));
-                                updateForm("images", updated);
-                              }}
-                              className="p-1.5 bg-white rounded-sm text-secondary hover:bg-stone-100"
-                              title={t("admin.setAsMain")}
-                            >
-                              <Star size={14} />
-                            </button>
                             <button
                               onClick={() => updateForm("images", formData.images.filter((_, i) => i !== idx))}
                               className="p-1.5 bg-white rounded-sm text-red-500 hover:bg-red-50"
@@ -1166,19 +1182,59 @@ export default function ProductsPage() {
                         </div>
                       ))}
 
-                      {/* Add placeholder */}
-                      <button
-                        onClick={() => {
-                          const newId = Math.max(0, ...formData.images.map((i) => i.id)) + 1;
-                          updateForm("images", [
-                            ...formData.images,
-                            { id: newId, url: `/products/new-${newId}.jpg`, alt: formData.name, isPrimary: formData.images.length === 0 },
-                          ]);
+                      {/* Upload image */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        multiple
+                        className="hidden"
+                        onChange={async (e) => {
+                          const files = e.target.files;
+                          if (!files || files.length === 0) return;
+                          setUploading(true);
+                          try {
+                            const newImages = [...formData.images];
+                            for (const file of Array.from(files)) {
+                              const fd = new FormData();
+                              fd.append("file", file);
+                              const res = await fetch("/api/upload", { method: "POST", body: fd });
+                              const data = await res.json();
+                              if (data.success) {
+                                const newId = Math.max(0, ...newImages.map((i) => i.id)) + 1;
+                                newImages.push({
+                                  id: newId,
+                                  url: data.data.url,
+                                  alt: formData.name || file.name,
+                                  isPrimary: newImages.length === 0,
+                                });
+                              }
+                            }
+                            updateForm("images", newImages);
+                          } catch (err) {
+                            console.error("Upload failed:", err);
+                          } finally {
+                            setUploading(false);
+                            if (fileInputRef.current) fileInputRef.current.value = "";
+                          }
                         }}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#999] hover:border-black hover:text-secondary transition-colors cursor-pointer"
+                      />
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#999] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
                       >
-                        <Upload size={24} />
-                        <span className="text-xs">{t("admin.addImage")}</span>
+                        {uploading ? (
+                          <>
+                            <div className="w-6 h-6 border-2 border-stone-300 border-t-black rounded-full animate-spin" />
+                            <span className="text-xs">Upload...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={24} />
+                            <span className="text-xs">{t("admin.addImage")}</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -1374,70 +1430,6 @@ export default function ProductsPage() {
                 </div>
               )}
 
-              {/* ── Tab: SEO ── */}
-              {activeTab === "seo" && (
-                <div className={sectionCls}>
-                  <div>
-                    <label className={labelCls}>
-                      {t("admin.seoTitle")}
-                      <span className={`ml-2 text-xs ${(formData.seoTitle.length) > 60 ? "text-red-500" : "text-[#999]"}`}>
-                        {formData.seoTitle.length}/60
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.seoTitle}
-                      onChange={(e) => updateForm("seoTitle", e.target.value)}
-                      className={inputCls}
-                      placeholder={`${t("admin.productName")} | Alta Moda`}
-                      maxLength={80}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelCls}>
-                      {t("admin.metaDescription")}
-                      <span className={`ml-2 text-xs ${(formData.metaDescription.length) > 160 ? "text-red-500" : "text-[#999]"}`}>
-                        {formData.metaDescription.length}/160
-                      </span>
-                    </label>
-                    <textarea
-                      value={formData.metaDescription}
-                      onChange={(e) => updateForm("metaDescription", e.target.value)}
-                      rows={3}
-                      className={inputCls + " resize-y"}
-                      placeholder={t("admin.shortDescSearch")}
-                      maxLength={200}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelCls}>{t("admin.urlSlug")}</label>
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-[#999]">/proizvodi/</span>
-                      <input
-                        type="text"
-                        value={formData.slug}
-                        onChange={(e) => updateForm("slug", e.target.value)}
-                        className={inputCls}
-                        placeholder={t("admin.autoGenerated")}
-                      />
-                    </div>
-                    <p className="text-xs text-[#999] mt-1">{t("admin.autoGenerated")}</p>
-                  </div>
-
-                  {/* SEO Preview */}
-                  <div>
-                    <label className={labelCls}>{t("admin.searchPreview")}</label>
-                    <div className="border border-stone-200 rounded-sm p-4 bg-white space-y-1">
-                      <p className="text-blue-700 text-base font-medium truncate">{formData.seoTitle || formData.name || t("admin.productName")}</p>
-                      <p className="text-green-700 text-xs">altamoda.rs/proizvodi/{formData.slug || "..."}</p>
-                      <p className="text-sm text-[#555] line-clamp-2">{formData.metaDescription || formData.description || "Meta opis proizvoda..."}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* ── Tab: Atributi ── */}
               {activeTab === "atributi" && (
                 <div className={sectionCls}>
@@ -1520,6 +1512,39 @@ export default function ProductsPage() {
             }
           `}</style>
         </>
+      )}
+
+      {/* Validation errors modal */}
+      {validationErrors.length > 0 && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-sm shadow-xl max-w-sm w-full mx-4 overflow-hidden">
+            <div className="flex items-center gap-3 px-6 pt-6 pb-2">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle size={20} className="text-red-500" />
+              </div>
+              <h3 className="text-lg font-serif font-bold text-black">{t("admin.requiredFields") || "Obavezna polja"}</h3>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-sm text-[#666] mb-3">{t("admin.fillRequiredFields") || "Popunite sva obavezna polja pre nego što sačuvate proizvod:"}</p>
+              <ul className="space-y-1.5">
+                {validationErrors.map((field) => (
+                  <li key={field} className="flex items-center gap-2 text-sm text-red-600">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                    {field}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="px-6 pb-6 pt-2 flex justify-end">
+              <button
+                onClick={() => setValidationErrors([])}
+                className="btn-gold px-6 py-2.5 rounded-sm text-sm font-medium"
+              >
+                {t("admin.understood") || "Razumem"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

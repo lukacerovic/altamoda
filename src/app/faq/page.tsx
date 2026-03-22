@@ -9,10 +9,11 @@ import {
   Phone,
   MessageCircle,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const faqSections = [
+const faqItemsData = [
   {
-    title: "Narudžbine i Dostava",
+    titleKey: "faq.catOrders",
     items: [
       { q: "Koliko traje dostava?", a: "Standardna dostava traje 1-3 radna dana za teritoriju Srbije. Za Beograd je moguća dostava narednog radnog dana za porudžbine primljene do 14h." },
       { q: "Koliko košta dostava?", a: "Dostava je besplatna za sve porudžbine iznad 5.000 RSD. Za porudžbine manje vrednosti, cena dostave iznosi 350 RSD." },
@@ -22,7 +23,7 @@ const faqSections = [
     ],
   },
   {
-    title: "Plaćanje",
+    titleKey: "faq.catPayment",
     items: [
       { q: "Koji načini plaćanja su dostupni?", a: "Prihvatamo platne kartice (Visa, Mastercard, Maestro, Dina), plaćanje pouzećem, kao i plaćanje putem fakture za B2B korisnike." },
       { q: "Da li je online plaćanje sigurno?", a: "Apsolutno. Koristimo SSL enkripciju i sertifikovane payment gateway sisteme. Vaši podaci o kartici nikada ne prolaze kroz naš server." },
@@ -31,7 +32,7 @@ const faqSections = [
     ],
   },
   {
-    title: "B2B Program",
+    titleKey: "faq.catB2B",
     items: [
       { q: "Kako se registrovati kao B2B korisnik?", a: "Kliknite na 'B2B Registracija' i popunite formular sa podacima o vašem salonu (PIB, matični broj, adresa). Naš tim će pregledati i odobriti vaš nalog u roku od 24h." },
       { q: "Koje su prednosti B2B programa?", a: "B2B korisnici imaju pristup posebnim cenama, rabatnim skalama, ekskluzivnim profesionalnim proizvodima, mogućnosti naručivanja po fakturi i loyalty programu." },
@@ -40,7 +41,7 @@ const faqSections = [
     ],
   },
   {
-    title: "Proizvodi",
+    titleKey: "faq.catProducts",
     items: [
       { q: "Da li su svi proizvodi originalni?", a: "Da, svi naši proizvodi su 100% originalni i nabavljeni direktno od ovlašćenih distributera. Garantujemo autentičnost svakog proizvoda." },
       { q: "Koji je rok trajanja proizvoda?", a: "Svi proizvodi imaju minimalno 12 meseci do isteka roka trajanja u momentu isporuke. Rok trajanja je jasno naznačen na pakovanju." },
@@ -48,7 +49,7 @@ const faqSections = [
     ],
   },
   {
-    title: "Povrat i Reklamacije",
+    titleKey: "faq.catReturns",
     items: [
       { q: "Kakva je politika povrata?", a: "Imate pravo na povrat neotvorenog proizvoda u roku od 14 dana od prijema. Proizvod mora biti u originalnom pakovanju, neoštećen i nekorišćen." },
       { q: "Kako pokrenuti povrat?", a: "Kontaktirajte nas putem emaila na reklamacije@altamoda.rs ili pozovite +381 11 123 4567. Naš tim će vam dati instrukcije za povrat." },
@@ -58,8 +59,14 @@ const faqSections = [
 ];
 
 export default function FAQPage() {
+  const { t } = useLanguage();
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+
+  const faqSections = faqItemsData.map((section) => ({
+    title: t(section.titleKey),
+    items: section.items,
+  }));
 
   const toggleItem = (key: string) => {
     const next = new Set(openItems);
@@ -86,16 +93,16 @@ export default function FAQPage() {
         <div className="text-center mb-10">
           <HelpCircle className="w-12 h-12 text-secondary mx-auto mb-4" />
           <h1 className="text-3xl md:text-4xl font-bold text-black mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
-            Često Postavljana Pitanja
+            {t("faq.title")}
           </h1>
-          <p className="text-[#666]">Pronađite odgovore na najčešća pitanja</p>
+          <p className="text-[#666]">{t("faq.subtitle")}</p>
         </div>
 
         {/* Search */}
         <div className="relative mb-10">
           <input
             type="text"
-            placeholder="Pretražite pitanja..."
+            placeholder={t("faq.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
@@ -139,8 +146,8 @@ export default function FAQPage() {
 
         {/* Contact Section */}
         <div className="mt-16 bg-white rounded-sm border border-stone-200 p-8 text-center">
-          <h3 className="text-xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>Niste pronašli odgovor?</h3>
-          <p className="text-[#666] mb-6">Naš tim za podršku je tu da vam pomogne</p>
+          <h3 className="text-xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
+          <p className="text-[#666] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="tel:+381111234567" className="flex items-center justify-center gap-2 px-6 py-3 border border-stone-200 rounded-sm text-sm font-medium text-[#333] hover:border-black hover:text-secondary transition-colors">
               <Phone className="w-4 h-4" /> +381 11 123 4567
