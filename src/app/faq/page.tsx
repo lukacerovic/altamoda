@@ -7,7 +7,6 @@ import {
   HelpCircle,
   Mail,
   Phone,
-  MessageCircle,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -155,9 +154,6 @@ export default function FAQPage() {
             <a href="mailto:info@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-stone-200 rounded-sm text-sm font-medium text-[#333] hover:border-black hover:text-secondary transition-colors">
               <Mail className="w-4 h-4" /> info@altamoda.rs
             </a>
-            <button className="flex items-center justify-center gap-2 px-6 py-3 bg-black hover:bg-stone-800 text-white rounded-sm text-sm font-medium transition-colors">
-              <MessageCircle className="w-4 h-4" /> Online Chat
-            </button>
           </div>
         </div>
       </div>

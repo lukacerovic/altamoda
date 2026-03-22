@@ -36,6 +36,7 @@ interface OrderItem {
   price: number;
   qty: number;
   image: string;
+  stockQuantity: number;
 }
 
 interface Props {
@@ -86,6 +87,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
           price: data.data.price,
           qty: 1,
           image: data.data.image,
+          stockQuantity: data.data.stockQuantity ?? 0,
         }]);
       } else {
         setSuggestions([]);
@@ -119,10 +121,24 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
     try {
       const text = await csvFile.text();
       const lines = text.trim().split("\n").slice(1); // skip header
-      const rows = lines.map((line) => {
+      const parseErrors: string[] = [];
+      const rows = lines.map((line, idx) => {
         const [sku, qty] = line.split(",").map((s) => s.trim());
-        return { sku, quantity: parseInt(qty) || 1 };
+        if (!sku) {
+          parseErrors.push(t("quickOrder.csvRowMissingSku").replace("{row}", String(idx + 2)));
+          return { sku: "", quantity: 1 };
+        }
+        const parsedQty = parseInt(qty);
+        if (qty && isNaN(parsedQty)) {
+          parseErrors.push(t("quickOrder.csvRowInvalidQty").replace("{row}", String(idx + 2)).replace("{qty}", qty).replace("{sku}", sku));
+        }
+        return { sku, quantity: parsedQty || 1 };
       }).filter((r) => r.sku);
+
+      if (rows.length === 0) {
+        setError(t("quickOrder.csvNoValidRows"));
+        return;
+      }
 
       const res = await fetch("/api/orders/quick", {
         method: "POST",
@@ -132,11 +148,14 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
       const data = await res.json();
       if (data.success) {
         setCsvResult(data.data);
+        if (parseErrors.length > 0) {
+          setError(t("quickOrder.csvWarnings") + "\n" + parseErrors.join("\n"));
+        }
       } else {
-        setError(data.error || "Greška pri obradi CSV fajla");
+        setError(data.error || t("quickOrder.csvProcessError"));
       }
     } catch {
-      setError("Greška pri čitanju fajla");
+      setError(t("quickOrder.csvReadError"));
     } finally {
       setCsvLoading(false);
     }
@@ -160,6 +179,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
           price: item.price,
           qty: item.quantity,
           image: item.image || "",
+          stockQuantity: item.stockQuantity ?? item.quantity,
         }]);
       }
     }
@@ -186,11 +206,12 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
           price: item.price,
           qty: item.quantity,
           image: item.image || "",
+          stockQuantity: item.stockQuantity ?? item.quantity,
         }));
         setOrderItems(newItems);
       }
     } catch {
-      setError("Greška pri učitavanju porudžbine");
+      setError(t("quickOrder.orderLoadError"));
     } finally {
       setRepeatLoading(null);
     }
@@ -207,7 +228,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
         quantity: item.qty,
         image: item.image,
         sku: item.code,
-        stockQuantity: 999,
+        stockQuantity: item.stockQuantity,
       });
     }
     router.push("/checkout");
@@ -221,13 +242,13 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
           <span className="inline-flex items-center gap-2 px-3 py-1 bg-stone-900 text-secondary text-xs font-semibold rounded-full mb-4">
             <Package className="w-3 h-3" /> B2B
           </span>
-          <h1 className="text-3xl font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>Brza Narudžbina</h1>
-          <p className="text-[#666] mt-1">Naručite brzo koristeći šifre proizvoda, listu ili CSV upload</p>
+          <h1 className="text-3xl font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>{t("quickOrder.title")}</h1>
+          <p className="text-[#666] mt-1">{t("quickOrder.subtitle")}</p>
         </div>
 
         {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-sm p-3 flex items-center gap-2 text-sm text-red-700">
-            <AlertCircle className="w-4 h-4" /> {error}
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-sm p-3 flex items-start gap-2 text-sm text-red-700">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" /> <span style={{ whiteSpace: "pre-line" }}>{error}</span>
           </div>
         )}
 
@@ -237,9 +258,9 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
             {/* Tabs */}
             <div className="flex border-b border-stone-200 mb-6">
               {[
-                { key: "code" as const, label: "Po šifri", icon: Hash },
+                { key: "code" as const, label: t("quickOrder.byCode"), icon: Hash },
                 { key: "list" as const, label: t("quickOrder.productList"), icon: List },
-                { key: "csv" as const, label: "Upload CSV", icon: Upload },
+                { key: "csv" as const, label: t("quickOrder.uploadCsv"), icon: Upload },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -262,7 +283,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                       type="text"
                       value={codeInput}
                       onChange={(e) => handleCodeSearch(e.target.value)}
-                      placeholder="Unesite šifru ili naziv proizvoda..."
+                      placeholder={t("quickOrder.searchPlaceholder")}
                       className="w-full px-4 py-3 border border-stone-200 rounded-sm text-sm focus:border-black"
                     />
                     {suggestions.length > 0 && (
@@ -282,7 +303,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="text-sm text-[#666]">Količina:</label>
+                    <label className="text-sm text-[#666]">{t("quickOrder.quantity")}</label>
                     <div className="flex items-center border border-stone-200 rounded-sm">
                       <button onClick={() => setQtyInput(Math.max(1, qtyInput - 1))} className="px-3 py-2 hover:bg-stone-100"><Minus className="w-4 h-4" /></button>
                       <span className="px-3 py-2 text-sm font-medium min-w-[40px] text-center">{qtyInput}</span>
@@ -290,7 +311,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-[#999]">Počnite da kucate šifru ili naziv proizvoda za brzu pretragu</p>
+                <p className="text-xs text-[#999]">{t("quickOrder.searchHint")}</p>
               </div>
             )}
 
@@ -311,9 +332,9 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                     >
                       <Upload className="w-12 h-12 text-secondary mx-auto mb-4" />
                       <h3 className="text-lg font-semibold text-[#333] mb-2">
-                        {csvFile ? csvFile.name : "Prevucite CSV fajl ovde"}
+                        {csvFile ? csvFile.name : t("quickOrder.dragCsvHere")}
                       </h3>
-                      <p className="text-sm text-[#666] mb-4">ili kliknite da izaberete fajl</p>
+                      <p className="text-sm text-[#666] mb-4">{t("quickOrder.orClickToSelect")}</p>
                       <input
                         id="csv-input"
                         type="file"
@@ -330,14 +351,14 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                           disabled={csvLoading}
                           className="px-6 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-stone-800 transition-colors disabled:opacity-50"
                         >
-                          {csvLoading ? "Obrada..." : "Učitaj"}
+                          {csvLoading ? t("quickOrder.processing") : t("quickOrder.upload")}
                         </button>
                       )}
                     </div>
                     <div className="mt-6 p-4 bg-stone-100 rounded-sm">
-                      <p className="text-sm font-medium text-[#333] mb-2">Format CSV fajla:</p>
+                      <p className="text-sm font-medium text-[#333] mb-2">{t("quickOrder.csvFormat")}</p>
                       <code className="text-xs text-[#666] font-mono block bg-white p-3 rounded border">
-                        sifra,kolicina<br />
+                        {t("quickOrder.csvHeaderExample")}<br />
                         MAJ-7.1,10<br />
                         OXI-6,3<br />
                         ABS-SH,2
@@ -349,16 +370,16 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Check className="w-8 h-8 text-green-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-[#333] mb-2">Fajl uspešno učitan!</h3>
-                    <p className="text-sm text-[#666] mb-6">Pronađeno {csvResult.summary.found} od {csvResult.summary.total} proizvoda</p>
+                    <h3 className="text-lg font-semibold text-[#333] mb-2">{t("quickOrder.fileUploaded")}</h3>
+                    <p className="text-sm text-[#666] mb-6">{t("quickOrder.foundOf")} {csvResult.summary.found} / {csvResult.summary.total}</p>
                     <div className="bg-stone-100 rounded-sm p-4 text-left max-w-sm mx-auto mb-6">
                       <div className="flex justify-between text-sm mb-1"><span className="text-[#666]">{t("quickOrder.found")}</span><span className="font-medium">{csvResult.summary.found} {t("quickOrder.items")}</span></div>
-                      <div className="flex justify-between text-sm mb-1"><span className="text-[#666]">Ukupna vrednost:</span><span className="font-medium">{csvResult.summary.totalValue?.toLocaleString()} RSD</span></div>
+                      <div className="flex justify-between text-sm mb-1"><span className="text-[#666]">{t("quickOrder.totalValue")}</span><span className="font-medium">{csvResult.summary.totalValue?.toLocaleString()} RSD</span></div>
                       <div className="flex justify-between text-sm"><span className="text-[#666]">{t("quickOrder.unavailable")}</span><span className="font-medium text-orange-500">{csvResult.summary.notFound + csvResult.summary.outOfStock} {t("quickOrder.items")}</span></div>
                     </div>
                     <div className="flex gap-3 justify-center">
                       <button onClick={addCsvToOrder} className="px-6 py-2.5 bg-black hover:bg-stone-800 text-white text-sm font-medium rounded-sm transition-colors">{t("quickOrder.addAllToCart")}</button>
-                      <button onClick={() => { setCsvResult(null); setCsvFile(null); }} className="px-6 py-2.5 border border-stone-200 text-[#666] text-sm font-medium rounded-sm hover:bg-stone-100 transition-colors">Otkaži</button>
+                      <button onClick={() => { setCsvResult(null); setCsvFile(null); }} className="px-6 py-2.5 border border-stone-200 text-[#666] text-sm font-medium rounded-sm hover:bg-stone-100 transition-colors">{t("common.cancel")}</button>
                     </div>
                   </div>
                 )}
@@ -378,7 +399,7 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                         </div>
                         <div>
                           <p className="font-medium text-sm text-[#333]">{order.orderNumber}</p>
-                          <p className="text-xs text-[#999] flex items-center gap-1"><Clock className="w-3 h-3" /> {order.date} · {order.items} stavki</p>
+                          <p className="text-xs text-[#999] flex items-center gap-1"><Clock className="w-3 h-3" /> {order.date} · {order.items} {t("quickOrder.items")}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
@@ -422,14 +443,14 @@ export default function QuickOrderPageClient({ recentOrders }: Props) {
                     ))}
                   </div>
                   <div className="border-t border-stone-200 pt-4 space-y-2 text-sm">
-                    <div className="flex justify-between"><span className="text-[#666]">Subtotal:</span><span>{subtotal.toLocaleString()} RSD</span></div>
-                    <div className="flex justify-between text-green-600"><span>B2B Popust ({B2B_BULK_DISCOUNT}%):</span><span>-{discount.toLocaleString()} RSD</span></div>
+                    <div className="flex justify-between"><span className="text-[#666]">{t("quickOrder.subtotal")}</span><span>{subtotal.toLocaleString()} RSD</span></div>
+                    <div className="flex justify-between text-green-600"><span>{t("quickOrder.b2bDiscount")} ({B2B_BULK_DISCOUNT}%):</span><span>-{discount.toLocaleString()} RSD</span></div>
                     <div className="flex justify-between font-bold text-lg border-t border-stone-200 pt-2 mt-2">
-                      <span>Ukupno:</span><span>{total.toLocaleString()} RSD</span>
+                      <span>{t("quickOrder.total")}</span><span>{total.toLocaleString()} RSD</span>
                     </div>
                   </div>
                   <button onClick={handleOrder} className="w-full mt-6 py-3 bg-black hover:bg-stone-800 text-white font-medium rounded-sm transition-colors text-sm tracking-wide">
-                    Naruči
+                    {t("quickOrder.placeOrder")}
                   </button>
                 </>
               ) : (

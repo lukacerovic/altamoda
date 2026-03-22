@@ -1,7 +1,12 @@
+"use client";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function AboutPage() {
+  const { t } = useLanguage();
+
   return (
     <>
       <Header />
@@ -11,16 +16,14 @@ export default function AboutPage() {
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-7 lg:col-span-6 flex flex-col justify-center">
               <span className="text-xs tracking-widest uppercase text-[#874d5d] mb-6">
-                Established 1996
+                {t("about.heroTag")}
               </span>
               <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-8 tracking-tight">
-                The Art of <br />
-                <i className="font-normal">Distribution</i>
+                {t("about.heroTitle1")} <br />
+                <i className="font-normal">{t("about.heroTitle2")}</i>
               </h1>
               <p className="text-lg md:text-xl text-[#524345] max-w-lg leading-relaxed mb-10">
-                For nearly three decades, Altamoda has stood as a silent architect behind
-                Serbia&apos;s luxury hair care landscape. A family legacy built on the foundations
-                of trust, expertise, and an unwavering commitment to professional excellence.
+                {t("about.heroDescription")}
               </p>
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-6 relative">
@@ -33,10 +36,10 @@ export default function AboutPage() {
               </div>
               <div className="absolute -bottom-8 -left-8 md:-left-16 bg-[#8c4a5a] p-8 md:p-12 text-white max-w-xs rounded-sm">
                 <p className="font-serif text-2xl italic mb-2">
-                  &ldquo;Quality is not an act, it is a habit.&rdquo;
+                  {t("about.heroQuote")}
                 </p>
                 <p className="text-xs uppercase tracking-widest opacity-80">
-                  — The Founding Philosophy
+                  {t("about.heroQuoteAttribution")}
                 </p>
               </div>
             </div>
@@ -49,23 +52,20 @@ export default function AboutPage() {
             <div className="flex flex-col md:flex-row gap-16 items-start">
               <div className="w-full md:w-1/3 sticky top-32">
                 <h2 className="font-serif text-4xl mb-6">
-                  A Family <br />
-                  Journey
+                  {t("about.familyJourneyTitle1")} <br />
+                  {t("about.familyJourneyTitle2")}
                 </h2>
                 <div className="w-12 h-px bg-[#703343] mb-6" />
                 <p className="text-[#524345] leading-relaxed">
-                  What started as a passionate vision in 1996 has evolved into Serbia&apos;s
-                  premier gateway for global luxury beauty brands.
+                  {t("about.familyJourneyDescription")}
                 </p>
               </div>
               <div className="w-full md:w-2/3 space-y-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-6">
-                    <h3 className="font-serif text-2xl">1996: The Genesis</h3>
+                    <h3 className="font-serif text-2xl">{t("about.genesisTitle")}</h3>
                     <p className="text-[#524345] font-light leading-relaxed">
-                      Founded in Belgrade, Altamoda began with a simple mission: to provide
-                      Serbian stylists with the same high-caliber tools and products available
-                      in the fashion capitals of Paris and Milan.
+                      {t("about.genesisDescription")}
                     </p>
                   </div>
                   <div className="aspect-square bg-white p-2 shadow-sm rounded-sm">
@@ -77,12 +77,9 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="bg-white p-12 rounded-sm shadow-sm border-l-4 border-[#703343]">
-                  <h3 className="font-serif text-2xl mb-6">The Reliability Factor</h3>
+                  <h3 className="font-serif text-2xl mb-6">{t("about.reliabilityTitle")}</h3>
                   <p className="text-lg text-[#524345] font-light italic leading-relaxed">
-                    &ldquo;In distribution, reliability is the only currency that matters. We
-                    don&apos;t just move products; we nurture the growth of our partners,
-                    ensuring that every salon we serve has the support to become a landmark of
-                    style.&rdquo;
+                    {t("about.reliabilityQuote")}
                   </p>
                 </div>
               </div>
@@ -95,44 +92,42 @@ export default function AboutPage() {
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="text-center mb-24">
               <span className="text-xs tracking-[0.2em] uppercase text-[#703343] mb-4 block">
-                The Chronology of Excellence
+                {t("about.milestonesTag")}
               </span>
-              <h2 className="font-serif text-5xl">Milestones of Progress</h2>
+              <h2 className="font-serif text-5xl">{t("about.milestonesTitle")}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px]">
               <div className="md:col-span-2 md:row-span-2 bg-[#ece8e0] p-10 flex flex-col justify-end group cursor-default">
                 <span className="text-6xl font-serif text-[#703343] opacity-20 mb-4 group-hover:opacity-100 transition-opacity">
                   2005
                 </span>
-                <h4 className="font-serif text-2xl mb-2">Nationwide Expansion</h4>
+                <h4 className="font-serif text-2xl mb-2">{t("about.milestone2005Title")}</h4>
                 <p className="text-[#524345] text-sm max-w-xs">
-                  Establishing our logistics network across every major city in Serbia, becoming
-                  the logistical backbone for 500+ premium salons.
+                  {t("about.milestone2005Description")}
                 </p>
               </div>
               <div className="md:col-span-2 bg-[#f2ede5] p-10 flex flex-col justify-center">
                 <span className="text-4xl font-serif text-[#703343] mb-2">2012</span>
-                <h4 className="font-serif text-xl">The Education Center</h4>
+                <h4 className="font-serif text-xl">{t("about.milestone2012Title")}</h4>
                 <p className="text-[#524345] text-sm">
-                  Opening our state-of-the-art training facility to empower the next generation
-                  of Serbian masters.
+                  {t("about.milestone2012Description")}
                 </p>
               </div>
               <div className="bg-[#8c4a5a] text-white p-8 flex flex-col justify-between">
                 <span className="text-3xl font-serif italic">2018</span>
                 <div>
-                  <h4 className="font-serif text-lg">Digital Shift</h4>
+                  <h4 className="font-serif text-lg">{t("about.milestone2018Title")}</h4>
                   <p className="text-xs opacity-80">
-                    Launching the B2B portal for seamless salon integration.
+                    {t("about.milestone2018Description")}
                   </p>
                 </div>
               </div>
               <div className="bg-[#e7e2da] p-8 flex flex-col justify-between border border-[#d7c1c4]/10">
                 <span className="text-3xl font-serif text-[#703343]">2024</span>
                 <div>
-                  <h4 className="font-serif text-lg">Legacy Modernized</h4>
+                  <h4 className="font-serif text-lg">{t("about.milestone2024Title")}</h4>
                   <p className="text-xs text-[#524345]">
-                    Rebranding for a new era of luxury distribution.
+                    {t("about.milestone2024Description")}
                   </p>
                 </div>
               </div>
@@ -146,26 +141,23 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
               <div className="space-y-6">
                 <div className="text-[#703343] text-4xl">&#9883;</div>
-                <h3 className="font-serif text-2xl">Proven Heritage</h3>
+                <h3 className="font-serif text-2xl">{t("about.valueHeritageTitle")}</h3>
                 <p className="text-[#524345] font-light leading-relaxed">
-                  Since 1996, our history is intertwined with the success of Serbia&apos;s most
-                  prestigious stylists.
+                  {t("about.valueHeritageDescription")}
                 </p>
               </div>
               <div className="space-y-6">
                 <div className="text-[#703343] text-4xl">&#9829;</div>
-                <h3 className="font-serif text-2xl">Family Reliability</h3>
+                <h3 className="font-serif text-2xl">{t("about.valueReliabilityTitle")}</h3>
                 <p className="text-[#524345] font-light leading-relaxed">
-                  As a family-run business, our relationships are personal. Your growth is our
-                  legacy.
+                  {t("about.valueReliabilityDescription")}
                 </p>
               </div>
               <div className="space-y-6">
                 <div className="text-[#703343] text-4xl">&#10004;</div>
-                <h3 className="font-serif text-2xl">Curation</h3>
+                <h3 className="font-serif text-2xl">{t("about.valueCurationTitle")}</h3>
                 <p className="text-[#524345] font-light leading-relaxed">
-                  We don&apos;t represent everyone. We represent the best, ensuring exclusivity
-                  and quality.
+                  {t("about.valueCurationDescription")}
                 </p>
               </div>
             </div>

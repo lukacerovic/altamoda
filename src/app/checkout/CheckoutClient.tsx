@@ -9,6 +9,7 @@ import {
   ChevronRight, MapPin, Truck, CreditCard, CheckCircle,
   AlertCircle, ChevronLeft, Shield, User,
 } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Address {
   id: string
@@ -30,6 +31,7 @@ type Step = 'contact' | 'address' | 'shipping' | 'payment' | 'review'
 
 export default function CheckoutClient({ userRole, isGuest, addresses }: Props) {
   const router = useRouter()
+  const { t } = useLanguage()
   const { items, getTotal, clearCart } = useCartStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -37,17 +39,17 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   // For guests, first step is contact info; for logged-in users, skip it
   const STEPS: { key: Step; label: string; icon: typeof MapPin }[] = isGuest
     ? [
-        { key: 'contact', label: 'Podaci', icon: User },
-        { key: 'address', label: 'Adresa', icon: MapPin },
-        { key: 'shipping', label: 'Dostava', icon: Truck },
-        { key: 'payment', label: 'Plaćanje', icon: CreditCard },
-        { key: 'review', label: 'Pregled', icon: CheckCircle },
+        { key: 'contact', label: t('checkout.step1'), icon: User },
+        { key: 'address', label: t('checkout.step2'), icon: MapPin },
+        { key: 'shipping', label: t('checkout.step3'), icon: Truck },
+        { key: 'payment', label: t('checkout.step4'), icon: CreditCard },
+        { key: 'review', label: t('checkout.step5'), icon: CheckCircle },
       ]
     : [
-        { key: 'address', label: 'Adresa', icon: MapPin },
-        { key: 'shipping', label: 'Dostava', icon: Truck },
-        { key: 'payment', label: 'Plaćanje', icon: CreditCard },
-        { key: 'review', label: 'Pregled', icon: CheckCircle },
+        { key: 'address', label: t('checkout.step2'), icon: MapPin },
+        { key: 'shipping', label: t('checkout.step3'), icon: Truck },
+        { key: 'payment', label: t('checkout.step4'), icon: CreditCard },
+        { key: 'review', label: t('checkout.step5'), icon: CheckCircle },
       ]
 
   const [step, setStep] = useState<Step>(STEPS[0].key)
@@ -72,13 +74,13 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   const isB2b = userRole === 'b2b'
   const paymentOptions = isB2b
     ? [
-        { key: 'invoice', label: 'Faktura (plaćanje po predračunu)' },
-        { key: 'card', label: 'Kartica' },
+        { key: 'invoice', label: t('checkout.invoicePreinvoice') },
+        { key: 'card', label: t('checkout.card') },
       ]
     : [
-        { key: 'card', label: 'Kartica (Visa, Mastercard)' },
-        { key: 'bank_transfer', label: 'Uplata na račun' },
-        { key: 'cash_on_delivery', label: 'Pouzeće' },
+        { key: 'card', label: t('checkout.cardVisaMaster') },
+        { key: 'bank_transfer', label: t('checkout.bankTransfer') },
+        { key: 'cash_on_delivery', label: t('checkout.cashOnDelivery') },
       ]
   const [paymentMethod, setPaymentMethod] = useState(isB2b ? 'invoice' : 'card')
 
@@ -114,10 +116,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-black mb-2">Vaša korpa je prazna</h2>
-          <p className="text-gray-500 mb-4">Dodajte proizvode pre nastavka na plaćanje.</p>
+          <h2 className="text-xl font-bold text-black mb-2">{t('checkout.emptyCart')}</h2>
+          <p className="text-gray-500 mb-4">{t('checkout.emptyCartDesc')}</p>
           <Link href="/products" className="px-6 py-3 bg-black text-white rounded font-medium hover:bg-stone-800">
-            Nastavi kupovinu
+            {t('checkout.continueShopping')}
           </Link>
         </div>
       </div>
@@ -127,12 +129,28 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   const handlePlaceOrder = async () => {
     if (!b2bMinimumMet) return
 
-    // Guest users need to register/create account first, or we handle as guest order
-    // For now, guests are prompted to login if the API requires auth
     setIsSubmitting(true)
     setError('')
 
     try {
+      // Layer 3: Validate stock before placing order
+      const stockRes = await fetch('/api/cart/validate-stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds: items.map((i) => i.productId) }),
+      })
+      const stockData = await stockRes.json()
+      if (stockData.success) {
+        const outOfStockNames = items
+          .filter((item) => (stockData.data[item.productId] ?? 0) <= 0)
+          .map((item) => item.name)
+        if (outOfStockNames.length > 0) {
+          setError(`${t('checkout.outOfStockError')}: ${outOfStockNames.join(', ')}. ${t('checkout.removeOutOfStock')}`)
+          setIsSubmitting(false)
+          return
+        }
+      }
+
       const orderPayload: Record<string, unknown> = {
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         shippingAddress: {
@@ -160,17 +178,21 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
       if (!data.success) {
         // If auth required, redirect to login
         if (res.status === 401) {
-          setError('Morate biti prijavljeni da biste naručili. Prijavite se ili kreirajte nalog.')
+          setError(t('checkout.mustBeLoggedIn'))
           return
         }
-        setError(data.error || 'Greška pri kreiranju porudžbine')
+        setError(data.error || t('checkout.orderError'))
         return
       }
 
       clearCart()
       router.push(`/checkout/confirmation?orderNumber=${data.data.orderNumber}`)
-    } catch {
-      setError('Greška pri povezivanju sa serverom')
+    } catch (err) {
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError(t('checkout.noInternetConnection'))
+      } else {
+        setError(t('checkout.serverError'))
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -193,14 +215,14 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-secondary">Početna</Link>
+          <Link href="/" className="hover:text-secondary">{t('checkout.breadcrumbHome')}</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/cart" className="hover:text-secondary">Korpa</Link>
+          <Link href="/cart" className="hover:text-secondary">{t('checkout.breadcrumbCart')}</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-black">Plaćanje</span>
+          <span className="text-black">{t('checkout.breadcrumbCheckout')}</span>
         </nav>
 
-        <h1 className="text-3xl font-bold text-black mb-8" style={{ fontFamily: "'Noto Serif', serif" }}>Plaćanje</h1>
+        <h1 className="text-3xl font-bold text-black mb-8" style={{ fontFamily: "'Noto Serif', serif" }}>{t('checkout.breadcrumbCheckout')}</h1>
 
         {/* Step indicator */}
         <div className="flex items-center justify-between mb-8">
@@ -226,32 +248,32 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {/* STEP: Contact (guest only) */}
             {step === 'contact' && isGuest && (
               <div className="bg-white rounded-sm shadow-sm p-6">
-                <h2 className="text-lg font-bold text-black mb-4">Vaši podaci</h2>
-                <p className="text-sm text-gray-500 mb-4">Unesite vaše kontakt podatke za porudžbinu.</p>
+                <h2 className="text-lg font-bold text-black mb-4">{t('checkout.yourDetails')}</h2>
+                <p className="text-sm text-gray-500 mb-4">{t('checkout.enterContactDetails')}</p>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ime i prezime *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.fullName')} *</label>
                     <input
                       type="text"
                       value={guestInfo.name}
                       onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
-                      placeholder="Unesite ime i prezime"
+                      placeholder={t('checkout.fullNamePlaceholder')}
                       className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email adresa *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.emailLabel')} *</label>
                     <input
                       type="email"
                       value={guestInfo.email}
                       onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
-                      placeholder="vasa@email.com"
+                      placeholder={t('checkout.emailPlaceholder')}
                       className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Broj telefona *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.phoneLabel')} *</label>
                     <input
                       type="tel"
                       value={guestInfo.phone}
@@ -263,11 +285,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
 
                 <div className="mt-4 p-3 bg-stone-50 rounded-sm text-sm text-gray-600">
-                  Imate nalog?{' '}
+                  {t('checkout.haveAccount')}{' '}
                   <Link href="/account/login?callbackUrl=/checkout" className="text-secondary font-medium hover:underline">
-                    Prijavite se
+                    {t('checkout.loginLink')}
                   </Link>{' '}
-                  za brže naručivanje i praćenje porudžbina.
+                  {t('checkout.forFasterOrdering')}
                 </div>
 
                 <button
@@ -275,7 +297,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   disabled={!canProceedContact}
                   className="mt-6 w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Nastavi <ChevronRight className="w-4 h-4" />
+                  {t('checkout.continue')} <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -283,7 +305,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {/* STEP: Address */}
             {step === 'address' && (
               <div className="bg-white rounded-sm shadow-sm p-6">
-                <h2 className="text-lg font-bold text-black mb-4">Adresa za dostavu</h2>
+                <h2 className="text-lg font-bold text-black mb-4">{t('checkout.shippingAddress')}</h2>
 
                 {addresses.length > 0 && (
                   <div className="space-y-3 mb-4">
@@ -298,17 +320,17 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     ))}
                     <label className={`flex items-center gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${useNewAddress ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
                       <input type="radio" name="address" checked={useNewAddress} onChange={() => setUseNewAddress(true)} className="text-secondary" />
-                      <span className="text-sm font-medium">Nova adresa</span>
+                      <span className="text-sm font-medium">{t('checkout.newAddress')}</span>
                     </label>
                   </div>
                 )}
 
                 {useNewAddress && (
                   <div className="space-y-3">
-                    <input type="text" placeholder="Ulica i broj" value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
+                    <input type="text" placeholder={t('checkout.streetAndNumber')} value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="w-full border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" placeholder="Grad" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
-                      <input type="text" placeholder="Poštanski broj" value={newAddress.postalCode} onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
+                      <input type="text" placeholder={t('checkout.city')} value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
+                      <input type="text" placeholder={t('checkout.postalCode')} value={newAddress.postalCode} onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })} className="border border-gray-200 rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
                     </div>
                   </div>
                 )}
@@ -316,11 +338,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 <div className="flex gap-3 mt-6">
                   {isGuest && (
                     <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
-                      <ChevronLeft className="w-4 h-4" /> Nazad
+                      <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                     </button>
                   )}
                   <button onClick={goNext} disabled={!canProceedAddress} className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                    Nastavi <ChevronRight className="w-4 h-4" />
+                    {t('checkout.continue')} <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -329,12 +351,12 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {/* STEP: Shipping */}
             {step === 'shipping' && (
               <div className="bg-white rounded-sm shadow-sm p-6">
-                <h2 className="text-lg font-bold text-black mb-4">Način dostave</h2>
+                <h2 className="text-lg font-bold text-black mb-4">{t('checkout.shippingMethod')}</h2>
                 <div className="space-y-3">
                   {[
-                    { key: 'standard', label: 'Standardna dostava (2-4 dana)', price: subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350 },
-                    { key: 'express', label: 'Ekspres dostava (1 dan)', price: 690 },
-                    { key: 'pickup', label: 'Preuzimanje u prodavnici', price: 0 },
+                    { key: 'standard', label: t('checkout.standardShipping'), price: subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350 },
+                    { key: 'express', label: t('checkout.expressShipping'), price: 690 },
+                    { key: 'pickup', label: t('checkout.storePickup'), price: 0 },
                   ].map((opt) => (
                     <label key={opt.key} className={`flex items-center justify-between gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${shippingMethod === opt.key ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
                       <div className="flex items-center gap-3">
@@ -342,17 +364,17 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                         <span className="text-sm font-medium">{opt.label}</span>
                       </div>
                       <span className={`text-sm font-semibold ${opt.price === 0 ? 'text-green-600' : ''}`}>
-                        {opt.price === 0 ? 'Besplatno' : `${opt.price} RSD`}
+                        {opt.price === 0 ? t('checkout.free') : `${opt.price} RSD`}
                       </span>
                     </label>
                   ))}
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
-                    <ChevronLeft className="w-4 h-4" /> Nazad
+                    <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={goNext} className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium flex items-center justify-center gap-2">
-                    Nastavi <ChevronRight className="w-4 h-4" />
+                    {t('checkout.continue')} <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -361,7 +383,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {/* STEP: Payment */}
             {step === 'payment' && (
               <div className="bg-white rounded-sm shadow-sm p-6">
-                <h2 className="text-lg font-bold text-black mb-4">Način plaćanja</h2>
+                <h2 className="text-lg font-bold text-black mb-4">{t('checkout.paymentMethod')}</h2>
                 <div className="space-y-3">
                   {paymentOptions.map((opt) => (
                     <label key={opt.key} className={`flex items-center gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${paymentMethod === opt.key ? 'border-black bg-stone-50' : 'border-gray-100 hover:border-gray-200'}`}>
@@ -372,16 +394,16 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Napomena (opciono)</label>
-                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Dodatne napomene..." className="w-full border border-gray-200 rounded px-4 py-3 text-sm resize-none focus:border-black focus:outline-none" />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkout.noteOptional')}</label>
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder={t('checkout.additionalNotes')} className="w-full border border-gray-200 rounded px-4 py-3 text-sm resize-none focus:border-black focus:outline-none" />
                 </div>
 
                 <div className="flex gap-3 mt-6">
                   <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
-                    <ChevronLeft className="w-4 h-4" /> Nazad
+                    <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={goNext} className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium flex items-center justify-center gap-2">
-                    Nastavi <ChevronRight className="w-4 h-4" />
+                    {t('checkout.continue')} <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -391,14 +413,14 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {step === 'review' && (
               <div className="space-y-4">
                 <div className="bg-white rounded-sm shadow-sm p-6">
-                  <h2 className="text-lg font-bold text-black mb-4">Pregled porudžbine</h2>
+                  <h2 className="text-lg font-bold text-black mb-4">{t('checkout.orderReview')}</h2>
 
                   {/* Guest contact summary */}
                   {isGuest && (
                     <div className="mb-4 p-4 bg-stone-50 rounded-sm">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-black">Kontakt podaci</span>
-                        <button onClick={() => setStep('contact')} className="text-xs text-secondary hover:underline">Izmeni</button>
+                        <span className="text-sm font-semibold text-black">{t('checkout.contactDetails')}</span>
+                        <button onClick={() => setStep('contact')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                       </div>
                       <p className="text-sm text-gray-600">{guestInfo.name}</p>
                       <p className="text-sm text-gray-600">{guestInfo.email} | {guestInfo.phone}</p>
@@ -408,8 +430,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   {/* Address summary */}
                   <div className="mb-4 p-4 bg-stone-50 rounded-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-black">Adresa za dostavu</span>
-                      <button onClick={() => setStep('address')} className="text-xs text-secondary hover:underline">Izmeni</button>
+                      <span className="text-sm font-semibold text-black">{t('checkout.shippingAddress')}</span>
+                      <button onClick={() => setStep('address')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-gray-600">
                       {shippingAddress?.street}, {shippingAddress?.postalCode} {shippingAddress?.city}
@@ -419,21 +441,21 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   {/* Shipping summary */}
                   <div className="mb-4 p-4 bg-stone-50 rounded-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-black">Dostava</span>
-                      <button onClick={() => setStep('shipping')} className="text-xs text-secondary hover:underline">Izmeni</button>
+                      <span className="text-sm font-semibold text-black">{t('checkout.step3')}</span>
+                      <button onClick={() => setStep('shipping')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-gray-600">
-                      {shippingMethod === 'standard' ? 'Standardna (2-4 dana)' : shippingMethod === 'express' ? 'Ekspres (1 dan)' : 'Preuzimanje'}
+                      {shippingMethod === 'standard' ? t('checkout.standardShort') : shippingMethod === 'express' ? t('checkout.expressShort') : t('checkout.pickupShort')}
                       {' — '}
-                      {shippingCost === 0 ? 'Besplatno' : `${shippingCost} RSD`}
+                      {shippingCost === 0 ? t('checkout.free') : `${shippingCost} RSD`}
                     </p>
                   </div>
 
                   {/* Payment summary */}
                   <div className="p-4 bg-stone-50 rounded-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-semibold text-black">Plaćanje</span>
-                      <button onClick={() => setStep('payment')} className="text-xs text-secondary hover:underline">Izmeni</button>
+                      <span className="text-sm font-semibold text-black">{t('checkout.step4')}</span>
+                      <button onClick={() => setStep('payment')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-gray-600">
                       {paymentOptions.find((o) => o.key === paymentMethod)?.label}
@@ -443,7 +465,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
                 {/* Items */}
                 <div className="bg-white rounded-sm shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-black mb-4">Proizvodi ({items.length})</h3>
+                  <h3 className="text-sm font-semibold text-black mb-4">{t('checkout.products')} ({items.length})</h3>
                   <div className="space-y-3">
                     {items.map((item) => (
                       <div key={item.productId} className="flex items-center gap-4">
@@ -465,13 +487,13 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     <div className="flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
                     </div>
-                    {isGuest && error.includes('prijavljeni') && (
+                    {isGuest && error.includes(t('checkout.mustBeLoggedIn').substring(0, 10)) && (
                       <div className="mt-2 flex gap-2">
                         <Link href="/account/login?callbackUrl=/checkout" className="px-4 py-2 bg-black text-white text-sm rounded font-medium hover:bg-stone-800">
-                          Prijavite se
+                          {t('checkout.loginLink')}
                         </Link>
                         <Link href="/account/register?callbackUrl=/checkout" className="px-4 py-2 border border-black text-secondary text-sm rounded font-medium hover:bg-stone-50">
-                          Kreirajte nalog
+                          {t('checkout.createAccount')}
                         </Link>
                       </div>
                     )}
@@ -481,16 +503,16 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 {!b2bMinimumMet && (
                   <div className="bg-orange-50 border border-orange-200 rounded-sm p-3 flex items-center gap-2 text-sm text-orange-700">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    Minimalni iznos B2B porudžbine je {MIN_B2B_ORDER.toLocaleString('sr-RS')} RSD
+                    {t('checkout.b2bMinimum')} {MIN_B2B_ORDER.toLocaleString('sr-RS')} RSD
                   </div>
                 )}
 
                 <div className="flex gap-3">
                   <button onClick={goPrev} className="flex-1 border border-gray-200 py-3 rounded font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2">
-                    <ChevronLeft className="w-4 h-4" /> Nazad
+                    <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-black hover:bg-stone-800 text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
-                    {isSubmitting ? 'Obrada...' : 'Poruči'}
+                    {isSubmitting ? t('checkout.processing') : t('checkout.placeOrderBtn')}
                   </button>
                 </div>
               </div>
@@ -500,24 +522,24 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
           {/* Order summary sidebar */}
           <div>
             <div className="bg-white rounded-sm shadow-sm p-6 sticky top-24">
-              <h3 className="text-lg font-bold text-black mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>Pregled</h3>
+              <h3 className="text-lg font-bold text-black mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>{t('checkout.summary')}</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Međuzbir ({items.length} stavki)</span>
+                  <span className="text-gray-500">{t('checkout.subtotal')} ({items.length} {t('checkout.itemsCount')})</span>
                   <span className="font-medium">{subtotal.toLocaleString('sr-RS')} RSD</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Dostava</span>
-                  <span className="font-medium">{shippingCost === 0 ? 'Besplatno' : `${shippingCost} RSD`}</span>
+                  <span className="text-gray-500">{t('checkout.step3')}</span>
+                  <span className="font-medium">{shippingCost === 0 ? t('checkout.free') : `${shippingCost} RSD`}</span>
                 </div>
                 <div className="pt-3 border-t border-gray-100 flex justify-between text-lg font-bold">
-                  <span>Ukupno</span>
+                  <span>{t('checkout.total')}</span>
                   <span>{total.toLocaleString('sr-RS')} RSD</span>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-500">
-                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-secondary" /> Sigurno online plaćanje</div>
-                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> Besplatna dostava preko 5.000 RSD</div>
+                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-secondary" /> {t('checkout.securePayment')}</div>
+                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> {t('checkout.freeShippingOver')}</div>
               </div>
             </div>
           </div>

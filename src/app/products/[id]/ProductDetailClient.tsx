@@ -101,6 +101,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
   const [addedToCart, setAddedToCart] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState("");
 
   const { addItem } = useCartStore();
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
@@ -125,7 +126,10 @@ export default function ProductDetailClient({ product, related, userRole, initia
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
+  const outOfStock = product.stockQuantity <= 0;
+
   const handleAddToCart = () => {
+    if (outOfStock) return;
     addItem({
       productId: product.id,
       name: product.nameLat,
@@ -192,12 +196,17 @@ export default function ProductDetailClient({ product, related, userRole, initia
   const handleSubmitReview = async () => {
     if (reviewRating === 0) return;
     setReviewSubmitting(true);
+    setReviewError("");
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: product.id, rating: reviewRating }),
       });
+      if (res.status === 401) {
+        setReviewError("Morate biti prijavljeni da biste ostavili recenziju.");
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setReviewSuccess(true);
@@ -210,9 +219,12 @@ export default function ProductDetailClient({ product, related, userRole, initia
           setReviewSuccess(false);
           setReviewRating(0);
         }, 1500);
+      } else {
+        setReviewError(data.error || "Greška pri slanju recenzije.");
       }
     } catch (err) {
       console.error("Review submission failed:", err);
+      setReviewError("Greška pri slanju recenzije. Pokušajte ponovo.");
     } finally {
       setReviewSubmitting(false);
     }
@@ -321,8 +333,8 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-secondary" />
                   <div>
-                    <span className="text-sm font-semibold text-secondary">B2B Cena</span>
-                    <p className="text-xs text-gray-500">Prijavite se za posebne cene za profesionalce i salone</p>
+                    <span className="text-sm font-semibold text-secondary">{t("productDetail.b2bPrice")}</span>
+                    <p className="text-xs text-gray-500">{t("productDetail.b2bPriceHint")}</p>
                   </div>
                 </div>
               </div>
@@ -332,7 +344,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
             {userRole === 'b2b' && product.priceB2b && (
               <div className="border-2 border-green-300 rounded-sm p-4 mb-6 bg-green-50">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-green-700">Vaša B2B cena</span>
+                  <span className="text-sm font-semibold text-green-700">{t("productDetail.yourB2bPrice")}</span>
                   <span className="text-lg font-bold text-green-700">{product.priceB2b.toLocaleString("sr-RS")} RSD</span>
                 </div>
               </div>
@@ -347,10 +359,12 @@ export default function ProductDetailClient({ product, related, userRole, initia
               </div>
               <button
                 onClick={handleAddToCart}
-                disabled={product.stockQuantity === 0}
-                className="flex-1 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={outOfStock}
+                className={`flex-1 py-3 rounded font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-gray-400 text-white cursor-not-allowed" : "bg-black hover:bg-stone-800 text-white"}`}
               >
-                {addedToCart ? (
+                {outOfStock ? (
+                  <>{t("products.outOfStock")}</>
+                ) : addedToCart ? (
                   <><CheckCircle className="w-5 h-5" /> {t("productDetail.addedToCart")}</>
                 ) : (
                   <><ShoppingBag className="w-5 h-5" /> {t("productDetail.addToCart")}</>
@@ -366,7 +380,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
               <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-sm text-sm text-orange-700 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {wishlistMessage}
-                <Link href="/account/login" className="ml-auto text-secondary font-medium hover:underline whitespace-nowrap">Prijavite se</Link>
+                <Link href="/account/login" className="ml-auto text-secondary font-medium hover:underline whitespace-nowrap">{t("productDetail.loginLink")}</Link>
               </div>
             )}
 
@@ -562,12 +576,17 @@ export default function ProductDetailClient({ product, related, userRole, initia
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Fotografija (opciono)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("productDetail.photoOptional")}</label>
                     <div className="border-2 border-dashed border-gray-200 rounded-sm p-6 text-center hover:border-black transition-colors cursor-pointer">
                       <Camera className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Kliknite da dodate fotografiju</p>
+                      <p className="text-sm text-gray-500">{t("productDetail.clickToAddPhoto")}</p>
                     </div>
                   </div>
+                  {reviewError && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">
+                      {reviewError}
+                    </div>
+                  )}
                   <button
                     onClick={handleSubmitReview}
                     disabled={reviewRating === 0 || reviewSubmitting}

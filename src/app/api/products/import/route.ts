@@ -16,15 +16,47 @@ interface CsvRow {
   isProfessional?: string
 }
 
+function parseCsvLine(line: string): string[] {
+  const fields: string[] = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') {
+        current += '"'
+        i++ // skip escaped quote
+      } else if (ch === '"') {
+        inQuotes = false
+      } else {
+        current += ch
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true
+      } else if (ch === ',') {
+        fields.push(current.trim())
+        current = ''
+      } else {
+        current += ch
+      }
+    }
+  }
+  fields.push(current.trim())
+  return fields
+}
+
 function parseCsv(text: string): CsvRow[] {
-  const lines = text.trim().split('\n')
+  const lines = text.trim().replace(/\r\n/g, '\n').split('\n')
   if (lines.length < 2) return []
 
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const headers = parseCsvLine(lines[0])
   const rows: CsvRow[] = []
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+    if (!lines[i].trim()) continue
+    const values = parseCsvLine(lines[i])
     const row: Record<string, string> = {}
     headers.forEach((h, idx) => {
       row[h] = values[idx] || ''

@@ -1,7 +1,12 @@
+"use client";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function ContactPage() {
+  const { t } = useLanguage();
+
   return (
     <>
       <Header />
@@ -18,11 +23,10 @@ export default function ContactPage() {
           </div>
           <div className="relative z-10 text-center px-6">
             <h1 className="font-serif italic text-5xl md:text-7xl lg:text-8xl tracking-tighter mb-4">
-              Get in Touch
+              {t("contact.heroTitle")}
             </h1>
             <p className="text-lg md:text-xl text-[#524345] max-w-2xl mx-auto font-light leading-relaxed">
-              Our atelier is a space of silent luxury and bespoke creation. Connect with us
-              for inquiries regarding collections, heritage, and unique partnerships.
+              {t("contact.heroDescription")}
             </p>
           </div>
         </section>
@@ -34,7 +38,7 @@ export default function ContactPage() {
               {/* Connect */}
               <div className="flex flex-col items-center">
                 <span className="text-xs tracking-[0.2em] text-[#703343] uppercase mb-10">
-                  Connect
+                  {t("contact.connect")}
                 </span>
                 <div className="space-y-6">
                   <a className="block font-serif text-2xl hover:text-[#703343] transition-colors duration-300 italic" href="#">
@@ -55,12 +59,12 @@ export default function ContactPage() {
               {/* Inquire */}
               <div className="flex flex-col items-center">
                 <span className="text-xs tracking-[0.2em] text-[#703343] uppercase mb-10">
-                  Inquire
+                  {t("contact.inquire")}
                 </span>
                 <div className="space-y-6">
                   <div className="space-y-1">
                     <p className="text-[10px] tracking-widest text-[#847375] uppercase mb-2">
-                      Email
+                      {t("contact.emailLabel")}
                     </p>
                     <a
                       className="block font-serif text-2xl hover:text-[#703343] transition-colors duration-300"
@@ -71,7 +75,7 @@ export default function ContactPage() {
                   </div>
                   <div className="pt-4 space-y-1">
                     <p className="text-[10px] tracking-widest text-[#847375] uppercase mb-2">
-                      Private Line
+                      {t("contact.phoneLabel")}
                     </p>
                     <a
                       className="block font-serif text-2xl hover:text-[#703343] transition-colors duration-300"
@@ -86,7 +90,7 @@ export default function ContactPage() {
               {/* Visit */}
               <div className="flex flex-col items-center">
                 <span className="text-xs tracking-[0.2em] text-[#703343] uppercase mb-10">
-                  Visit
+                  {t("contact.visit")}
                 </span>
                 <div className="space-y-6">
                   <address className="not-italic space-y-4">
@@ -103,7 +107,7 @@ export default function ContactPage() {
                       className="inline-flex items-center gap-2 text-xs tracking-widest text-[#703343] uppercase hover:opacity-70 transition-opacity duration-300"
                       href="#"
                     >
-                      View on Map
+                      {t("contact.viewOnMap")}
                     </a>
                   </div>
                 </div>
@@ -115,22 +119,21 @@ export default function ContactPage() {
         {/* Newsletter */}
         <section className="bg-[#f8f3eb] py-24 border-t border-[#d7c1c4]/10">
           <div className="max-w-2xl mx-auto px-8 text-center">
-            <h3 className="font-serif text-3xl mb-8">The Heritage Journal</h3>
+            <h3 className="font-serif text-3xl mb-8">{t("contact.newsletterTitle")}</h3>
             <p className="text-[#524345] mb-10 font-light italic">
-              Receive seasonal insights from our atelier and updates on new heritage
-              collections.
+              {t("contact.newsletterDescription")}
             </p>
             <form className="flex flex-col md:flex-row gap-4">
               <input
                 className="flex-grow bg-transparent border-0 border-b border-[#847375] focus:border-[#703343] focus:ring-0 py-3 text-[#1d1c17] placeholder:text-[#847375]/50 transition-colors duration-500"
-                placeholder="Your email address"
+                placeholder={t("contact.emailPlaceholder")}
                 type="email"
               />
               <button
                 className="bg-[#8c4a5a] text-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#703343] transition-colors duration-300"
                 type="submit"
               >
-                Subscribe
+                {t("contact.subscribe")}
               </button>
             </form>
           </div>

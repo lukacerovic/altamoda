@@ -3,8 +3,8 @@ import HomePageClient from './HomePageClient'
 import type { ProductData } from './HomePageClient'
 
 function formatProduct(p: {
-  id: string; nameLat: string; slug: string; priceB2c: unknown; priceB2b: unknown; oldPrice: unknown;
-  isNew: boolean; isFeatured: boolean; isProfessional: boolean;
+  id: string; nameLat: string; slug: string; sku: string; priceB2c: unknown; priceB2b: unknown; oldPrice: unknown;
+  stockQuantity: number; isNew: boolean; isFeatured: boolean; isProfessional: boolean;
   brand: { name: string } | null;
   images: { url: string }[];
 }, avgRating: number): ProductData {
@@ -20,6 +20,8 @@ function formatProduct(p: {
     isNew: p.isNew,
     isFeatured: p.isFeatured,
     isProfessional: p.isProfessional,
+    stockQuantity: p.stockQuantity,
+    sku: p.sku,
   }
 }
 

@@ -23,18 +23,21 @@ export default function Footer() {
         <div className="flex items-center gap-3 mt-6">
           <a
             href="#"
+            aria-label="Instagram"
             className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-amber-700 hover:border-amber-700 transition-colors"
           >
             <Globe className="w-3.5 h-3.5" />
           </a>
           <a
             href="#"
+            aria-label="Email"
             className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-amber-700 hover:border-amber-700 transition-colors"
           >
             <AtSign className="w-3.5 h-3.5" />
           </a>
           <a
             href="#"
+            aria-label="YouTube"
             className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-amber-700 hover:border-amber-700 transition-colors"
           >
             <Play className="w-3.5 h-3.5" />
@@ -75,10 +78,7 @@ export default function Footer() {
         <Link href="/faq" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
           {t("footer.faq")}
         </Link>
-        <Link href="/blog" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
-          {t("footer.blog")}
-        </Link>
-        <Link href="/seminars" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
+<Link href="/seminars" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
           {t("footer.seminars")}
         </Link>
         <a href="#" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">

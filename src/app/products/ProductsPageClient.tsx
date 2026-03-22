@@ -169,9 +169,12 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
     }
   };
 
+  const outOfStock = product.stockQuantity <= 0;
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (outOfStock) return;
     addItem({
       productId: product.id,
       name: product.name,
@@ -206,8 +209,8 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
           <Heart className={`w-4 h-4 ${liked ? "fill-[#735b28] text-secondary" : "text-stone-400"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={handleAddToCart} className={`w-full text-white text-sm font-medium py-2.5 rounded-sm transition-colors flex items-center justify-center gap-2 ${addedToCart ? "bg-green-600" : "bg-black hover:bg-[#1a1a1a]"}`}>
-            {addedToCart ? <><CheckCircle className="w-4 h-4" /> {t("products.addedToCart")}</> : <><ShoppingBag className="w-4 h-4" /> {t("products.addToCart")}</>}
+          <button onClick={handleAddToCart} disabled={outOfStock} className={`w-full text-white text-sm font-medium py-2.5 rounded-sm transition-colors flex items-center justify-center gap-2 ${outOfStock ? "bg-gray-400 cursor-not-allowed" : addedToCart ? "bg-green-600" : "bg-black hover:bg-[#1a1a1a]"}`}>
+            {outOfStock ? <>{t("products.outOfStock")}</> : addedToCart ? <><CheckCircle className="w-4 h-4" /> {t("products.addedToCart")}</> : <><ShoppingBag className="w-4 h-4" /> {t("products.addToCart")}</>}
           </button>
         </div>
       </div>
@@ -358,6 +361,7 @@ export default function ProductsPageClient({
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState("");
 
   const [gridView, setGridView] = useState(true);
   const [mobileFilter, setMobileFilter] = useState(false);
@@ -442,6 +446,7 @@ export default function ProductsPageClient({
   // Fetch products from API
   const fetchProducts = useCallback(async (page: number) => {
     setLoading(true);
+    setFetchError("");
     try {
       const qs = buildQueryString(page);
       const res = await fetch(`/api/products?${qs}`);
@@ -452,6 +457,7 @@ export default function ProductsPageClient({
       }
     } catch (err) {
       console.error("Failed to fetch products:", err);
+      setFetchError("Greška pri učitavanju proizvoda. Pokušajte ponovo.");
     } finally {
       setLoading(false);
     }
@@ -960,6 +966,13 @@ export default function ProductsPageClient({
                 <button onClick={clearAllTags} className="text-[12px] text-stone-400 hover:text-secondary font-medium ml-1 transition-colors">
                   {t("products.clearFilters")}
                 </button>
+              </div>
+            )}
+
+            {/* Fetch error */}
+            {fetchError && !loading && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm text-center">
+                {fetchError}
               </div>
             )}
 

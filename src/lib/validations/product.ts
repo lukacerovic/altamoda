@@ -19,6 +19,38 @@ export const createProductSchema = z.object({
   isFeatured: z.boolean().default(false),
 })
 
+export const updateProductSchema = z.object({
+  nameLat: z.string().min(1).optional(),
+  nameCyr: z.string().optional(),
+  brandId: z.string().optional(),
+  productLineId: z.string().optional(),
+  categoryId: z.string().optional(),
+  description: z.string().optional(),
+  ingredients: z.string().optional(),
+  usageInstructions: z.string().optional(),
+  priceB2c: z.coerce.number().positive().optional(),
+  priceB2b: z.coerce.number().positive().optional(),
+  oldPrice: z.coerce.number().positive().optional(),
+  costPrice: z.coerce.number().positive().optional(),
+  stockQuantity: z.coerce.number().int().min(0).optional(),
+  lowStockThreshold: z.coerce.number().int().min(0).optional(),
+  weightGrams: z.coerce.number().min(0).optional(),
+  volumeMl: z.coerce.number().min(0).optional(),
+  isProfessional: z.boolean().optional(),
+  isNew: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isBestseller: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  colorLevel: z.number().int().min(1).max(10).optional(),
+  undertoneCode: z.string().optional(),
+  undertoneName: z.string().optional(),
+  hexValue: z.string().optional(),
+  shadeCode: z.string().optional(),
+  removeColor: z.boolean().optional(),
+})
+
 export const productFilterSchema = z.object({
   category: z.string().optional(),
   brand: z.union([z.string(), z.array(z.string())]).optional(),

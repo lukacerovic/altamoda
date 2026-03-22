@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   User, Eye, EyeOff, Mail, Lock, Building2, Clock, X,
@@ -10,6 +10,8 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/account";
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -35,6 +37,7 @@ export default function LoginPage() {
   const [regAddress, setRegAddress] = useState("");
   const [regTerms, setRegTerms] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
+  const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -73,7 +76,7 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       setLoading(false);
-      router.push("/account");
+      router.push(callbackUrl);
       router.refresh();
     }
   }
@@ -136,7 +139,7 @@ export default function LoginPage() {
         });
         setLoading(false);
         if (!result?.error) {
-          router.push("/account");
+          router.push(callbackUrl);
           router.refresh();
         }
       }
@@ -196,8 +199,13 @@ export default function LoginPage() {
                     <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                       <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-secondary focus:ring-black" /> {t("auth.rememberMe")}
                     </label>
-                    <a href="#" className="text-sm text-secondary hover:text-black">{t("auth.forgotPassword")}</a>
+                    <button type="button" onClick={(e) => { e.preventDefault(); setForgotPasswordMsg(true); setTimeout(() => setForgotPasswordMsg(false), 3000); }} className="text-sm text-secondary hover:text-black">{t("auth.forgotPassword")}</button>
                   </div>
+                  {forgotPasswordMsg && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded">
+                      Funkcija resetovanja lozinke uskoro dolazi.
+                    </div>
+                  )}
                   <button type="submit" disabled={loading} className="w-full bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.loggingIn") : t("auth.loginButton")}
                   </button>

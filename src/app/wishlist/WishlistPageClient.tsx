@@ -34,12 +34,19 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   const [items, setItems] = useState(initialItems);
   const { addItem } = useCartStore();
 
+  const [removeError, setRemoveError] = useState("");
+
   const removeItem = async (productId: string) => {
-    setItems(items.filter((item) => item.productId !== productId));
+    setRemoveError("");
     try {
-      await fetch(`/api/wishlist?productId=${productId}`, { method: "DELETE" });
+      const res = await fetch(`/api/wishlist?productId=${productId}`, { method: "DELETE" });
+      if (!res.ok) {
+        throw new Error("Server error");
+      }
+      setItems(items.filter((item) => item.productId !== productId));
     } catch (err) {
       console.error("Failed to remove wishlist item:", err);
+      setRemoveError("Greška pri uklanjanju proizvoda. Pokušajte ponovo.");
     }
   };
 
@@ -76,6 +83,12 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
           <span className="text-[#333]">{t("wishlist.title")}</span>
         </div>
 
+        {removeError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">
+            {removeError}
+          </div>
+        )}
+
         {items.length > 0 ? (
           <>
             {/* Title + Actions */}
@@ -83,7 +96,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
               <div className="flex items-center gap-3">
                 <Heart className="w-6 h-6 text-secondary fill-[#735b28]" />
                 <h1 className="text-3xl font-bold text-black" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
-                <span className="text-sm text-[#999]">({items.length} proizvoda)</span>
+                <span className="text-sm text-[#999]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
               <div className="flex items-center gap-3">
                 <button className="flex items-center gap-2 px-4 py-2 border border-stone-200 text-[#666] text-sm rounded-sm hover:bg-stone-100 transition-colors">

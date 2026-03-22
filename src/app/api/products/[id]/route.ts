@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
+import { updateProductSchema } from '@/lib/validations/product'
 
 // GET /api/products/[id] — Full product detail
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
@@ -104,7 +105,8 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   await requireAdmin()
   const { id } = await getRouteParams<{ id: string }>(context)
 
-  const body = await req.json()
+  const raw = await req.json()
+  const body = updateProductSchema.parse(raw)
 
   const product = await prisma.product.update({
     where: { id },

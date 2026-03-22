@@ -40,30 +40,33 @@ export const POST = withErrorHandler(async (req: Request) => {
   })
   const validProductIds = new Set(validProducts.map((p) => p.id))
 
-  // Get existing cart items in one query
-  const existingCartItems = await prisma.cartItem.findMany({
-    where: { cartId: cart.id, productId: { in: productIds } },
-  })
-  const existingMap = new Map(existingCartItems.map((ci) => [ci.productId, ci]))
+  // Wrap merge in a transaction for atomicity
+  await prisma.$transaction(async (tx) => {
+    // Get existing cart items in one query
+    const existingCartItems = await tx.cartItem.findMany({
+      where: { cartId: cart.id, productId: { in: productIds } },
+    })
+    const existingMap = new Map(existingCartItems.map((ci) => [ci.productId, ci]))
 
-  // Merge each valid item
-  for (const item of items) {
-    if (!validProductIds.has(item.productId)) continue
+    // Merge each valid item
+    for (const item of items) {
+      if (!validProductIds.has(item.productId)) continue
 
-    const existing = existingMap.get(item.productId)
+      const existing = existingMap.get(item.productId)
 
-    if (existing) {
-      // Sum quantities (not max — guest items should add to existing)
-      await prisma.cartItem.update({
-        where: { id: existing.id },
-        data: { quantity: existing.quantity + item.quantity },
-      })
-    } else {
-      await prisma.cartItem.create({
-        data: { cartId: cart.id, productId: item.productId, quantity: item.quantity },
-      })
+      if (existing) {
+        // Sum quantities (not max — guest items should add to existing)
+        await tx.cartItem.update({
+          where: { id: existing.id },
+          data: { quantity: existing.quantity + item.quantity },
+        })
+      } else {
+        await tx.cartItem.create({
+          data: { cartId: cart.id, productId: item.productId, quantity: item.quantity },
+        })
+      }
     }
-  }
+  })
 
   return successResponse({ message: 'Korpa spojena' })
 })

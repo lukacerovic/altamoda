@@ -160,7 +160,10 @@ export default function Header() {
         const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}`);
         const json = await res.json();
         if (json.success) setSearchResults(json.data);
-      } catch { /* ignore */ }
+      } catch (err) {
+        console.error("Search failed:", err);
+        setSearchResults([]);
+      }
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);

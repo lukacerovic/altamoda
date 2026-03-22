@@ -137,12 +137,17 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   }
 
-  // Sort
-  let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' }
-  if (sort === 'price_asc') orderBy = { priceB2c: 'asc' }
-  else if (sort === 'price_desc') orderBy = { priceB2c: 'desc' }
-  else if (sort === 'newest') orderBy = { createdAt: 'desc' }
-  else if (sort === 'name_asc') orderBy = { nameLat: 'asc' }
+  // Sort — always show in-stock products first
+  let sortOrderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' }
+  if (sort === 'price_asc') sortOrderBy = { priceB2c: 'asc' }
+  else if (sort === 'price_desc') sortOrderBy = { priceB2c: 'desc' }
+  else if (sort === 'newest') sortOrderBy = { createdAt: 'desc' }
+  else if (sort === 'name_asc') sortOrderBy = { nameLat: 'asc' }
+
+  const orderBy: Prisma.ProductOrderByWithRelationInput[] = [
+    { stockQuantity: 'desc' },
+    sortOrderBy,
+  ]
 
   // Query
   const [products, total] = await Promise.all([

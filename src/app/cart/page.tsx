@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -9,7 +9,7 @@ import { useCartStore } from "@/lib/stores/cart-store";
 import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
   ShoppingBag, Trash2, Minus, Plus, ChevronRight,
-  Truck, Shield, Star,
+  Truck, Shield, Star, AlertCircle,
   CheckCircle, FileText, Save, MessageSquare, Store, Sparkles,
 } from "lucide-react";
 
@@ -24,15 +24,53 @@ export default function CartPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { t } = useLanguage();
-  const { items, updateQuantity, removeItem, getTotal } = useCartStore();
+  const { items, updateQuantity, removeItem, getTotal, setItems } = useCartStore();
   const [deliveryMethod, setDeliveryMethod] = useState("standard");
   const [b2bNoOnlinePayment, setB2bNoOnlinePayment] = useState(false);
   const [b2bInvoice, setB2bInvoice] = useState(false);
   const [orderNotes, setOrderNotes] = useState("");
   const [savedNotice, setSavedNotice] = useState(false);
+  const [stockChecked, setStockChecked] = useState(false);
+
+  // Layer 2: Validate stock from DB on cart page load
+  const [stockMap, setStockMap] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    const productIds = useCartStore.getState().items.map((i) => i.productId);
+    if (productIds.length === 0) { setStockChecked(true); return; }
+    const validateStock = async () => {
+      try {
+        const res = await fetch("/api/cart/validate-stock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productIds }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          setStockMap(json.data);
+          // Update stockQuantity on items using latest store state
+          const currentItems = useCartStore.getState().items;
+          const updated = currentItems.map((item) => ({
+            ...item,
+            stockQuantity: json.data[item.productId] ?? item.stockQuantity,
+          }));
+          const changed = updated.some((u, i) => u.stockQuantity !== currentItems[i].stockQuantity);
+          if (changed) setItems(updated);
+        }
+      } catch {
+        // Silently fail — use cached stockQuantity
+      } finally {
+        setStockChecked(true);
+      }
+    };
+    validateStock();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isB2b = session?.user?.role === "b2b";
-  const subtotal = getTotal();
+  const inStockItems = items.filter((i) => i.stockQuantity > 0);
+  const hasOutOfStock = items.some((i) => i.stockQuantity <= 0);
+  const subtotal = inStockItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const deliveryOptions = [
     { key: "standard", label: t("cart.standardDelivery"), price: subtotal > FREE_SHIPPING_THRESHOLD ? 0 : 350, note: subtotal > FREE_SHIPPING_THRESHOLD ? t("cart.freeDeliveryForOrders") : "350 RSD" },
@@ -73,30 +111,52 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* CART ITEMS */}
             <div className="lg:col-span-2 space-y-4">
-              {items.map((item) => (
-                <div key={item.productId} className="bg-white rounded-sm shadow-sm p-4 md:p-6 flex gap-4">
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0">
+              {items.map((item) => {
+                const outOfStock = item.stockQuantity <= 0;
+                return (
+                <div key={item.productId} className={`bg-white rounded-sm shadow-sm p-4 md:p-6 flex gap-4 ${outOfStock ? "opacity-60" : ""}`}>
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0 relative">
                     {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
+                    {outOfStock && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-red-600 px-2 py-1 rounded-sm">{t("cart.outOfStock")}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className="text-xs text-secondary font-medium uppercase tracking-wider">{item.brand}</span>
                         <h3 className="text-sm md:text-base font-medium text-black mt-1">{item.name}</h3>
+                        {outOfStock && <p className="text-xs text-red-600 font-medium mt-1">{t("cart.outOfStockNotice")}</p>}
                       </div>
                       <button onClick={() => removeItem(item.productId)} className="text-gray-400 hover:text-[#c0392b] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                     </div>
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center border border-gray-200 rounded">
-                        <button onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Minus className="w-3 h-3" /></button>
-                        <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Plus className="w-3 h-3" /></button>
-                      </div>
-                      <span className="font-bold text-black">{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                      {outOfStock ? (
+                        <span className="text-xs text-gray-400 italic">{t("cart.unavailable")}</span>
+                      ) : (
+                        <div className="flex items-center border border-gray-200 rounded">
+                          <button onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Minus className="w-3 h-3" /></button>
+                          <input
+                            type="number"
+                            min={1}
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              if (!isNaN(val) && val >= 1) updateQuantity(item.productId, val);
+                            }}
+                            className="w-12 text-center text-sm font-medium border-0 focus:ring-0 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-50"><Plus className="w-3 h-3" /></button>
+                        </div>
+                      )}
+                      <span className={`font-bold ${outOfStock ? "text-gray-400 line-through" : "text-black"}`}>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {/* Delivery Options */}
               <div className="bg-white rounded-sm shadow-sm p-6">
@@ -185,7 +245,14 @@ export default function CartPage() {
                   <div className="flex justify-between text-lg font-bold"><span>{t("cart.total")}</span><span>{total.toLocaleString("sr-RS")} RSD</span></div>
                 </div>
 
-                <button onClick={handleCheckout} className="w-full bg-black hover:bg-stone-800 text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2">
+                {hasOutOfStock && (
+                  <div className="mt-4 bg-orange-50 border border-orange-200 rounded-sm p-3 flex items-start gap-2 text-sm text-orange-700">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <span>{t("cart.outOfStockWarning")}</span>
+                  </div>
+                )}
+
+                <button onClick={handleCheckout} disabled={inStockItems.length === 0} className="w-full bg-black hover:bg-stone-800 text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                   {t("cart.proceedToCheckout")} <ChevronRight className="w-4 h-4" />
                 </button>
 

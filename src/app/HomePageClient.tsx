@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useCartStore } from "@/lib/stores/cart-store";
 
 /* ─── Types ─── */
 export interface ProductData {
@@ -27,6 +28,8 @@ export interface ProductData {
   isNew: boolean;
   isFeatured: boolean;
   isProfessional: boolean;
+  stockQuantity: number;
+  sku: string;
 }
 
 const defaultImg = "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop";
@@ -45,7 +48,10 @@ const trustBadgeIcons = [Leaf, ShieldCheck, Award, Truck];
 /* ─── ProductCard ─── */
 function ProductCard({ product, showOld = false, badge }: { product: ProductData; showOld?: boolean; badge?: string }) {
   const { t } = useLanguage();
+  const { addItem } = useCartStore();
   const [liked, setLiked] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const outOfStock = product.stockQuantity <= 0;
   const newLabel = t("home.new");
   const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = badge || (product.isNew ? newLabel : discountBadge);
@@ -68,7 +74,23 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
           <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#b07a87]"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={(e) => e.preventDefault()} className="w-full bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-sm font-medium py-2.5 rounded-full transition-colors">{t("home.addToCart")}</button>
+          <button onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (outOfStock) return;
+            addItem({
+              productId: product.id,
+              name: product.name,
+              brand: product.brand,
+              price: product.price,
+              quantity: 1,
+              image: product.image ?? "",
+              sku: product.sku,
+              stockQuantity: product.stockQuantity,
+            });
+            setAddedToCart(true);
+            setTimeout(() => setAddedToCart(false), 1500);
+          }} disabled={outOfStock} className={`w-full text-sm font-medium py-2.5 rounded-full transition-colors ${outOfStock ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#8c4a5a] hover:bg-[#6e3848] text-white"}`}>{outOfStock ? t("home.outOfStock") || "Nema na stanju" : addedToCart ? "✓" : t("home.addToCart")}</button>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
