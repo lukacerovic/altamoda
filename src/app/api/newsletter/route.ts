@@ -24,12 +24,41 @@ export const POST = withErrorHandler(async (req: Request) => {
         unsubscribedAt: null,
       },
     })
+
+    // Send welcome email (non-blocking)
+    try {
+      const { sendEmail } = await import('@/lib/email')
+      const { welcomeTemplate } = await import('@/lib/email-templates')
+      await sendEmail({
+        to: email,
+        subject: 'Dobrodošli u Altamoda porodicu! 🎉',
+        html: welcomeTemplate(email),
+      })
+    } catch (err) {
+      console.error('Failed to send welcome email:', err)
+      // Don't fail the subscription if email fails
+    }
+
     return successResponse({ message: 'Uspešno ste se ponovo prijavili na newsletter' }, 201)
   }
 
   await prisma.newsletterSubscriber.create({
     data: { email, segment },
   })
+
+  // Send welcome email (non-blocking)
+  try {
+    const { sendEmail } = await import('@/lib/email')
+    const { welcomeTemplate } = await import('@/lib/email-templates')
+    await sendEmail({
+      to: email,
+      subject: 'Dobrodošli u Altamoda porodicu! 🎉',
+      html: welcomeTemplate(email),
+    })
+  } catch (err) {
+    console.error('Failed to send welcome email:', err)
+    // Don't fail the subscription if email fails
+  }
 
   return successResponse({ message: 'Uspešno ste se prijavili na newsletter' }, 201)
 })

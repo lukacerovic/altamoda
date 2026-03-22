@@ -96,6 +96,14 @@ enum NewsletterSegment {
   b2c
 }
 
+enum CampaignStatus {
+  draft
+  scheduled
+  sending
+  sent
+  failed
+}
+
 // ==================== USERS & AUTH ====================
 
 model User {
@@ -538,6 +546,40 @@ model NewsletterSubscriber {
   unsubscribedAt DateTime?         @map("unsubscribed_at")
 
   @@map("newsletter_subscribers")
+}
+
+model NewsletterCampaign {
+  id          String            @id @default(cuid())
+  title       String
+  subject     String
+  content     String            @db.Text
+  segment     NewsletterSegment @default(b2c)
+  status      CampaignStatus    @default(draft)
+  sentAt      DateTime?         @map("sent_at")
+  sentCount   Int               @default(0) @map("sent_count")
+  openCount   Int               @default(0) @map("open_count")
+  clickCount  Int               @default(0) @map("click_count")
+  scheduledAt DateTime?         @map("scheduled_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  @@map("newsletter_campaigns")
+}
+
+model NewsletterAutomation {
+  id              String            @id @default(cuid())
+  name            String
+  description     String
+  trigger         String
+  segment         NewsletterSegment @default(b2c)
+  templateSubject String            @map("template_subject")
+  templateContent String            @db.Text @map("template_content")
+  enabled         Boolean           @default(false)
+  lastTriggeredAt DateTime?         @map("last_triggered_at")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  @@map("newsletter_automations")
 }
 
 // ==================== SHIPPING ====================
