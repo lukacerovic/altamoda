@@ -349,14 +349,53 @@ export const POST = withErrorHandler(async (req: Request) => {
   const newBrands = new Map<string, string>()
   const newCategories = new Map<string, string>()
 
+  // Pre-transform all rows to collect SKUs/erpIds for batch lookup
+  const transformedRows: { rowNum: number; row: ParsedRow | null; error: string | null }[] = []
+  for (let i = 0; i < rawRows.length; i++) {
+    const rowNum = i + 2
+    const result = transformRow(rawRows[i], mapped, profile, rowNum)
+    transformedRows.push({ rowNum, ...result })
+  }
+
+  // Batch load existing products by SKU and erpId to avoid N+1
+  const allSkus = transformedRows.filter(t => t.row?.sku).map(t => t.row!.sku)
+  const allErpIds = transformedRows.filter(t => t.row?.erpId).map(t => t.row!.erpId)
+  const allSlugs = transformedRows.filter(t => t.row?.slug).map(t => t.row!.slug)
+
+  const [existingBySku, existingByErpId, existingSlugs] = await Promise.all([
+    allSkus.length > 0
+      ? prisma.product.findMany({ where: { sku: { in: allSkus } }, select: { id: true, sku: true, erpId: true } })
+      : [],
+    allErpIds.length > 0
+      ? prisma.product.findMany({ where: { erpId: { in: allErpIds } }, select: { id: true, sku: true, erpId: true } })
+      : [],
+    allSlugs.length > 0
+      ? prisma.product.findMany({ where: { slug: { in: allSlugs } }, select: { id: true, slug: true } })
+      : [],
+  ])
+
+  const skuToId = new Map(existingBySku.map(p => [p.sku, p.id]))
+  const erpIdToId = new Map(existingByErpId.filter(p => p.erpId).map(p => [p.erpId!, p.id]))
+  const existingSlugSet = new Set(existingSlugs.map(p => p.slug))
+
+  // Also batch check which products already have images
+  const allExistingIds = [...new Set([...skuToId.values(), ...erpIdToId.values()])]
+  const existingImages = allExistingIds.length > 0
+    ? await prisma.productImage.findMany({
+        where: { productId: { in: allExistingIds } },
+        select: { productId: true },
+      })
+    : []
+  const productsWithImages = new Set(existingImages.map(img => img.productId))
+
   let created = 0
   let updated = 0
   let skipped = 0
+  const usedSlugs = new Set(existingSlugSet)
+  const usedSkus = new Set(allSkus.filter(s => skuToId.has(s)))
   const errors: { row: number; name: string; error: string }[] = []
 
-  for (let i = 0; i < rawRows.length; i++) {
-    const rowNum = i + 2 // +2 for 1-indexed + header row
-    const { row, error } = transformRow(rawRows[i], mapped, profile, rowNum)
+  for (const { rowNum, row, error } of transformedRows) {
 
     if (!row && !error) {
       // Silently skipped row (e.g. empty name)
@@ -421,15 +460,12 @@ export const POST = withErrorHandler(async (req: Request) => {
         }
       }
 
-      // Check for existing product by SKU or erpId
-      let existing = await prisma.product.findUnique({ where: { sku: row.sku } })
-      if (!existing && row.erpId) {
-        existing = await prisma.product.findFirst({ where: { erpId: row.erpId } })
-      }
+      // Check for existing product using pre-loaded maps (no per-row queries)
+      const existingId = skuToId.get(row.sku) || (row.erpId ? erpIdToId.get(row.erpId) : undefined)
 
-      if (existing) {
+      if (existingId) {
         await prisma.product.update({
-          where: { id: existing.id },
+          where: { id: existingId },
           data: {
             nameLat: row.name,
             priceB2c: row.priceB2c,
@@ -449,31 +485,35 @@ export const POST = withErrorHandler(async (req: Request) => {
           },
         })
 
-        // Update image if provided and product has none
-        if (row.imageUrl) {
-          const hasImage = await prisma.productImage.findFirst({ where: { productId: existing.id } })
-          if (!hasImage) {
-            await prisma.productImage.create({
-              data: {
-                productId: existing.id,
-                url: row.imageUrl,
-                altText: row.name,
-                isPrimary: true,
-                sortOrder: 0,
-              },
-            })
-          }
+        // Add image if product has none (using pre-loaded set)
+        if (row.imageUrl && !productsWithImages.has(existingId)) {
+          await prisma.productImage.create({
+            data: {
+              productId: existingId,
+              url: row.imageUrl,
+              altText: row.name,
+              isPrimary: true,
+              sortOrder: 0,
+            },
+          })
+          productsWithImages.add(existingId)
         }
 
         updated++
       } else {
-        // Ensure unique slug
-        const existingSlug = await prisma.product.findUnique({ where: { slug: row.slug } })
-        const finalSlug = existingSlug ? `${row.slug}-${Date.now().toString(36)}` : row.slug
+        // Ensure unique slug using in-memory tracking (no per-row queries)
+        let finalSlug = row.slug
+        while (usedSlugs.has(finalSlug)) {
+          finalSlug = `${row.slug}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`
+        }
+        usedSlugs.add(finalSlug)
 
         // Ensure unique SKU
-        const existingSku = await prisma.product.findUnique({ where: { sku: row.sku } })
-        const finalSku = existingSku ? `${row.sku}-${Date.now().toString(36)}` : row.sku
+        let finalSku = row.sku
+        while (usedSkus.has(finalSku)) {
+          finalSku = `${row.sku}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`
+        }
+        usedSkus.add(finalSku)
 
         const product = await prisma.product.create({
           data: {
@@ -496,6 +536,10 @@ export const POST = withErrorHandler(async (req: Request) => {
             isActive: row.isActive,
           },
         })
+
+        // Track the new product so later rows can detect it as existing
+        skuToId.set(finalSku, product.id)
+        if (row.erpId) erpIdToId.set(row.erpId, product.id)
 
         // Create image if provided
         if (row.imageUrl) {

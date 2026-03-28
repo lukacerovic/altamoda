@@ -196,6 +196,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     stockQuantity: p.stockQuantity,
     barcode: p.barcode,
     vatRate: p.vatRate,
+    vatCode: p.vatCode,
     erpId: p.erpId,
     rating: ratingMap.get(p.id) || 0,
     reviewCount: p._count.reviews,

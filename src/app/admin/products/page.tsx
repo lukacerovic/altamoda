@@ -527,6 +527,12 @@ export default function ProductsPage() {
       isFeatured: formData.badges.isFeatured,
       isBestseller: formData.badges.isBestseller,
       isActive: formData.status === "active",
+      barcode: formData.barcode || null,
+      vatRate: formData.vatRate || 20,
+      vatCode: formData.vatCode || (formData.vatRate === 10 ? "R1" : "R2"),
+      erpId: formData.erpId || null,
+      seoTitle: formData.seoTitle || null,
+      seoDescription: formData.metaDescription || null,
       slug: formData.slug || null,
       // Color data — only include if a color level is actually set
       ...(formData.colorLevel ? {
