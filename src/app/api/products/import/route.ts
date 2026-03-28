@@ -4,117 +4,57 @@ import { requireAdmin } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
 import * as XLSX from 'xlsx'
 
-/* ─── Column mapping profiles ─── */
+/* ═══════════════════════════════════════════════════════════════
+   FILE TYPE DETECTION
+   ═══════════════════════════════════════════════════════════════ */
 
-/** Our standard CSV format (altamoda_products.csv) */
-const ALTAMODA_CSV_COLUMNS = {
-  name: ['name', 'naziv'],
-  sku: ['sku', 'sifra', 'šifra', 'id'],
-  brand: ['brand', 'brend'],
-  category: ['category', 'kategorija'],
-  priceB2c: ['priceb2c', 'price', 'cena', 'current_price_rsd', 'maloprodajna_cena'],
-  priceB2b: ['priceb2b', 'veleprodajna_cena'],
-  oldPrice: ['oldprice', 'old_price', 'original_price_rsd', 'stara_cena'],
-  costPrice: ['costprice', 'cost_price', 'nabavna_cena'],
-  stock: ['stock', 'zalihe', 'kolicina', 'količina'],
-  description: ['description', 'opis', 'volume_size'],
-  isProfessional: ['isprofessional', 'profesionalni', 'pro'],
-  barcode: ['barcode', 'barkod', 'ean'],
-  vatRate: ['vatrate', 'vat_rate', 'pdv', 'pdv_stopa'],
-  imageUrl: ['image_url', 'slika', 'image'],
-  slug: ['url_slug', 'slug'],
-  erpId: ['erpid', 'erp_id', 'pantheon_id', 'acident'],
-}
+type PantheonFileType = 'products' | 'categories' | 'barcodes' | 'altamoda_csv' | 'unknown'
 
-/** Pantheon the_setItem export format */
-const PANTHEON_COLUMNS = {
-  name: ['acname'],
-  sku: ['acident'],
-  brand: ['acclassif', 'acfieldsc'],
-  category: ['acclassif2'],
-  priceB2c: ['ansaleprice'],
-  costPrice: ['anbuyprice'],
-  vatRate: ['anvat'],
-  vatCode: ['acvatcode'],
-  barcode: ['accode'],
-  isActive: ['acactive'],
-  webshopVisible: ['acwebshopitem'],
-  description: ['acfieldse', 'acfieldsb'],
-  erpId: ['acident'],
-}
+function detectFileType(headers: string[]): PantheonFileType {
+  const lower = new Set(headers.map(h => h.toLowerCase().trim()))
 
-type ColumnProfile = 'altamoda' | 'pantheon' | 'unknown'
-
-interface ParsedRow {
-  name: string
-  sku: string
-  brand: string
-  category: string
-  priceB2c: number
-  priceB2b: number | null
-  oldPrice: number | null
-  costPrice: number | null
-  stock: number
-  description: string
-  isProfessional: boolean
-  barcode: string
-  vatRate: number
-  vatCode: string
-  imageUrl: string
-  slug: string
-  erpId: string
-  isActive: boolean
-}
-
-/** Detect which column profile the file uses */
-function detectProfile(headers: string[]): { profile: ColumnProfile; mapped: Record<string, string> } {
-  const lower = headers.map(h => h.toLowerCase().trim())
-
-  // Check for Pantheon-specific columns
-  const pantheonHits = lower.filter(h => ['acname', 'acident', 'ansaleprice', 'acclassif', 'acactive'].includes(h))
-  if (pantheonHits.length >= 3) {
-    const mapped = mapColumns(lower, headers, PANTHEON_COLUMNS)
-    return { profile: 'pantheon', mapped }
+  // Pantheon products: has acIdent + acName + anSalePrice
+  if (lower.has('acident') && lower.has('acname') && lower.has('ansaleprice')) {
+    return 'products'
   }
 
-  // Check for our CSV format
-  const altamodaHits = lower.filter(h =>
+  // Pantheon categories: has acClassif + acName + acType (but NOT anSalePrice)
+  if (lower.has('acclassif') && lower.has('acname') && lower.has('actype') && !lower.has('ansaleprice')) {
+    return 'categories'
+  }
+
+  // Pantheon barcodes: has acIdent + acCode + acType (small table, ~14 cols)
+  if (lower.has('acident') && lower.has('accode') && lower.has('actype') && !lower.has('acname')) {
+    return 'barcodes'
+  }
+  // Also detect barcodes if it has acIdent + acCode but only few columns (< 20)
+  if (lower.has('acident') && lower.has('accode') && headers.length < 20) {
+    return 'barcodes'
+  }
+
+  // Alta Moda CSV format
+  const altamodaHits = [...lower].filter(h =>
     ['name', 'brand', 'category', 'current_price_rsd', 'url_slug', 'image_url', 'sku', 'priceb2c', 'price'].includes(h)
   )
   if (altamodaHits.length >= 2) {
-    const mapped = mapColumns(lower, headers, ALTAMODA_CSV_COLUMNS)
-    return { profile: 'altamoda', mapped }
+    return 'altamoda_csv'
   }
 
-  return { profile: 'unknown', mapped: {} }
+  return 'unknown'
 }
 
-/** Map actual column headers to our field names */
-function mapColumns(
-  lowerHeaders: string[],
-  originalHeaders: string[],
-  profile: Record<string, string[]>
-): Record<string, string> {
-  const result: Record<string, string> = {}
-  for (const [field, aliases] of Object.entries(profile)) {
-    const idx = lowerHeaders.findIndex(h => aliases.includes(h))
-    if (idx !== -1) {
-      result[field] = originalHeaders[idx]
-    }
-  }
-  return result
+const FILE_TYPE_LABELS: Record<PantheonFileType, string> = {
+  products: 'Pantheon Proizvodi (the_setItem)',
+  categories: 'Pantheon Kategorije (tHE_SetItemCateg)',
+  barcodes: 'Pantheon Barkodovi (tHE_SetItemExtItemSubj)',
+  altamoda_csv: 'Alta Moda CSV',
+  unknown: 'Nepoznat format',
 }
 
-/** Get value from a raw row using the column mapping */
-function getVal(row: Record<string, unknown>, mapped: Record<string, string>, field: string): string {
-  const col = mapped[field]
-  if (!col) return ''
-  const val = row[col]
-  if (val == null) return ''
-  return String(val).trim()
-}
+/* ═══════════════════════════════════════════════════════════════
+   FILE PARSING
+   ═══════════════════════════════════════════════════════════════ */
 
-/** Parse a file (CSV or Excel) into raw rows */
 function parseFile(buffer: ArrayBuffer, fileName: string): { headers: string[]; rows: Record<string, unknown>[] } {
   const ext = fileName.toLowerCase().split('.').pop()
 
@@ -130,30 +70,24 @@ function parseFile(buffer: ArrayBuffer, fileName: string): { headers: string[]; 
     const sheet = workbook.Sheets[sheetName]
     const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' })
     if (json.length === 0) throw new Error('Excel sheet je prazan')
-    const headers = Object.keys(json[0])
-    return { headers, rows: json }
+    return { headers: Object.keys(json[0]), rows: json }
   }
 
-  throw new Error(`Nepodržan format fajla: .${ext}. Koristite .csv, .xlsx ili .xls`)
+  throw new Error(`Nepodržan format: .${ext}. Koristite .csv, .xlsx ili .xls`)
 }
 
 function parseCsvText(text: string): { headers: string[]; rows: Record<string, unknown>[] } {
   const lines = text.trim().replace(/\r\n/g, '\n').split('\n')
-  if (lines.length < 2) throw new Error('CSV fajl mora imati zaglavlje i bar jedan red podataka')
-
+  if (lines.length < 2) throw new Error('CSV mora imati zaglavlje i bar jedan red podataka')
   const headers = parseCsvLine(lines[0])
   const rows: Record<string, unknown>[] = []
-
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue
     const values = parseCsvLine(lines[i])
     const row: Record<string, unknown> = {}
-    headers.forEach((h, idx) => {
-      row[h] = values[idx] || ''
-    })
+    headers.forEach((h, idx) => { row[h] = values[idx] || '' })
     rows.push(row)
   }
-
   return { headers, rows }
 }
 
@@ -161,276 +95,280 @@ function parseCsvLine(line: string): string[] {
   const fields: string[] = []
   let current = ''
   let inQuotes = false
-
   for (let i = 0; i < line.length; i++) {
     const ch = line[i]
     if (inQuotes) {
-      if (ch === '"' && line[i + 1] === '"') {
-        current += '"'
-        i++
-      } else if (ch === '"') {
-        inQuotes = false
-      } else {
-        current += ch
-      }
+      if (ch === '"' && line[i + 1] === '"') { current += '"'; i++ }
+      else if (ch === '"') { inQuotes = false }
+      else { current += ch }
     } else {
-      if (ch === '"') {
-        inQuotes = true
-      } else if (ch === ',') {
-        fields.push(current.trim())
-        current = ''
-      } else {
-        current += ch
-      }
+      if (ch === '"') { inQuotes = true }
+      else if (ch === ',') { fields.push(current.trim()); current = '' }
+      else { current += ch }
     }
   }
   fields.push(current.trim())
   return fields
 }
 
-/** Transform a raw row into our standardized ParsedRow */
-function transformRow(
-  raw: Record<string, unknown>,
-  mapped: Record<string, string>,
-  profile: ColumnProfile,
-  rowNum: number,
-): { row: ParsedRow | null; error: string | null } {
-  const name = getVal(raw, mapped, 'name')
-  if (!name) {
-    // Silently skip rows with no name (metadata/empty rows in Pantheon exports)
-    return { row: null, error: null }
-  }
-
-  const priceStr = getVal(raw, mapped, 'priceB2c')
-  const price = Number(priceStr)
-  if (isNaN(price) || price < 0) {
-    return { row: null, error: `Red ${rowNum}: Nevalidna cena "${priceStr}" za "${name}". Cena mora biti broj >= 0.` }
-  }
-  // Price 0 is allowed — Pantheon B2B items, unpriced products, items priced via rebates
-
-  // SKU: use provided or generate from name
-  let sku = getVal(raw, mapped, 'sku')
-  if (profile === 'pantheon' && sku) {
-    // Pantheon acIdent is a float — convert to clean string
-    sku = String(Math.floor(Number(sku) || 0))
-  }
-  if (!sku) {
-    sku = `IMP-${slugify(name).slice(0, 20)}-${rowNum}`
-  }
-
-  // Slug
-  let slug = getVal(raw, mapped, 'slug')
-  if (!slug) slug = slugify(name)
-
-  // VAT
-  const vatRateStr = getVal(raw, mapped, 'vatRate')
-  const vatRate = vatRateStr ? Number(vatRateStr) : 20
-  const vatCodeRaw = getVal(raw, mapped, 'vatCode')
-  const vatCode = vatCodeRaw || (vatRate === 10 ? 'R1' : 'R2')
-
-  // All imported products are active by default — admin can deactivate individually later
-  const isActive = true
-
-  // ERP ID
-  let erpId = getVal(raw, mapped, 'erpId')
-  if (erpId && profile === 'pantheon') {
-    erpId = String(Math.floor(Number(erpId) || 0))
-  }
-
-  return {
-    row: {
-      name,
-      sku,
-      brand: getVal(raw, mapped, 'brand'),
-      category: getVal(raw, mapped, 'category'),
-      priceB2c: price,
-      priceB2b: getVal(raw, mapped, 'priceB2b') ? Number(getVal(raw, mapped, 'priceB2b')) : null,
-      oldPrice: getVal(raw, mapped, 'oldPrice') ? Number(getVal(raw, mapped, 'oldPrice')) : null,
-      costPrice: getVal(raw, mapped, 'costPrice') ? Number(getVal(raw, mapped, 'costPrice')) : null,
-      stock: Number(getVal(raw, mapped, 'stock')) || 0,
-      description: getVal(raw, mapped, 'description'),
-      isProfessional: ['true', '1', 'da'].includes(getVal(raw, mapped, 'isProfessional').toLowerCase()),
-      barcode: getVal(raw, mapped, 'barcode'),
-      vatRate: isNaN(vatRate) ? 20 : vatRate,
-      vatCode,
-      imageUrl: getVal(raw, mapped, 'imageUrl'),
-      slug,
-      erpId,
-      isActive,
-    },
-    error: null,
-  }
+/** Case-insensitive column value getter */
+function col(row: Record<string, unknown>, name: string): string {
+  // Try exact match first, then case-insensitive
+  if (row[name] != null) return String(row[name]).trim()
+  const key = Object.keys(row).find(k => k.toLowerCase() === name.toLowerCase())
+  if (key && row[key] != null) return String(row[key]).trim()
+  return ''
 }
 
-// ─── POST /api/products/import ───
+/** Convert Pantheon float ID to clean string */
+function cleanId(val: string): string {
+  if (!val) return ''
+  const num = Number(val)
+  return isNaN(num) ? val : String(Math.floor(num))
+}
 
-export const POST = withErrorHandler(async (req: Request) => {
-  await requireAdmin()
+/* ═══════════════════════════════════════════════════════════════
+   STEP 1: IMPORT CATEGORIES (tHE_SetItemCateg)
+   ═══════════════════════════════════════════════════════════════ */
 
-  const formData = await req.formData()
-  const file = formData.get('file') as File | null
+interface CategoryResult {
+  created: number
+  updated: number
+  skipped: number
+  errors: { row: number; error: string }[]
+}
 
-  if (!file) {
-    return errorResponse('Fajl nije prosleđen. Izaberite CSV ili Excel fajl.', 400)
+async function importCategories(
+  rows: Record<string, unknown>[],
+  brandMap: Map<string, string>,
+  categoryMap: Map<string, string>,
+): Promise<CategoryResult> {
+  let created = 0, updated = 0, skipped = 0
+  const errors: { row: number; error: string }[] = []
+
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i]
+    const classif = col(r, 'acClassif')
+    const name = col(r, 'acName') || classif
+    const type = col(r, 'acType').toUpperCase()
+    const active = col(r, 'acActive').toUpperCase() !== 'F'
+
+    if (!classif || !name) { skipped++; continue }
+
+    const slug = slugify(name)
+    if (!slug) { skipped++; continue }
+
+    try {
+      if (type === 'P') {
+        // Product-level classification → Brand
+        const key = name.toLowerCase()
+        if (brandMap.has(key)) {
+          updated++
+        } else {
+          const existing = await prisma.brand.findUnique({ where: { slug } })
+          if (existing) {
+            brandMap.set(key, existing.id)
+            updated++
+          } else {
+            const brand = await prisma.brand.create({
+              data: { name, slug, isActive: active },
+            })
+            brandMap.set(key, brand.id)
+            created++
+          }
+        }
+      } else {
+        // O = parent category, S = sub-category
+        const key = name.toLowerCase()
+        if (categoryMap.has(key)) {
+          updated++
+        } else {
+          const existing = await prisma.category.findUnique({ where: { slug } })
+          if (existing) {
+            categoryMap.set(key, existing.id)
+            updated++
+          } else {
+            // For sub-categories (S), try to find parent by matching prefix
+            let parentId: string | null = null
+            if (type === 'S') {
+              // Try to match parent category — look for O-type entries already imported
+              for (const [catName, catId] of categoryMap.entries()) {
+                if (name.toLowerCase().includes(catName) || catName.includes(name.toLowerCase())) {
+                  parentId = catId
+                  break
+                }
+              }
+            }
+
+            const cat = await prisma.category.create({
+              data: {
+                nameLat: name,
+                slug,
+                isActive: active,
+                parentId,
+                depth: parentId ? 1 : 0,
+              },
+            })
+            categoryMap.set(key, cat.id)
+            created++
+          }
+        }
+      }
+    } catch (err) {
+      errors.push({ row: i + 2, error: `"${name}": ${(err as Error).message.slice(0, 150)}` })
+    }
   }
 
-  // Validate file size (max 10MB)
-  if (file.size > 10 * 1024 * 1024) {
-    return errorResponse('Fajl je prevelik. Maksimalna veličina je 10MB.', 400)
-  }
+  return { created, updated, skipped, errors }
+}
 
-  // Validate file extension
-  const ext = file.name.toLowerCase().split('.').pop()
-  if (!['csv', 'xlsx', 'xls', 'txt'].includes(ext || '')) {
-    return errorResponse(
-      `Nepodržan format fajla: .${ext}. Dozvoljeni formati su: .csv, .xlsx, .xls`,
-      400
-    )
-  }
+/* ═══════════════════════════════════════════════════════════════
+   STEP 2: IMPORT PRODUCTS (the_setItem or altamoda CSV)
+   ═══════════════════════════════════════════════════════════════ */
 
-  // Parse file
-  let headers: string[]
-  let rawRows: Record<string, unknown>[]
-  try {
-    const buffer = await file.arrayBuffer()
-    const result = parseFile(buffer, file.name)
-    headers = result.headers
-    rawRows = result.rows
-  } catch (err) {
-    return errorResponse(`Greška pri čitanju fajla: ${(err as Error).message}`, 400)
-  }
+interface ProductResult {
+  created: number
+  updated: number
+  skipped: number
+  errors: { row: number; name: string; error: string }[]
+  newBrands: string[]
+  newCategories: string[]
+}
 
-  if (rawRows.length === 0) {
-    return errorResponse('Fajl ne sadrži podatke. Proverite da li ima zaglavlje i bar jedan red.', 400)
-  }
-
-  if (rawRows.length > 10000) {
-    return errorResponse(`Fajl sadrži ${rawRows.length} redova. Maksimalno je 10.000 po importu.`, 400)
-  }
-
-  // Detect column profile
-  const { profile, mapped } = detectProfile(headers)
-
-  if (profile === 'unknown') {
-    return errorResponse(
-      `Nije prepoznat format kolona u fajlu.\n\n` +
-      `Pronađene kolone: ${headers.join(', ')}\n\n` +
-      `Očekivane kolone za Alta Moda format: name, brand, category, current_price_rsd (ili priceB2c), url_slug, image_url\n\n` +
-      `Očekivane kolone za Pantheon format: acName, acIdent, anSalePrice, acClassif, acActive`,
-      400
-    )
-  }
-
-  // Check required columns are mapped
-  if (!mapped['name']) {
-    return errorResponse(
-      `Kolona za naziv proizvoda nije pronađena.\n` +
-      `Pronađene kolone: ${headers.join(', ')}\n` +
-      `Očekivana kolona: "name", "naziv" ili "acName"`,
-      400
-    )
-  }
-  if (!mapped['priceB2c']) {
-    return errorResponse(
-      `Kolona za cenu nije pronađena.\n` +
-      `Pronađene kolone: ${headers.join(', ')}\n` +
-      `Očekivana kolona: "priceB2c", "current_price_rsd", "cena" ili "anSalePrice"`,
-      400
-    )
-  }
-
-  // Batch load brands and categories
-  const allBrands = await prisma.brand.findMany({ select: { id: true, name: true, slug: true } })
-  const allCategories = await prisma.category.findMany({ select: { id: true, nameLat: true, slug: true } })
-  const brandMap = new Map(allBrands.map(b => [b.name.toLowerCase(), b.id]))
-  const categoryMap = new Map(allCategories.map(c => [c.nameLat.toLowerCase(), c.id]))
-
-  // Track new brands/categories to create
+async function importProducts(
+  rows: Record<string, unknown>[],
+  fileType: 'products' | 'altamoda_csv',
+  brandMap: Map<string, string>,
+  categoryMap: Map<string, string>,
+): Promise<ProductResult> {
   const newBrands = new Map<string, string>()
   const newCategories = new Map<string, string>()
 
-  // Pre-transform all rows to collect SKUs/erpIds for batch lookup
-  const transformedRows: { rowNum: number; row: ParsedRow | null; error: string | null }[] = []
-  for (let i = 0; i < rawRows.length; i++) {
-    const rowNum = i + 2
-    const result = transformRow(rawRows[i], mapped, profile, rowNum)
-    transformedRows.push({ rowNum, ...result })
+  // Column accessor based on file type
+  const isPantheon = fileType === 'products'
+  const getName = (r: Record<string, unknown>) => isPantheon ? col(r, 'acName') : (col(r, 'name') || col(r, 'naziv'))
+  const getSku = (r: Record<string, unknown>) => {
+    const raw = isPantheon ? col(r, 'acIdent') : (col(r, 'sku') || col(r, 'id'))
+    return isPantheon ? cleanId(raw) : raw
+  }
+  const getBrand = (r: Record<string, unknown>) => isPantheon ? (col(r, 'acClassif') || col(r, 'acFieldSC')) : col(r, 'brand')
+  const getCategory = (r: Record<string, unknown>) => isPantheon ? col(r, 'acClassif2') : col(r, 'category')
+  const getPrice = (r: Record<string, unknown>) => isPantheon ? col(r, 'anSalePrice') : (col(r, 'priceB2c') || col(r, 'current_price_rsd') || col(r, 'price'))
+  const getCostPrice = (r: Record<string, unknown>) => isPantheon ? col(r, 'anBuyPrice') : (col(r, 'costPrice') || col(r, 'cost_price'))
+  const getOldPrice = (r: Record<string, unknown>) => isPantheon ? '' : (col(r, 'oldPrice') || col(r, 'original_price_rsd'))
+  const getVatRate = (r: Record<string, unknown>) => isPantheon ? col(r, 'anVAT') : col(r, 'vatRate')
+  const getVatCode = (r: Record<string, unknown>) => isPantheon ? col(r, 'acVATCode') : col(r, 'vatCode')
+  const getDescription = (r: Record<string, unknown>) => isPantheon ? (col(r, 'acFieldSE') || col(r, 'acFieldSB')) : (col(r, 'description') || col(r, 'volume_size'))
+  const getSlug = (r: Record<string, unknown>) => isPantheon ? '' : (col(r, 'url_slug') || col(r, 'slug'))
+  const getImageUrl = (r: Record<string, unknown>) => isPantheon ? '' : col(r, 'image_url')
+  const getBarcode = (r: Record<string, unknown>) => isPantheon ? '' : col(r, 'barcode')
+  const getErpId = (r: Record<string, unknown>) => isPantheon ? cleanId(col(r, 'acIdent')) : (col(r, 'erpId') || col(r, 'erp_id'))
+
+  // Pre-transform to collect SKUs for batch lookup
+  interface TransformedProduct {
+    rowNum: number
+    name: string
+    sku: string
+    brand: string
+    category: string
+    priceB2c: number
+    costPrice: number | null
+    oldPrice: number | null
+    vatRate: number
+    vatCode: string
+    description: string
+    slug: string
+    imageUrl: string
+    barcode: string
+    erpId: string
   }
 
-  // Batch load existing products by SKU and erpId to avoid N+1
-  const allSkus = transformedRows.filter(t => t.row?.sku).map(t => t.row!.sku)
-  const allErpIds = transformedRows.filter(t => t.row?.erpId).map(t => t.row!.erpId)
-  const allSlugs = transformedRows.filter(t => t.row?.slug).map(t => t.row!.slug)
+  const transformed: TransformedProduct[] = []
+  const parseErrors: { row: number; name: string; error: string }[] = []
+  let skipped = 0
 
-  const [existingBySku, existingByErpId, existingSlugs] = await Promise.all([
-    allSkus.length > 0
-      ? prisma.product.findMany({ where: { sku: { in: allSkus } }, select: { id: true, sku: true, erpId: true } })
-      : [],
-    allErpIds.length > 0
-      ? prisma.product.findMany({ where: { erpId: { in: allErpIds } }, select: { id: true, sku: true, erpId: true } })
-      : [],
-    allSlugs.length > 0
-      ? prisma.product.findMany({ where: { slug: { in: allSlugs } }, select: { id: true, slug: true } })
-      : [],
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i]
+    const rowNum = i + 2
+    const name = getName(r)
+    if (!name) { skipped++; continue }
+
+    const priceStr = getPrice(r)
+    const price = Number(priceStr)
+    if (isNaN(price) || price < 0) {
+      parseErrors.push({ row: rowNum, name, error: `Nevalidna cena "${priceStr}". Mora biti broj >= 0.` })
+      continue
+    }
+
+    let sku = getSku(r)
+    if (!sku) sku = `IMP-${slugify(name).slice(0, 20)}-${rowNum}`
+
+    let slug = getSlug(r)
+    if (!slug) slug = slugify(name)
+
+    const vatRateNum = Number(getVatRate(r)) || 20
+    const vatCodeRaw = getVatCode(r)
+
+    const costStr = getCostPrice(r)
+    const oldStr = getOldPrice(r)
+
+    transformed.push({
+      rowNum, name, sku, slug, erpId: getErpId(r),
+      brand: getBrand(r), category: getCategory(r),
+      priceB2c: price,
+      costPrice: costStr ? Number(costStr) || null : null,
+      oldPrice: oldStr ? Number(oldStr) || null : null,
+      vatRate: isNaN(vatRateNum) ? 20 : vatRateNum,
+      vatCode: vatCodeRaw || (vatRateNum === 10 ? 'R1' : 'R2'),
+      description: getDescription(r),
+      imageUrl: getImageUrl(r),
+      barcode: getBarcode(r),
+    })
+  }
+
+  // Batch lookup existing products
+  const allSkus = transformed.map(t => t.sku)
+  const allErpIds = transformed.filter(t => t.erpId).map(t => t.erpId)
+  const allSlugs = transformed.map(t => t.slug)
+
+  const [existBySku, existByErp, existSlugs] = await Promise.all([
+    allSkus.length > 0 ? prisma.product.findMany({ where: { sku: { in: allSkus } }, select: { id: true, sku: true } }) : [],
+    allErpIds.length > 0 ? prisma.product.findMany({ where: { erpId: { in: allErpIds } }, select: { id: true, erpId: true } }) : [],
+    allSlugs.length > 0 ? prisma.product.findMany({ where: { slug: { in: allSlugs } }, select: { id: true, slug: true } }) : [],
   ])
 
-  const skuToId = new Map(existingBySku.map(p => [p.sku, p.id]))
-  const erpIdToId = new Map(existingByErpId.filter(p => p.erpId).map(p => [p.erpId!, p.id]))
-  const existingSlugSet = new Set(existingSlugs.map(p => p.slug))
+  const skuToId = new Map(existBySku.map(p => [p.sku, p.id]))
+  const erpToId = new Map(existByErp.filter(p => p.erpId).map(p => [p.erpId!, p.id]))
+  const usedSlugs = new Set(existSlugs.map(p => p.slug))
+  const usedSkus = new Set(existBySku.map(p => p.sku))
 
-  // Also batch check which products already have images
-  const allExistingIds = [...new Set([...skuToId.values(), ...erpIdToId.values()])]
-  const existingImages = allExistingIds.length > 0
-    ? await prisma.productImage.findMany({
-        where: { productId: { in: allExistingIds } },
-        select: { productId: true },
-      })
+  // Batch check images
+  const allExistIds = [...new Set([...skuToId.values(), ...erpToId.values()])]
+  const existImgs = allExistIds.length > 0
+    ? await prisma.productImage.findMany({ where: { productId: { in: allExistIds } }, select: { productId: true } })
     : []
-  const productsWithImages = new Set(existingImages.map(img => img.productId))
+  const hasImage = new Set(existImgs.map(i => i.productId))
 
-  let created = 0
-  let updated = 0
-  let skipped = 0
-  const usedSlugs = new Set(existingSlugSet)
-  const usedSkus = new Set(allSkus.filter(s => skuToId.has(s)))
-  const errors: { row: number; name: string; error: string }[] = []
+  let created = 0, updated = 0
 
-  for (const { rowNum, row, error } of transformedRows) {
-
-    if (!row && !error) {
-      // Silently skipped row (e.g. empty name)
-      skipped++
-      continue
-    }
-    if (error || !row) {
-      errors.push({ row: rowNum, name: '', error: error || 'Nepoznata greška' })
-      continue
-    }
-
-    // Skip products without a name (empty/metadata rows)
-    if (!row.name.trim()) {
-      skipped++
-      continue
-    }
-
+  for (const t of transformed) {
     try {
-      // Resolve brand — create if new
+      // Resolve brand
       let brandId: string | null = null
-      if (row.brand) {
-        const key = row.brand.toLowerCase()
+      if (t.brand) {
+        const key = t.brand.toLowerCase()
         brandId = brandMap.get(key) || null
+        // Case-insensitive search
         if (!brandId) {
-          // Fuzzy match
-          brandId = [...brandMap.entries()].find(([k]) => k.includes(key) || key.includes(k))?.[1] || null
+          for (const [k, v] of brandMap) {
+            if (k === key || k.includes(key) || key.includes(k)) { brandId = v; break }
+          }
         }
         if (!brandId) {
-          // Create new brand
           if (newBrands.has(key)) {
             brandId = newBrands.get(key)!
           } else {
-            const brand = await prisma.brand.create({
-              data: { name: row.brand, slug: slugify(row.brand) },
-            })
+            const brand = await prisma.brand.create({ data: { name: t.brand, slug: slugify(t.brand) || `brand-${Date.now().toString(36)}` } })
             brandId = brand.id
             brandMap.set(key, brandId)
             newBrands.set(key, brandId)
@@ -438,21 +376,21 @@ export const POST = withErrorHandler(async (req: Request) => {
         }
       }
 
-      // Resolve category — create if new
+      // Resolve category
       let categoryId: string | null = null
-      if (row.category) {
-        const key = row.category.toLowerCase()
+      if (t.category) {
+        const key = t.category.toLowerCase()
         categoryId = categoryMap.get(key) || null
         if (!categoryId) {
-          categoryId = [...categoryMap.entries()].find(([k]) => k.includes(key) || key.includes(k))?.[1] || null
+          for (const [k, v] of categoryMap) {
+            if (k === key || k.includes(key) || key.includes(k)) { categoryId = v; break }
+          }
         }
         if (!categoryId) {
           if (newCategories.has(key)) {
             categoryId = newCategories.get(key)!
           } else {
-            const cat = await prisma.category.create({
-              data: { nameLat: row.category, slug: slugify(row.category) },
-            })
+            const cat = await prisma.category.create({ data: { nameLat: t.category, slug: slugify(t.category) || `cat-${Date.now().toString(36)}` } })
             categoryId = cat.id
             categoryMap.set(key, categoryId)
             newCategories.set(key, categoryId)
@@ -460,126 +398,243 @@ export const POST = withErrorHandler(async (req: Request) => {
         }
       }
 
-      // Check for existing product using pre-loaded maps (no per-row queries)
-      const existingId = skuToId.get(row.sku) || (row.erpId ? erpIdToId.get(row.erpId) : undefined)
+      // Find existing
+      const existingId = skuToId.get(t.sku) || (t.erpId ? erpToId.get(t.erpId) : undefined)
 
       if (existingId) {
         await prisma.product.update({
           where: { id: existingId },
           data: {
-            nameLat: row.name,
-            priceB2c: row.priceB2c,
-            priceB2b: row.priceB2b ?? undefined,
-            oldPrice: row.oldPrice ?? undefined,
-            costPrice: row.costPrice ?? undefined,
-            stockQuantity: row.stock || undefined,
-            description: row.description || undefined,
-            brandId: brandId || undefined,
-            categoryId: categoryId || undefined,
-            isProfessional: row.isProfessional,
-            barcode: row.barcode || undefined,
-            vatRate: row.vatRate,
-            vatCode: row.vatCode || undefined,
-            erpId: row.erpId || undefined,
-            isActive: row.isActive,
+            nameLat: t.name, priceB2c: t.priceB2c, costPrice: t.costPrice ?? undefined,
+            oldPrice: t.oldPrice ?? undefined, description: t.description || undefined,
+            brandId: brandId || undefined, categoryId: categoryId || undefined,
+            barcode: t.barcode || undefined, vatRate: t.vatRate,
+            vatCode: t.vatCode || undefined, erpId: t.erpId || undefined, isActive: true,
           },
         })
-
-        // Add image if product has none (using pre-loaded set)
-        if (row.imageUrl && !productsWithImages.has(existingId)) {
-          await prisma.productImage.create({
-            data: {
-              productId: existingId,
-              url: row.imageUrl,
-              altText: row.name,
-              isPrimary: true,
-              sortOrder: 0,
-            },
-          })
-          productsWithImages.add(existingId)
+        if (t.imageUrl && !hasImage.has(existingId)) {
+          await prisma.productImage.create({ data: { productId: existingId, url: t.imageUrl, altText: t.name, isPrimary: true, sortOrder: 0 } })
+          hasImage.add(existingId)
         }
-
         updated++
       } else {
-        // Ensure unique slug using in-memory tracking (no per-row queries)
-        let finalSlug = row.slug
-        while (usedSlugs.has(finalSlug)) {
-          finalSlug = `${row.slug}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`
-        }
+        // Unique slug & sku
+        let finalSlug = t.slug
+        while (usedSlugs.has(finalSlug)) { finalSlug = `${t.slug}-${Math.random().toString(36).slice(2, 7)}` }
         usedSlugs.add(finalSlug)
 
-        // Ensure unique SKU
-        let finalSku = row.sku
-        while (usedSkus.has(finalSku)) {
-          finalSku = `${row.sku}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`
-        }
+        let finalSku = t.sku
+        while (usedSkus.has(finalSku)) { finalSku = `${t.sku}-${Math.random().toString(36).slice(2, 7)}` }
         usedSkus.add(finalSku)
 
         const product = await prisma.product.create({
           data: {
-            sku: finalSku,
-            nameLat: row.name,
-            slug: finalSlug,
-            priceB2c: row.priceB2c,
-            priceB2b: row.priceB2b,
-            oldPrice: row.oldPrice,
-            costPrice: row.costPrice,
-            stockQuantity: row.stock,
-            description: row.description || null,
-            brandId,
-            categoryId,
-            isProfessional: row.isProfessional,
-            barcode: row.barcode || null,
-            vatRate: row.vatRate,
-            vatCode: row.vatCode || null,
-            erpId: row.erpId || null,
-            isActive: row.isActive,
+            sku: finalSku, nameLat: t.name, slug: finalSlug, priceB2c: t.priceB2c,
+            costPrice: t.costPrice, oldPrice: t.oldPrice, description: t.description || null,
+            brandId, categoryId, barcode: t.barcode || null, vatRate: t.vatRate,
+            vatCode: t.vatCode || null, erpId: t.erpId || null, isActive: true,
           },
         })
-
-        // Track the new product so later rows can detect it as existing
         skuToId.set(finalSku, product.id)
-        if (row.erpId) erpIdToId.set(row.erpId, product.id)
+        if (t.erpId) erpToId.set(t.erpId, product.id)
 
-        // Create image if provided
-        if (row.imageUrl) {
-          await prisma.productImage.create({
-            data: {
-              productId: product.id,
-              url: row.imageUrl,
-              altText: row.name,
-              isPrimary: true,
-              sortOrder: 0,
-            },
-          })
+        if (t.imageUrl) {
+          await prisma.productImage.create({ data: { productId: product.id, url: t.imageUrl, altText: t.name, isPrimary: true, sortOrder: 0 } })
         }
-
         created++
       }
     } catch (err) {
-      const msg = (err as Error).message
-      // Make Prisma errors human-readable
-      let humanError = msg
-      if (msg.includes('Unique constraint')) {
-        humanError = `Proizvod sa ovom šifrom ili slug-om već postoji`
-      } else if (msg.includes('Foreign key constraint')) {
-        humanError = `Referenca na nepostojeći brend ili kategoriju`
-      } else if (msg.length > 200) {
-        humanError = msg.slice(0, 200) + '...'
-      }
-      errors.push({ row: rowNum, name: row.name, error: humanError })
+      let msg = (err as Error).message
+      if (msg.includes('Unique constraint')) msg = 'Duplikat šifre ili slug-a'
+      else if (msg.length > 150) msg = msg.slice(0, 150) + '...'
+      parseErrors.push({ row: t.rowNum, name: t.name, error: msg })
     }
   }
 
+  return { created, updated, skipped, errors: parseErrors, newBrands: [...newBrands.keys()], newCategories: [...newCategories.keys()] }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STEP 3: IMPORT BARCODES (tHE_SetItemExtItemSubj)
+   ═══════════════════════════════════════════════════════════════ */
+
+interface BarcodeResult {
+  updated: number
+  skipped: number
+  errors: { row: number; error: string }[]
+}
+
+async function importBarcodes(rows: Record<string, unknown>[]): Promise<BarcodeResult> {
+  let updated = 0, skipped = 0
+  const errors: { row: number; error: string }[] = []
+
+  // Collect all product erpIds from barcodes for batch lookup
+  const erpIds = rows.map(r => cleanId(col(r, 'acIdent'))).filter(Boolean)
+  const products = erpIds.length > 0
+    ? await prisma.product.findMany({ where: { erpId: { in: erpIds } }, select: { id: true, erpId: true } })
+    : []
+  const erpToId = new Map(products.filter(p => p.erpId).map(p => [p.erpId!, p.id]))
+
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i]
+    const erpId = cleanId(col(r, 'acIdent'))
+    const barcode = cleanId(col(r, 'acCode'))
+    const type = col(r, 'acType').toUpperCase()
+
+    if (!erpId || !barcode) { skipped++; continue }
+    if (type && type !== 'P') { skipped++; continue } // Only product barcodes
+
+    const productId = erpToId.get(erpId)
+    if (!productId) { skipped++; continue } // Product not in our DB
+
+    try {
+      await prisma.product.update({
+        where: { id: productId },
+        data: { barcode },
+      })
+      updated++
+    } catch (err) {
+      errors.push({ row: i + 2, error: `erpId ${erpId}: ${(err as Error).message.slice(0, 100)}` })
+    }
+  }
+
+  return { updated, skipped, errors }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN HANDLER — Multi-file import
+   ═══════════════════════════════════════════════════════════════ */
+
+interface FileInfo {
+  name: string
+  type: PantheonFileType
+  label: string
+  rows: number
+}
+
+export const POST = withErrorHandler(async (req: Request) => {
+  await requireAdmin()
+
+  const formData = await req.formData()
+  const files = formData.getAll('files') as File[]
+
+  // Fallback: also check single-file field for backward compatibility
+  if (files.length === 0) {
+    const single = formData.get('file') as File | null
+    if (single) files.push(single)
+  }
+
+  if (files.length === 0) {
+    return errorResponse('Nijedan fajl nije prosleđen. Izaberite jedan ili više fajlova.', 400)
+  }
+
+  // Validate all files first
+  for (const file of files) {
+    if (file.size > 10 * 1024 * 1024) {
+      return errorResponse(`Fajl "${file.name}" je prevelik. Maksimalno 10MB po fajlu.`, 400)
+    }
+    const ext = file.name.toLowerCase().split('.').pop()
+    if (!['csv', 'xlsx', 'xls', 'txt'].includes(ext || '')) {
+      return errorResponse(`Fajl "${file.name}" ima nepodržan format (.${ext}). Koristite .csv, .xlsx ili .xls`, 400)
+    }
+  }
+
+  // Parse all files and detect types
+  const parsedFiles: { file: File; type: PantheonFileType; headers: string[]; rows: Record<string, unknown>[] }[] = []
+
+  for (const file of files) {
+    try {
+      const buffer = await file.arrayBuffer()
+      const { headers, rows } = parseFile(buffer, file.name)
+      if (rows.length === 0) {
+        return errorResponse(`Fajl "${file.name}" ne sadrži podatke.`, 400)
+      }
+      if (rows.length > 10000) {
+        return errorResponse(`Fajl "${file.name}" ima ${rows.length} redova. Maksimalno 10.000.`, 400)
+      }
+      const type = detectFileType(headers)
+      if (type === 'unknown') {
+        return errorResponse(
+          `Fajl "${file.name}" — nije prepoznat format.\n\n` +
+          `Pronađene kolone: ${headers.slice(0, 15).join(', ')}${headers.length > 15 ? '...' : ''}\n\n` +
+          `Podržani formati:\n` +
+          `• Proizvodi: acIdent, acName, anSalePrice\n` +
+          `• Kategorije: acClassif, acName, acType\n` +
+          `• Barkodovi: acIdent, acCode\n` +
+          `• Alta Moda CSV: name, brand, category, current_price_rsd`,
+          400
+        )
+      }
+      parsedFiles.push({ file, type, headers, rows })
+    } catch (err) {
+      return errorResponse(`Greška pri čitanju "${file.name}": ${(err as Error).message}`, 400)
+    }
+  }
+
+  // Sort by processing order: categories → products → barcodes
+  const ORDER: Record<PantheonFileType, number> = { categories: 1, products: 2, altamoda_csv: 2, barcodes: 3, unknown: 9 }
+  parsedFiles.sort((a, b) => ORDER[a.type] - ORDER[b.type])
+
+  // Pre-load brands and categories (shared across all file imports)
+  const allBrands = await prisma.brand.findMany({ select: { id: true, name: true } })
+  const allCats = await prisma.category.findMany({ select: { id: true, nameLat: true } })
+  const brandMap = new Map(allBrands.map(b => [b.name.toLowerCase(), b.id]))
+  const categoryMap = new Map(allCats.map(c => [c.nameLat.toLowerCase(), c.id]))
+
+  // Process each file in order
+  const fileResults: {
+    fileName: string
+    fileType: string
+    fileLabel: string
+    rows: number
+    created: number
+    updated: number
+    skipped: number
+    errors: { row: number; name?: string; error: string }[]
+    newBrands?: string[]
+    newCategories?: string[]
+  }[] = []
+
+  const detectedFiles: FileInfo[] = parsedFiles.map(f => ({
+    name: f.file.name,
+    type: f.type,
+    label: FILE_TYPE_LABELS[f.type],
+    rows: f.rows.length,
+  }))
+
+  for (const pf of parsedFiles) {
+    if (pf.type === 'categories') {
+      const result = await importCategories(pf.rows, brandMap, categoryMap)
+      fileResults.push({
+        fileName: pf.file.name, fileType: pf.type, fileLabel: FILE_TYPE_LABELS[pf.type],
+        rows: pf.rows.length, ...result, newBrands: [], newCategories: [],
+      })
+    } else if (pf.type === 'products' || pf.type === 'altamoda_csv') {
+      const result = await importProducts(pf.rows, pf.type, brandMap, categoryMap)
+      fileResults.push({
+        fileName: pf.file.name, fileType: pf.type, fileLabel: FILE_TYPE_LABELS[pf.type],
+        rows: pf.rows.length, ...result,
+      })
+    } else if (pf.type === 'barcodes') {
+      const result = await importBarcodes(pf.rows)
+      fileResults.push({
+        fileName: pf.file.name, fileType: pf.type, fileLabel: FILE_TYPE_LABELS[pf.type],
+        rows: pf.rows.length, created: 0, ...result,
+      })
+    }
+  }
+
+  // Aggregate totals
+  const totals = {
+    created: fileResults.reduce((s, r) => s + r.created, 0),
+    updated: fileResults.reduce((s, r) => s + r.updated, 0),
+    skipped: fileResults.reduce((s, r) => s + r.skipped, 0),
+    errors: fileResults.reduce((s, r) => s + r.errors.length, 0),
+  }
+
   return successResponse({
-    profile,
-    mappedColumns: mapped,
-    created,
-    updated,
-    skipped,
-    errors,
-    total: rawRows.length,
-    newBrands: [...newBrands.keys()],
-    newCategories: [...newCategories.keys()],
+    files: detectedFiles,
+    results: fileResults,
+    totals,
   })
 })
