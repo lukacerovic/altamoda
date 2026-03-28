@@ -5,15 +5,20 @@ import ProductsPageClient from "./ProductsPageClient";
 
 export async function generateMetadata(): Promise<Metadata> {
   const total = await prisma.product.count({ where: { isActive: true } });
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.altamoda.rs";
   return {
-    title: `Svi Proizvodi (${total}) | Alta Moda`,
+    title: `Svi Proizvodi (${total})`,
     description:
       "Pregledajte kompletnu ponudu profesionalnih proizvoda za kosu — boje, negu, styling i aparate. Brendovi: L'Oreal, Schwarzkopf, Kerastase, Olaplex i drugi.",
+    alternates: {
+      canonical: `${baseUrl}/products`,
+    },
     openGraph: {
       title: "Svi Proizvodi | Alta Moda",
       description:
         "Profesionalni proizvodi za kosu — boje, nega, styling. Više od 300 artikala poznatih brendova.",
       type: "website",
+      url: `${baseUrl}/products`,
     },
   };
 }

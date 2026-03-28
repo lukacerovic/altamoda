@@ -15,15 +15,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     include: { brand: true, images: { where: { isPrimary: true }, take: 1 } },
   })
 
-  if (!product) return { title: 'Proizvod nije pronađen | Alta Moda' }
+  if (!product) return { title: 'Proizvod nije pronađen' }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.altamoda.rs'
 
   return {
-    title: `${product.nameLat} | ${product.brand?.name || 'Alta Moda'}`,
+    title: product.seoTitle || `${product.nameLat} | ${product.brand?.name || 'Alta Moda'}`,
     description: product.seoDescription || product.description?.slice(0, 160) || `Kupite ${product.nameLat} po najboljoj ceni.`,
+    alternates: {
+      canonical: `${baseUrl}/products/${product.slug}`,
+    },
     openGraph: {
       title: product.seoTitle || product.nameLat,
       description: product.description?.slice(0, 200) || '',
       images: product.images[0]?.url ? [product.images[0].url] : [],
+      type: 'website',
+      url: `${baseUrl}/products/${product.slug}`,
     },
   }
 }
@@ -158,5 +165,59 @@ export default async function ProductDetailPage({ params }: PageProps) {
     userExistingRating = existingReview?.rating ?? null
   }
 
-  return <ProductDetailClient product={serialized} related={related} userRole={role} initialLiked={isInWishlist} userExistingRating={userExistingRating} />
+  // JSON-LD Structured Data
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.altamoda.rs'
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.nameLat,
+    description: product.description || undefined,
+    image: product.images[0]?.url || undefined,
+    sku: product.sku,
+    ...(product.brand ? { brand: { '@type': 'Brand', name: product.brand.name } } : {}),
+    offers: {
+      '@type': 'Offer',
+      url: `${baseUrl}/products/${product.slug}`,
+      priceCurrency: 'RSD',
+      price: Number(product.priceB2c),
+      availability: product.stockQuantity > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'Alta Moda' },
+    },
+    ...(product._count.reviews > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: (avgRating._avg.rating || 0).toFixed(1),
+        reviewCount: product._count.reviews,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    } : {}),
+  }
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Početna', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Proizvodi', item: `${baseUrl}/products` },
+      ...(product.category ? [{
+        '@type': 'ListItem',
+        position: 3,
+        name: product.category.nameLat,
+        item: `${baseUrl}/products?category=${product.category.slug}`,
+      }] : []),
+      { '@type': 'ListItem', position: product.category ? 4 : 3, name: product.nameLat },
+    ],
+  }
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <ProductDetailClient product={serialized} related={related} userRole={role} initialLiked={isInWishlist} userExistingRating={userExistingRating} />
+    </>
+  )
 }
