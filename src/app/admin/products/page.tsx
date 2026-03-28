@@ -73,6 +73,10 @@ interface Product {
   seoTitle: string;
   metaDescription: string;
   slug: string;
+  barcode: string;
+  vatRate: number;
+  vatCode: string;
+  erpId: string;
   attributes: {
     sulfateFree: boolean;
     parabenFree: boolean;
@@ -119,6 +123,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/loreal1.jpg", alt: "Serie Expert Gold Quinoa \u0161ampon", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "Serie Expert Gold Quinoa \u0160ampon | Alta Moda", metaDescription: "Profesionalni \u0161ampon za o\u0161te\u0107enu kosu. L'Or\u00e9al Serie Expert linija.", slug: "serie-expert-gold-quinoa",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["O\u0161te\u0107ena", "Farbana"] },
   },
   {
@@ -132,6 +137,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/schwarzkopf1.jpg", alt: "BC Bonacure Peptide Repair", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "BC Bonacure Peptide Repair | Alta Moda", metaDescription: "Schwarzkopf BC Bonacure Peptide Repair \u0161ampon za obnovu kose.", slug: "bc-bonacure-peptide-repair",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["O\u0161te\u0107ena", "Normalna"] },
   },
   {
@@ -145,6 +151,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/kerastase1.jpg", alt: "K\u00e9rastase Elixir Ultime", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "K\u00e9rastase Elixir Ultime Serum | Alta Moda", metaDescription: "Luksuzni serum za sjaj kose. K\u00e9rastase Elixir Ultime.", slug: "elixir-ultime-serum",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Normalna", "Farbana"] },
   },
   {
@@ -158,6 +165,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/wella1.jpg", alt: "Wella Oil Reflections \u0161ampon", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "Wella Oil Reflections \u0160ampon | Alta Moda", metaDescription: "Wella Oil Reflections \u0161ampon za blistavu kosu.", slug: "oil-reflections-sampon",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Normalna", "Suva"] },
   },
   {
@@ -171,6 +179,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/moroccanoil1.jpg", alt: "Moroccanoil Treatment", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "Moroccanoil Treatment Original | Alta Moda", metaDescription: "Originalni Moroccanoil tretman sa arganovim uljem.", slug: "moroccanoil-treatment-100ml",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "O\u0161te\u0107ena", "Kovrd\u017eava"] },
   },
   {
@@ -185,6 +194,7 @@ const initialProducts: Product[] = [
     videoUrl: "", gifUrl: "",
     colorLevel: 7, colorUndertone: "N", colorHex: "#8B6914", shadeCode: "7-0",
     seoTitle: "Igora Royal 7-0 Srednje Plava | Alta Moda", metaDescription: "Schwarzkopf Igora Royal 7-0 permanentna boja. Prirodno srednje plava.", slug: "igora-royal-7-0",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
@@ -199,6 +209,7 @@ const initialProducts: Product[] = [
     videoUrl: "", gifUrl: "",
     colorLevel: 6, colorUndertone: "N", colorHex: "#6B4226", shadeCode: "6.0",
     seoTitle: "L'Or\u00e9al Majirel 6.0 Tamno Plava | Alta Moda", metaDescription: "L'Or\u00e9al Majirel 6.0 profesionalna permanentna boja.", slug: "majirel-6-0",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
@@ -212,6 +223,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/osis1.jpg", alt: "OSIS+ Dust It puder", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "OSIS+ Dust It Puder za Volumen | Alta Moda", metaDescription: "Schwarzkopf OSIS+ Dust It matirajuc\u0301i puder za volumen.", slug: "osis-dust-it",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["Normalna", "Masna"] },
   },
   {
@@ -225,6 +237,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/tecniart1.jpg", alt: "Tecni Art Pli Shaper", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "Tecni Art Pli Shaper | Alta Moda", metaDescription: "L'Or\u00e9al Tecni Art Pli termo-aktivni gel.", slug: "tecni-art-pli-shaper",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Normalna", "Suva"] },
   },
   {
@@ -239,6 +252,7 @@ const initialProducts: Product[] = [
     videoUrl: "", gifUrl: "",
     colorLevel: 8, colorUndertone: "N", colorHex: "#B8860B", shadeCode: "8/0",
     seoTitle: "Koleston Perfect 8/0 Svetlo Plava | Alta Moda", metaDescription: "Wella Koleston Perfect 8/0 permanentna boja.", slug: "koleston-perfect-8-0",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
@@ -252,6 +266,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/blondme1.jpg", alt: "BlondMe Premium Lift", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "BlondMe Premium Lift Posvetliva\u010d | Alta Moda", metaDescription: "Schwarzkopf BlondMe Premium Lift puder za posvetljivanje.", slug: "blondme-premium-lift",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
@@ -265,6 +280,7 @@ const initialProducts: Product[] = [
     images: [{ id: 1, url: "/products/mythic1.jpg", alt: "L'Or\u00e9al Mythic Oil", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     seoTitle: "L'Or\u00e9al Mythic Oil Huile | Alta Moda", metaDescription: "L'Or\u00e9al Mythic Oil hranljivo ulje za kosu.", slug: "mythic-oil-huile",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Normalna", "O\u0161te\u0107ena"] },
   },
 ];
@@ -297,6 +313,10 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   seoTitle: "",
   metaDescription: "",
   slug: "",
+  barcode: "",
+  vatRate: 20,
+  vatCode: "R2",
+  erpId: "",
   attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
 });
 
@@ -402,6 +422,10 @@ export default function ProductsPage() {
             seoTitle: "",
             metaDescription: "",
             slug: (p.slug || "") as string,
+            barcode: (p.barcode || "") as string,
+            vatRate: (p.vatRate ?? 20) as number,
+            vatCode: (p.vatCode || (p.vatRate === 10 ? "R1" : "R2")) as string,
+            erpId: (p.erpId || "") as string,
             attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
           }));
           setProducts(mapped);
@@ -503,6 +527,12 @@ export default function ProductsPage() {
       isFeatured: formData.badges.isFeatured,
       isBestseller: formData.badges.isBestseller,
       isActive: formData.status === "active",
+      barcode: formData.barcode || null,
+      vatRate: formData.vatRate || 20,
+      vatCode: formData.vatCode || (formData.vatRate === 10 ? "R1" : "R2"),
+      erpId: formData.erpId || null,
+      seoTitle: formData.seoTitle || null,
+      seoDescription: formData.metaDescription || null,
       slug: formData.slug || null,
       // Color data — only include if a color level is actually set
       ...(formData.colorLevel ? {
@@ -926,10 +956,27 @@ export default function ProductsPage() {
                     <input type="text" value={formData.name} onChange={(e) => handleNameChange(e.target.value)} className={inputCls} placeholder={t("admin.enterProductName")} />
                   </div>
 
-                  <div>
-                    <label className={labelCls}>{t("admin.skuCode")} *</label>
-                    <input type="text" value={formData.sku} onChange={(e) => updateForm("sku", e.target.value)} className={inputCls} placeholder="npr. LOR-MJ-600" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>{t("admin.skuCode")} *</label>
+                      <input type="text" value={formData.sku} onChange={(e) => updateForm("sku", e.target.value)} className={inputCls} placeholder="npr. LOR-MJ-600" />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Barkod (EAN)</label>
+                      <input type="text" value={formData.barcode} onChange={(e) => updateForm("barcode", e.target.value)} className={inputCls} placeholder="npr. 3474630715530" />
+                    </div>
                   </div>
+
+                  {/* ERP Info (read-only) */}
+                  {(formData.erpId || formData.vatCode) && (
+                    <div className="p-3 bg-stone-50 border border-stone-200 rounded-sm">
+                      <label className="text-[10px] uppercase tracking-wider text-[#999] font-medium">ERP / Pantheon</label>
+                      <div className="flex gap-6 mt-1.5 text-sm text-[#666]">
+                        {formData.erpId && <span>ERP ID: <strong className="text-black">{formData.erpId}</strong></span>}
+                        <span>PDV kod: <strong className="text-black">{formData.vatCode || "R2"}</strong></span>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -1070,15 +1117,32 @@ export default function ProductsPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className={labelCls}>{t("admin.purchasePrice")}</label>
-                    <input
-                      type="number"
-                      value={formData.purchasePrice || ""}
-                      onChange={(e) => updateForm("purchasePrice", Number(e.target.value) || 0)}
-                      className={inputCls}
-                      placeholder="0"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>{t("admin.purchasePrice")}</label>
+                      <input
+                        type="number"
+                        value={formData.purchasePrice || ""}
+                        onChange={(e) => updateForm("purchasePrice", Number(e.target.value) || 0)}
+                        className={inputCls}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>PDV stopa</label>
+                      <select
+                        value={formData.vatRate}
+                        onChange={(e) => {
+                          const rate = Number(e.target.value);
+                          updateForm("vatRate", rate);
+                          updateForm("vatCode", rate === 10 ? "R1" : "R2");
+                        }}
+                        className={inputCls + " cursor-pointer"}
+                      >
+                        <option value={20}>20% (opšta stopa)</option>
+                        <option value={10}>10% (posebna stopa)</option>
+                      </select>
+                    </div>
                   </div>
 
                   {/* Margin info */}

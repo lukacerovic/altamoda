@@ -168,6 +168,18 @@ interface Props {
   saleProducts: ProductData[];
 }
 
+const b2cShowcaseImages = [
+  "/showcase/b2cProizvod1.webp",
+  "/showcase/b2cProizvod2.webp",
+  "/showcase/b2cProizvod3.webp",
+];
+
+const b2bShowcaseImages = [
+  "/showcase/b2bProizvod1.webp",
+  "/showcase/b2bproizvod2.webp",
+  "/showcase/b2bproizvod3.webp",
+];
+
 /* ─── Main Page ─── */
 export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts }: Props) {
   const { t } = useLanguage();
@@ -272,18 +284,86 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         </section>
       )}
 
-      {/* ECO-FRIENDLY BANNER */}
+      {/* B2C & B2B SHOWCASE */}
       <section className="relative overflow-hidden">
         <div className="bg-[#38202a] py-20 md:py-28">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-10">
-            <div className="flex-1 text-center md:text-left">
-              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">{t("home.forProfessionals")}</span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.ecoFriendly")},{" "}<em className="italic text-[#b07a87]">{t("home.hairFriendly")}</em>{" "}{t("home.forHair")}</h2>
-              <p className="text-white/50 mb-8 max-w-lg text-sm leading-relaxed">{t("home.ecoDescription")}</p>
-              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">{t("home.learnMore")} <ArrowRight className="w-4 h-4" /></Link>
+          <div className="max-w-7xl mx-auto px-4">
+            {/* Header */}
+            <div className="text-center mb-14">
+              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">{t("home.shopByType")}</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                {t("home.forEveryone")},{" "}<em className="italic text-[#b07a87]">{t("home.forProfessionals")}</em>
+              </h2>
+              <p className="text-white/40 max-w-2xl mx-auto text-sm leading-relaxed">{t("home.shopByTypeDesc")}</p>
             </div>
-            <div className="flex-1 relative">
-              <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=700&fit=crop" alt="Natural products" className="rounded-3xl w-full max-w-md mx-auto object-cover aspect-[4/5]" />
+            <div className="flex flex-col items-center lg:flex-row lg:items-start lg:justify-between gap-10 lg:gap-20">
+              {/* B2C Column */}
+              <div className="flex-1 w-full max-w-lg lg:max-w-[45%]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                    <Heart className="w-5 h-5 text-[#b07a87]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-white">{t("home.b2cTitle")}</h3>
+                    <p className="text-white/40 text-xs">{t("home.b2cDesc")}</p>
+                  </div>
+                </div>
+                {/* Pinterest-style masonry grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Left: tall image */}
+                  <Link href="/products" className="group/card relative row-span-2 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all">
+                    <img src={b2cShowcaseImages[0]} alt="B2C proizvod 1" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                  </Link>
+                  {/* Right top: short image */}
+                  <Link href="/products" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
+                    <img src={b2cShowcaseImages[1]} alt="B2C proizvod 2" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                  </Link>
+                  {/* Right bottom: short image */}
+                  <Link href="/products" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
+                    <img src={b2cShowcaseImages[2]} alt="B2C proizvod 3" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                  </Link>
+                </div>
+                <Link href="/products" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mt-5 transition-colors">
+                  {t("home.shopB2c")} <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              {/* B2B Column */}
+              <div className="flex-1 w-full max-w-lg lg:max-w-[45%]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex-1 flex flex-col items-end">
+                    <h3 className="text-lg font-medium text-white">{t("home.b2bShowcaseTitle")}</h3>
+                    <p className="text-white/40 text-xs">{t("home.b2bShowcaseDesc")}</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-[#b07a87]/20 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-[#b07a87]" />
+                  </div>
+                </div>
+                {/* Pinterest-style masonry grid — mirrored layout */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Left top: short image */}
+                  <Link href="/products?visibility=b2b" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
+                    <img src={b2bShowcaseImages[0]} alt="B2B proizvod 1" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                  </Link>
+                  {/* Right: tall image */}
+                  <Link href="/products?visibility=b2b" className="group/card relative row-span-2 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all">
+                    <img src={b2bShowcaseImages[1]} alt="B2B proizvod 2" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                  </Link>
+                  {/* Left bottom: short image */}
+                  <Link href="/products?visibility=b2b" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
+                    <img src={b2bShowcaseImages[2]} alt="B2B proizvod 3" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                  </Link>
+                </div>
+                <Link href="/products?visibility=b2b" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mt-5 transition-colors">
+                  {t("home.shopB2b")} <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -28,7 +28,7 @@ describe('Prisma Schema Integrity', () => {
     'Banner',
     'NewsletterSubscriber',
     'ShippingZone', 'ShippingRate',
-    'ErpSyncLog', 'SeoMetadata', 'Faq',
+    'ErpSyncLog', 'ErpSyncQueue', 'SeoMetadata', 'Faq',
   ]
 
   for (const model of requiredModels) {
@@ -113,5 +113,51 @@ describe('Prisma Schema Integrity', () => {
 
   it('Product has professional flag for B2B visibility', () => {
     expect(schema).toContain('isProfessional')
+  })
+
+  // ─── Pantheon ERP Alignment Fields ───
+
+  it('Product has ERP sync fields', () => {
+    expect(schema).toMatch(/model Product[\s\S]*?erpId/)
+    expect(schema).toMatch(/model Product[\s\S]*?barcode/)
+    expect(schema).toMatch(/model Product[\s\S]*?vatRate/)
+    expect(schema).toMatch(/model Product[\s\S]*?vatCode/)
+  })
+
+  it('Product vatRate defaults to 20', () => {
+    expect(schema).toContain('@default(20)')
+  })
+
+  it('Order has ERP sync tracking fields', () => {
+    expect(schema).toMatch(/model Order[\s\S]*?erpSynced/)
+    expect(schema).toMatch(/model Order[\s\S]*?erpId/)
+  })
+
+  it('B2bProfile has erpSubjectId for Pantheon customer link', () => {
+    expect(schema).toMatch(/model B2bProfile[\s\S]*?erpSubjectId/)
+  })
+
+  it('B2bProfile erpSubjectId is unique', () => {
+    expect(schema).toContain('"erp_subject_id"')
+  })
+
+  it('ErpSyncQueue has retry tracking fields', () => {
+    expect(schema).toMatch(/model ErpSyncQueue[\s\S]*?attempts/)
+    expect(schema).toMatch(/model ErpSyncQueue[\s\S]*?maxAttempts/)
+    expect(schema).toMatch(/model ErpSyncQueue[\s\S]*?lastError/)
+    expect(schema).toMatch(/model ErpSyncQueue[\s\S]*?nextRetryAt/)
+  })
+
+  it('ErpSyncQueue maps to snake_case table', () => {
+    expect(schema).toContain('@@map("erp_sync_queue")')
+  })
+
+  it('ErpSyncQueue has index on status and nextRetryAt', () => {
+    expect(schema).toContain('@@index([status, nextRetryAt])')
+  })
+
+  it('ErpSyncLog has SyncDirection and SyncStatus enums', () => {
+    expect(schema).toContain('enum SyncDirection')
+    expect(schema).toContain('enum SyncStatus')
   })
 })

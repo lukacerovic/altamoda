@@ -33,3 +33,41 @@ export function calculateDiscountPercentage(
   if (oldPrice <= 0) return 0
   return Math.round(((oldPrice - newPrice) / oldPrice) * 100)
 }
+
+// ─── ERP / Pantheon Helpers ───
+
+/** Convert Pantheon float ID to string (avoids float precision issues) */
+export function pantheonIdToString(id: number | string | null | undefined): string | null {
+  if (id == null || id === '') return null
+  return String(typeof id === 'number' ? Math.floor(id) : id)
+}
+
+/** Remove VAT from a VAT-inclusive price */
+export function removeVat(priceWithVat: number, vatRate: number): number {
+  return priceWithVat / (1 + vatRate / 100)
+}
+
+/** Calculate VAT amount from a VAT-inclusive price */
+export function vatAmount(priceWithVat: number, vatRate: number): number {
+  return priceWithVat - removeVat(priceWithVat, vatRate)
+}
+
+/** Strip RTF formatting from Pantheon note fields to plain text */
+export function stripRtf(rtf: string | null | undefined): string {
+  if (!rtf || !rtf.startsWith('{\\rtf')) return rtf || ''
+  return rtf
+    .replace(/\{\\fonttbl[^}]*\}/g, '')       // Remove font table
+    .replace(/\{\\colortbl[^}]*\}/g, '')       // Remove color table
+    .replace(/\{\\stylesheet[^}]*\}/g, '')     // Remove stylesheet
+    .replace(/\\[a-z]+\d*\s?/gi, '')           // Remove RTF commands (\par, \pard, etc.)
+    .replace(/[{}]/g, '')                      // Remove remaining braces
+    .replace(/\r?\n/g, ' ')                    // Normalize whitespace
+    .replace(/\s+/g, ' ')                      // Collapse multiple spaces
+    .trim()
+}
+
+/** Strip "RS-" prefix from Pantheon postal codes (e.g., "RS-11000" → "11000") */
+export function normalizePostalCode(code: string | null | undefined): string {
+  if (!code) return ''
+  return code.replace(/^RS-/i, '')
+}

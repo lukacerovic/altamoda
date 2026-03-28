@@ -71,6 +71,9 @@ export const GET = withErrorHandler(async (req: Request) => {
       maticniBroj: u.b2bProfile.maticniBroj,
       address: u.b2bProfile.address,
       discountTier: u.b2bProfile.discountTier,
+      creditLimit: u.b2bProfile.creditLimit ? Number(u.b2bProfile.creditLimit) : null,
+      paymentTerms: u.b2bProfile.paymentTerms,
+      erpSubjectId: u.b2bProfile.erpSubjectId,
       approvedAt: u.b2bProfile.approvedAt,
     } : null,
   }))
