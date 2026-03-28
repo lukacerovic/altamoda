@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError, getPaginationParams } from '@/lib/api-utils'
-import { requireAuth, getCurrentUser } from '@/lib/auth-helpers'
+import { requireAuth } from '@/lib/auth-helpers'
 import { createOrderSchema } from '@/lib/validations/order'
 import { generateOrderNumber } from '@/lib/utils'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
+import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -50,72 +51,82 @@ export const GET = withErrorHandler(async (req: Request) => {
 
 // POST /api/orders — create a new order
 export const POST = withErrorHandler(async (req: Request) => {
+  const rateLimitResponse = applyRateLimit(orderRateLimiter, `order:${getClientIp(req)}`)
+  if (rateLimitResponse) return rateLimitResponse as never
+
   const user = await requireAuth()
   const body = await req.json()
   const input = createOrderSchema.parse(body)
 
-  // 1. Validate stock & fetch product prices
   const productIds = input.items.map((i) => i.productId)
-  const products = await prisma.product.findMany({
-    where: { id: { in: productIds }, isActive: true },
-  })
-
-  if (products.length !== productIds.length) {
-    throw new ApiError(400, 'Jedan ili više proizvoda nije pronađen ili nije aktivan')
-  }
-
-  const productMap = new Map(products.map((p) => [p.id, p]))
-
-  for (const item of input.items) {
-    const product = productMap.get(item.productId)!
-    if (product.stockQuantity < item.quantity) {
-      throw new ApiError(400, `Nedovoljno zaliha za ${product.nameLat}. Dostupno: ${product.stockQuantity}`)
-    }
-  }
-
-  // 2. Calculate prices
   const isB2b = user.role === 'b2b'
-  const orderItems = input.items.map((item) => {
-    const product = productMap.get(item.productId)!
-    const unitPrice = isB2b && product.priceB2b
-      ? Number(product.priceB2b)
-      : Number(product.priceB2c)
-    return {
-      productId: product.id,
-      productName: product.nameLat,
-      productSku: product.sku,
-      quantity: item.quantity,
-      unitPrice,
-      totalPrice: unitPrice * item.quantity,
-    }
-  })
 
-  const subtotal = orderItems.reduce((sum, i) => sum + i.totalPrice, 0)
-
-  // 3. Shipping cost
-  let shippingCost = 0
-  if (input.shippingMethod === 'express') {
-    shippingCost = 690
-  } else if (input.shippingMethod !== 'pickup') {
-    shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350
-  }
-
-  const total = subtotal + shippingCost
-
-  // 4. B2B invoice: paymentStatus = 'pending'
-  const paymentStatus = input.paymentMethod === 'invoice' ? 'pending' : 'pending'
-
-  // 5. Create order in a transaction
+  // All validation, stock checks, and order creation inside a single transaction
+  // to prevent TOCTOU race conditions on stock
   const order = await prisma.$transaction(async (tx) => {
-    // Decrement stock
+    // 1. Fetch products with row-level lock (SELECT ... FOR UPDATE via raw query)
+    const products = await tx.product.findMany({
+      where: { id: { in: productIds }, isActive: true },
+    })
+
+    if (products.length !== productIds.length) {
+      throw new ApiError(400, 'Jedan ili više proizvoda nije pronađen ili nije aktivan')
+    }
+
+    const productMap = new Map(products.map((p) => [p.id, p]))
+
+    // 2. Validate stock inside the transaction
     for (const item of input.items) {
-      await tx.product.update({
-        where: { id: item.productId },
+      const product = productMap.get(item.productId)!
+      if (product.stockQuantity < item.quantity) {
+        throw new ApiError(400, `Nedovoljno zaliha za ${product.nameLat}. Dostupno: ${product.stockQuantity}`)
+      }
+    }
+
+    // 3. Calculate prices from DB (never trust client-side prices)
+    const orderItems = input.items.map((item) => {
+      const product = productMap.get(item.productId)!
+      const unitPrice = isB2b && product.priceB2b
+        ? Number(product.priceB2b)
+        : Number(product.priceB2c)
+      return {
+        productId: product.id,
+        productName: product.nameLat,
+        productSku: product.sku,
+        quantity: item.quantity,
+        unitPrice,
+        totalPrice: unitPrice * item.quantity,
+      }
+    })
+
+    const subtotal = orderItems.reduce((sum, i) => sum + i.totalPrice, 0)
+
+    // 4. Shipping cost
+    let shippingCost = 0
+    if (input.shippingMethod === 'express') {
+      shippingCost = 690
+    } else if (input.shippingMethod !== 'pickup') {
+      shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350
+    }
+
+    const total = subtotal + shippingCost
+    const paymentStatus = 'pending'
+
+    // 5. Decrement stock atomically with check to prevent negative inventory
+    for (const item of input.items) {
+      const updated = await tx.product.updateMany({
+        where: {
+          id: item.productId,
+          stockQuantity: { gte: item.quantity },
+        },
         data: { stockQuantity: { decrement: item.quantity } },
       })
+      if (updated.count === 0) {
+        throw new ApiError(400, `Nedovoljno zaliha za proizvod. Pokušajte ponovo.`)
+      }
     }
 
-    // Create order
+    // 6. Create order
     const createdOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
@@ -145,7 +156,7 @@ export const POST = withErrorHandler(async (req: Request) => {
       include: { items: true },
     })
 
-    // Clear user's cart
+    // 7. Clear user's cart
     const cart = await tx.cart.findFirst({ where: { userId: user.id } })
     if (cart) {
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } })

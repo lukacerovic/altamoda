@@ -2,8 +2,12 @@ import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { registerB2cSchema, registerB2bSchema } from '@/lib/validations/user'
+import { registrationRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 
 export const POST = withErrorHandler(async (req: Request) => {
+  const rateLimitResponse = applyRateLimit(registrationRateLimiter, `register:${getClientIp(req)}`)
+  if (rateLimitResponse) return rateLimitResponse as never
+
   const body = await req.json()
   const isB2b = body.salonName || body.pib
 

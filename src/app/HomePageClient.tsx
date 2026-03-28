@@ -68,7 +68,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
           }`}>{displayBadge}</span>
         )}
         {product.isProfessional && (
-          <span className="absolute top-3 left-3 mt-8 px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-[#2d2d2d]/80 text-white backdrop-blur-sm">PRO</span>
+          <span className="absolute top-3 left-3 mt-8 px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-[#2d2d2d]/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
         )}
         <button onClick={(e) => { e.preventDefault(); setLiked(!liked); }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors z-10">
           <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#b07a87]"}`} />

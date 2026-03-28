@@ -14,6 +14,11 @@ interface CsvRow {
   stock?: string
   description?: string
   isProfessional?: string
+  image_url?: string
+  url_slug?: string
+  current_price_rsd?: string
+  original_price_rsd?: string
+  volume_size?: string
 }
 
 function parseCsvLine(line: string): string[] {

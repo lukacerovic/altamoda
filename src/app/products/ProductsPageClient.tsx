@@ -202,7 +202,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
             }`}>{badge}</span>
           )}
           {product.isProfessional && (
-            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">PRO</span>
+            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
           )}
         </div>
         <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-sm bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
@@ -815,8 +815,8 @@ export default function ProductsPageClient({
   const visibilityTabs = !userRole ? (
     <div className="flex items-center gap-1 bg-white border border-[#e8e2d9] rounded-sm p-1 shadow-sm">
       {([
-        { key: "all" as const, label: "Svi proizvodi" },
-        { key: "b2c" as const, label: "Maloprodaja" },
+        { key: "all" as const, label: t("products.allProducts") },
+        { key: "b2c" as const, label: t("products.retail") },
         { key: "b2b" as const, label: t("products.professional") },
       ]).map((tab) => (
         <button
@@ -993,7 +993,7 @@ export default function ProductsPageClient({
                     <div className="w-36 h-36 bg-[#faf7f3] flex-shrink-0 relative overflow-hidden">
                       <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {p.isProfessional && (
-                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">PRO</span>
+                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
                       )}
                       {getBadge(p) && (
                         <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm ${

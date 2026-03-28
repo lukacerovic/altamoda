@@ -97,7 +97,7 @@ async function main() {
     const sku = slug // use slug as SKU since CSV doesn't have one
 
     try {
-      await prisma.product.upsert({
+      const product = await prisma.product.upsert({
         where: { slug },
         update: {
           nameLat: row.name,
@@ -119,18 +119,27 @@ async function main() {
           volumeMl: parseVolume(row.volume_size),
           description: row.volume_size || null,
           isActive: true,
-          images: row.image_url
-            ? {
-                create: {
-                  url: row.image_url,
-                  altText: row.name,
-                  isPrimary: true,
-                  sortOrder: 0,
-                },
-              }
-            : undefined,
         },
       })
+
+      // Ensure product has an image — create one if missing
+      if (row.image_url) {
+        const existingImage = await prisma.productImage.findFirst({
+          where: { productId: product.id },
+        })
+        if (!existingImage) {
+          await prisma.productImage.create({
+            data: {
+              productId: product.id,
+              url: row.image_url,
+              altText: row.name,
+              isPrimary: true,
+              sortOrder: 0,
+            },
+          })
+        }
+      }
+
       created++
     } catch (e: any) {
       console.error(`⚠ Failed to upsert "${row.name}" (${slug}): ${e.message}`)

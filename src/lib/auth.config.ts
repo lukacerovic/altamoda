@@ -6,6 +6,7 @@ export const authConfig: NextAuthConfig = {
   },
   session: {
     strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours instead of default 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
