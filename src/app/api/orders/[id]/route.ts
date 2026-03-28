@@ -54,6 +54,8 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     shippingAddress: order.shippingAddress,
     billingAddress: order.billingAddress,
     notes: order.notes,
+    erpId: order.erpId,
+    erpSynced: order.erpSynced,
     createdAt: order.createdAt,
     user: order.user,
     items: order.items.map((item) => ({

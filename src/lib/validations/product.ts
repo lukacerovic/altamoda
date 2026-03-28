@@ -13,10 +13,15 @@ export const createProductSchema = z.object({
   priceB2c: z.coerce.number().positive(),
   priceB2b: z.coerce.number().positive().optional(),
   oldPrice: z.coerce.number().positive().optional(),
+  costPrice: z.coerce.number().positive().optional(),
   stockQuantity: z.coerce.number().int().min(0).default(0),
   isProfessional: z.boolean().default(false),
   isNew: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
+  barcode: z.string().optional(),
+  vatRate: z.coerce.number().int().min(0).max(100).default(20),
+  vatCode: z.string().optional(),
+  erpId: z.string().optional(),
 })
 
 export const updateProductSchema = z.object({
@@ -41,6 +46,10 @@ export const updateProductSchema = z.object({
   isFeatured: z.boolean().optional(),
   isBestseller: z.boolean().optional(),
   isActive: z.boolean().optional(),
+  barcode: z.string().optional(),
+  vatRate: z.coerce.number().int().min(0).max(100).optional(),
+  vatCode: z.string().optional(),
+  erpId: z.string().optional(),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
   colorLevel: z.number().int().min(1).max(10).optional(),

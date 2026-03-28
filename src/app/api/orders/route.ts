@@ -41,6 +41,8 @@ export const GET = withErrorHandler(async (req: Request) => {
     itemCount: o.items.length,
     createdAt: o.createdAt,
     user: o.user,
+    erpId: o.erpId,
+    erpSynced: o.erpSynced,
   }))
 
   return successResponse({

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createProductSchema, productFilterSchema } from '@/lib/validations/product'
+import { createProductSchema, updateProductSchema, productFilterSchema } from '@/lib/validations/product'
 
 describe('Product Validations', () => {
   describe('createProductSchema', () => {
@@ -65,6 +65,79 @@ describe('Product Validations', () => {
     it('coerces string prices to numbers', () => {
       const result = createProductSchema.parse({ ...validProduct, priceB2c: '2500' })
       expect(result.priceB2c).toBe(2500)
+    })
+
+    it('accepts ERP fields (barcode, vatRate, vatCode, erpId)', () => {
+      const result = createProductSchema.parse({
+        ...validProduct,
+        barcode: '3474630715530',
+        vatRate: 20,
+        vatCode: 'R2',
+        erpId: '10002',
+      })
+      expect(result.barcode).toBe('3474630715530')
+      expect(result.vatRate).toBe(20)
+      expect(result.vatCode).toBe('R2')
+      expect(result.erpId).toBe('10002')
+    })
+
+    it('defaults vatRate to 20', () => {
+      const result = createProductSchema.parse(validProduct)
+      expect(result.vatRate).toBe(20)
+    })
+
+    it('accepts 10% VAT rate', () => {
+      const result = createProductSchema.parse({ ...validProduct, vatRate: 10 })
+      expect(result.vatRate).toBe(10)
+    })
+
+    it('rejects vatRate over 100', () => {
+      expect(() => createProductSchema.parse({ ...validProduct, vatRate: 101 })).toThrow()
+    })
+
+    it('rejects negative vatRate', () => {
+      expect(() => createProductSchema.parse({ ...validProduct, vatRate: -1 })).toThrow()
+    })
+
+    it('coerces string vatRate to number', () => {
+      const result = createProductSchema.parse({ ...validProduct, vatRate: '20' })
+      expect(result.vatRate).toBe(20)
+    })
+
+    it('accepts costPrice', () => {
+      const result = createProductSchema.parse({ ...validProduct, costPrice: 800 })
+      expect(result.costPrice).toBe(800)
+    })
+
+    it('ERP fields are optional', () => {
+      const result = createProductSchema.parse(validProduct)
+      expect(result.barcode).toBeUndefined()
+      expect(result.vatCode).toBeUndefined()
+      expect(result.erpId).toBeUndefined()
+    })
+  })
+
+  describe('updateProductSchema', () => {
+    it('accepts all ERP fields as optional', () => {
+      const result = updateProductSchema.parse({
+        barcode: '1234567890123',
+        vatRate: 10,
+        vatCode: 'R1',
+        erpId: '5000',
+      })
+      expect(result.barcode).toBe('1234567890123')
+      expect(result.vatRate).toBe(10)
+      expect(result.vatCode).toBe('R1')
+      expect(result.erpId).toBe('5000')
+    })
+
+    it('accepts empty update (all optional)', () => {
+      const result = updateProductSchema.parse({})
+      expect(result).toBeDefined()
+    })
+
+    it('rejects invalid vatRate in update', () => {
+      expect(() => updateProductSchema.parse({ vatRate: 150 })).toThrow()
     })
   })
 
