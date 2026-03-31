@@ -115,6 +115,7 @@ model User {
   role          UserRole  @default(b2c)
   status        UserStatus @default(active)
   avatarUrl     String?   @map("avatar_url")
+  erpId         String?   @unique @map("erp_id")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
@@ -149,8 +150,8 @@ model B2bProfile {
   id           String   @id @default(cuid())
   userId       String   @unique @map("user_id")
   salonName    String   @map("salon_name")
-  pib          String
-  maticniBroj  String   @map("maticni_broj")
+  pib          String?
+  maticniBroj  String?  @map("maticni_broj")
   address      String?
   discountTier Int      @default(0) @map("discount_tier")
   creditLimit  Decimal? @map("credit_limit") @db.Decimal(12, 2)
@@ -393,7 +394,7 @@ model Order {
   notes           String?
   promoCodeId     String?       @map("promo_code_id")
   erpSynced       Boolean       @default(false) @map("erp_synced")
-  erpId           String?       @map("erp_id")
+  erpId           String?       @unique @map("erp_id")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
 

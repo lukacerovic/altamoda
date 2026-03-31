@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
+import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Search,
   Filter,
   Download,
+  Upload,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
@@ -34,6 +36,7 @@ interface OrderListItem {
   paymentStatus: string;
   itemCount: number;
   createdAt: string;
+  erpId: string | null;
   user: { id: string; name: string | null; email: string; role: string } | null;
 }
 
@@ -83,6 +86,20 @@ const paymentMethodLabels: Record<string, string> = {
   bank_transfer: "Virman",
   cash_on_delivery: "Pouzeće",
   invoice: "Faktura",
+};
+
+const paymentStatusLabels: Record<string, string> = {
+  pending: "Na čekanju",
+  paid: "Plaćeno",
+  failed: "Neuspelo",
+  refunded: "Refundirano",
+};
+
+const paymentStatusColors: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-700",
+  paid: "bg-emerald-100 text-emerald-700",
+  failed: "bg-red-100 text-red-700",
+  refunded: "bg-purple-100 text-purple-700",
 };
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -143,11 +160,6 @@ export default function OrdersPage() {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Poll for new orders every 30s
-  useEffect(() => {
-    const interval = setInterval(() => fetchOrders(true), 30000);
-    return () => clearInterval(interval);
-  }, [fetchOrders]);
 
   /* ── Fetch order detail ── */
   const fetchOrderDetail = async (orderId: string) => {
@@ -253,7 +265,7 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -262,10 +274,19 @@ export default function OrdersPage() {
             {totalOrders} {t("admin.totalOrders")}
           </p>
         </div>
-        <button className="btn-outline-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
-          <Download size={18} />
-          {t("admin.export")}
-        </button>
+        <div className="flex gap-2 self-start">
+          <Link
+            href="/admin/orders/import"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-stone-900 text-white hover:bg-black transition-colors"
+          >
+            <Upload size={18} />
+            <span className="hidden sm:inline">Uvoz porudžbina</span>
+          </Link>
+          <button className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-stone-900 text-white hover:bg-black transition-colors">
+            <Download size={18} />
+            <span className="hidden sm:inline">{t("admin.export")}</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -322,7 +343,7 @@ export default function OrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[700px]">
               <thead>
                 <tr className="bg-stone-100 border-b border-stone-200">
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
@@ -343,6 +364,12 @@ export default function OrdersPage() {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">
                     {t("admin.payment")}
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">
+                    Plaćanje
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">
+                    ERP ID
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
                     {t("admin.status")}
                   </th>
@@ -351,9 +378,8 @@ export default function OrdersPage() {
               </thead>
               <tbody className="divide-y divide-[#f0f0f0]">
                 {filtered.map((order) => (
-                  <>
+                  <Fragment key={order.id}>
                     <tr
-                      key={order.id}
                       className="hover:bg-stone-100 transition-colors cursor-pointer"
                       onClick={() => toggleExpand(order.id)}
                     >
@@ -382,6 +408,14 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-[#666] hidden sm:table-cell">
                         {paymentMethodLabels[order.paymentMethod] || order.paymentMethod}
+                      </td>
+                      <td className="px-6 py-4 hidden sm:table-cell">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${paymentStatusColors[order.paymentStatus] || "bg-gray-100 text-gray-600"}`}>
+                          {paymentStatusLabels[order.paymentStatus] || order.paymentStatus}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-xs font-mono text-[#666] hidden xl:table-cell">
+                        {order.erpId || "—"}
                       </td>
                       <td className="px-6 py-4">
                         {VALID_TRANSITIONS[order.status]?.length > 0 ? (
@@ -422,7 +456,7 @@ export default function OrdersPage() {
                     {/* Expanded Detail */}
                     {expandedOrder === order.id && (
                       <tr key={`${order.id}-detail`}>
-                        <td colSpan={8} className="px-6 py-6 bg-stone-100">
+                        <td colSpan={10} className="px-6 py-6 bg-stone-100">
                           {detailLoading || !orderDetail ? (
                             <div className="flex items-center justify-center py-8">
                               <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent" />
@@ -649,7 +683,7 @@ export default function OrdersPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -671,19 +705,26 @@ export default function OrdersPage() {
               >
                 <ChevronLeft size={18} />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-sm text-sm font-medium transition-colors ${
-                    page === currentPage
-                      ? "bg-black text-white"
-                      : "text-[#666] hover:bg-stone-100"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let page = i + 1;
+                if (totalPages > 5) {
+                  const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+                  page = start + i;
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-sm text-sm font-medium transition-colors ${
+                      page === currentPage
+                        ? "bg-black text-white"
+                        : "text-[#666] hover:bg-stone-100"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}

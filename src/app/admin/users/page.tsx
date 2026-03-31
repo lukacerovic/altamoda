@@ -24,10 +24,11 @@ import {
 
 interface B2bProfile {
   salonName: string;
-  pib: string;
-  maticniBroj: string;
+  pib: string | null;
+  maticniBroj: string | null;
   address: string | null;
   discountTier: number;
+  erpSubjectId: string | null;
   approvedAt: string | null;
 }
 
@@ -88,13 +89,6 @@ export default function UsersPage() {
     return () => clearTimeout(debounce);
   }, [fetchUsers]);
 
-  // Poll for new registrations every 30s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchUsers();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [fetchUsers]);
 
   const totalPages = Math.ceil(total / perPage);
   const pendingCount = users.filter((u) => u.status === "pending").length;
@@ -161,7 +155,7 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-serif font-bold text-black">{t("admin.users")}</h1>
@@ -242,12 +236,14 @@ export default function UsersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[700px]">
                 <thead>
                   <tr className="bg-stone-100 border-b border-stone-200">
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.user")}</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.type")}</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.registration")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">Salon</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">Telefon</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">{t("admin.registration")}</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.orders")}</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.spent")}</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.status")}</th>
@@ -257,7 +253,7 @@ export default function UsersPage() {
                 <tbody className="divide-y divide-[#f0f0f0]">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#999]">
+                      <td colSpan={9} className="px-6 py-12 text-center text-sm text-[#999]">
                         {t("admin.noUsersFound")}
                       </td>
                     </tr>
@@ -275,7 +271,9 @@ export default function UsersPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 hidden md:table-cell">{roleBadge(user.role)}</td>
-                      <td className="px-6 py-4 text-sm text-[#666] hidden lg:table-cell">{formatDate(user.createdAt)}</td>
+                      <td className="px-6 py-4 text-sm text-[#333] hidden lg:table-cell truncate max-w-[160px]">{user.b2bProfile?.salonName || "—"}</td>
+                      <td className="px-6 py-4 text-sm text-[#666] hidden sm:table-cell">{user.phone || "—"}</td>
+                      <td className="px-6 py-4 text-sm text-[#666] hidden xl:table-cell">{formatDate(user.createdAt)}</td>
                       <td className="px-6 py-4 text-sm text-[#333] hidden sm:table-cell">{user.ordersCount}</td>
                       <td className="px-6 py-4 text-sm font-medium text-black hidden md:table-cell">{user.totalSpent.toLocaleString()} RSD</td>
                       <td className="px-6 py-4">{statusBadge(user.status)}</td>
@@ -383,6 +381,12 @@ export default function UsersPage() {
                       <div className="flex items-center gap-2 text-sm">
                         <MapPin size={14} className="text-[#999]" />
                         <span className="text-[#333]">{selectedUser.b2bProfile.address}</span>
+                      </div>
+                    )}
+                    {selectedUser.b2bProfile.erpSubjectId && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-xs font-medium text-[#999] w-[14px] text-center">ID</span>
+                        <span className="text-[#333] font-mono text-xs">Pantheon: {selectedUser.b2bProfile.erpSubjectId}</span>
                       </div>
                     )}
                     {selectedUser.b2bProfile.approvedAt && (

@@ -188,6 +188,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     priceB2c: Number(p.priceB2c),
     priceB2b: p.priceB2b ? Number(p.priceB2b) : null,
     oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+    costPrice: role === 'admin' && p.costPrice ? Number(p.costPrice) : undefined,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,
     isNew: p.isNew,

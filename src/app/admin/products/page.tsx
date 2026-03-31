@@ -17,7 +17,6 @@ import {
   Eye,
   EyeOff,
   Upload,
-  FolderTree,
   Image as ImageIcon,
   Star,
   Film,
@@ -401,7 +400,7 @@ export default function ProductsPage() {
             priceB2C: (p.priceB2c || 0) as number,
             priceB2B: (p.priceB2b || 0) as number,
             oldPrice: (p.oldPrice || undefined) as number | undefined,
-            purchasePrice: 0,
+            purchasePrice: (p.costPrice || 0) as number,
             stock: (p.stockQuantity || 0) as number,
             lowStockThreshold: 5,
             weight: 0,
@@ -444,11 +443,6 @@ export default function ProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Poll for product updates every 30s
-  useEffect(() => {
-    const interval = setInterval(fetchProducts, 30000);
-    return () => clearInterval(interval);
-  }, [fetchProducts]);
 
   /* ── Filtered / paginated ── */
   const filtered = useMemo(() => {
@@ -678,34 +672,27 @@ export default function ProductsPage() {
   /* ───────────────────── RENDER ───────────────────── */
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.products")}</h1>
           <p className="text-sm text-[#666] mt-1">{products.length} {t("admin.totalProducts")}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={openAddPanel}
-            className="btn-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2"
-          >
-            <Plus size={18} />
-            {t("admin.addProduct")}
-          </button>
+        <div className="flex items-center gap-2">
           <Link
             href="/admin/import"
-            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-200 text-black hover:bg-stone-100 transition-colors"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-stone-900 text-white hover:bg-black transition-colors"
           >
             <Upload size={16} />
-            {t("admin.importCsv")}
+            <span className="hidden sm:inline">{t("admin.importCsv")}</span>
           </Link>
           <button
-            onClick={() => alert(t("admin.categoriesComingSoon"))}
-            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-200 text-black hover:bg-stone-100 transition-colors"
+            onClick={openAddPanel}
+            className="px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-stone-900 text-white hover:bg-black transition-colors"
           >
-            <FolderTree size={16} />
-            {t("admin.manageCategories")}
+            <Plus size={18} />
+            <span className="hidden sm:inline">{t("admin.addProduct")}</span>
           </button>
         </div>
       </div>
@@ -775,7 +762,7 @@ export default function ProductsPage() {
       {/* Products Table */}
       <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
@@ -789,7 +776,10 @@ export default function ProductsPage() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.category")}</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.priceB2c")}</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.priceB2b")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">Nabavna</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.stock")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">Barkod</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">ERP ID</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.status")}</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.actions")}</th>
               </tr>
@@ -835,6 +825,7 @@ export default function ProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-[#333] hidden lg:table-cell">{product.priceB2B.toLocaleString()} RSD</td>
+                  <td className="px-4 py-3 text-sm text-[#666] hidden lg:table-cell">{product.purchasePrice ? `${product.purchasePrice.toLocaleString()} RSD` : "—"}</td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <div className="flex items-center gap-1.5">
                       <span className={`text-sm font-medium ${product.stock <= product.lowStockThreshold ? "text-red-500" : product.stock <= product.lowStockThreshold * 2 ? "text-orange-500" : "text-[#333]"}`}>
@@ -845,6 +836,8 @@ export default function ProductsPage() {
                       )}
                     </div>
                   </td>
+                  <td className="px-4 py-3 text-xs font-mono text-[#666] hidden xl:table-cell">{product.barcode || "—"}</td>
+                  <td className="px-4 py-3 text-xs font-mono text-[#666] hidden xl:table-cell">{product.erpId || "—"}</td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${product.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
                       {product.status === "active" ? t("admin.active") : t("admin.inactive")}
@@ -864,7 +857,7 @@ export default function ProductsPage() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#999]">
+                  <td colSpan={13} className="px-4 py-12 text-center text-sm text-[#999]">
                     {t("admin.noProductsMatch")}
                   </td>
                 </tr>
@@ -875,9 +868,9 @@ export default function ProductsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
-            <span className="text-sm text-[#666]">
-              {t("admin.showing")} {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
+          <div className="px-4 sm:px-6 py-4 border-t border-stone-200 flex items-center justify-between gap-2">
+            <span className="text-xs sm:text-sm text-[#666] whitespace-nowrap">
+              {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} / {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <button
@@ -887,15 +880,22 @@ export default function ProductsPage() {
               >
                 <ChevronLeft size={18} />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#666] hover:bg-stone-100"}`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let page = i + 1;
+                if (totalPages > 5) {
+                  const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+                  page = start + i;
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#666] hover:bg-stone-100"}`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}

@@ -143,7 +143,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setMobileMenu(false);
+      if (window.innerWidth >= 1024) setMobileMenu(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -208,8 +208,13 @@ export default function Header() {
       {/* MAIN HEADER - Clean Kanva style */}
       <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-          {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Mobile hamburger - left */}
+          <button onClick={() => setMobileMenu(true)} className="lg:hidden">
+            <Menu className="w-6 h-6 text-black" />
+          </button>
+
+          {/* Nav links - left (desktop only) */}
+          <nav className="hidden lg:flex items-center gap-6">
             {navLinks.map((l) => {
               const hasMega = l.hasMega && megaMenus[l.menuKey] !== undefined;
               const menuData = hasMega ? megaMenus[l.menuKey] : null;
@@ -300,18 +305,18 @@ export default function Header() {
             <img src="/logo.png" alt="Alta Moda" className="h-6 md:h-7" />
           </Link>
 
-          {/* Icons - right */}
+          {/* Icons - right (all visible on desktop, only cart on mobile) */}
           <div className="flex items-center gap-5">
-            <div className="hidden sm:block">
+            <div className="hidden lg:block">
               <LanguageToggle />
             </div>
-            <Link href={session ? "/account" : "/account/login"} className="hidden sm:block hover:text-secondary transition-colors">
+            <Link href={session ? "/account" : "/account/login"} className="hidden lg:block hover:text-secondary transition-colors">
               <User className="w-5 h-5 text-black" />
             </Link>
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-secondary transition-colors">
               <Search className="w-5 h-5 text-black" />
             </button>
-            <Link href="/wishlist" className="relative hidden sm:block hover:text-secondary transition-colors">
+            <Link href="/wishlist" className="relative hidden lg:block hover:text-secondary transition-colors">
               <Heart className="w-5 h-5 text-black" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
@@ -327,9 +332,6 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <button onClick={() => setMobileMenu(true)} className="md:hidden">
-              <Menu className="w-6 h-6 text-black" />
-            </button>
           </div>
         </div>
 
@@ -444,7 +446,41 @@ export default function Header() {
                 );
               })}
 
-              {/* Language selector in mobile menu */}
+              {/* Quick links in mobile menu */}
+              <div className="pt-4 border-t border-stone-200 mt-2 space-y-1">
+                <Link
+                  href={session ? "/account" : "/account/login"}
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 py-3 px-2 text-sm text-black hover:text-secondary transition-colors"
+                >
+                  <User className="w-5 h-5" />
+                  {session ? t("account.myProfile") : t("auth.login")}
+                </Link>
+                <Link
+                  href="/wishlist"
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 py-3 px-2 text-sm text-black hover:text-secondary transition-colors"
+                >
+                  <Heart className="w-5 h-5" />
+                  {t("wishlist.title")}
+                  {wishlistCount > 0 && (
+                    <span className="ml-auto px-2 py-0.5 bg-black text-white text-[10px] rounded-full">{wishlistCount}</span>
+                  )}
+                </Link>
+                <Link
+                  href="/cart"
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 py-3 px-2 text-sm text-black hover:text-secondary transition-colors"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {t("cart.title")}
+                  {cartItemCount > 0 && (
+                    <span className="ml-auto px-2 py-0.5 bg-black text-white text-[10px] rounded-full">{cartItemCount}</span>
+                  )}
+                </Link>
+              </div>
+
+              {/* Language selector */}
               <div className="pt-4 border-t border-stone-200 mt-2">
                 <LanguageToggle />
               </div>

@@ -156,7 +156,7 @@ export default function NewsletterPage() {
       const res = await fetch("/api/newsletter/campaigns");
       const json = await res.json();
       if (json.success) {
-        setCampaigns(json.data);
+        setCampaigns(json.data.campaigns || json.data);
       }
     } catch (err) {
       console.error("Failed to fetch campaigns:", err);

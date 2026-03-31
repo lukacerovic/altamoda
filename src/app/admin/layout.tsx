@@ -15,7 +15,6 @@ import {
   ChevronDown,
   LogOut,
   User,
-  PackageOpen,
   Mail,
   Zap,
   Home,
@@ -59,7 +58,6 @@ export default function AdminLayout({
       title: t("admin.sales"),
       items: [
         { href: "/admin/actions", label: t("admin.promotions"), icon: Zap },
-        { href: "/admin/bundles", label: t("admin.bundles"), icon: PackageOpen },
       ],
     },
     {
@@ -229,7 +227,7 @@ export default function AdminLayout({
 
       {/* Main content area */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+        className={`flex-1 min-w-0 flex flex-col min-h-screen transition-all duration-300 ${
           sidebarOpen ? "lg:ml-80" : "lg:ml-20"
         }`}
       >
@@ -334,7 +332,7 @@ export default function AdminLayout({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8">{children}</main>
+        <main className="flex-1 min-w-0 overflow-hidden p-4 lg:p-8">{children}</main>
       </div>
     </div>
   );

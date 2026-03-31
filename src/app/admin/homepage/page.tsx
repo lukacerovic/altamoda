@@ -29,7 +29,7 @@ export default function HomepagePage() {
   const sections: SectionConfig[] = [
     { key: "featured", label: t("admin.featuredSection"), filterParam: "isFeatured=true", flagField: "isFeatured", icon: <Star size={20} /> },
     { key: "newArrivals", label: t("admin.newArrivalsSection"), filterParam: "isNew=true", flagField: "isNew", icon: <ShoppingBag size={20} /> },
-    { key: "sale", label: t("admin.saleSection"), filterParam: "onSale=true", flagField: "", icon: <Tag size={20} />, readOnly: true },
+    { key: "sale", label: t("admin.saleSection"), filterParam: "onSale=true", flagField: "onSale", icon: <Tag size={20} /> },
   ];
 
   const [sectionProducts, setSectionProducts] = useState<Record<string, SectionProduct[]>>({});
@@ -142,13 +142,17 @@ export default function HomepagePage() {
     const productsToAdd = modalResults.filter((p) => selectedToAdd.has(p.id));
 
     await Promise.all(
-      productsToAdd.map((product) =>
-        fetch(`/api/products/${product.id}`, {
+      productsToAdd.map((product) => {
+        // For sale section, set oldPrice to current price to mark as "on sale"
+        const body = flagField === "onSale"
+          ? { oldPrice: product.price }
+          : { [flagField]: true };
+        return fetch(`/api/products/${product.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ [flagField]: true }),
-        })
-      )
+          body: JSON.stringify(body),
+        });
+      })
     );
 
     setSectionProducts((prev) => ({
@@ -161,10 +165,14 @@ export default function HomepagePage() {
 
   const removeProduct = async (sectionKey: string, productId: string, flagField: string) => {
     try {
+      // For sale section, clear oldPrice to remove from sale
+      const body = flagField === "onSale"
+        ? { oldPrice: null }
+        : { [flagField]: false };
       await fetch(`/api/products/${productId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [flagField]: false }),
+        body: JSON.stringify(body),
       });
       setSectionProducts((prev) => ({
         ...prev,
@@ -225,7 +233,7 @@ export default function HomepagePage() {
                 <div className="p-6">
                   {products.length === 0 && (
                     <p className="text-sm text-[#999] text-center py-4">
-                      {section.readOnly ? t("admin.saleNote") : t("admin.noProductsMatch")}
+                      {t("admin.noProductsMatch")}
                     </p>
                   )}
 
@@ -268,10 +276,6 @@ export default function HomepagePage() {
                     ))}
                   </div>
 
-                  {/* Sale section note */}
-                  {section.readOnly && products.length > 0 && (
-                    <p className="mt-4 text-xs text-[#999] italic">{t("admin.saleNote")}</p>
-                  )}
                 </div>
               </div>
             );
