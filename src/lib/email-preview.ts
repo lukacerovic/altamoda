@@ -1,0 +1,268 @@
+/**
+ * Client-side email preview generator.
+ * Wraps TipTap body content into a responsive Altamoda email template
+ * for live preview in the admin editor.
+ *
+ * Aesthetic: clean, minimal, unisex beauty — inspired by Aesop / Le Labo / Byredo.
+ * Warm neutrals, generous whitespace, refined typography.
+ */
+
+// ── Palette: warm neutral, unisex ──
+const PAGE_BG = '#f7f5f2'
+const HEADER_BG = '#2d2926'
+const CONTENT_BG = '#ffffff'
+const FOOTER_BG = '#f0ece7'
+
+const TEXT_PRIMARY = '#2d2926'
+const TEXT_BODY = '#3d3833'
+const TEXT_MUTED = '#9e9389'
+const ACCENT = '#7c6f64'
+const DIVIDER = '#d4cdc5'
+
+const FONT = "font-family:'Georgia','Times New Roman',serif;"
+
+/** Detect whether html is already a full email document */
+export function isFullEmailHtml(html: string): boolean {
+  const trimmed = html.trimStart()
+  return trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html')
+}
+
+/**
+ * Convert TipTap HTML into email-safe inline-styled HTML.
+ * Email clients strip <style> blocks, so every element needs inline styles.
+ */
+export function convertToEmailHtml(body: string): string {
+  return body
+    // Headings
+    .replace(/<h1([^>]*)>/g, `<h1$1 style="margin:0 0 20px;font-size:30px;font-weight:400;color:${TEXT_PRIMARY};letter-spacing:2px;text-transform:uppercase;${FONT}">`)
+    .replace(/<h2([^>]*)>/g, `<h2$1 style="margin:0 0 16px;font-size:24px;font-weight:400;color:${TEXT_PRIMARY};letter-spacing:1px;${FONT}">`)
+    .replace(/<h3([^>]*)>/g, `<h3$1 style="margin:0 0 12px;font-size:18px;font-weight:600;color:${TEXT_PRIMARY};${FONT}">`)
+    // Paragraphs — preserve text-align
+    .replace(/<p style="text-align:\s*(center|right|left)">/g,
+      `<p style="margin:0 0 18px;font-size:16px;line-height:1.8;color:${TEXT_BODY};${FONT}text-align:$1;">`)
+    .replace(/<p>/g,
+      `<p style="margin:0 0 18px;font-size:16px;line-height:1.8;color:${TEXT_BODY};${FONT}">`)
+    // Images — handle width and alignment from data attributes
+    .replace(/<img ([^>]*?)>/g, (_match, attrs: string) => {
+      let margin = '20px auto'
+      if (attrs.includes('data-align="left"')) margin = '20px 20px 20px 0'
+      else if (attrs.includes('data-align="right"')) margin = '20px 0 20px auto'
+      // Extract width if set
+      const widthMatch = attrs.match(/style="width:\s*([^"]+)"/)
+      const widthStyle = widthMatch ? `width:${widthMatch[1]};` : ''
+      // Clean attrs of style and data-align
+      const cleanAttrs = attrs
+        .replace(/style="[^"]*"/g, '')
+        .replace(/data-align="[^"]*"/g, '')
+        .trim()
+      return `<img ${cleanAttrs} style="${widthStyle}max-width:100%;height:auto;display:block;margin:${margin};border-radius:4px;" />`
+    })
+    // CTA links (bold + link → renders as button)
+    .replace(/<strong><a ([^>]*?)>([^<]*)<\/a><\/strong>/g,
+      `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px auto 8px;"><tr><td style="background-color:${HEADER_BG};border-radius:6px;"><a $1 style="display:inline-block;padding:14px 36px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:2px;text-transform:uppercase;${FONT}">$2</a></td></tr></table>`)
+    // Regular links
+    .replace(/<a ([^>]*?)>/g, `<a $1 style="color:${ACCENT};text-decoration:underline;">`)
+    // Lists
+    .replace(/<ul>/g, '<ul style="margin:0 0 18px;padding-left:24px;">')
+    .replace(/<ol>/g, '<ol style="margin:0 0 18px;padding-left:24px;">')
+    .replace(/<li>/g, `<li style="margin:0 0 6px;font-size:16px;line-height:1.8;color:${TEXT_BODY};${FONT}">`)
+    // Horizontal rule
+    .replace(/<hr>/g, `<hr style="border:none;border-top:1px solid ${DIVIDER};margin:32px 0;" />`)
+    // Blockquote
+    .replace(/<blockquote>/g, `<blockquote style="margin:24px 0;padding:16px 28px;border-left:3px solid ${ACCENT};background:${PAGE_BG};font-style:italic;color:${TEXT_BODY};">`)
+    // Strong / Em
+    .replace(/<strong>/g, `<strong style="font-weight:700;color:${TEXT_PRIMARY};">`)
+}
+
+// ── Customisation options for header / footer ──
+
+export interface EmailTemplateOptions {
+  headerTitle?: string
+  headerSubtitle?: string
+  headerBg?: string
+  headerImage?: string
+  footerText?: string
+  footerCopyright?: string
+}
+
+export const defaultEmailOptions: EmailTemplateOptions = {
+  headerTitle: 'ALTAMODA',
+  headerSubtitle: 'Heritage',
+  headerBg: HEADER_BG,
+  headerImage: '',
+  footerText: 'Altamoda Heritage',
+  footerCopyright: `© ${new Date().getFullYear()} · Sva prava zadrzana`,
+}
+
+/**
+ * Wrap styled body content in the full Altamoda email layout.
+ * Clean, minimal design with warm neutrals and generous whitespace.
+ */
+export function wrapInEmailTemplate(styledBody: string, opts: EmailTemplateOptions = {}): string {
+  const o = { ...defaultEmailOptions, ...opts }
+  const hBg = o.headerBg || HEADER_BG
+
+  // Header content — either an image or text
+  const headerContent = o.headerImage
+    ? `<img src="${o.headerImage}" alt="${o.headerTitle}" style="max-width:260px;max-height:80px;height:auto;display:block;margin:0 auto;" />`
+    : [
+        `<p style="margin:0;font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:4px;text-transform:uppercase;${FONT}">· · ·</p>`,
+        `<h1 style="margin:8px 0 0;font-size:32px;font-weight:400;color:#ffffff;letter-spacing:6px;text-transform:uppercase;${FONT}">${o.headerTitle}</h1>`,
+        o.headerSubtitle
+          ? `<p style="margin:6px 0 0;font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:3px;text-transform:uppercase;${FONT}">${o.headerSubtitle}</p>`
+          : '',
+      ].join('\n')
+
+  return `<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>${o.headerTitle}</title>
+<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+<style>
+@media only screen and (max-width:620px){
+.ew{padding:20px 12px!important}
+.ec{width:100%!important;border-radius:0!important}
+.eh{padding:28px 24px 20px!important}
+.eb{padding:32px 24px!important}
+.ef{padding:24px!important}
+img{max-width:100%!important;height:auto!important}
+h1{font-size:24px!important;letter-spacing:1px!important}
+h2{font-size:20px!important}
+}
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:${PAGE_BG};${FONT}color:${TEXT_BODY};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${PAGE_BG};">
+<tr>
+<td class="ew" align="center" style="padding:48px 20px;">
+<table class="ec" role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${CONTENT_BG};border-radius:2px;overflow:hidden;">
+
+<!-- Header -->
+<tr>
+<td class="eh" align="center" style="padding:36px 40px 28px;background-color:${hBg};">
+${headerContent}
+</td>
+</tr>
+
+<!-- Accent line -->
+<tr>
+<td align="center" style="background-color:${CONTENT_BG};">
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+<tr><td style="width:48px;height:1px;background-color:${ACCENT};font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+</td>
+</tr>
+
+<!-- Content -->
+<tr>
+<td class="eb" style="padding:40px 48px 32px;">
+<!-- EMAIL_BODY_START -->
+${styledBody}
+<!-- EMAIL_BODY_END -->
+</td>
+</tr>
+
+<!-- Footer -->
+<tr>
+<td class="ef" style="padding:28px 48px;background-color:${FOOTER_BG};border-top:1px solid ${DIVIDER};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center">
+<p style="margin:0 0 6px;font-size:11px;color:${TEXT_MUTED};letter-spacing:1px;text-transform:uppercase;${FONT}">${o.footerText}</p>
+<p style="margin:0 0 12px;font-size:11px;color:${TEXT_MUTED};${FONT}">${o.footerCopyright}</p>
+<p style="margin:0;font-size:11px;${FONT}"><a href="#" style="color:${ACCENT};text-decoration:none;border-bottom:1px solid ${DIVIDER};">Odjavi se</a></p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>`
+}
+
+/**
+ * Full pipeline: body HTML → email-safe styles → responsive wrapper.
+ * If already a full email doc, returns as-is.
+ */
+export function generateEmailPreview(bodyContent: string, opts?: EmailTemplateOptions): string {
+  if (isFullEmailHtml(bodyContent)) return bodyContent
+  return wrapInEmailTemplate(convertToEmailHtml(bodyContent), opts)
+}
+
+/**
+ * Extract editable body content from a full email HTML.
+ * Looks for EMAIL_BODY markers first (new format), then
+ * falls back to heuristic extraction (legacy templates).
+ */
+export function extractBodyContent(fullHtml: string): string {
+  if (!isFullEmailHtml(fullHtml)) return fullHtml
+
+  // New format — marked body section
+  const markerMatch = fullHtml.match(
+    /<!-- EMAIL_BODY_START -->([\s\S]*?)<!-- EMAIL_BODY_END -->/
+  )
+  if (markerMatch) {
+    return stripInlineStyles(markerMatch[1].trim())
+  }
+
+  // Legacy format — heuristic extraction
+  return extractLegacyBody(fullHtml)
+}
+
+function extractLegacyBody(html: string): string {
+  let body = html
+
+  // Cut after the header (ends after "Heritage" text)
+  const headerEnd = body.match(/Heritage[\s\S]*?<\/td>\s*<\/tr>/i)
+  if (headerEnd && headerEnd.index !== undefined) {
+    body = body.slice(headerEnd.index + headerEnd[0].length)
+  }
+
+  // Cut before the footer (beige/light background)
+  const footerPatterns = ['#f5f0e8', '#f0ece7']
+  for (const pattern of footerPatterns) {
+    const idx = body.indexOf(pattern)
+    if (idx > -1) {
+      const trBefore = body.lastIndexOf('<tr', idx)
+      if (trBefore > -1) { body = body.slice(0, trBefore); break }
+    }
+  }
+
+  // Strip table wrapper markup
+  body = body
+    .replace(/<\/?table[^>]*>/gi, '')
+    .replace(/<\/?tbody[^>]*>/gi, '')
+    .replace(/<\/?tr[^>]*>/gi, '')
+    .replace(/<\/?td[^>]*>/gi, '')
+
+  // Strip email-specific attributes
+  body = body
+    .replace(/ style="[^"]*"/gi, '')
+    .replace(/ width="[^"]*"/gi, '')
+    .replace(/ role="[^"]*"/gi, '')
+    .replace(/ cellpadding="[^"]*"/gi, '')
+    .replace(/ cellspacing="[^"]*"/gi, '')
+    .replace(/ align="[^"]*"/gi, '')
+    .replace(/ class="[^"]*"/gi, '')
+
+  body = body.replace(/\n\s*\n\s*\n/g, '\n').trim()
+  return body
+}
+
+function stripInlineStyles(html: string): string {
+  return html
+    // Preserve text-align (TipTap uses it), strip everything else
+    .replace(/ style="([^"]*)"/gi, (_match, styles: string) => {
+      const alignMatch = styles.match(/text-align:\s*(center|right|left)/)
+      return alignMatch ? ` style="text-align: ${alignMatch[1]}"` : ''
+    })
+    .replace(/ class="[^"]*"/gi, '')
+    .trim()
+}

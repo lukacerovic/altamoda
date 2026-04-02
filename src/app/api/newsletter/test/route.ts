@@ -1,4 +1,4 @@
-import { withErrorHandler, successResponse } from '@/lib/api-utils'
+import { withErrorHandler, successResponse, ApiError } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { sendEmail } from '@/lib/email'
 import { welcomeTemplate } from '@/lib/email-templates'
@@ -9,7 +9,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
   const { email } = await req.json()
   if (!email || typeof email !== 'string') {
-    return Response.json({ success: false, error: 'Email je obavezan' }, { status: 400 })
+    throw new ApiError(400, 'Email je obavezan')
   }
 
   await sendEmail({

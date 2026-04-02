@@ -94,6 +94,7 @@ enum SyncStatus {
 enum NewsletterSegment {
   b2b
   b2c
+  all
 }
 
 enum CampaignStatus {
@@ -149,8 +150,8 @@ model B2bProfile {
   id           String   @id @default(cuid())
   userId       String   @unique @map("user_id")
   salonName    String   @map("salon_name")
-  pib          String
-  maticniBroj  String   @map("maticni_broj")
+  pib          String?
+  maticniBroj  String?  @map("maticni_broj")
   address      String?
   discountTier Int      @default(0) @map("discount_tier")
   creditLimit  Decimal? @map("credit_limit") @db.Decimal(12, 2)
@@ -541,6 +542,22 @@ model Banner {
 
 // ==================== NEWSLETTER ====================
 
+model NewsletterTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  subject     String
+  htmlContent String   @db.Text @map("html_content")
+  thumbnail   String?
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  campaigns   NewsletterCampaign[]
+
+  @@map("newsletter_templates")
+}
+
 model NewsletterSubscriber {
   id             String            @id @default(cuid())
   email          String            @unique
@@ -564,8 +581,11 @@ model NewsletterCampaign {
   openCount   Int               @default(0) @map("open_count")
   clickCount  Int               @default(0) @map("click_count")
   scheduledAt DateTime?         @map("scheduled_at")
+  templateId  String?           @map("template_id")
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  template    NewsletterTemplate? @relation(fields: [templateId], references: [id])
 
   @@map("newsletter_campaigns")
 }
