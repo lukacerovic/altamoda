@@ -125,7 +125,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           className={`px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 self-start transition-all ${
-            saved ? "bg-emerald-500 text-white" : "btn-gold"
+            saved ? "bg-emerald-500 text-white" : "bg-black text-white hover:bg-stone-800"
           }`}
         >
           {saved ? <><Check size={18} /> {t("admin.saved")}</> : <><Save size={18} /> {t("admin.saveChanges")}</>}

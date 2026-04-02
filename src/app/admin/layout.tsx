@@ -15,11 +15,9 @@ import {
   ChevronDown,
   LogOut,
   User,
-  PackageOpen,
   Mail,
   Zap,
   Home,
-  Palette,
 } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -50,7 +48,6 @@ export default function AdminLayout({
       items: [
         { href: "/admin/homepage", label: t("admin.homepage"), icon: Home },
         { href: "/admin/products", label: t("admin.products"), icon: Package },
-        { href: "/admin/colors", label: t("admin.colors"), icon: Palette },
         { href: "/admin/orders", label: t("admin.orders"), icon: ShoppingCart },
         { href: "/admin/users", label: t("admin.users"), icon: Users },
       ],
@@ -59,7 +56,6 @@ export default function AdminLayout({
       title: t("admin.sales"),
       items: [
         { href: "/admin/actions", label: t("admin.promotions"), icon: Zap },
-        { href: "/admin/bundles", label: t("admin.bundles"), icon: PackageOpen },
       ],
     },
     {
@@ -80,7 +76,7 @@ export default function AdminLayout({
   const isActive = (href: string) => pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen bg-stone-100 flex">
+    <div className="min-h-screen bg-stone-100 flex overflow-x-hidden">
       {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex flex-col fixed top-0 left-0 h-full bg-stone-50 text-stone-900 z-40 transition-all duration-300 ${
@@ -229,7 +225,7 @@ export default function AdminLayout({
 
       {/* Main content area */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+        className={`flex-1 min-w-0 flex flex-col min-h-screen transition-all duration-300 ${
           sidebarOpen ? "lg:ml-80" : "lg:ml-20"
         }`}
       >
@@ -334,7 +330,7 @@ export default function AdminLayout({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8">{children}</main>
+        <main className="flex-1 p-4 lg:p-8 overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

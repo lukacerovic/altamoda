@@ -29,7 +29,7 @@ export default function HomepagePage() {
   const sections: SectionConfig[] = [
     { key: "featured", label: t("admin.featuredSection"), filterParam: "isFeatured=true", flagField: "isFeatured", icon: <Star size={20} /> },
     { key: "newArrivals", label: t("admin.newArrivalsSection"), filterParam: "isNew=true", flagField: "isNew", icon: <ShoppingBag size={20} /> },
-    { key: "sale", label: t("admin.saleSection"), filterParam: "onSale=true", flagField: "", icon: <Tag size={20} />, readOnly: true },
+    { key: "sale", label: t("admin.saleSection"), filterParam: "onSale=true", flagField: "onSale", icon: <Tag size={20} /> },
   ];
 
   const [sectionProducts, setSectionProducts] = useState<Record<string, SectionProduct[]>>({});
@@ -142,13 +142,16 @@ export default function HomepagePage() {
     const productsToAdd = modalResults.filter((p) => selectedToAdd.has(p.id));
 
     await Promise.all(
-      productsToAdd.map((product) =>
-        fetch(`/api/products/${product.id}`, {
+      productsToAdd.map((product) => {
+        const updateBody = flagField === "onSale"
+          ? { oldPrice: product.price > 0 ? Math.round(product.price * 1.2) : 100 }
+          : { [flagField]: true };
+        return fetch(`/api/products/${product.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ [flagField]: true }),
-        })
-      )
+          body: JSON.stringify(updateBody),
+        });
+      })
     );
 
     setSectionProducts((prev) => ({
@@ -161,10 +164,13 @@ export default function HomepagePage() {
 
   const removeProduct = async (sectionKey: string, productId: string, flagField: string) => {
     try {
+      const updateBody = flagField === "onSale"
+        ? { oldPrice: null }
+        : { [flagField]: false };
       await fetch(`/api/products/${productId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [flagField]: false }),
+        body: JSON.stringify(updateBody),
       });
       setSectionProducts((prev) => ({
         ...prev,
@@ -213,7 +219,7 @@ export default function HomepagePage() {
                   {!section.readOnly && (
                     <button
                       onClick={() => openAddModal(section.key, section.flagField)}
-                      className="btn-gold px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2"
+                      className="bg-black text-white hover:bg-stone-800 transition-colors px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2"
                     >
                       <Plus size={16} />
                       {t("admin.addToSection")}
@@ -370,7 +376,7 @@ export default function HomepagePage() {
               <button
                 onClick={addSelectedProducts}
                 disabled={selectedToAdd.size === 0 || addingProducts}
-                className="btn-gold px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50 flex items-center gap-2"
               >
                 {addingProducts ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

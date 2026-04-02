@@ -55,43 +55,33 @@ function useMegaMenus() {
         {
           title: t("nav.hairCare"),
           links: [
-            { name: t("nav.shampoos"), href: "/products?category=shampoo" },
-            { name: t("nav.masks"), href: "/products?category=masks" },
-            { name: t("nav.conditioners"), href: "/products?category=conditioner" },
-            { name: t("nav.serums"), href: "/products?category=serum" },
-            { name: t("nav.oils"), href: "/products?category=oils" },
+            { name: t("nav.shampoos"), href: "/products?category=samponi" },
+            { name: t("nav.masks"), href: "/products?category=maske" },
+            { name: t("nav.conditioners"), href: "/products?category=regeneratori" },
+            { name: t("nav.serums"), href: "/products?category=serumi" },
+            { name: t("nav.oils"), href: "/products?category=ulja" },
           ],
         },
         {
           title: t("nav.styling"),
           links: [
-            { name: t("nav.sprays_styling"), href: "/products?category=spray" },
-            { name: t("nav.styling"), href: "/products?category=styling" },
+            { name: t("nav.sprays_styling"), href: "/products?category=sprejevi" },
+            { name: t("nav.styling"), href: "/products?category=stajling" },
             { name: t("nav.leaveIn"), href: "/products?category=leave-in" },
           ],
         },
         {
           title: t("nav.appliances"),
           links: [
-            { name: t("nav.tools"), href: "/products?category=tools" },
-            { name: t("nav.brushes"), href: "/products?category=brushes" },
-            { name: t("nav.scissors"), href: "/products?category=scissors" },
+            { name: t("nav.tools"), href: "/products?category=alat-i-pribor" },
+            { name: t("nav.brushes"), href: "/products?category=cetke" },
+            { name: t("nav.scissors"), href: "/products?category=makaze" },
           ],
         },
-      ],
-      featured: {
-        image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
-        title: t("nav.premiumHairCare"),
-        cta: t("nav.explore"),
-        href: "/products",
-      },
-    },
-    collections: {
-      columns: [
         {
           title: t("nav.hairColors"),
           links: [
-            { name: t("nav.permanent"), href: "/colors?type=permanentne" },
+            { name: t("nav.permanent"), href: "/products?category=boje-za-kosu" },
             { name: t("nav.ammoniaFree"), href: "/colors?type=bez-amonijaka" },
             { name: t("nav.demiPermanent"), href: "/colors?type=demi-permanentne" },
           ],
@@ -107,17 +97,16 @@ function useMegaMenus() {
         },
       ],
       featured: {
-        image: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=300&fit=crop",
-        title: t("nav.newColorCollection"),
-        cta: t("nav.view"),
-        href: "/colors",
+        image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
+        title: t("nav.premiumHairCare"),
+        cta: t("nav.explore"),
+        href: "/products",
       },
     },
   };
 
   const navLinks = [
     { name: t("nav.products"), href: "/products", hasMega: true, menuKey: "products" },
-    { name: t("nav.collections"), href: "/colors", hasMega: true, menuKey: "collections" },
     { name: t("nav.about"), href: "/about", hasMega: false, menuKey: "" },
     { name: t("nav.contact"), href: "/contact", hasMega: false, menuKey: "" },
   ];
@@ -208,6 +197,11 @@ export default function Header() {
       {/* MAIN HEADER - Clean Kanva style */}
       <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+          {/* Mobile hamburger - left */}
+          <button onClick={() => setMobileMenu(true)} className="md:hidden text-black hover:text-secondary transition-colors">
+            <Menu className="w-6 h-6" />
+          </button>
+
           {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((l) => {
@@ -244,7 +238,7 @@ export default function Header() {
                           <div className="flex-1 flex gap-8">
                             {menuData.columns.map((col) => (
                               <div key={col.title} className="min-w-[140px]">
-                                <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-3">
+                                <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-3 min-h-[2.5rem] flex items-start">
                                   {col.title}
                                 </h4>
                                 <ul className="space-y-2">
@@ -302,16 +296,16 @@ export default function Header() {
 
           {/* Icons - right */}
           <div className="flex items-center gap-5">
-            <div className="hidden sm:block">
+            <div className="hidden md:block">
               <LanguageToggle />
             </div>
-            <Link href={session ? "/account" : "/account/login"} className="hidden sm:block hover:text-secondary transition-colors">
+            <Link href={session ? "/account" : "/account/login"} className="hidden md:block hover:text-secondary transition-colors">
               <User className="w-5 h-5 text-black" />
             </Link>
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-secondary transition-colors">
               <Search className="w-5 h-5 text-black" />
             </button>
-            <Link href="/wishlist" className="relative hidden sm:block hover:text-secondary transition-colors">
+            <Link href="/wishlist" className="relative hidden md:block hover:text-secondary transition-colors">
               <Heart className="w-5 h-5 text-black" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
@@ -327,9 +321,6 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <button onClick={() => setMobileMenu(true)} className="md:hidden">
-              <Menu className="w-6 h-6 text-black" />
-            </button>
           </div>
         </div>
 
@@ -443,6 +434,29 @@ export default function Header() {
                   </div>
                 );
               })}
+
+              {/* Account & Wishlist in mobile menu */}
+              <div className="pt-4 border-t border-stone-200 mt-2 space-y-1">
+                <Link
+                  href={session ? "/account" : "/account/login"}
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 py-3 px-2 text-black hover:text-secondary text-sm"
+                >
+                  <User className="w-5 h-5" />
+                  {session ? t("nav.account") || "Account" : t("nav.login") || "Login"}
+                </Link>
+                <Link
+                  href="/wishlist"
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 py-3 px-2 text-black hover:text-secondary text-sm"
+                >
+                  <Heart className="w-5 h-5" />
+                  {t("nav.wishlist") || "Wishlist"}
+                  {wishlistCount > 0 && (
+                    <span className="ml-auto px-2 py-0.5 rounded-full bg-black text-white text-[10px]">{wishlistCount}</span>
+                  )}
+                </Link>
+              </div>
 
               {/* Language selector in mobile menu */}
               <div className="pt-4 border-t border-stone-200 mt-2">

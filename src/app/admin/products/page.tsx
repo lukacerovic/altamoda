@@ -17,7 +17,6 @@ import {
   Eye,
   EyeOff,
   Upload,
-  FolderTree,
   Image as ImageIcon,
   Star,
   Film,
@@ -86,25 +85,28 @@ interface Product {
   };
 }
 
-type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe" | "boja" | "atributi";
+type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe" | "atributi";
 
 /* ───────────────────────── Constants ───────────────────────── */
 
-const brandNames = ["L'Oréal", "Schwarzkopf", "Kérastase", "Wella", "Moroccanoil"];
+const brandNames = ["Redken", "Matrix", "Framesi", "Biolage", "Olivia Garden", "Elchim", "L'image"];
 
 const brandProductLines: Record<string, string[]> = {
-  "L'Or\u00e9al": ["Majirel", "Serie Expert", "Tecni Art", "Blond Studio", "Inoa"],
-  Schwarzkopf: ["Igora Royal", "BC Bonacure", "OSIS+", "BlondMe", "Fibre Clinix"],
-  "K\u00e9rastase": ["Elixir Ultime", "Nutritive", "Resistance", "Densifique", "Chronologiste"],
-  Wella: ["Koleston Perfect", "Oil Reflections", "EIMI", "Fusion", "Elements"],
-  Moroccanoil: ["Treatment", "Hydration", "Repair", "Color Complete", "Curl"],
+  Redken: ["All Soft", "Extreme", "Color Extend", "Brews", "Frizz Dismiss"],
+  Matrix: ["Total Results", "Biolage", "SoColor", "Oil Wonders", "Style Link"],
+  Framesi: ["Morphosis", "Color Lover", "By Super Hold", "Framcolor"],
+  Biolage: ["Hydra Source", "Color Last", "Strength Recovery", "Volume Bloom", "Smooth Proof"],
+  "Olivia Garden": ["Ceramic + Ion", "Nano Thermic", "Healthy Hair"],
+  Elchim: ["3900 Healthy Ionic", "8th Sense", "Dress Code"],
+  "L'image": ["Training Heads", "Mannequin Heads"],
 };
 
 const categoryHierarchy: Record<string, string[]> = {
-  "Nega kose": ["\u0160amponi", "Balzami", "Maske", "Tretmani"],
-  "Boje za kosu": ["Permanentne", "Polutrajna", "Toneri", "Posvetliva\u010di"],
-  Styling: ["Gelovi", "Voskovi", "Sprejevi", "Puderi", "Pene"],
-  "Ulja i serumi": ["Ulja", "Serumi", "Eliksiri"],
+  "Nega": ["\u0160amponi", "Regeneratori", "Maske", "Ulja", "Serumi", "Tretmani", "Leave-in", "Nega kose", "Nega boje"],
+  "Styling": ["Stajling", "Sprejevi", "Mu\u0161ki stajling"],
+  "Kolor": ["Boje za kosu"],
+  "Pribor": ["\u010cetke", "Makaze", "\u010ce\u0161ljevi", "Alat i pribor", "Dodaci", "Trening oprema"],
+  "Aparati": ["Aparati za kosu"],
 };
 
 /* colorUndertones and hairTypeOptions moved inside component to use t() */
@@ -113,173 +115,172 @@ const categoryHierarchy: Record<string, string[]> = {
 
 const initialProducts: Product[] = [
   {
-    id: 1, name: "Serie Expert Gold Quinoa", sku: "LOR-SE-GQ001", brand: "L'Or\u00e9al", productLine: "Serie Expert",
-    category: "Nega kose", subCategory: "\u0160amponi", priceB2C: 2500, priceB2B: 1800, oldPrice: 3200, purchasePrice: 1200,
+    id: 1, name: "Redken All Soft Shampoo 300ml", sku: "RED-AS-S300", brand: "Redken", productLine: "All Soft",
+    category: "Nega", subCategory: "\u0160amponi", priceB2C: 2500, priceB2B: 1800, oldPrice: 3200, purchasePrice: 1200,
     stock: 45, lowStockThreshold: 10, weight: 300, volume: 300, status: "active",
     badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
-    description: "Profesionalni \u0161ampon za o\u0161te\u0107enu kosu sa zlatnim kvinojom.",
-    ingredients: "Aqua, Sodium Laureth Sulfate, Gold Quinoa Extract...",
+    description: "Profesionalni \u0161ampon za suvu i lomljivu kosu.",
+    ingredients: "Aqua, Sodium Laureth Sulfate, Argan Oil...",
     howToUse: "Nanesite na mokru kosu, upenite i isperite. Ponovite po potrebi.",
-    images: [{ id: 1, url: "/products/loreal1.jpg", alt: "Serie Expert Gold Quinoa \u0161ampon", isPrimary: true }],
+    images: [{ id: 1, url: "/products/redken1.jpg", alt: "Redken All Soft \u0161ampon", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "Serie Expert Gold Quinoa \u0160ampon | Alta Moda", metaDescription: "Profesionalni \u0161ampon za o\u0161te\u0107enu kosu. L'Or\u00e9al Serie Expert linija.", slug: "serie-expert-gold-quinoa",
+    seoTitle: "Redken All Soft \u0160ampon | Alta Moda", metaDescription: "Profesionalni \u0161ampon za suvu kosu. Redken All Soft linija.", slug: "redken-all-soft-shampoo-300ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["O\u0161te\u0107ena", "Farbana"] },
+    attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Lomljiva"] },
   },
   {
-    id: 2, name: "BC Bonacure Peptide Repair", sku: "SCH-BC-PR001", brand: "Schwarzkopf", productLine: "BC Bonacure",
-    category: "Nega kose", subCategory: "\u0160amponi", priceB2C: 1800, priceB2B: 1300, purchasePrice: 900,
-    stock: 32, lowStockThreshold: 10, weight: 250, volume: 250, status: "active",
+    id: 2, name: "Matrix Total Results Repair 300ml", sku: "MAT-TR-R300", brand: "Matrix", productLine: "Total Results",
+    category: "Nega", subCategory: "\u0160amponi", priceB2C: 1800, priceB2B: 1300, purchasePrice: 900,
+    stock: 32, lowStockThreshold: 10, weight: 250, volume: 300, status: "active",
     badges: { isNew: true, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
-    description: "Rescue \u0161ampon za finu i o\u0161te\u0107enu kosu.",
-    ingredients: "Aqua, Sodium Laureth Sulfate, Peptide Complex...",
+    description: "Repair \u0161ampon za o\u0161te\u0107enu kosu.",
+    ingredients: "Aqua, Sodium Laureth Sulfate, Ceramide Complex...",
     howToUse: "Nanesite na mokru kosu, masirajte i isperite.",
-    images: [{ id: 1, url: "/products/schwarzkopf1.jpg", alt: "BC Bonacure Peptide Repair", isPrimary: true }],
+    images: [{ id: 1, url: "/products/matrix1.jpg", alt: "Matrix Total Results Repair", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "BC Bonacure Peptide Repair | Alta Moda", metaDescription: "Schwarzkopf BC Bonacure Peptide Repair \u0161ampon za obnovu kose.", slug: "bc-bonacure-peptide-repair",
+    seoTitle: "Matrix Total Results Repair | Alta Moda", metaDescription: "Matrix Total Results Repair \u0161ampon za obnovu kose.", slug: "matrix-total-results-repair-300ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["O\u0161te\u0107ena", "Normalna"] },
   },
   {
-    id: 3, name: "Elixir Ultime Serum", sku: "KER-EU-S001", brand: "K\u00e9rastase", productLine: "Elixir Ultime",
-    category: "Ulja i serumi", subCategory: "Serumi", priceB2C: 4200, priceB2B: 3200, oldPrice: 4800, purchasePrice: 2200,
+    id: 3, name: "Framesi Morphosis Serum 100ml", sku: "FRA-MO-S100", brand: "Framesi", productLine: "Morphosis",
+    category: "Nega", subCategory: "Serumi", priceB2C: 4200, priceB2B: 3200, oldPrice: 4800, purchasePrice: 2200,
     stock: 3, lowStockThreshold: 5, weight: 100, volume: 100, status: "active",
     badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
-    description: "Luksuzno ulje za izvanredan sjaj kose.",
+    description: "Luksuzni serum za izvanredan sjaj kose.",
     ingredients: "Cyclopentasiloxane, Dimethiconol, Argan Oil...",
     howToUse: "Nanesite 1-2 pumpe na suvu ili vla\u017enu kosu.",
-    images: [{ id: 1, url: "/products/kerastase1.jpg", alt: "K\u00e9rastase Elixir Ultime", isPrimary: true }],
+    images: [{ id: 1, url: "/products/framesi1.jpg", alt: "Framesi Morphosis Serum", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "K\u00e9rastase Elixir Ultime Serum | Alta Moda", metaDescription: "Luksuzni serum za sjaj kose. K\u00e9rastase Elixir Ultime.", slug: "elixir-ultime-serum",
+    seoTitle: "Framesi Morphosis Serum | Alta Moda", metaDescription: "Luksuzni serum za sjaj kose. Framesi Morphosis.", slug: "framesi-morphosis-serum-100ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Normalna", "Farbana"] },
   },
   {
-    id: 4, name: "Oil Reflections \u0160ampon", sku: "WEL-OR-S001", brand: "Wella", productLine: "Oil Reflections",
-    category: "Nega kose", subCategory: "\u0160amponi", priceB2C: 1950, priceB2B: 1400, purchasePrice: 950,
+    id: 4, name: "Biolage Hydra Source \u0160ampon 250ml", sku: "BIO-HS-S250", brand: "Biolage", productLine: "Hydra Source",
+    category: "Nega", subCategory: "\u0160amponi", priceB2C: 1950, priceB2B: 1400, purchasePrice: 950,
     stock: 28, lowStockThreshold: 10, weight: 250, volume: 250, status: "active",
     badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
-    description: "\u0160ampon za blistavu i glatku kosu.",
-    ingredients: "Aqua, Sodium Laureth Sulfate, Camellia Oil...",
-    howToUse: "Nanesite na mokru kosu, masirajte teme i isperite.",
-    images: [{ id: 1, url: "/products/wella1.jpg", alt: "Wella Oil Reflections \u0161ampon", isPrimary: true }],
+    description: "\u0160ampon za hidrataciju suve kose.",
+    ingredients: "Aqua, Sodium Laureth Sulfate, Aloe Extract...",
+    howToUse: "Nanesite na mokru kosu, masirajte i isperite.",
+    images: [{ id: 1, url: "/products/biolage1.jpg", alt: "Biolage Hydra Source \u0161ampon", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "Wella Oil Reflections \u0160ampon | Alta Moda", metaDescription: "Wella Oil Reflections \u0161ampon za blistavu kosu.", slug: "oil-reflections-sampon",
+    seoTitle: "Biolage Hydra Source \u0160ampon | Alta Moda", metaDescription: "Biolage Hydra Source \u0161ampon za hidrataciju.", slug: "biolage-hydra-source-sampon-250ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Normalna", "Suva"] },
+    attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["Normalna", "Suva"] },
   },
   {
-    id: 5, name: "Moroccanoil Treatment 100ml", sku: "MOR-TR-001", brand: "Moroccanoil", productLine: "Treatment",
-    category: "Ulja i serumi", subCategory: "Ulja", priceB2C: 3500, priceB2B: 2600, purchasePrice: 1800,
-    stock: 15, lowStockThreshold: 5, weight: 120, volume: 100, status: "active",
-    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
-    description: "Originalni Moroccanoil tretman za kosu sa arganovim uljem.",
-    ingredients: "Cyclomethicone, Dimethicone, Argania Spinosa Kernel Oil...",
-    howToUse: "Nanesite malu koli\u010dinu na vla\u017enu ili suvu kosu.",
-    images: [{ id: 1, url: "/products/moroccanoil1.jpg", alt: "Moroccanoil Treatment", isPrimary: true }],
+    id: 5, name: "Olivia Garden Ceramic Ion Brush 45mm", sku: "OG-CI-B45", brand: "Olivia Garden", productLine: "Ceramic + Ion",
+    category: "Pribor", subCategory: "\u010cetke", priceB2C: 3500, priceB2B: 2600, purchasePrice: 1800,
+    stock: 15, lowStockThreshold: 5, weight: 120, volume: 0, status: "active",
+    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: true },
+    description: "Profesionalna kerami\u010dka \u010detka za feniranje.",
+    ingredients: "",
+    howToUse: "Koristite prilikom feniranja za glatku i sjajnu kosu.",
+    images: [{ id: 1, url: "/products/oliviagarden1.jpg", alt: "Olivia Garden Ceramic Ion Brush", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "Moroccanoil Treatment Original | Alta Moda", metaDescription: "Originalni Moroccanoil tretman sa arganovim uljem.", slug: "moroccanoil-treatment-100ml",
+    seoTitle: "Olivia Garden Ceramic Ion Brush | Alta Moda", metaDescription: "Profesionalna \u010detka za feniranje.", slug: "olivia-garden-ceramic-ion-brush-45mm",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "O\u0161te\u0107ena", "Kovrd\u017eava"] },
+    attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
-    id: 6, name: "Igora Royal 60ml - 7.0", sku: "SCH-IR-700", brand: "Schwarzkopf", productLine: "Igora Royal",
-    category: "Boje za kosu", subCategory: "Permanentne", priceB2C: 850, priceB2B: 580, purchasePrice: 350,
+    id: 6, name: "Framesi Framcolor 60ml - 7.0", sku: "FRA-FC-700", brand: "Framesi", productLine: "Framcolor",
+    category: "Kolor", subCategory: "Boje za kosu", priceB2C: 850, priceB2B: 580, purchasePrice: 350,
     stock: 120, lowStockThreshold: 20, weight: 80, volume: 60, status: "active",
     badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
     description: "Permanentna profesionalna boja za kosu. Nivo 7, prirodno plava.",
     ingredients: "Aqua, Cetearyl Alcohol, Propylene Glycol...",
     howToUse: "Pome\u0161ajte 1:1 sa razvo\u010diva\u010dem. Nanesite i ostavite 30-45 min.",
-    images: [{ id: 1, url: "/products/igora1.jpg", alt: "Igora Royal 7.0", isPrimary: true }],
+    images: [{ id: 1, url: "/products/framesi-color1.jpg", alt: "Framesi Framcolor 7.0", isPrimary: true }],
     videoUrl: "", gifUrl: "",
     colorLevel: 7, colorUndertone: "N", colorHex: "#8B6914", shadeCode: "7-0",
-    seoTitle: "Igora Royal 7-0 Srednje Plava | Alta Moda", metaDescription: "Schwarzkopf Igora Royal 7-0 permanentna boja. Prirodno srednje plava.", slug: "igora-royal-7-0",
+    seoTitle: "Framesi Framcolor 7-0 | Alta Moda", metaDescription: "Framesi Framcolor 7-0 permanentna boja.", slug: "framesi-framcolor-7-0",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
-    id: 7, name: "Majirel 50ml - 6.0", sku: "LOR-MJ-600", brand: "L'Or\u00e9al", productLine: "Majirel",
-    category: "Boje za kosu", subCategory: "Permanentne", priceB2C: 900, priceB2B: 620, purchasePrice: 380,
-    stock: 5, lowStockThreshold: 15, weight: 70, volume: 50, status: "active",
+    id: 7, name: "Matrix SoColor 60ml - 6N", sku: "MAT-SC-6N", brand: "Matrix", productLine: "SoColor",
+    category: "Kolor", subCategory: "Boje za kosu", priceB2C: 900, priceB2B: 620, purchasePrice: 380,
+    stock: 5, lowStockThreshold: 15, weight: 70, volume: 60, status: "active",
     badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
-    description: "L'Or\u00e9al Majirel permanentna boja. Nivo 6, tamno plava.",
+    description: "Matrix SoColor permanentna boja. Nivo 6, tamno plava.",
     ingredients: "Aqua, Cetearyl Alcohol, Hexylene Glycol...",
     howToUse: "Pome\u0161ajte sa oksidansom u srazmeri 1:1.5. Vreme delovanja 35 min.",
-    images: [{ id: 1, url: "/products/majirel1.jpg", alt: "Majirel 6.0", isPrimary: true }],
+    images: [{ id: 1, url: "/products/matrix-socolor1.jpg", alt: "Matrix SoColor 6N", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    colorLevel: 6, colorUndertone: "N", colorHex: "#6B4226", shadeCode: "6.0",
-    seoTitle: "L'Or\u00e9al Majirel 6.0 Tamno Plava | Alta Moda", metaDescription: "L'Or\u00e9al Majirel 6.0 profesionalna permanentna boja.", slug: "majirel-6-0",
+    colorLevel: 6, colorUndertone: "N", colorHex: "#6B4226", shadeCode: "6N",
+    seoTitle: "Matrix SoColor 6N | Alta Moda", metaDescription: "Matrix SoColor 6N permanentna boja.", slug: "matrix-socolor-6n",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
-    id: 8, name: "OSIS+ Dust It", sku: "SCH-OS-DI01", brand: "Schwarzkopf", productLine: "OSIS+",
-    category: "Styling", subCategory: "Puderi", priceB2C: 1200, priceB2B: 850, purchasePrice: 550,
-    stock: 42, lowStockThreshold: 10, weight: 10, volume: 10, status: "inactive",
-    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
-    description: "Matirajuc\u0301i puder za volumen i teksturu.",
-    ingredients: "Silica, Magnesium Stearate...",
-    howToUse: "Nanesite malu koli\u010dinu na korenove kose i umasirajte.",
-    images: [{ id: 1, url: "/products/osis1.jpg", alt: "OSIS+ Dust It puder", isPrimary: true }],
+    id: 8, name: "Redken Brews Clay Pomade", sku: "RED-BR-CP01", brand: "Redken", productLine: "Brews",
+    category: "Styling", subCategory: "Stajling", priceB2C: 1200, priceB2B: 850, purchasePrice: 550,
+    stock: 42, lowStockThreshold: 10, weight: 100, volume: 100, status: "active",
+    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
+    description: "Pomada sa glinom za matiran zavr\u0161ni izgled.",
+    ingredients: "Aqua, Kaolin, Beeswax...",
+    howToUse: "Nanesite malu koli\u010dinu na suvu kosu i oblikujte.",
+    images: [{ id: 1, url: "/products/redken-brews1.jpg", alt: "Redken Brews Clay Pomade", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "OSIS+ Dust It Puder za Volumen | Alta Moda", metaDescription: "Schwarzkopf OSIS+ Dust It matirajuc\u0301i puder za volumen.", slug: "osis-dust-it",
+    seoTitle: "Redken Brews Clay Pomade | Alta Moda", metaDescription: "Redken Brews Clay Pomade za matiran izgled.", slug: "redken-brews-clay-pomade",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["Normalna", "Masna"] },
   },
   {
-    id: 9, name: "Tecni Art Pli Shaper", sku: "LOR-TA-PS01", brand: "L'Or\u00e9al", productLine: "Tecni Art",
-    category: "Styling", subCategory: "Gelovi", priceB2C: 1450, priceB2B: 1050, purchasePrice: 680,
-    stock: 18, lowStockThreshold: 8, weight: 190, volume: 190, status: "active",
-    badges: { isNew: true, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
-    description: "Termo-aktivni gel za dugotrajno oblikovanje.",
-    ingredients: "Aqua, VP/VA Copolymer, PEG-40 Hydrogenated Castor Oil...",
-    howToUse: "Nanesite na vla\u017enu kosu pre feniranja.",
-    images: [{ id: 1, url: "/products/tecniart1.jpg", alt: "Tecni Art Pli Shaper", isPrimary: true }],
+    id: 9, name: "Biolage Strength Recovery Maska 250ml", sku: "BIO-SR-M250", brand: "Biolage", productLine: "Strength Recovery",
+    category: "Nega", subCategory: "Maske", priceB2C: 1450, priceB2B: 1050, purchasePrice: 680,
+    stock: 18, lowStockThreshold: 8, weight: 250, volume: 250, status: "active",
+    badges: { isNew: true, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
+    description: "Intenzivna maska za obnovu o\u0161te\u0107ene kose.",
+    ingredients: "Aqua, Cetearyl Alcohol, Squalane...",
+    howToUse: "Nanesite na opranu kosu, ostavite 5 min i isperite.",
+    images: [{ id: 1, url: "/products/biolage-sr1.jpg", alt: "Biolage Strength Recovery Maska", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "Tecni Art Pli Shaper | Alta Moda", metaDescription: "L'Or\u00e9al Tecni Art Pli termo-aktivni gel.", slug: "tecni-art-pli-shaper",
+    seoTitle: "Biolage Strength Recovery Maska | Alta Moda", metaDescription: "Biolage Strength Recovery maska za obnovu kose.", slug: "biolage-strength-recovery-maska-250ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Normalna", "Suva"] },
+    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["O\u0161te\u0107ena", "Suva"] },
   },
   {
-    id: 10, name: "Koleston Perfect 60ml - 8/0", sku: "WEL-KP-800", brand: "Wella", productLine: "Koleston Perfect",
-    category: "Boje za kosu", subCategory: "Permanentne", priceB2C: 950, priceB2B: 650, purchasePrice: 400,
-    stock: 4, lowStockThreshold: 15, weight: 80, volume: 60, status: "active",
-    badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: true },
-    description: "Profesionalna permanentna boja za kosu. Svetlo plava.",
-    ingredients: "Aqua, Cetearyl Alcohol, Propylene Glycol...",
-    howToUse: "Pome\u0161ajte sa Welloxon Perfect. Nanesite i ostavite 30 min.",
-    images: [{ id: 1, url: "/products/koleston1.jpg", alt: "Koleston Perfect 8/0", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
-    colorLevel: 8, colorUndertone: "N", colorHex: "#B8860B", shadeCode: "8/0",
-    seoTitle: "Koleston Perfect 8/0 Svetlo Plava | Alta Moda", metaDescription: "Wella Koleston Perfect 8/0 permanentna boja.", slug: "koleston-perfect-8-0",
-    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
-  },
-  {
-    id: 11, name: "BlondMe Premium Lift", sku: "SCH-BM-PL01", brand: "Schwarzkopf", productLine: "BlondMe",
-    category: "Boje za kosu", subCategory: "Posvetliva\u010di", priceB2C: 1100, priceB2B: 780, purchasePrice: 480,
-    stock: 55, lowStockThreshold: 15, weight: 450, volume: 450, status: "active",
+    id: 10, name: "Elchim 3900 Healthy Ionic Fen", sku: "ELC-39-HI01", brand: "Elchim", productLine: "3900 Healthy Ionic",
+    category: "Aparati", subCategory: "Aparati za kosu", priceB2C: 15000, priceB2B: 12000, purchasePrice: 8000,
+    stock: 4, lowStockThreshold: 2, weight: 480, volume: 0, status: "active",
     badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: true },
-    description: "Premium puder za posvetljivanje do 9 nivoa.",
-    ingredients: "Potassium Persulfate, Sodium Silicate, Magnesium Carbonate...",
-    howToUse: "Pome\u0161ajte 1:2 sa razvo\u010diva\u010dem. Ne koristiti na ko\u017ei glave.",
-    images: [{ id: 1, url: "/products/blondme1.jpg", alt: "BlondMe Premium Lift", isPrimary: true }],
+    description: "Profesionalni fen sa jonskom tehnologijom.",
+    ingredients: "",
+    howToUse: "Koristite sa difuzerom ili koncentratorom.",
+    images: [{ id: 1, url: "/products/elchim1.jpg", alt: "Elchim 3900 Healthy Ionic", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "BlondMe Premium Lift Posvetliva\u010d | Alta Moda", metaDescription: "Schwarzkopf BlondMe Premium Lift puder za posvetljivanje.", slug: "blondme-premium-lift",
+    seoTitle: "Elchim 3900 Healthy Ionic | Alta Moda", metaDescription: "Elchim 3900 profesionalni fen.", slug: "elchim-3900-healthy-ionic",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
-    id: 12, name: "Mythic Oil Huile", sku: "LOR-MO-H001", brand: "L'Or\u00e9al", productLine: "Serie Expert",
-    category: "Ulja i serumi", subCategory: "Ulja", priceB2C: 2800, priceB2B: 2100, purchasePrice: 1400,
+    id: 11, name: "Framesi Color Lover Shampoo 500ml", sku: "FRA-CL-S500", brand: "Framesi", productLine: "Color Lover",
+    category: "Nega", subCategory: "Nega boje", priceB2C: 1100, priceB2B: 780, purchasePrice: 480,
+    stock: 55, lowStockThreshold: 15, weight: 500, volume: 500, status: "active",
+    badges: { isNew: false, isFeatured: true, isBestseller: false, isProfessionalOnly: false },
+    description: "\u0160ampon za o\u010duvanje boje farbane kose.",
+    ingredients: "Aqua, Sodium Laureth Sulfate, Quinoa Extract...",
+    howToUse: "Nanesite na mokru kosu, upenite i isperite.",
+    images: [{ id: 1, url: "/products/framesi-cl1.jpg", alt: "Framesi Color Lover Shampoo", isPrimary: true }],
+    videoUrl: "", gifUrl: "",
+    seoTitle: "Framesi Color Lover Shampoo | Alta Moda", metaDescription: "Framesi Color Lover \u0161ampon za farbanu kosu.", slug: "framesi-color-lover-shampoo-500ml",
+    barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
+    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Farbana", "Normalna"] },
+  },
+  {
+    id: 12, name: "Redken Extreme Ulje 100ml", sku: "RED-EX-U100", brand: "Redken", productLine: "Extreme",
+    category: "Nega", subCategory: "Ulja", priceB2C: 2800, priceB2B: 2100, purchasePrice: 1400,
     stock: 22, lowStockThreshold: 8, weight: 120, volume: 100, status: "active",
     badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
-    description: "Hranljivo ulje za kosu na bazi arganovog ulja.",
+    description: "Hranljivo ulje za obnovu o\u0161te\u0107ene kose.",
     ingredients: "Cyclomethicone, Dimethiconol, Argania Spinosa Oil...",
-    howToUse: "Nanesite 1-2 kapi na krajeve kose. Mo\u017ee se koristiti na suvu ili vla\u017enu kosu.",
-    images: [{ id: 1, url: "/products/mythic1.jpg", alt: "L'Or\u00e9al Mythic Oil", isPrimary: true }],
+    howToUse: "Nanesite 1-2 kapi na krajeve kose.",
+    images: [{ id: 1, url: "/products/redken-extreme1.jpg", alt: "Redken Extreme Ulje", isPrimary: true }],
     videoUrl: "", gifUrl: "",
-    seoTitle: "L'Or\u00e9al Mythic Oil Huile | Alta Moda", metaDescription: "L'Or\u00e9al Mythic Oil hranljivo ulje za kosu.", slug: "mythic-oil-huile",
+    seoTitle: "Redken Extreme Ulje | Alta Moda", metaDescription: "Redken Extreme hranljivo ulje za kosu.", slug: "redken-extreme-ulje-100ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
     attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Normalna", "O\u0161te\u0107ena"] },
   },
@@ -290,10 +291,10 @@ const initialProducts: Product[] = [
 const defaultFormData = (): Omit<Product, "id"> => ({
   name: "",
   sku: "",
-  brand: "L'Or\u00e9al",
-  productLine: brandProductLines["L'Or\u00e9al"][0],
-  category: "Nega kose",
-  subCategory: categoryHierarchy["Nega kose"][0],
+  brand: "Redken",
+  productLine: brandProductLines["Redken"][0],
+  category: "Nega",
+  subCategory: categoryHierarchy["Nega"][0],
   priceB2C: 0,
   priceB2B: 0,
   oldPrice: undefined,
@@ -337,9 +338,9 @@ export default function ProductsPage() {
   const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [search, setSearch] = useState("");
-  const [brandFilter, setBrandFilter] = useState(t("admin.allBrands"));
-  const [categoryFilter, setCategoryFilter] = useState(t("admin.allCategories"));
-  const [statusFilter, setStatusFilter] = useState(t("admin.allStatuses"));
+  const [brandFilter, setBrandFilter] = useState("__all__");
+  const [categoryFilter, setCategoryFilter] = useState("__all__");
+  const [statusFilter, setStatusFilter] = useState("__all__");
   const [currentPage, setCurrentPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -357,10 +358,19 @@ export default function ProductsPage() {
   // Separate state for discount % input so user can type it
   const [discountInput, setDiscountInput] = useState("");
 
-  // Translated filter options
-  const brands = [t("admin.allBrands"), ...brandNames];
-  const categories = [t("admin.allCategories"), "Nega kose", "Boje za kosu", "Styling", "Ulja i serumi"];
-  const statuses = [t("admin.allStatuses"), t("admin.active"), t("admin.inactive")];
+  // Dynamic category management
+  const [customCategories, setCustomCategories] = useState<Record<string, string[]>>({});
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [showNewSubCategory, setShowNewSubCategory] = useState(false);
+  const [newSubCategoryName, setNewSubCategoryName] = useState("");
+
+  // Category & filter helpers
+  const allCategoryNames = [...new Set([...Object.keys(categoryHierarchy), ...Object.keys(customCategories)])];
+  const getAllSubcategories = (cat: string): string[] => [
+    ...(categoryHierarchy[cat] || []),
+    ...(customCategories[cat] || []),
+  ];
 
   const colorUndertones = [
     { value: "N", label: "N - Neutralni" },
@@ -454,12 +464,12 @@ export default function ProductsPage() {
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.brand.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
-      const matchBrand = brandFilter === t("admin.allBrands") || p.brand === brandFilter;
-      const matchCategory = categoryFilter === t("admin.allCategories") || p.category === categoryFilter;
+      const matchBrand = brandFilter === "__all__" || p.brand === brandFilter;
+      const matchCategory = categoryFilter === "__all__" || p.category === categoryFilter;
       const matchStatus =
-        statusFilter === t("admin.allStatuses") ||
-        (statusFilter === t("admin.active") && p.status === "active") ||
-        (statusFilter === t("admin.inactive") && p.status === "inactive");
+        statusFilter === "__all__" ||
+        (statusFilter === "active" && p.status === "active") ||
+        (statusFilter === "inactive" && p.status === "inactive");
       return matchSearch && matchBrand && matchCategory && matchStatus;
     });
   }, [products, search, brandFilter, categoryFilter, statusFilter, t]);
@@ -666,7 +676,6 @@ export default function ProductsPage() {
     { key: "sadrzaj", label: t("admin.productDescription"), icon: <FileImage size={16} /> },
     { key: "mediji", label: t("admin.productImages"), icon: <ImageIcon size={16} /> },
     { key: "zalihe", label: t("admin.stock"), icon: <Package size={16} /> },
-    { key: "boja", label: t("admin.colorLevel").split(" ")[0] || "Boja", icon: <Palette size={16} /> },
     { key: "atributi", label: t("admin.productAttributes"), icon: <ShieldCheck size={16} /> },
   ];
 
@@ -678,7 +687,7 @@ export default function ProductsPage() {
   /* ───────────────────── RENDER ───────────────────── */
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -688,25 +697,18 @@ export default function ProductsPage() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={openAddPanel}
-            className="btn-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2"
+            className="px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-black text-white hover:bg-stone-800 transition-colors"
           >
             <Plus size={18} />
             {t("admin.addProduct")}
           </button>
           <Link
             href="/admin/import"
-            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-200 text-black hover:bg-stone-100 transition-colors"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-black text-white hover:bg-stone-800 transition-colors"
           >
             <Upload size={16} />
             {t("admin.importCsv")}
           </Link>
-          <button
-            onClick={() => alert(t("admin.categoriesComingSoon"))}
-            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-200 text-black hover:bg-stone-100 transition-colors"
-          >
-            <FolderTree size={16} />
-            {t("admin.manageCategories")}
-          </button>
         </div>
       </div>
 
@@ -732,13 +734,17 @@ export default function ProductsPage() {
           </button>
           <div className={`${showFilters ? "flex" : "hidden"} sm:flex flex-col sm:flex-row gap-3`}>
             <select value={brandFilter} onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
-              {brands.map((b) => <option key={b}>{b}</option>)}
+              <option value="__all__">{t("admin.allBrands")}</option>
+              {brandNames.map((b) => <option key={b} value={b}>{b}</option>)}
             </select>
             <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
-              {categories.map((c) => <option key={c}>{c}</option>)}
+              <option value="__all__">{t("admin.allCategories")}</option>
+              {allCategoryNames.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
             <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
-              {statuses.map((s) => <option key={s}>{s}</option>)}
+              <option value="__all__">{t("admin.allStatuses")}</option>
+              <option value="active">{t("admin.active")}</option>
+              <option value="inactive">{t("admin.inactive")}</option>
             </select>
           </div>
         </div>
@@ -775,7 +781,7 @@ export default function ProductsPage() {
       {/* Products Table */}
       <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[900px]">
             <thead>
               <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
@@ -784,13 +790,13 @@ export default function ProductsPage() {
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.product")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden xl:table-cell">{t("admin.sku")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.brand")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.category")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.sku")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.brand")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.category")}</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.priceB2c")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.priceB2b")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.stock")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.status")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.priceB2b")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.stock")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.status")}</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.actions")}</th>
               </tr>
             </thead>
@@ -819,13 +825,12 @@ export default function ProductsPage() {
                             <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">{t("admin.new")}</span>
                           )}
                         </div>
-                        <p className="text-xs text-[#999] md:hidden">{product.brand}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs font-mono text-[#666] hidden xl:table-cell">{product.sku}</td>
-                  <td className="px-4 py-3 text-sm text-[#333] hidden md:table-cell">{product.brand}</td>
-                  <td className="px-4 py-3 text-sm text-[#333] hidden lg:table-cell">{product.category}</td>
+                  <td className="px-4 py-3 text-xs font-mono text-[#666]">{product.sku}</td>
+                  <td className="px-4 py-3 text-sm text-[#333]">{product.brand}</td>
+                  <td className="px-4 py-3 text-sm text-[#333]">{product.category}</td>
                   <td className="px-4 py-3">
                     <div>
                       <span className="text-sm font-medium text-black">{product.priceB2C.toLocaleString()} RSD</span>
@@ -834,8 +839,8 @@ export default function ProductsPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#333] hidden lg:table-cell">{product.priceB2B.toLocaleString()} RSD</td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
+                  <td className="px-4 py-3 text-sm text-[#333]">{product.priceB2B.toLocaleString()} RSD</td>
+                  <td className="px-4 py-3 ">
                     <div className="flex items-center gap-1.5">
                       <span className={`text-sm font-medium ${product.stock <= product.lowStockThreshold ? "text-red-500" : product.stock <= product.lowStockThreshold * 2 ? "text-orange-500" : "text-[#333]"}`}>
                         {product.stock}
@@ -845,7 +850,7 @@ export default function ProductsPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
+                  <td className="px-4 py-3 ">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${product.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
                       {product.status === "active" ? t("admin.active") : t("admin.inactive")}
                     </span>
@@ -991,7 +996,7 @@ export default function ProductsPage() {
                         }}
                         className={inputCls + " cursor-pointer"}
                       >
-                        {brands.filter((b) => b !== t("admin.allBrands")).map((b) => <option key={b}>{b}</option>)}
+                        {brandNames.map((b) => <option key={b}>{b}</option>)}
                       </select>
                     </div>
                     <div>
@@ -1005,24 +1010,99 @@ export default function ProductsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className={labelCls}>{t("admin.category")}</label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) => {
-                          const cat = e.target.value;
-                          updateForm("category", cat);
-                          const subs = categoryHierarchy[cat] || [];
-                          updateForm("subCategory", subs[0] || "");
-                        }}
-                        className={inputCls + " cursor-pointer"}
-                      >
-                        {categories.filter((c) => c !== t("admin.allCategories")).map((c) => <option key={c}>{c}</option>)}
-                      </select>
+                      <div className="flex gap-2">
+                        <select
+                          value={formData.category}
+                          onChange={(e) => {
+                            const cat = e.target.value;
+                            updateForm("category", cat);
+                            const subs = getAllSubcategories(cat);
+                            updateForm("subCategory", subs[0] || "");
+                          }}
+                          className={inputCls + " cursor-pointer flex-1"}
+                        >
+                          {allCategoryNames.map((c) => <option key={c}>{c}</option>)}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setShowNewCategory(!showNewCategory)}
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-secondary hover:bg-stone-50 transition-colors whitespace-nowrap"
+                        >
+                          + Nova
+                        </button>
+                      </div>
+                      {showNewCategory && (
+                        <div className="flex gap-2 mt-2">
+                          <input
+                            type="text"
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            placeholder="Naziv nove kategorije"
+                            className={inputCls + " flex-1"}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (newCategoryName.trim()) {
+                                const name = newCategoryName.trim();
+                                setCustomCategories((prev) => ({ ...prev, [name]: prev[name] || [] }));
+                                updateForm("category", name);
+                                updateForm("subCategory", "");
+                                setNewCategoryName("");
+                                setShowNewCategory(false);
+                              }
+                            }}
+                            className="px-4 py-2 bg-black text-white rounded-sm text-xs font-medium hover:bg-stone-800 transition-colors"
+                          >
+                            Dodaj
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className={labelCls}>{t("admin.subcategory")}</label>
-                      <select value={formData.subCategory} onChange={(e) => updateForm("subCategory", e.target.value)} className={inputCls + " cursor-pointer"}>
-                        {(categoryHierarchy[formData.category] || []).map((s) => <option key={s}>{s}</option>)}
-                      </select>
+                      <div className="flex gap-2">
+                        <select value={formData.subCategory} onChange={(e) => updateForm("subCategory", e.target.value)} className={inputCls + " cursor-pointer flex-1"}>
+                          {getAllSubcategories(formData.category).map((s) => <option key={s}>{s}</option>)}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setShowNewSubCategory(!showNewSubCategory)}
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-secondary hover:bg-stone-50 transition-colors whitespace-nowrap"
+                        >
+                          + Nova
+                        </button>
+                      </div>
+                      {showNewSubCategory && (
+                        <div className="flex gap-2 mt-2">
+                          <input
+                            type="text"
+                            value={newSubCategoryName}
+                            onChange={(e) => setNewSubCategoryName(e.target.value)}
+                            placeholder="Naziv nove podkategorije"
+                            className={inputCls + " flex-1"}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (newSubCategoryName.trim()) {
+                                const name = newSubCategoryName.trim();
+                                const cat = formData.category;
+                                setCustomCategories((prev) => ({
+                                  ...prev,
+                                  [cat]: [...(prev[cat] || []), name],
+                                }));
+                                updateForm("subCategory", name);
+                                setNewSubCategoryName("");
+                                setShowNewSubCategory(false);
+                              }
+                            }}
+                            className="px-4 py-2 bg-black text-white rounded-sm text-xs font-medium hover:bg-stone-800 transition-colors"
+                          >
+                            Dodaj
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1063,6 +1143,127 @@ export default function ProductsPage() {
                       ))}
                     </div>
                   </div>
+
+                  {/* ── Color section — only for color-related categories ── */}
+                  {(formData.category === "Kolor" || formData.category === "Boje za kosu") && (
+                    <>
+                      <div className="border-t border-stone-200 pt-5 mt-2">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Palette size={18} className="text-secondary" />
+                          <h3 className="text-sm font-semibold text-black">Podaci o boji</h3>
+                        </div>
+                        <div className="p-3 bg-stone-100 rounded-sm text-xs text-stone-500 flex items-center gap-2 mb-5">
+                          <Palette size={16} className="text-secondary" />
+                          Dodelite boju proizvodu — podaci se koriste za vizuelni prikaz i filtriranje na sajtu.
+                        </div>
+
+                        {/* Level selector — visual */}
+                        <div className="mb-5">
+                          <label className={labelCls}>Ton (1-10)</label>
+                          <div className="flex gap-1.5">
+                            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+                              const levelHex = [
+                                "#1a1a1a", "#2d1f1a", "#3d2b1a", "#5a3825", "#6b4226",
+                                "#7a5533", "#8B6914", "#B8860B", "#D4A843", "#F5E6B8",
+                              ][n - 1];
+                              return (
+                                <button
+                                  key={n}
+                                  type="button"
+                                  onClick={() => { updateForm("colorLevel", formData.colorLevel === n ? undefined : n); updateForm("removeColor", undefined); }}
+                                  className={`w-9 h-9 rounded-sm text-xs font-bold transition-all border-2 ${
+                                    formData.colorLevel === n
+                                      ? "border-black ring-2 ring-black/20 scale-110"
+                                      : "border-transparent hover:border-stone-400"
+                                  }`}
+                                  style={{ backgroundColor: levelHex, color: n <= 5 ? "#fff" : "#000" }}
+                                >
+                                  {n}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Undertone selector — visual chips */}
+                        <div className="mb-5">
+                          <label className={labelCls}>Pod ton</label>
+                          <div className="flex flex-wrap gap-2">
+                            {colorUndertones.map((u) => (
+                              <button
+                                key={u.value}
+                                type="button"
+                                onClick={() => updateForm("colorUndertone", formData.colorUndertone === u.value ? undefined : u.value)}
+                                className={`px-3 py-1.5 text-xs font-medium border transition-all rounded-sm ${
+                                  formData.colorUndertone === u.value
+                                    ? "bg-black text-white border-black"
+                                    : "bg-white text-stone-600 border-stone-200 hover:border-black"
+                                }`}
+                              >
+                                {u.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                          <div>
+                            <label className={labelCls}>Šifra boje</label>
+                            <input type="text" value={formData.shadeCode || ""} onChange={(e) => updateForm("shadeCode", e.target.value)} className={inputCls} placeholder="npr. 7-0, 8/1, 6.44" />
+                          </div>
+                          <div>
+                            <label className={labelCls}>Hexa kod boje</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={formData.colorHex || "#000000"}
+                                onChange={(e) => updateForm("colorHex", e.target.value)}
+                                className="w-10 h-10 rounded-sm border border-stone-200 cursor-pointer p-0.5"
+                              />
+                              <input
+                                type="text"
+                                value={formData.colorHex || ""}
+                                onChange={(e) => updateForm("colorHex", e.target.value)}
+                                className={inputCls}
+                                placeholder="#8B6914"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Live color preview */}
+                        {(formData.colorHex || formData.colorLevel) && (
+                          <div className="flex items-center gap-4 p-4 bg-stone-50 rounded-sm border border-stone-200">
+                            <div
+                              className="w-14 h-14 rounded-full border-2 border-white shadow-md flex-shrink-0"
+                              style={{ backgroundColor: formData.colorHex || "#888" }}
+                            />
+                            <div>
+                              <p className="text-sm font-bold text-black">
+                                {formData.shadeCode || "—"} &mdash; Ton {formData.colorLevel || "?"} / {colorUndertones.find((u) => u.value === formData.colorUndertone)?.label || "—"}
+                              </p>
+                              <p className="text-xs text-stone-400 mt-0.5 font-mono">{formData.colorHex || "Bez boje"}</p>
+                            </div>
+                            {formData.colorHex && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updateForm("colorLevel", undefined);
+                                  updateForm("colorUndertone", undefined);
+                                  updateForm("colorHex", undefined);
+                                  updateForm("shadeCode", undefined);
+                                  updateForm("removeColor", true);
+                                }}
+                                className="ml-auto text-xs text-stone-400 hover:text-red-500 transition-colors"
+                              >
+                                Ukloni boju
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -1379,121 +1580,6 @@ export default function ProductsPage() {
                 </div>
               )}
 
-              {/* ── Tab: Boja ── */}
-              {activeTab === "boja" && (
-                <div className={sectionCls}>
-                  <div className="p-3 bg-stone-100 rounded-sm text-xs text-stone-500 flex items-center gap-2">
-                    <Palette size={16} className="text-secondary" />
-                    Dodelite boju proizvodu — podaci se koriste za vizuelni prikaz i filtriranje na sajtu.
-                  </div>
-
-                  {/* Level selector — visual */}
-                  <div>
-                    <label className={labelCls}>{t("admin.colorLevel")} (1-10)</label>
-                    <div className="flex gap-1.5">
-                      {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
-                        const levelHex = [
-                          "#1a1a1a", "#2d1f1a", "#3d2b1a", "#5a3825", "#6b4226",
-                          "#7a5533", "#8B6914", "#B8860B", "#D4A843", "#F5E6B8",
-                        ][n - 1];
-                        return (
-                          <button
-                            key={n}
-                            type="button"
-                            onClick={() => { updateForm("colorLevel", formData.colorLevel === n ? undefined : n); updateForm("removeColor", undefined); }}
-                            className={`w-9 h-9 rounded-sm text-xs font-bold transition-all border-2 ${
-                              formData.colorLevel === n
-                                ? "border-black ring-2 ring-black/20 scale-110"
-                                : "border-transparent hover:border-stone-400"
-                            }`}
-                            style={{ backgroundColor: levelHex, color: n <= 5 ? "#fff" : "#000" }}
-                          >
-                            {n}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Undertone selector — visual chips */}
-                  <div>
-                    <label className={labelCls}>{t("admin.undertone")}</label>
-                    <div className="flex flex-wrap gap-2">
-                      {colorUndertones.map((u) => (
-                        <button
-                          key={u.value}
-                          type="button"
-                          onClick={() => updateForm("colorUndertone", formData.colorUndertone === u.value ? undefined : u.value)}
-                          className={`px-3 py-1.5 text-xs font-medium border transition-all rounded-sm ${
-                            formData.colorUndertone === u.value
-                              ? "bg-black text-white border-black"
-                              : "bg-white text-stone-600 border-stone-200 hover:border-black"
-                          }`}
-                        >
-                          {u.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>{t("admin.hexColor")}</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={formData.colorHex || "#000000"}
-                          onChange={(e) => updateForm("colorHex", e.target.value)}
-                          className="w-10 h-10 rounded-sm border border-stone-200 cursor-pointer p-0.5"
-                        />
-                        <input
-                          type="text"
-                          value={formData.colorHex || ""}
-                          onChange={(e) => updateForm("colorHex", e.target.value)}
-                          className={inputCls}
-                          placeholder="#8B6914"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelCls}>{t("admin.shadeCode")}</label>
-                      <input type="text" value={formData.shadeCode || ""} onChange={(e) => updateForm("shadeCode", e.target.value)} className={inputCls} placeholder="npr. 7-0, 8/1, 6.44" />
-                    </div>
-                  </div>
-
-                  {/* Live color preview */}
-                  {(formData.colorHex || formData.colorLevel) && (
-                    <div className="flex items-center gap-4 p-4 bg-stone-50 rounded-sm border border-stone-200">
-                      <div
-                        className="w-14 h-14 rounded-full border-2 border-white shadow-md flex-shrink-0"
-                        style={{ backgroundColor: formData.colorHex || "#888" }}
-                      />
-                      <div>
-                        <p className="text-sm font-bold text-black">
-                          {formData.shadeCode || "—"} &mdash; Nivo {formData.colorLevel || "?"} / {colorUndertones.find((u) => u.value === formData.colorUndertone)?.label || "—"}
-                        </p>
-                        <p className="text-xs text-stone-400 mt-0.5 font-mono">{formData.colorHex || "Bez boje"}</p>
-                      </div>
-                      {formData.colorHex && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            updateForm("colorLevel", undefined);
-                            updateForm("colorUndertone", undefined);
-                            updateForm("colorHex", undefined);
-                            updateForm("shadeCode", undefined);
-                            updateForm("removeColor", true);
-                          }}
-                          className="ml-auto text-xs text-stone-400 hover:text-red-500 transition-colors"
-                        >
-                          Ukloni boju
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* ── Tab: Atributi ── */}
               {activeTab === "atributi" && (
                 <div className={sectionCls}>
@@ -1559,7 +1645,7 @@ export default function ProductsPage() {
               >
                 {t("admin.cancel")}
               </button>
-              <button onClick={handleSave} disabled={saving} className="btn-gold px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
+              <button onClick={handleSave} disabled={saving} className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
                 {saving ? t("admin.saving") : editingProduct ? t("admin.saveChanges") : t("admin.addProduct")}
               </button>
             </div>
@@ -1602,7 +1688,7 @@ export default function ProductsPage() {
             <div className="px-6 pb-6 pt-2 flex justify-end">
               <button
                 onClick={() => setValidationErrors([])}
-                className="btn-gold px-6 py-2.5 rounded-sm text-sm font-medium"
+                className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
               >
                 {t("admin.understood") || "Razumem"}
               </button>

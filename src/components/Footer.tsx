@@ -78,9 +78,6 @@ export default function Footer() {
         <Link href="/faq" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
           {t("footer.faq")}
         </Link>
-<Link href="/seminars" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
-          {t("footer.seminars")}
-        </Link>
         <a href="#" className="text-xs uppercase tracking-wider text-stone-600 hover:text-amber-700 transition-colors">
           {t("footer.termsOfUse")}
         </a>

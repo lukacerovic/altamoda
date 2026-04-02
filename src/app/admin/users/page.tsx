@@ -161,7 +161,7 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-serif font-bold text-black">{t("admin.users")}</h1>
@@ -242,14 +242,14 @@ export default function UsersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[750px]">
                 <thead>
                   <tr className="bg-stone-100 border-b border-stone-200">
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.user")}</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.type")}</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">{t("admin.registration")}</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">{t("admin.orders")}</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">{t("admin.spent")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.type")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.registration")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.orders")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.spent")}</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.status")}</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider"></th>
                   </tr>
@@ -274,10 +274,10 @@ export default function UsersPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 hidden md:table-cell">{roleBadge(user.role)}</td>
-                      <td className="px-6 py-4 text-sm text-[#666] hidden lg:table-cell">{formatDate(user.createdAt)}</td>
-                      <td className="px-6 py-4 text-sm text-[#333] hidden sm:table-cell">{user.ordersCount}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-black hidden md:table-cell">{user.totalSpent.toLocaleString()} RSD</td>
+                      <td className="px-6 py-4">{roleBadge(user.role)}</td>
+                      <td className="px-6 py-4 text-sm text-[#666]">{formatDate(user.createdAt)}</td>
+                      <td className="px-6 py-4 text-sm text-[#333]">{user.ordersCount}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-black">{user.totalSpent.toLocaleString()} RSD</td>
                       <td className="px-6 py-4">{statusBadge(user.status)}</td>
                       <td className="px-6 py-4">
                         <button className="p-1.5 text-[#999] hover:text-secondary rounded-sm transition-colors">

@@ -253,7 +253,7 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -322,7 +322,7 @@ export default function OrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="bg-stone-100 border-b border-stone-200">
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
@@ -331,16 +331,16 @@ export default function OrdersPage() {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
                     {t("admin.customer")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden md:table-cell">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
                     {t("admin.date")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden lg:table-cell">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
                     {t("admin.items")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
                     {t("admin.total")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider hidden sm:table-cell">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
                     {t("admin.payment")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">
@@ -371,16 +371,16 @@ export default function OrdersPage() {
                         )}
                         <p className="text-xs text-[#999] md:hidden">{formatDate(order.createdAt)}</p>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#666] hidden md:table-cell">
+                      <td className="px-6 py-4 text-sm text-[#666] ">
                         {formatDate(order.createdAt)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#666] hidden lg:table-cell">
+                      <td className="px-6 py-4 text-sm text-[#666] ">
                         {order.itemCount} {t("admin.itemsCount")}
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-black">
                         {order.total.toLocaleString()} RSD
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#666] hidden sm:table-cell">
+                      <td className="px-6 py-4 text-sm text-[#666] ">
                         {paymentMethodLabels[order.paymentMethod] || order.paymentMethod}
                       </td>
                       <td className="px-6 py-4">

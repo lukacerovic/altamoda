@@ -13,7 +13,7 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { useCartStore } from "@/lib/stores/cart-store";
+
 
 /* ─── Types ─── */
 export interface ProductData {
@@ -48,10 +48,7 @@ const trustBadgeIcons = [Leaf, ShieldCheck, Award, Truck];
 /* ─── ProductCard ─── */
 function ProductCard({ product, showOld = false, badge }: { product: ProductData; showOld?: boolean; badge?: string }) {
   const { t } = useLanguage();
-  const { addItem } = useCartStore();
   const [liked, setLiked] = useState(false);
-  const [addedToCart, setAddedToCart] = useState(false);
-  const outOfStock = product.stockQuantity <= 0;
   const newLabel = t("home.new");
   const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = badge || (product.isNew ? newLabel : discountBadge);
@@ -74,23 +71,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
           <Heart className={`w-4 h-4 ${liked ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#b07a87]"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (outOfStock) return;
-            addItem({
-              productId: product.id,
-              name: product.name,
-              brand: product.brand,
-              price: product.price,
-              quantity: 1,
-              image: product.image ?? "",
-              sku: product.sku,
-              stockQuantity: product.stockQuantity,
-            });
-            setAddedToCart(true);
-            setTimeout(() => setAddedToCart(false), 1500);
-          }} disabled={outOfStock} className={`w-full text-sm font-medium py-2.5 rounded-full transition-colors ${outOfStock ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#8c4a5a] hover:bg-[#6e3848] text-white"}`}>{outOfStock ? t("home.outOfStock") || "Nema na stanju" : addedToCart ? "✓" : t("home.addToCart")}</button>
+          <span className="block w-full text-sm font-medium py-2.5 rounded-full transition-colors bg-[#8c4a5a] hover:bg-[#6e3848] text-white text-center">{t("nav.explore")}</span>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
@@ -133,10 +114,28 @@ function ProductCarousel({ products, showOld = false }: { products: ProductData[
   const goNext = useCallback(() => { setCurrentIndex((prev) => (prev >= totalSlides - 1 ? 0 : prev + 1)); }, [totalSlides]);
   const goPrev = useCallback(() => { setCurrentIndex((prev) => (prev <= 0 ? totalSlides - 1 : prev - 1)); }, [totalSlides]);
 
-  useEffect(() => { timerRef.current = setInterval(goNext, 4000); return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, [goNext]);
+  const needsCarousel = totalSlides > 1;
+
+  useEffect(() => {
+    if (!needsCarousel) return;
+    timerRef.current = setInterval(goNext, 4000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [goNext, needsCarousel]);
 
   const slidePercent = 100 / itemsPerView;
   const translateX = -(currentIndex * slidePercent);
+
+  if (!needsCarousel) {
+    return (
+      <div className="flex justify-center gap-4">
+        {products.map((p) => (
+          <div key={p.id} className="w-full px-2" style={{ maxWidth: `${slidePercent}%` }}>
+            <ProductCard product={p} showOld={showOld} />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="relative" onMouseEnter={() => { if (timerRef.current) clearInterval(timerRef.current); }} onMouseLeave={() => { timerRef.current = setInterval(goNext, 4000); }}>
@@ -235,7 +234,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-light leading-[0.95] mb-6 text-white animate-slideUp" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              {t("home.heroTitle1")}{" "}<em className="italic text-[#b07a87]">{t("home.heroTitle2")}</em>
+              {t("home.heroTitle1")}<br /><em className="italic text-[#b07a87]">{t("home.heroTitle2")}</em>
             </h1>
             <p className="text-white/60 text-base md:text-lg mb-8 max-w-lg animate-slideUp leading-relaxed" style={{ animationDelay: "0.1s" }}>
               {t("home.heroSubtitle")}
@@ -274,9 +273,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <section className="py-16 bg-white border-y border-[#e0d8cc]">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.featuredProducts")}</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {featuredProducts.slice(0, 8).map((p) => <ProductCard key={p.id} product={p} showOld={!!p.oldPrice} />)}
-            </div>
+            <ProductCarousel products={featuredProducts} showOld />
             <div className="text-center mt-10">
               <Link href="/products" className="inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.viewAllProducts")}</Link>
             </div>
@@ -399,9 +396,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </div>
               <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.allProducts")}</Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {newArrivals.map((p) => <ProductCard key={p.id} product={p} badge={t("home.new")} />)}
-            </div>
+            <ProductCarousel products={newArrivals} />
           </div>
         </section>
       )}

@@ -235,7 +235,7 @@ export default function ActionsPage() {
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.actionsAndDiscounts")}</h1>
           <p className="text-sm text-[#666] mt-1">{t("admin.manageActionsDesc")}</p>
         </div>
-        <button onClick={openCreate} className="btn-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
+        <button onClick={openCreate} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
           <Plus size={18} /> {t("admin.newAction")}
         </button>
       </div>
@@ -385,7 +385,7 @@ export default function ActionsPage() {
             <Zap size={48} className="text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-black mb-2">{t("admin.noActions")}</h3>
             <p className="text-sm text-[#666] mb-4">{t("admin.createActionDesc")}</p>
-            <button onClick={openCreate} className="btn-gold px-5 py-2.5 rounded-sm text-sm">{t("admin.newAction")}</button>
+            <button onClick={openCreate} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm">{t("admin.newAction")}</button>
           </div>
         )}
       </div>
@@ -568,7 +568,7 @@ export default function ActionsPage() {
             {/* Footer */}
             <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-end gap-3 flex-shrink-0">
               <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
-              <button onClick={handleSave} disabled={!form.name || !form.value || form.selectedProductIds.length === 0} className="btn-gold px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+              <button onClick={handleSave} disabled={!form.name || !form.value || form.selectedProductIds.length === 0} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                 {editingAction ? t("admin.saveChanges") : t("admin.createAction")}
               </button>
             </div>
