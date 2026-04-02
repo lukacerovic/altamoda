@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { generateEmailPreview, extractBodyContent, isFullEmailHtml, defaultEmailOptions } from "@/lib/email-preview";
+import type { EmailTemplateOptions } from "@/lib/email-preview";
 import {
   Search,
   Download,
@@ -10,25 +13,43 @@ import {
   X,
   Users,
   Send,
-  Clock,
-  ToggleLeft,
-  ToggleRight,
-  BarChart3,
-  MousePointer,
-  Eye,
-  ShoppingCart,
-  Gift,
-  Sparkles,
-  GraduationCap,
-  UserPlus,
   Trash2,
   ChevronLeft,
   ChevronRight,
   Pencil,
   Loader2,
+  Copy,
+  FileText,
+  ArrowLeft,
+  Save,
+  Settings2,
+  ChevronDown,
 } from "lucide-react";
 
-type Tab = "subscribers" | "campaigns" | "automations";
+const TiptapEditor = dynamic(() => import("@/components/admin/TiptapEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="border border-stone-200 rounded-lg p-16 flex items-center justify-center bg-white">
+      <Loader2 size={24} className="animate-spin text-[#999]" />
+    </div>
+  ),
+});
+
+type Tab = "templates" | "subscribers";
+
+// ── Types ──
+
+interface Template {
+  id: string;
+  name: string;
+  description: string | null;
+  subject: string;
+  htmlContent: string;
+  thumbnail: string | null;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface Subscriber {
   id: string;
@@ -45,69 +66,33 @@ interface Stats {
   b2cCount: number;
 }
 
-interface Campaign {
-  id: string;
-  title: string;
-  subject: string;
-  content: string;
-  segment: "b2b" | "b2c";
-  status: "draft" | "scheduled" | "sending" | "sent" | "failed";
-  sentAt: string | null;
-  sentCount: number;
-  openCount: number;
-  clickCount: number;
-  scheduledAt: string | null;
-  createdAt: string;
-}
-
-interface Automation {
-  id: number;
-  name: string;
-  description: string;
-  target: string;
-  enabled: boolean;
-  lastTriggered: string;
-  icon: "Gift" | "Sparkles" | "GraduationCap" | "UserPlus" | "ShoppingCart";
-}
-
-const initialAutomations: Automation[] = [
-  { id: 1, name: "Nove akcije → B2C pretplatnici", description: "Automatski šalje obaveštenje o novim akcijama svim B2C pretplatnicima", target: "B2C", enabled: true, lastTriggered: "2026-03-05 10:30", icon: "Gift" },
-  { id: 2, name: "Noviteti → Svi pretplatnici", description: "Obaveštava sve pretplatnike o novim proizvodima u ponudi", target: "Svi", enabled: true, lastTriggered: "2026-02-20 14:00", icon: "Sparkles" },
-  { id: 3, name: "Seminari → B2B pretplatnici", description: "Šalje pozivnice za seminare registrovanim salonima", target: "B2B", enabled: true, lastTriggered: "2026-02-15 09:00", icon: "GraduationCap" },
-  { id: 4, name: "Dobrodošlica + promo kod → Novi pretplatnici", description: "Automatski šalje email dobrodošlice sa promo kodom od 10% novim pretplatnicima", target: "Novi", enabled: true, lastTriggered: "2026-03-10 16:45", icon: "UserPlus" },
-  { id: 5, name: "Podsećanje na korpu → Svi", description: "Šalje podsećanje korisnicima koji su napustili korpu bez kupovine", target: "Svi", enabled: false, lastTriggered: "2026-03-01 08:00", icon: "ShoppingCart" },
-];
-
-const iconMap = {
-  Gift,
-  Sparkles,
-  GraduationCap,
-  UserPlus,
-  ShoppingCart,
-};
+// ── Component ──
 
 export default function NewsletterPage() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<Tab>("subscribers");
+  const [activeTab, setActiveTab] = useState<Tab>("templates");
+
+  // Templates state
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
+  const [templateForm, setTemplateForm] = useState({
+    name: "",
+    subject: "",
+    description: "",
+    htmlContent: "",
+  });
+  const [templateSaving, setTemplateSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<Template | null>(null);
+  const [showNewTemplateModal, setShowNewTemplateModal] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [editorBodyContent, setEditorBodyContent] = useState("");
+  const [emailOptions, setEmailOptions] = useState<EmailTemplateOptions>({ ...defaultEmailOptions });
+  const [showEmailSettings, setShowEmailSettings] = useState(false);
+
+  // Subscribers state
   const [search, setSearch] = useState("");
   const [segmentFilter, setSegmentFilter] = useState("all");
-  const [automations, setAutomations] = useState(initialAutomations);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [campaignsLoading, setCampaignsLoading] = useState(false);
-  const [showCampaignModal, setShowCampaignModal] = useState(false);
-  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
-  const [campaignForm, setCampaignForm] = useState({ title: "", subject: "", segment: "b2c", content: "" });
-  const [campaignSaving, setCampaignSaving] = useState(false);
-  const [sendingCampaignId, setSendingCampaignId] = useState<string | null>(null);
-  const [showSendConfirm, setShowSendConfirm] = useState<Campaign | null>(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [previewHtml, setPreviewHtml] = useState("");
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [showTestModal, setShowTestModal] = useState(false);
-  const [testEmail, setTestEmail] = useState("");
-  const [testSending, setTestSending] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
-
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -116,15 +101,39 @@ export default function NewsletterPage() {
   const limit = 20;
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Send-from-template state
+  const [sendSegment, setSendSegment] = useState<"all" | "b2b" | "b2c">("all");
+  const [sendSubject, setSendSubject] = useState("");
+  const [showSendConfirm, setShowSendConfirm] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const [showTestModal, setShowTestModal] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
+  const [testSending, setTestSending] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  // ── Fetch functions ──
+
+  const fetchTemplates = useCallback(async () => {
+    setTemplatesLoading(true);
+    try {
+      const res = await fetch("/api/newsletter/templates");
+      const json = await res.json();
+      if (json.success) {
+        setTemplates(json.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch templates:", err);
+    } finally {
+      setTemplatesLoading(false);
+    }
+  }, []);
+
   const fetchSubscribers = useCallback(async (searchVal: string, segmentVal: string, pageVal: number) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        search: searchVal,
-        segment: segmentVal,
-        page: String(pageVal),
-        limit: String(limit),
-      });
+      const params = new URLSearchParams({ search: searchVal, segment: segmentVal, page: String(pageVal), limit: String(limit) });
       const res = await fetch(`/api/newsletter?${params}`);
       const json = await res.json();
       if (json.success) {
@@ -142,39 +151,171 @@ export default function NewsletterPage() {
     try {
       const res = await fetch("/api/newsletter/stats");
       const json = await res.json();
-      if (json.success) {
-        setStats(json.data);
-      }
+      if (json.success) setStats(json.data);
     } catch (err) {
       console.error("Failed to fetch stats:", err);
     }
   }, []);
 
-  const fetchCampaigns = useCallback(async () => {
-    setCampaignsLoading(true);
-    try {
-      const res = await fetch("/api/newsletter/campaigns");
-      const json = await res.json();
-      if (json.success) {
-        setCampaigns(json.data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch campaigns:", err);
-    } finally {
-      setCampaignsLoading(false);
+  // ── Effects ──
+
+  useEffect(() => {
+    fetchTemplates();
+    fetchStats();
+  }, [fetchTemplates, fetchStats]);
+
+  useEffect(() => {
+    if (activeTab === "subscribers") {
+      fetchSubscribers(search, segmentFilter, page);
+      fetchStats();
     }
+  }, [activeTab, page, segmentFilter, fetchSubscribers, fetchStats]); // search omitted — handleSearchChange debounces and fetches directly
+
+  // Cleanup search timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
   }, []);
 
+  // Auto-seed defaults if no templates exist
+  const seedingRef = useRef(false);
   useEffect(() => {
-    fetchSubscribers(search, segmentFilter, page);
-    fetchStats();
-  }, [page, segmentFilter, fetchSubscribers, fetchStats]);
-
-  useEffect(() => {
-    if (activeTab === "campaigns") {
-      fetchCampaigns();
+    if (!templatesLoading && templates.length === 0 && !seedingRef.current) {
+      seedingRef.current = true;
+      setSeeding(true);
+      fetch("/api/newsletter/templates/seed", { method: "POST" })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success) fetchTemplates();
+        })
+        .catch(console.error)
+        .finally(() => setSeeding(false));
     }
-  }, [activeTab, fetchCampaigns]);
+  }, [templatesLoading, templates.length, fetchTemplates]);
+
+  // ── Derived: live email preview from editor body ──
+
+  const emailPreviewHtml = useMemo(() => {
+    if (!editorBodyContent) return "";
+    return generateEmailPreview(editorBodyContent, emailOptions);
+  }, [editorBodyContent, emailOptions]);
+
+  // Subscriber count for selected send segment
+  const sendRecipientCount = useMemo(() => {
+    if (sendSegment === "all") return stats.totalActive;
+    if (sendSegment === "b2b") return stats.b2bCount;
+    return stats.b2cCount;
+  }, [sendSegment, stats]);
+
+  // ── Template handlers ──
+
+  const openTemplateEditor = (template: Template) => {
+    setEditingTemplate(template);
+    setTemplateForm({
+      name: template.name,
+      subject: template.subject,
+      description: template.description || "",
+      htmlContent: template.htmlContent,
+    });
+    // Extract body content from legacy full-email HTML, or use as-is
+    const body = isFullEmailHtml(template.htmlContent)
+      ? extractBodyContent(template.htmlContent)
+      : template.htmlContent;
+    setEditorBodyContent(body);
+    setEmailOptions({ ...defaultEmailOptions });
+    setShowEmailSettings(false);
+    setSendSubject(template.subject);
+    setSendSegment("all");
+    setSendResult(null);
+    fetchStats();
+  };
+
+  const closeTemplateEditor = () => {
+    setEditingTemplate(null);
+    setTemplateForm({ name: "", subject: "", description: "", htmlContent: "" });
+    setEditorBodyContent("");
+    setEmailOptions({ ...defaultEmailOptions });
+    setShowEmailSettings(false);
+    setSendSubject("");
+    setSendSegment("all");
+    setSendResult(null);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!editingTemplate) return;
+    setTemplateSaving(true);
+    try {
+      // Save the body content — the full email HTML is generated on demand
+      const res = await fetch(`/api/newsletter/templates/${editingTemplate.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: templateForm.name,
+          subject: templateForm.subject,
+          description: templateForm.description,
+          htmlContent: editorBodyContent,
+        }),
+      });
+      if (res.ok) {
+        await fetchTemplates();
+        closeTemplateEditor();
+      }
+    } catch (err) {
+      console.error("Failed to save template:", err);
+    } finally {
+      setTemplateSaving(false);
+    }
+  };
+
+  const handleDuplicateTemplate = async (template: Template) => {
+    try {
+      const res = await fetch(`/api/newsletter/templates/${template.id}/duplicate`, { method: "POST" });
+      if (res.ok) fetchTemplates();
+    } catch (err) {
+      console.error("Failed to duplicate template:", err);
+    }
+  };
+
+  const handleDeleteTemplate = async (template: Template) => {
+    try {
+      const res = await fetch(`/api/newsletter/templates/${template.id}`, { method: "DELETE" });
+      if (res.ok) {
+        fetchTemplates();
+        setShowDeleteConfirm(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete template:", err);
+    }
+  };
+
+  const handleCreateTemplate = async () => {
+    if (!templateForm.name.trim() || !templateForm.subject.trim()) return;
+    setTemplateSaving(true);
+    try {
+      const res = await fetch("/api/newsletter/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: templateForm.name,
+          subject: templateForm.subject,
+          description: templateForm.description,
+          htmlContent: templateForm.htmlContent || "<p>Vaš sadržaj ovde...</p>",
+        }),
+      });
+      if (res.ok) {
+        await fetchTemplates();
+        setShowNewTemplateModal(false);
+        setTemplateForm({ name: "", subject: "", description: "", htmlContent: "" });
+      }
+    } catch (err) {
+      console.error("Failed to create template:", err);
+    } finally {
+      setTemplateSaving(false);
+    }
+  };
+
+  // ── Subscriber handlers ──
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -190,7 +331,7 @@ export default function NewsletterPage() {
     setPage(1);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteSubscriber = async (id: string) => {
     try {
       const res = await fetch(`/api/newsletter/${id}`, { method: "DELETE" });
       if (res.ok) {
@@ -204,25 +345,13 @@ export default function NewsletterPage() {
 
   const handleExport = async () => {
     try {
-      const params = new URLSearchParams({
-        search: "",
-        segment: "all",
-        page: "1",
-        limit: "10000",
-      });
+      const params = new URLSearchParams({ search: "", segment: "all", page: "1", limit: "10000" });
       const res = await fetch(`/api/newsletter?${params}`);
       const json = await res.json();
       if (!json.success) return;
-
       const rows = [[t("newsletter.email"), t("newsletter.segment"), t("newsletter.status"), t("newsletter.subscribeDate"), t("newsletter.unsubscribed")]];
       for (const sub of json.data.subscribers) {
-        rows.push([
-          sub.email,
-          sub.segment.toUpperCase(),
-          sub.isSubscribed ? t("newsletter.active") : t("newsletter.unsubscribed"),
-          new Date(sub.subscribedAt).toLocaleDateString("sr-RS"),
-          sub.unsubscribedAt ? new Date(sub.unsubscribedAt).toLocaleDateString("sr-RS") : "",
-        ]);
+        rows.push([sub.email, sub.segment.toUpperCase(), sub.isSubscribed ? t("newsletter.active") : t("newsletter.unsubscribed"), new Date(sub.subscribedAt).toLocaleDateString("sr-RS"), sub.unsubscribedAt ? new Date(sub.unsubscribedAt).toLocaleDateString("sr-RS") : ""]);
       }
       const csv = rows.map((r) => r.join(",")).join("\n");
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -237,118 +366,51 @@ export default function NewsletterPage() {
     }
   };
 
-  const totalPages = Math.ceil(total / limit);
+  // ── Send from template ──
 
-  const openNewCampaign = () => {
-    setEditingCampaign(null);
-    setCampaignForm({ title: "", subject: "", segment: "b2c", content: "" });
-    setShowCampaignModal(true);
-  };
-
-  const openEditCampaign = (campaign: Campaign) => {
-    if (campaign.status !== "draft") return;
-    setEditingCampaign(campaign);
-    setCampaignForm({
-      title: campaign.title,
-      subject: campaign.subject,
-      segment: campaign.segment,
-      content: campaign.content,
-    });
-    setShowCampaignModal(true);
-  };
-
-  const handleSaveCampaign = async () => {
-    if (!campaignForm.title.trim() || !campaignForm.subject.trim()) return;
-    setCampaignSaving(true);
+  const handleSendFromTemplate = async () => {
+    if (!editingTemplate || !sendSubject.trim() || !editorBodyContent.trim()) return;
+    setSending(true);
+    setSendResult(null);
     try {
-      if (editingCampaign) {
-        const res = await fetch(`/api/newsletter/campaigns/${editingCampaign.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(campaignForm),
-        });
-        if (!res.ok) throw new Error("Failed to update campaign");
-      } else {
-        const res = await fetch("/api/newsletter/campaigns", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(campaignForm),
-        });
-        if (!res.ok) throw new Error("Failed to create campaign");
-      }
-      setShowCampaignModal(false);
-      setEditingCampaign(null);
-      setCampaignForm({ title: "", subject: "", segment: "b2c", content: "" });
-      fetchCampaigns();
-    } catch (err) {
-      console.error("Failed to save campaign:", err);
-    } finally {
-      setCampaignSaving(false);
-    }
-  };
-
-  const handleDeleteCampaign = async (campaign: Campaign) => {
-    if (campaign.status === "sent" || campaign.status === "sending") return;
-    try {
-      const res = await fetch(`/api/newsletter/campaigns/${campaign.id}`, { method: "DELETE" });
-      if (res.ok) {
-        fetchCampaigns();
-      }
-    } catch (err) {
-      console.error("Failed to delete campaign:", err);
-    }
-  };
-
-  const handleSendCampaign = async (campaign: Campaign) => {
-    setSendingCampaignId(campaign.id);
-    setShowSendConfirm(null);
-    try {
-      const res = await fetch(`/api/newsletter/campaigns/${campaign.id}/send`, {
-        method: "POST",
+      // 1. Save template changes
+      await fetch(`/api/newsletter/templates/${editingTemplate.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: templateForm.name,
+          subject: sendSubject,
+          description: templateForm.description,
+          htmlContent: editorBodyContent,
+        }),
       });
-      if (!res.ok) throw new Error("Failed to send campaign");
-      fetchCampaigns();
-    } catch (err) {
-      console.error("Failed to send campaign:", err);
-    } finally {
-      setSendingCampaignId(null);
-    }
-  };
-
-  const handlePreviewCampaign = async (campaign: Campaign) => {
-    setPreviewLoading(true);
-    setShowPreviewModal(true);
-    setPreviewHtml("");
-    try {
-      const res = await fetch(`/api/newsletter/campaigns/${campaign.id}/preview`);
-      const json = await res.json();
-      if (json.success) {
-        setPreviewHtml(json.data.html);
+      // 2. Create campaign from template
+      const createRes = await fetch("/api/newsletter/campaigns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `${templateForm.name} — ${new Date().toLocaleDateString("sr-RS")}`,
+          subject: sendSubject,
+          content: editorBodyContent,
+          segment: sendSegment,
+        }),
+      });
+      const createJson = await createRes.json();
+      if (!createJson.success) throw new Error("Failed to create campaign");
+      // 3. Send it
+      const sendRes = await fetch(`/api/newsletter/campaigns/${createJson.data.id}/send`, { method: "POST" });
+      const sendJson = await sendRes.json();
+      if (sendJson.success) {
+        setSendResult({ ok: true, msg: `Email uspešno poslat na ${sendJson.data.sentCount || sendRecipientCount} primaoca!` });
+        setShowSendConfirm(false);
+      } else {
+        setSendResult({ ok: false, msg: sendJson.error || "Greška pri slanju" });
       }
     } catch (err) {
-      console.error("Failed to load preview:", err);
+      console.error("Send failed:", err);
+      setSendResult({ ok: false, msg: "Greška pri slanju emaila" });
     } finally {
-      setPreviewLoading(false);
-    }
-  };
-
-  const getStatusLabel = (status: Campaign["status"]) => {
-    switch (status) {
-      case "draft": return "Nacrt";
-      case "scheduled": return "Zakazano";
-      case "sending": return "Slanje";
-      case "sent": return "Poslato";
-      case "failed": return "Neuspelo";
-    }
-  };
-
-  const getStatusColor = (status: Campaign["status"]) => {
-    switch (status) {
-      case "draft": return "bg-gray-100 text-gray-500";
-      case "scheduled": return "bg-blue-100 text-blue-700";
-      case "sending": return "bg-yellow-100 text-yellow-700";
-      case "sent": return "bg-green-100 text-green-700";
-      case "failed": return "bg-red-100 text-red-700";
+      setSending(false);
     }
   };
 
@@ -357,17 +419,10 @@ export default function NewsletterPage() {
     setTestSending(true);
     setTestResult(null);
     try {
-      const res = await fetch("/api/newsletter/test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: testEmail.trim() }),
-      });
+      const res = await fetch("/api/newsletter/test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: testEmail.trim() }) });
       const json = await res.json();
-      if (json.success) {
-        setTestResult({ ok: true, msg: `Test email poslat na ${testEmail}` });
-      } else {
-        setTestResult({ ok: false, msg: json.error || "Greška pri slanju" });
-      }
+      if (json.success) setTestResult({ ok: true, msg: `Test email poslat na ${testEmail}` });
+      else setTestResult({ ok: false, msg: json.error || "Greška pri slanju" });
     } catch {
       setTestResult({ ok: false, msg: "Greška pri povezivanju sa serverom" });
     } finally {
@@ -375,15 +430,293 @@ export default function NewsletterPage() {
     }
   };
 
-  const toggleAutomation = (id: number) => {
-    setAutomations(automations.map((a) => a.id === id ? { ...a, enabled: !a.enabled } : a));
-  };
+  const totalPages = Math.ceil(total / limit);
 
   const tabs: { id: Tab; label: string }[] = [
+    { id: "templates", label: "Šabloni" },
     { id: "subscribers", label: t("newsletter.subscribers") },
-    { id: "campaigns", label: t("newsletter.campaigns") },
-    { id: "automations", label: t("newsletter.automations") },
   ];
+
+  // ── Template Editor View ──
+
+  if (editingTemplate) {
+    return (
+      <div>
+        {/* Header bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <button onClick={closeTemplateEditor} className="p-2.5 hover:bg-stone-100 rounded-lg transition-colors">
+              <ArrowLeft size={20} className="text-[#666]" />
+            </button>
+            <div className="flex-1 min-w-0">
+              <input
+                type="text"
+                value={templateForm.name}
+                onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
+                className="font-serif text-xl lg:text-2xl font-bold text-black bg-transparent border-0 border-b border-transparent hover:border-stone-300 focus:border-[#8c4a5a] focus:outline-none w-full pb-0.5 transition-colors"
+                placeholder="Naziv šablona..."
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={closeTemplateEditor}
+              className="px-5 py-2.5 text-sm font-medium text-[#666] hover:text-black hover:bg-stone-100 rounded-lg transition-colors"
+            >
+              Otkaži
+            </button>
+            <button
+              onClick={handleSaveTemplate}
+              disabled={templateSaving}
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#8c4a5a] hover:bg-[#703343] text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
+            >
+              {templateSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              Sačuvaj
+            </button>
+          </div>
+        </div>
+
+        {/* Subject & description row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+          <div>
+            <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
+            <input
+              type="text"
+              value={templateForm.subject}
+              onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none transition-colors"
+              placeholder="Subject line za email..."
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Opis šablona (opciono)</label>
+            <input
+              type="text"
+              value={templateForm.description}
+              onChange={(e) => setTemplateForm({ ...templateForm, description: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none transition-colors"
+              placeholder="Kratak opis..."
+            />
+          </div>
+        </div>
+
+        {/* Header & Footer settings */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowEmailSettings(!showEmailSettings)}
+            className="flex items-center gap-2 text-sm font-medium text-[#666] hover:text-black transition-colors"
+          >
+            <Settings2 size={16} />
+            Podešavanja zaglavlja i podnožja
+            <ChevronDown size={14} className={`transition-transform ${showEmailSettings ? "rotate-180" : ""}`} />
+          </button>
+
+          {showEmailSettings && (
+            <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4 p-5 bg-white border border-stone-200 rounded-lg">
+              {/* Header settings */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Zaglavlje (Header)</h4>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Naslov</label>
+                  <input
+                    type="text"
+                    value={emailOptions.headerTitle || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, headerTitle: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="ALTAMODA"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Podnaslov</label>
+                  <input
+                    type="text"
+                    value={emailOptions.headerSubtitle || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, headerSubtitle: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="Heritage"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Boja pozadine</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={emailOptions.headerBg || "#2d2926"}
+                      onChange={(e) => setEmailOptions({ ...emailOptions, headerBg: e.target.value })}
+                      className="w-9 h-9 rounded border border-stone-200 cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={emailOptions.headerBg || "#2d2926"}
+                      onChange={(e) => setEmailOptions({ ...emailOptions, headerBg: e.target.value })}
+                      className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm font-mono focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Logo slika (opciono — zamenjuje tekst)</label>
+                  <input
+                    type="text"
+                    value={emailOptions.headerImage || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, headerImage: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="https://... URL logo slike"
+                  />
+                </div>
+              </div>
+
+              {/* Footer settings */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Podnožje (Footer)</h4>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Tekst podnožja</label>
+                  <input
+                    type="text"
+                    value={emailOptions.footerText || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, footerText: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="Altamoda Heritage"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Copyright</label>
+                  <input
+                    type="text"
+                    value={emailOptions.footerCopyright || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, footerCopyright: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="© 2026 · Sva prava zadrzana"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Send section */}
+        <div className="mb-6 p-4 bg-white border border-stone-200 rounded-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
+            <div className="lg:col-span-4">
+              <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
+              <input
+                type="text"
+                value={sendSubject}
+                onChange={(e) => setSendSubject(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#2d2926] focus:ring-1 focus:ring-[#2d2926]/20 focus:outline-none transition-colors"
+                placeholder="Subject line za email..."
+              />
+            </div>
+            <div className="lg:col-span-3">
+              <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Publika</label>
+              <select
+                value={sendSegment}
+                onChange={(e) => setSendSegment(e.target.value as "all" | "b2b" | "b2c")}
+                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#2d2926] focus:ring-1 focus:ring-[#2d2926]/20 focus:outline-none transition-colors"
+              >
+                <option value="all">Svi pretplatnici</option>
+                <option value="b2c">B2C — Krajnji kupci</option>
+                <option value="b2b">B2B — Poslovni klijenti</option>
+              </select>
+            </div>
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-2 px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-lg">
+                <Users size={16} className="text-[#999]" />
+                <span className="text-sm font-semibold text-[#2d2926]">{sendRecipientCount}</span>
+                <span className="text-xs text-[#999]">prim.</span>
+              </div>
+            </div>
+            <div className="lg:col-span-3">
+              <button
+                onClick={() => setShowSendConfirm(true)}
+                disabled={sending || !sendSubject.trim() || !editorBodyContent.trim() || sendRecipientCount === 0}
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#2d2926] hover:bg-black text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
+              >
+                <Send size={16} />
+                Pošalji newsletter
+              </button>
+            </div>
+          </div>
+          {sendResult && (
+            <div className={`mt-3 p-3 rounded-lg text-sm ${sendResult.ok ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+              {sendResult.msg}
+            </div>
+          )}
+        </div>
+
+        {/* Send Confirmation Modal */}
+        {showSendConfirm && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowSendConfirm(false)}>
+            <div className="bg-white rounded-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-6 border-b border-stone-200">
+                <h2 className="font-serif text-xl font-bold text-black">Potvrda slanja</h2>
+                <button onClick={() => setShowSendConfirm(false)} className="p-1 hover:bg-stone-100 rounded-lg"><X size={20} /></button>
+              </div>
+              <div className="p-6">
+                <p className="text-sm text-[#333]">
+                  Da li ste sigurni da želite da pošaljete <strong>&quot;{sendSubject}&quot;</strong> na{" "}
+                  <strong>{sendRecipientCount}</strong>{" "}
+                  {sendSegment === "all" ? "pretplatnika" : `${sendSegment.toUpperCase()} pretplatnika`}?
+                </p>
+              </div>
+              <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
+                <button onClick={() => setShowSendConfirm(false)} className="px-5 py-2.5 border border-stone-200 rounded-lg text-sm font-medium hover:bg-stone-100 transition-colors">
+                  Otkaži
+                </button>
+                <button
+                  onClick={handleSendFromTemplate}
+                  disabled={sending}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2d2926] text-white rounded-lg text-sm font-semibold hover:bg-black transition-colors disabled:opacity-40"
+                >
+                  {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {sending ? "Slanje..." : "Potvrdi i pošalji"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Editor + Preview side by side */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {/* Left: WYSIWYG Editor */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Editor</h3>
+              <span className="text-[10px] text-[#999]">Pišite tekst, dodajte slike i formatirajte sadržaj</span>
+            </div>
+            <TiptapEditor
+              content={editorBodyContent}
+              onChange={setEditorBodyContent}
+            />
+          </div>
+
+          {/* Right: Live Email Preview */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Pregled emaila</h3>
+              <span className="text-[10px] font-semibold text-[#8c4a5a] bg-[#8c4a5a]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Uživo
+              </span>
+            </div>
+            <div className="bg-white rounded-lg border border-stone-200 overflow-hidden sticky top-6">
+              <div className="p-4 bg-stone-50/50">
+                <div className="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm mx-auto" style={{ maxWidth: 620 }}>
+                  <iframe
+                    srcDoc={emailPreviewHtml}
+                    className="w-full border-0"
+                    style={{ minHeight: 650 }}
+                    title="Email Preview"
+                    sandbox="allow-same-origin"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Main Page ──
 
   return (
     <div>
@@ -414,7 +747,108 @@ export default function NewsletterPage() {
         ))}
       </div>
 
-      {/* Subscribers Tab */}
+      {/* ═══ Templates Tab ═══ */}
+      {activeTab === "templates" && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-sm text-[#666]">Kreirajte i upravljajte email šablonima za vaše newsletter kampanje.</p>
+            <button
+              onClick={() => {
+                setTemplateForm({ name: "", subject: "", description: "", htmlContent: "" });
+                setShowNewTemplateModal(true);
+              }}
+              className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm hover:bg-[#b8994e] transition-colors font-medium text-sm"
+            >
+              <Plus size={18} /> Novi šablon
+            </button>
+          </div>
+
+          {templatesLoading || seeding ? (
+            <div className="bg-white rounded-sm border border-stone-200 p-12 flex flex-col items-center justify-center">
+              <Loader2 size={28} className="animate-spin text-[#999] mb-3" />
+              <span className="text-[#999] text-sm">{seeding ? "Kreiranje podrazumevanih šablona..." : "Učitavanje šablona..."}</span>
+            </div>
+          ) : templates.length === 0 ? (
+            <div className="bg-white rounded-sm border border-stone-200 p-12 text-center">
+              <FileText size={40} className="mx-auto text-[#999] mb-3" />
+              <p className="text-[#666]">Nema šablona. Kliknite &quot;Novi šablon&quot; da kreirate prvi.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {templates.map((template) => (
+                <div
+                  key={template.id}
+                  className="group bg-white border border-stone-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-stone-300 transition-all duration-200"
+                >
+                  {/* Preview thumbnail */}
+                  <div
+                    className="relative h-52 bg-stone-50 border-b border-stone-100 overflow-hidden cursor-pointer"
+                    onClick={() => openTemplateEditor(template)}
+                  >
+                    <iframe
+                      srcDoc={generateEmailPreview(template.htmlContent)}
+                      className="w-[600px] h-[600px] border-0 pointer-events-none"
+                      style={{ transform: "scale(0.38)", transformOrigin: "top left" }}
+                      title={template.name}
+                      sandbox="allow-same-origin"
+                      tabIndex={-1}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30 pointer-events-none" />
+                    {template.isDefault && (
+                      <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 bg-[#8c4a5a]/90 text-white text-[10px] font-semibold rounded-full uppercase tracking-wider backdrop-blur-sm">
+                        Podrazumevani
+                      </span>
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm text-[#333] text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                        Uredi šablon
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-black text-sm mb-0.5">{template.name}</h3>
+                    {template.description && (
+                      <p className="text-xs text-[#999] mb-2.5 line-clamp-2">{template.description}</p>
+                    )}
+                    <p className="text-xs text-[#999] mb-3">
+                      Poslednja izmena: {new Date(template.updatedAt).toLocaleDateString("sr-RS")}
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openTemplateEditor(template)}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#8c4a5a] text-white rounded-lg text-xs font-semibold hover:bg-[#703343] transition-colors"
+                      >
+                        <Pencil size={13} /> Uredi
+                      </button>
+                      <button
+                        onClick={() => handleDuplicateTemplate(template)}
+                        className="inline-flex items-center justify-center px-3 py-2 border border-stone-200 rounded-lg text-xs font-medium text-[#666] hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors"
+                        title="Dupliraj"
+                      >
+                        <Copy size={13} />
+                      </button>
+                      {!template.isDefault && (
+                        <button
+                          onClick={() => setShowDeleteConfirm(template)}
+                          className="inline-flex items-center justify-center px-3 py-2 border border-stone-200 rounded-lg text-xs text-red-400 hover:border-red-300 hover:text-red-600 transition-colors"
+                          title="Obriši"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ Subscribers Tab ═══ */}
       {activeTab === "subscribers" && (
         <div>
           {/* Stats */}
@@ -463,8 +897,7 @@ export default function NewsletterPage() {
                 <option value="b2c">B2C</option>
               </select>
               <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">
-                <Download size={16} />
-                {t("newsletter.exportSubscribers")}
+                <Download size={16} /> {t("newsletter.exportSubscribers")}
               </button>
             </div>
           </div>
@@ -484,13 +917,9 @@ export default function NewsletterPage() {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.loading")}</td>
-                    </tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.loading")}</td></tr>
                   ) : subscribers.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.noSubscribers")}</td>
-                    </tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.noSubscribers")}</td></tr>
                   ) : (
                     subscribers.map((sub) => (
                       <tr key={sub.id} className="border-b border-stone-100 hover:bg-stone-100 transition-colors">
@@ -512,7 +941,7 @@ export default function NewsletterPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <button onClick={() => handleDelete(sub.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors" title={t("newsletter.delete")}>
+                          <button onClick={() => handleDeleteSubscriber(sub.id)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors" title={t("newsletter.delete")}>
                             <Trash2 size={16} />
                           </button>
                         </td>
@@ -522,26 +951,14 @@ export default function NewsletterPage() {
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-4 py-3 border-t border-stone-200">
-                <span className="text-sm text-[#666]">
-                  {t("newsletter.pageOf")} {page} {t("newsletter.of")} {totalPages} ({total} {t("newsletter.totalLabel")})
-                </span>
+                <span className="text-sm text-[#666]">{t("newsletter.pageOf")} {page} {t("newsletter.of")} {totalPages} ({total} {t("newsletter.totalLabel")})</span>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="p-1.5 border border-stone-200 rounded-sm hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
+                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 border border-stone-200 rounded-sm hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     <ChevronLeft size={16} />
                   </button>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="p-1.5 border border-stone-200 rounded-sm hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  >
+                  <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-1.5 border border-stone-200 rounded-sm hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     <ChevronRight size={16} />
                   </button>
                 </div>
@@ -551,243 +968,62 @@ export default function NewsletterPage() {
         </div>
       )}
 
-      {/* Campaigns Tab */}
-      {activeTab === "campaigns" && (
-        <div>
-          <div className="flex justify-end mb-6">
-            <button onClick={openNewCampaign} className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm hover:bg-[#b8994e] transition-colors font-medium text-sm">
-              <Plus size={18} />
-              {t("newsletter.newCampaign")}
-            </button>
-          </div>
-          <div className="space-y-4">
-            {campaignsLoading ? (
-              <div className="bg-white rounded-sm border border-stone-200 p-8 flex items-center justify-center">
-                <Loader2 size={24} className="animate-spin text-[#999]" />
-                <span className="ml-2 text-[#999]">{t("newsletter.loading")}</span>
-              </div>
-            ) : campaigns.length === 0 ? (
-              <div className="bg-white rounded-sm border border-stone-200 p-8 text-center text-[#999]">{t("newsletter.noCampaigns")}</div>
-            ) : (
-              campaigns.map((campaign) => {
-                const openRate = campaign.sentCount > 0 ? Math.round((campaign.openCount / campaign.sentCount) * 100) : 0;
-                const clickRate = campaign.sentCount > 0 ? Math.round((campaign.clickCount / campaign.sentCount) * 100) : 0;
-                const isSending = sendingCampaignId === campaign.id;
+      {/* ═══ Modals ═══ */}
 
-                return (
-                  <div key={campaign.id} className="bg-white rounded-sm border border-stone-200 p-5 hover:shadow-md transition-shadow">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-black mb-1">{campaign.title}</h3>
-                        <p className="text-sm text-[#666] mb-2">{campaign.subject}</p>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <span className={`text-xs px-2 py-1 rounded font-medium ${campaign.segment === "b2b" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
-                            {campaign.segment.toUpperCase()}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
-                            {getStatusLabel(campaign.status)}
-                          </span>
-                          {campaign.sentAt && (
-                            <span className="text-xs text-[#999]">
-                              {new Date(campaign.sentAt).toLocaleDateString("sr-RS")}
-                            </span>
-                          )}
-                          {campaign.status === "sent" && (
-                            <span className="text-xs text-[#999]">
-                              {campaign.sentCount} poslato
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        {campaign.status === "sent" && (
-                          <div className="flex items-center gap-3 sm:gap-6">
-                            <div className="text-center">
-                              <div className="flex items-center gap-1 text-secondary">
-                                <BarChart3 size={14} />
-                                <span className="text-base sm:text-lg font-bold">{openRate}%</span>
-                              </div>
-                              <p className="text-xs text-[#999]">{t("newsletter.opened")}</p>
-                            </div>
-                            <div className="text-center">
-                              <div className="flex items-center gap-1 text-secondary">
-                                <MousePointer size={14} />
-                                <span className="text-base sm:text-lg font-bold">{clickRate}%</span>
-                              </div>
-                              <p className="text-xs text-[#999]">{t("newsletter.clicked")}</p>
-                            </div>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => handlePreviewCampaign(campaign)} className="p-1.5 text-[#666] hover:text-secondary hover:bg-stone-100 rounded-sm transition-colors" title="Pregled">
-                            <Eye size={16} />
-                          </button>
-                          {campaign.status === "draft" && (
-                            <button onClick={() => openEditCampaign(campaign)} className="p-1.5 text-[#666] hover:text-secondary hover:bg-stone-100 rounded-sm transition-colors" title={t("admin.edit")}>
-                              <Pencil size={16} />
-                            </button>
-                          )}
-                          {campaign.status === "draft" && (
-                            <button
-                              onClick={() => setShowSendConfirm(campaign)}
-                              disabled={isSending}
-                              className="p-1.5 text-[#666] hover:text-green-600 hover:bg-green-50 rounded-sm transition-colors disabled:opacity-40"
-                              title="Pošalji"
-                            >
-                              {isSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                            </button>
-                          )}
-                          {campaign.status !== "sent" && campaign.status !== "sending" && (
-                            <button onClick={() => handleDeleteCampaign(campaign)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors" title={t("admin.delete")}>
-                              <Trash2 size={16} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Automations Tab */}
-      {activeTab === "automations" && (
-        <div className="space-y-4">
-          {automations.map((automation) => {
-            const Icon = iconMap[automation.icon];
-            return (
-              <div key={automation.id} className="bg-white rounded-sm border border-stone-200 p-5 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0 ${automation.enabled ? "bg-black/10" : "bg-gray-100"}`}>
-                      <Icon size={20} className={automation.enabled ? "text-secondary" : "text-gray-400"} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-black mb-1">{automation.name}</h3>
-                      <p className="text-sm text-[#666] mb-2">{automation.description}</p>
-                      <div className="flex items-center gap-3 text-xs text-[#999]">
-                        <span className="bg-stone-100 px-2 py-0.5 rounded">{t("newsletter.target")}: {automation.target}</span>
-                        <span className="flex items-center gap-1">
-                          <Clock size={12} />
-                          {t("newsletter.lastTriggered")}: {automation.lastTriggered}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <button onClick={() => toggleAutomation(automation.id)} className="flex-shrink-0">
-                    {automation.enabled ? (
-                      <ToggleRight size={32} className="text-secondary" />
-                    ) : (
-                      <ToggleLeft size={32} className="text-[#999]" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Campaign Modal */}
-      {showCampaignModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }}>
-          <div className="bg-white rounded-sm w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      {/* New Template Modal */}
+      {showNewTemplateModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowNewTemplateModal(false)}>
+          <div className="bg-white rounded-sm w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-stone-200">
-              <h2 className="font-serif text-xl font-bold text-black">{editingCampaign ? t("newsletter.editCampaign") : t("newsletter.newCampaign")}</h2>
-              <button onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }} className="p-1 hover:bg-stone-100 rounded-sm"><X size={20} /></button>
+              <h2 className="font-serif text-xl font-bold text-black">Novi šablon</h2>
+              <button onClick={() => setShowNewTemplateModal(false)} className="p-1 hover:bg-stone-100 rounded-sm"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">{t("newsletter.campaignTitle")}</label>
-                <input type="text" value={campaignForm.title} onChange={(e) => setCampaignForm({ ...campaignForm, title: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder={t("newsletter.campaignTitlePlaceholder")} />
+                <label className="block text-sm font-medium text-[#333] mb-1">Naziv šablona</label>
+                <input type="text" value={templateForm.name} onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="npr. Letnja Akcija" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Subject</label>
-                <input type="text" value={campaignForm.subject} onChange={(e) => setCampaignForm({ ...campaignForm, subject: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="Subject line za email..." />
+                <label className="block text-sm font-medium text-[#333] mb-1">Subject (predmet emaila)</label>
+                <input type="text" value={templateForm.subject} onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="Subject line za email..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">{t("newsletter.campaignSegment")}</label>
-                <select value={campaignForm.segment} onChange={(e) => setCampaignForm({ ...campaignForm, segment: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none">
-                  <option value="b2b">B2B</option>
-                  <option value="b2c">B2C</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Sadržaj</label>
-                <textarea
-                  value={campaignForm.content}
-                  onChange={(e) => setCampaignForm({ ...campaignForm, content: e.target.value })}
-                  className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none min-h-[200px] resize-y"
-                  placeholder="Sadržaj email kampanje..."
-                />
+                <label className="block text-sm font-medium text-[#333] mb-1">Opis (opciono)</label>
+                <input type="text" value={templateForm.description} onChange={(e) => setTemplateForm({ ...templateForm, description: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="Kratak opis šablona..." />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
-              <button onClick={() => { setShowCampaignModal(false); setEditingCampaign(null); }} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">{t("newsletter.cancel")}</button>
-              <button onClick={handleSaveCampaign} disabled={!campaignForm.title.trim() || !campaignForm.subject.trim() || campaignSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#b8994e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                {campaignSaving && <Loader2 size={16} className="animate-spin" />}
-                {editingCampaign ? t("newsletter.saveChanges") : t("newsletter.createCampaign")}
+              <button onClick={() => setShowNewTemplateModal(false)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">Otkaži</button>
+              <button onClick={handleCreateTemplate} disabled={!templateForm.name.trim() || !templateForm.subject.trim() || templateSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#b8994e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                {templateSaving && <Loader2 size={16} className="animate-spin" />}
+                Kreiraj šablon
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Send Confirmation Modal */}
-      {showSendConfirm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowSendConfirm(null)}>
+      {/* Delete Template Confirm */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowDeleteConfirm(null)}>
           <div className="bg-white rounded-sm w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-stone-200">
-              <h2 className="font-serif text-xl font-bold text-black">Potvrda slanja</h2>
-              <button onClick={() => setShowSendConfirm(null)} className="p-1 hover:bg-stone-100 rounded-sm"><X size={20} /></button>
+              <h2 className="font-serif text-xl font-bold text-black">Brisanje šablona</h2>
+              <button onClick={() => setShowDeleteConfirm(null)} className="p-1 hover:bg-stone-100 rounded-sm"><X size={20} /></button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-[#333]">
-                Da li ste sigurni da želite da pošaljete ovu kampanju? Biće poslata svim {showSendConfirm.segment.toUpperCase()} pretplatnicima.
-              </p>
+              <p className="text-sm text-[#333]">Da li ste sigurni da želite da obrišete šablon &quot;{showDeleteConfirm.name}&quot;? Ova akcija se ne može poništiti.</p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
-              <button onClick={() => setShowSendConfirm(null)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">{t("newsletter.cancel")}</button>
-              <button onClick={() => handleSendCampaign(showSendConfirm)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#b8994e] transition-colors">
-                <Send size={16} />
-                Pošalji
+              <button onClick={() => setShowDeleteConfirm(null)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">Otkaži</button>
+              <button onClick={() => handleDeleteTemplate(showDeleteConfirm)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-sm text-sm font-medium hover:bg-red-700 transition-colors">
+                <Trash2 size={16} /> Obriši
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Preview Modal */}
-      {showPreviewModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowPreviewModal(false)}>
-          <div className="bg-white rounded-sm w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-stone-200">
-              <h2 className="font-serif text-xl font-bold text-black">Pregled kampanje</h2>
-              <button onClick={() => setShowPreviewModal(false)} className="p-1 hover:bg-stone-100 rounded-sm"><X size={20} /></button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-6">
-              {previewLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 size={24} className="animate-spin text-[#999]" />
-                  <span className="ml-2 text-[#999]">Učitavanje pregleda...</span>
-                </div>
-              ) : (
-                <div className="border border-stone-200 rounded-sm overflow-hidden">
-                  <iframe
-                    srcDoc={previewHtml}
-                    className="w-full min-h-[500px] border-0"
-                    title="Campaign Preview"
-                    sandbox="allow-same-origin"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
       {/* Test Email Modal */}
       {showTestModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowTestModal(false)}>
@@ -812,11 +1048,7 @@ export default function NewsletterPage() {
             )}
             <div className="flex gap-3">
               <button onClick={() => setShowTestModal(false)} className="flex-1 px-4 py-2.5 border border-stone-200 text-[#666] rounded-sm text-sm font-medium hover:bg-stone-50 transition-colors">Otkaži</button>
-              <button
-                onClick={handleSendTest}
-                disabled={testSending || !testEmail.trim()}
-                className="flex-1 px-4 py-2.5 bg-[#8c4a5a] hover:bg-[#703343] text-white rounded-sm text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
+              <button onClick={handleSendTest} disabled={testSending || !testEmail.trim()} className="flex-1 px-4 py-2.5 bg-[#8c4a5a] hover:bg-[#703343] text-white rounded-sm text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {testSending ? <><Loader2 className="w-4 h-4 animate-spin" /> Slanje...</> : <><Send className="w-4 h-4" /> Pošalji</>}
               </button>
             </div>
