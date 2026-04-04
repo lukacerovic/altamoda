@@ -719,7 +719,7 @@ export default function ProductsPage() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
             <input
               type="text"
-              placeholder={t("admin.searchProducts")}
+              placeholder={t("admin.searchByNameOrCode")}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black focus:outline-none"

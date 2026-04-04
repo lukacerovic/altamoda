@@ -95,6 +95,15 @@ function useMegaMenus() {
             { name: t("nav.decolorantPowders"), href: "/colors?type=dekoloranti-puderi" },
           ],
         },
+        {
+          title: t("nav.manCollection"),
+          links: [
+            { name: t("nav.menShampoos"), href: "/products?category=samponi&gender=man" },
+            { name: t("nav.menStyling"), href: "/products?category=stajling&gender=man" },
+            { name: t("nav.beardCare"), href: "/products?category=nega-brade&gender=man" },
+            { name: t("nav.menBodyCare"), href: "/products?category=muska-nega-tela&gender=man" },
+          ],
+        },
       ],
       featured: {
         image: "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=400&h=300&fit=crop",
@@ -107,12 +116,22 @@ function useMegaMenus() {
 
   const navLinks = [
     { name: t("nav.products"), href: "/products", hasMega: true, menuKey: "products" },
+    { name: t("nav.exploreBrands"), href: "/brands", hasMega: true, menuKey: "brands" },
     { name: t("nav.about"), href: "/about", hasMega: false, menuKey: "" },
     { name: t("nav.contact"), href: "/contact", hasMega: false, menuKey: "" },
   ];
 
   return { megaMenus, navLinks };
 }
+
+interface BrandItem {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+}
+
+let cachedBrands: BrandItem[] = [];
 
 export default function Header() {
   const { t } = useLanguage();
@@ -124,6 +143,21 @@ export default function Header() {
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [brands, setBrands] = useState<BrandItem[]>(cachedBrands);
+
+  // Fetch brands for the nav dropdown (cached across mounts)
+  useEffect(() => {
+    if (cachedBrands.length > 0) return;
+    fetch("/api/brands")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) {
+          cachedBrands = json.data;
+          setBrands(json.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: session } = useSession();
@@ -205,8 +239,9 @@ export default function Header() {
           {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((l) => {
-              const hasMega = l.hasMega && megaMenus[l.menuKey] !== undefined;
-              const menuData = hasMega ? megaMenus[l.menuKey] : null;
+              const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || l.menuKey === "brands");
+              const menuData = megaMenus[l.menuKey] || null;
+              const isBrandsMenu = l.menuKey === "brands";
               return (
                 <div
                   key={l.menuKey || l.name}
@@ -222,8 +257,49 @@ export default function Header() {
                     {hasMega && <ChevronDown className="w-3 h-3" />}
                   </Link>
 
-                  {/* Mega Menu Dropdown */}
-                  {hasMega && menuData && (
+                  {/* Brands Dropdown */}
+                  {isBrandsMenu && brands.length > 0 && (
+                    <div
+                      className={`mega-menu absolute top-full left-0 pt-2 ${
+                        activeMenu === "brands" ? "!opacity-100 !visible !translate-y-0" : ""
+                      }`}
+                      style={{ minWidth: "480px" }}
+                      onMouseEnter={() => handleMenuEnter("brands")}
+                      onMouseLeave={handleMenuLeave}
+                    >
+                      <div className="bg-white rounded-sm border border-stone-200 overflow-hidden shadow-lg">
+                        <div className="h-0.5 bg-gradient-to-r from-black via-stone-500 to-black" />
+                        <div className="p-5">
+                          <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-4">
+                            {t("nav.ourBrands")}
+                          </h4>
+                          <div className="grid grid-cols-3 gap-2">
+                            {brands.map((brand) => (
+                              <Link
+                                key={brand.id}
+                                href={`/brands/${brand.slug}`}
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#faf7f3] transition-colors group"
+                              >
+                                {brand.logoUrl ? (
+                                  <img src={brand.logoUrl} alt={brand.name} className="w-8 h-8 object-contain flex-shrink-0" />
+                                ) : (
+                                  <div className="w-8 h-8 bg-stone-100 rounded-sm flex items-center justify-center flex-shrink-0">
+                                    <span className="text-xs font-bold text-stone-400">{brand.name.charAt(0)}</span>
+                                  </div>
+                                )}
+                                <span className="text-sm text-[#6b6b6b] group-hover:text-black transition-colors truncate">
+                                  {brand.name}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mega Menu Dropdown (products etc.) */}
+                  {!isBrandsMenu && hasMega && menuData && (
                     <div
                       className={`mega-menu absolute top-full left-0 pt-2 ${
                         activeMenu === l.menuKey ? "!opacity-100 !visible !translate-y-0" : ""
@@ -384,8 +460,9 @@ export default function Header() {
             </div>
             <div className="p-4 space-y-1">
               {navLinks.map((l) => {
-                const hasMega = l.hasMega && megaMenus[l.menuKey] !== undefined;
-                const menuData = hasMega ? megaMenus[l.menuKey] : null;
+                const isBrandsMenu = l.menuKey === "brands";
+                const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || isBrandsMenu);
+                const menuData = megaMenus[l.menuKey] || null;
                 const isExpanded = expandedMobile === l.menuKey;
                 return (
                   <div key={l.menuKey || l.name}>
@@ -410,7 +487,30 @@ export default function Header() {
                         </button>
                       )}
                     </div>
-                    {hasMega && isExpanded && menuData && (
+                    {/* Brands mobile submenu */}
+                    {isBrandsMenu && isExpanded && brands.length > 0 && (
+                      <div className="pl-4 pb-2 animate-slideDown">
+                        {brands.map((brand) => (
+                          <Link
+                            key={brand.id}
+                            href={`/brands/${brand.slug}`}
+                            onClick={() => setMobileMenu(false)}
+                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#6b6b6b] hover:text-secondary transition-colors"
+                          >
+                            {brand.logoUrl ? (
+                              <img src={brand.logoUrl} alt={brand.name} className="w-6 h-6 object-contain" />
+                            ) : (
+                              <div className="w-6 h-6 bg-stone-100 rounded-sm flex items-center justify-center">
+                                <span className="text-[10px] font-bold text-stone-400">{brand.name.charAt(0)}</span>
+                              </div>
+                            )}
+                            {brand.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                    {/* Products mega menu mobile submenu */}
+                    {!isBrandsMenu && hasMega && isExpanded && menuData && (
                       <div className="pl-4 pb-2 animate-slideDown">
                         {menuData.columns.map((col) => (
                           <div key={col.title} className="mb-3">

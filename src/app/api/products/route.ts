@@ -86,6 +86,12 @@ export const GET = withErrorHandler(async (req: Request) => {
     where[priceField] = priceFilter
   }
 
+  // Gender filter
+  const gender = searchParams.get('gender')
+  if (gender) {
+    where.gender = gender
+  }
+
   // Boolean filters
   if (isNew === 'true') where.isNew = true
   if (onSale === 'true') where.oldPrice = { not: null }

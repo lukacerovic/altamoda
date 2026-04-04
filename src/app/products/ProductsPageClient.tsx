@@ -356,6 +356,8 @@ export default function ProductsPageClient({
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
   const searchParam = searchParams.get("search");
+  const genderParam = searchParams.get("gender");
+  const brandParam = searchParams.get("brand");
 
   const wishlistedSet = new Set(wishlistedProductIds);
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -372,14 +374,17 @@ export default function ProductsPageClient({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
   // Filters
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(brandParam ? [brandParam] : []);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
+  const [selectedGender, setSelectedGender] = useState<string | null>(genderParam);
 
-  // Sync category from URL when navigating between menu links
+  // Sync category, gender, and brand from URL when navigating between menu links
   useEffect(() => {
     setSelectedCategory(categoryParam);
+    setSelectedGender(genderParam);
+    setSelectedBrands(brandParam ? [brandParam] : []);
     setCurrentPage(1);
-  }, [categoryParam]);
+  }, [categoryParam, genderParam, brandParam]);
 
   // Sync search from URL (e.g. from header search) and auto-submit
   useEffect(() => {
@@ -418,6 +423,10 @@ export default function ProductsPageClient({
       params.set("category", selectedCategory);
     }
 
+    if (selectedGender) {
+      params.set("gender", selectedGender);
+    }
+
     selectedBrands.forEach((b) => params.append("brand", b));
 
     if (priceMin) params.set("priceMin", priceMin);
@@ -441,7 +450,7 @@ export default function ProductsPageClient({
     if (filterUndertone) params.set("colorUndertone", filterUndertone);
 
     return params.toString();
-  }, [sortBy, visibility, userRole, selectedCategory, selectedBrands, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
+  }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (page: number) => {
@@ -464,15 +473,16 @@ export default function ProductsPageClient({
   }, [buildQueryString]);
 
   // Re-fetch when filters/sort/visibility change (reset to page 1)
+  const isInitialMount = useRef(true);
   useEffect(() => {
-    // Skip initial render — we already have initialProducts
-    const timer = setTimeout(() => {
-      setCurrentPage(1);
-      fetchProducts(1);
-    }, 0);
-    return () => clearTimeout(timer);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    setCurrentPage(1);
+    fetchProducts(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, visibility, selectedCategory, selectedBrands, activeToggles, searchParam]);
+  }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
 
   // Re-fetch when page changes
   useEffect(() => {
@@ -553,6 +563,10 @@ export default function ProductsPageClient({
     else if (key === "on_sale") activeTags.push({ key: `toggle:on_sale`, label: "Na akciji" });
     else if (key === "featured") activeTags.push({ key: `toggle:featured`, label: "Izdvojeno" });
   });
+  if (selectedGender) {
+    const genderLabels: Record<string, string> = { man: t("nav.manCollection"), woman: t("products.womanCollection") || "Ženska kolekcija" };
+    activeTags.push({ key: `gender:${selectedGender}`, label: genderLabels[selectedGender] || selectedGender });
+  }
   if (selectedCategory) {
     const findCat = (nodes: CategoryNode[]): string | null => {
       for (const n of nodes) {
@@ -576,6 +590,8 @@ export default function ProductsPageClient({
     } else if (tagKey.startsWith("toggle:")) {
       const key = tagKey.replace("toggle:", "");
       setActiveToggles((prev) => prev.filter((k) => k !== key));
+    } else if (tagKey.startsWith("gender:")) {
+      setSelectedGender(null);
     } else if (tagKey.startsWith("cat:")) {
       setSelectedCategory(null);
     }
@@ -585,6 +601,7 @@ export default function ProductsPageClient({
     setSelectedBrands([]);
     setActiveToggles([]);
     setSelectedCategory(null);
+    setSelectedGender(null);
     setFilterColorLevel(null);
     setFilterUndertone(null);
     setFilterHasColor(false);
@@ -607,36 +624,37 @@ export default function ProductsPageClient({
   });
 
   /* ─── Filter Sidebar ─── */
+  const genderOptions = [
+    { value: "man", label: t("products.forMen") },
+    { value: "woman", label: t("products.forWomen") },
+  ];
+
   const filterSidebar = (
     <div>
+      {/* Gender / Collection filter */}
+      <FilterSection title={t("products.collection")}>
+        <div className="space-y-1">
+          {genderOptions.map((g) => (
+            <button
+              key={g.value}
+              onClick={() => setSelectedGender(selectedGender === g.value ? null : g.value)}
+              className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors ${
+                selectedGender === g.value
+                  ? "bg-black text-white"
+                  : "text-stone-500 hover:text-black hover:bg-stone-100"
+              }`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
       {/* Category Tree */}
       <FilterSection title={t("products.category")}>
         <div className="space-y-0">
           {categories.map((cat) => (
             <CategoryTreeItem key={cat.id} item={cat} onSelect={handleCategorySelect} selectedSlug={selectedCategory} />
-          ))}
-        </div>
-      </FilterSection>
-
-      <FilterSection title={t("products.brand")} count={selectedBrands.length}>
-        <div className="space-y-1 max-h-52 overflow-y-auto pr-1">
-          {brands.map((b) => (
-            <label key={b.slug} className="flex items-center gap-3 text-[13px] text-stone-500 cursor-pointer hover:text-black py-1.5 px-2 -mx-2 rounded-sm hover:bg-stone-100 transition-colors">
-              <div className="relative flex items-center">
-                <input
-                  type="checkbox"
-                  className="peer sr-only"
-                  checked={selectedBrands.includes(b.slug)}
-                  onChange={() => toggleBrand(b.slug)}
-                />
-                <div className="w-[18px] h-[18px] rounded-md border-2 border-[#d5cfc5] peer-checked:border-black peer-checked:bg-black transition-all flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </div>
-              {b.name}
-            </label>
           ))}
         </div>
       </FilterSection>
@@ -948,6 +966,33 @@ export default function ProductsPageClient({
               </div>
 
               <SortSelect value={sortBy} onChange={setSortBy} />
+            </div>
+
+            {/* Brand tags */}
+            <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b border-stone-100">
+              <button
+                onClick={() => setSelectedBrands([])}
+                className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
+                  selectedBrands.length === 0
+                    ? "bg-black text-white shadow-sm"
+                    : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
+                }`}
+              >
+                {t("products.allProducts")}
+              </button>
+              {brands.map((b) => (
+                <button
+                  key={b.slug}
+                  onClick={() => toggleBrand(b.slug)}
+                  className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
+                    selectedBrands.includes(b.slug)
+                      ? "bg-black text-white shadow-sm"
+                      : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
+                  }`}
+                >
+                  {b.name}
+                </button>
+              ))}
             </div>
 
             {/* Active filter tags */}
