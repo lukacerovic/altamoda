@@ -9,7 +9,6 @@ import {
   Search,
   Download,
   Mail,
-  Plus,
   X,
   Users,
   Send,
@@ -18,7 +17,6 @@ import {
   ChevronRight,
   Pencil,
   Loader2,
-  Copy,
   FileText,
   ArrowLeft,
   Save,
@@ -223,7 +221,12 @@ export default function NewsletterPage() {
       ? extractBodyContent(template.htmlContent)
       : template.htmlContent;
     setEditorBodyContent(body);
-    setEmailOptions({ ...defaultEmailOptions });
+    // Set header background image for Akcije template
+    if (template.name === 'Akcije') {
+      setEmailOptions({ ...defaultEmailOptions, headerBgImage: '/hero.png' });
+    } else {
+      setEmailOptions({ ...defaultEmailOptions });
+    }
     setShowEmailSettings(false);
     setSendSubject(template.subject);
     setSendSegment("all");
@@ -563,6 +566,16 @@ export default function NewsletterPage() {
                     placeholder="https://... URL logo slike"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Pozadinska slika zaglavlja (opciono)</label>
+                  <input
+                    type="text"
+                    value={emailOptions.headerBgImage || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, headerBgImage: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="/hero.png ili https://... URL slike"
+                  />
+                </div>
               </div>
 
               {/* Footer settings */}
@@ -703,7 +716,7 @@ export default function NewsletterPage() {
                   <iframe
                     srcDoc={emailPreviewHtml}
                     className="w-full border-0"
-                    style={{ minHeight: 650 }}
+                    style={{ minHeight: 1000 }}
                     title="Email Preview"
                     sandbox="allow-same-origin"
                   />
@@ -751,16 +764,7 @@ export default function NewsletterPage() {
       {activeTab === "templates" && (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-[#666]">Kreirajte i upravljajte email šablonima za vaše newsletter kampanje.</p>
-            <button
-              onClick={() => {
-                setTemplateForm({ name: "", subject: "", description: "", htmlContent: "" });
-                setShowNewTemplateModal(true);
-              }}
-              className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm hover:bg-[#b8994e] transition-colors font-medium text-sm"
-            >
-              <Plus size={18} /> Novi šablon
-            </button>
+            <p className="text-sm text-[#666]">Upravljajte email šablonima za vaše newsletter kampanje.</p>
           </div>
 
           {templatesLoading || seeding ? (
@@ -786,7 +790,7 @@ export default function NewsletterPage() {
                     onClick={() => openTemplateEditor(template)}
                   >
                     <iframe
-                      srcDoc={generateEmailPreview(template.htmlContent)}
+                      srcDoc={generateEmailPreview(template.htmlContent, template.name === 'Akcije' ? { ...defaultEmailOptions, headerBgImage: '/hero.png' } : undefined)}
                       className="w-[600px] h-[600px] border-0 pointer-events-none"
                       style={{ transform: "scale(0.38)", transformOrigin: "top left" }}
                       title={template.name}
@@ -822,13 +826,6 @@ export default function NewsletterPage() {
                         className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#8c4a5a] text-white rounded-lg text-xs font-semibold hover:bg-[#703343] transition-colors"
                       >
                         <Pencil size={13} /> Uredi
-                      </button>
-                      <button
-                        onClick={() => handleDuplicateTemplate(template)}
-                        className="inline-flex items-center justify-center px-3 py-2 border border-stone-200 rounded-lg text-xs font-medium text-[#666] hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors"
-                        title="Dupliraj"
-                      >
-                        <Copy size={13} />
                       </button>
                       {!template.isDefault && (
                         <button

@@ -81,6 +81,7 @@ export interface EmailTemplateOptions {
   headerSubtitle?: string
   headerBg?: string
   headerImage?: string
+  headerBgImage?: string
   footerText?: string
   footerCopyright?: string
 }
@@ -118,6 +119,7 @@ export function wrapInEmailTemplate(styledBody: string, opts: EmailTemplateOptio
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<base href="/" />
 <title>${o.headerTitle}</title>
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 <style>
@@ -141,7 +143,7 @@ h2{font-size:20px!important}
 
 <!-- Header -->
 <tr>
-<td class="eh" align="center" style="padding:36px 40px 28px;background-color:${hBg};">
+<td class="eh" align="center" style="padding:${o.headerBgImage ? '60px 40px 52px' : '36px 40px 28px'};background-color:${hBg};${o.headerBgImage ? `background-image:url('${o.headerBgImage}');background-size:cover;background-position:center;` : ''}">
 ${headerContent}
 </td>
 </tr>
