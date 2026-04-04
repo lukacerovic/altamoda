@@ -9,7 +9,6 @@ import {
   Search,
   Download,
   Mail,
-  Plus,
   X,
   Users,
   Send,
@@ -18,7 +17,6 @@ import {
   ChevronRight,
   Pencil,
   Loader2,
-  Copy,
   FileText,
   ArrowLeft,
   Save,
@@ -718,7 +716,7 @@ export default function NewsletterPage() {
                   <iframe
                     srcDoc={emailPreviewHtml}
                     className="w-full border-0"
-                    style={{ minHeight: 650 }}
+                    style={{ minHeight: 1000 }}
                     title="Email Preview"
                     sandbox="allow-same-origin"
                   />
@@ -766,16 +764,7 @@ export default function NewsletterPage() {
       {activeTab === "templates" && (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-[#666]">Kreirajte i upravljajte email šablonima za vaše newsletter kampanje.</p>
-            <button
-              onClick={() => {
-                setTemplateForm({ name: "", subject: "", description: "", htmlContent: "" });
-                setShowNewTemplateModal(true);
-              }}
-              className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm hover:bg-[#b8994e] transition-colors font-medium text-sm"
-            >
-              <Plus size={18} /> Novi šablon
-            </button>
+            <p className="text-sm text-[#666]">Upravljajte email šablonima za vaše newsletter kampanje.</p>
           </div>
 
           {templatesLoading || seeding ? (
@@ -837,13 +826,6 @@ export default function NewsletterPage() {
                         className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#8c4a5a] text-white rounded-lg text-xs font-semibold hover:bg-[#703343] transition-colors"
                       >
                         <Pencil size={13} /> Uredi
-                      </button>
-                      <button
-                        onClick={() => handleDuplicateTemplate(template)}
-                        className="inline-flex items-center justify-center px-3 py-2 border border-stone-200 rounded-lg text-xs font-medium text-[#666] hover:border-[#8c4a5a] hover:text-[#8c4a5a] transition-colors"
-                        title="Dupliraj"
-                      >
-                        <Copy size={13} />
                       </button>
                       {!template.isDefault && (
                         <button
