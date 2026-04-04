@@ -223,7 +223,12 @@ export default function NewsletterPage() {
       ? extractBodyContent(template.htmlContent)
       : template.htmlContent;
     setEditorBodyContent(body);
-    setEmailOptions({ ...defaultEmailOptions });
+    // Set header background image for Akcije template
+    if (template.name === 'Akcije') {
+      setEmailOptions({ ...defaultEmailOptions, headerBgImage: '/hero.png' });
+    } else {
+      setEmailOptions({ ...defaultEmailOptions });
+    }
     setShowEmailSettings(false);
     setSendSubject(template.subject);
     setSendSegment("all");
@@ -563,6 +568,16 @@ export default function NewsletterPage() {
                     placeholder="https://... URL logo slike"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Pozadinska slika zaglavlja (opciono)</label>
+                  <input
+                    type="text"
+                    value={emailOptions.headerBgImage || ""}
+                    onChange={(e) => setEmailOptions({ ...emailOptions, headerBgImage: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    placeholder="/hero.png ili https://... URL slike"
+                  />
+                </div>
               </div>
 
               {/* Footer settings */}
@@ -786,7 +801,7 @@ export default function NewsletterPage() {
                     onClick={() => openTemplateEditor(template)}
                   >
                     <iframe
-                      srcDoc={generateEmailPreview(template.htmlContent)}
+                      srcDoc={generateEmailPreview(template.htmlContent, template.name === 'Akcije' ? { ...defaultEmailOptions, headerBgImage: '/hero.png' } : undefined)}
                       className="w-[600px] h-[600px] border-0 pointer-events-none"
                       style={{ transform: "scale(0.38)", transformOrigin: "top left" }}
                       title={template.name}
