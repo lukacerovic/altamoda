@@ -57,7 +57,9 @@ function buildCategoryTree(
   return attachChildren(null);
 }
 
-export default async function ProductsPage() {
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const resolvedParams = await searchParams;
+  const brandSlug = typeof resolvedParams.brand === "string" ? resolvedParams.brand : null;
   // Get session / user role
   const session = await auth();
   const user = session?.user as { role?: string } | undefined;
@@ -204,6 +206,14 @@ export default async function ProductsPage() {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([code, data]) => ({ code, name: data.name, count: data.count, hexSamples: data.hexSamples }));
 
+  // Fetch active brand info if brand filter is set
+  const activeBrand = brandSlug
+    ? await prisma.brand.findUnique({
+        where: { slug: brandSlug },
+        select: { name: true, slug: true, logoUrl: true, description: true, content: true },
+      })
+    : null;
+
   // Fetch user's wishlisted product IDs
   let wishlistedIds: string[] = [];
   if (session?.user?.id) {
@@ -225,6 +235,7 @@ export default async function ProductsPage() {
       wishlistedProductIds={wishlistedIds}
       availableColorLevels={availableColorLevels}
       availableColorUndertones={availableColorUndertones}
+      activeBrand={activeBrand}
     />
   );
 }
