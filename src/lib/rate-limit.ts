@@ -94,14 +94,22 @@ export const checkStatusRateLimiter = createRateLimiter({
   maxRequests: 15,           // 15 checks per 15 min
 })
 
+export const newsletterRateLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 5,            // 5 subscriptions per hour per IP
+})
+
 /**
  * Extract client IP from request headers.
- * In production behind a reverse proxy, use X-Forwarded-For.
+ * Uses the rightmost IP in X-Forwarded-For (the one added by the trusted proxy),
+ * not the leftmost (which is client-controlled and spoofable).
  */
 export function getClientIp(req: Request): string {
   const forwarded = req.headers.get('x-forwarded-for')
   if (forwarded) {
-    return forwarded.split(',')[0].trim()
+    const ips = forwarded.split(',').map(ip => ip.trim())
+    // Rightmost IP is added by the reverse proxy and is trustworthy
+    return ips[ips.length - 1]
   }
   return req.headers.get('x-real-ip') || 'unknown'
 }

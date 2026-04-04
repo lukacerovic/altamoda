@@ -17,13 +17,14 @@ export const POST = withErrorHandler(async (req: Request) => {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { status: true, role: true },
+    select: { status: true },
   })
 
+  // Return only status, never role. Return 'active' for non-existent users
+  // to prevent account enumeration.
   if (!user) {
-    // Don't reveal whether user exists — return generic response
-    return successResponse({ status: 'unknown' })
+    return successResponse({ status: 'active' })
   }
 
-  return successResponse({ status: user.status, role: user.role })
+  return successResponse({ status: user.status })
 })

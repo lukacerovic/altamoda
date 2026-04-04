@@ -2,9 +2,13 @@ import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError, getPaginationParams } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { subscribeSchema, unsubscribeSchema, newsletterFilterSchema } from '@/lib/validations/newsletter'
+import { newsletterRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 
 // POST /api/newsletter — subscribe (public)
 export const POST = withErrorHandler(async (req: Request) => {
+  const rateLimitResponse = applyRateLimit(newsletterRateLimiter, `newsletter:${getClientIp(req)}`)
+  if (rateLimitResponse) return rateLimitResponse as never
+
   const body = await req.json()
   const { email, segment } = subscribeSchema.parse(body)
 

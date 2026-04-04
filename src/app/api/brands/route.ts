@@ -6,7 +6,18 @@ import { slugify } from '@/lib/utils'
 // GET /api/brands — All active brands (or all brands with ?all=true for admin)
 export const GET = withErrorHandler(async (req: Request) => {
   const { searchParams } = new URL(req.url)
-  const showAll = searchParams.get('all') === 'true'
+  const wantsAll = searchParams.get('all') === 'true'
+
+  // Only admins can see inactive brands
+  let showAll = false
+  if (wantsAll) {
+    try {
+      await requireAdmin()
+      showAll = true
+    } catch {
+      // Not admin — silently fall back to active only
+    }
+  }
 
   const brands = await prisma.brand.findMany({
     where: showAll ? {} : { isActive: true },

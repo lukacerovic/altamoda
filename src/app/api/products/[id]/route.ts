@@ -75,13 +75,14 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     take: 8,
   })
 
-  // Format response
+  // Format response — hide sensitive pricing from unauthorized users
+  const isB2bOrAdmin = role === 'b2b' || role === 'admin'
   const formatted = {
     ...product,
     priceB2c: Number(product.priceB2c),
-    priceB2b: product.priceB2b ? Number(product.priceB2b) : null,
+    priceB2b: isB2bOrAdmin && product.priceB2b ? Number(product.priceB2b) : null,
     oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
-    costPrice: product.costPrice ? Number(product.costPrice) : null,
+    costPrice: role === 'admin' && product.costPrice ? Number(product.costPrice) : null,
     price: role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c),
     rating: avgRating._avg.rating || 0,
     reviewCount: product._count.reviews,
@@ -95,6 +96,14 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       image: r.images[0]?.url || null,
       isProfessional: r.isProfessional,
     })),
+  }
+
+  // Strip ERP/internal fields for non-admin users
+  if (role !== 'admin') {
+    delete (formatted as Record<string, unknown>).erpId
+    delete (formatted as Record<string, unknown>).barcode
+    delete (formatted as Record<string, unknown>).vatRate
+    delete (formatted as Record<string, unknown>).vatCode
   }
 
   return successResponse(formatted)
