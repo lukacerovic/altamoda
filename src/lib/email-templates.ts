@@ -32,8 +32,10 @@ function baseLayout(content: string, email: string) {
           </tr>
           <!-- Content -->
           <tr>
-            <td style="padding: 40px;">
-              ${content}
+            <td style="padding: 0;">
+              <div style="padding: 0;">
+                ${content}
+              </div>
             </td>
           </tr>
           <!-- Footer -->
@@ -57,6 +59,7 @@ function baseLayout(content: string, email: string) {
 
 export function welcomeTemplate(email: string): string {
   const content = `
+    <div style="padding: 40px;">
     <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Dobrodosli u Altamoda!</h2>
     <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
       Hvala vam sto ste se prijavili na nas newsletter. Od sada cete prvi saznati o novim proizvodima, ekskluzivnim ponudama i profesionalnim savetima za negu kose.
@@ -76,13 +79,13 @@ export function welcomeTemplate(email: string): string {
     <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.5; color: #8a8578;">
       Kod vazi 30 dana od danas. Minimalna vrednost narudzbe: 3.000 RSD.
     </p>
+    </div>
   `
   return baseLayout(content, email)
 }
 
-export function campaignTemplate(subject: string, content: string, email: string): string {
+export function campaignTemplate(_subject: string, content: string, email: string): string {
   const wrappedContent = `
-    <h2 style="margin: 0 0 24px; font-size: 22px; color: ${BRAND_PRIMARY};">${subject}</h2>
     <div style="font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
       ${content}
     </div>
@@ -98,6 +101,7 @@ export function promoTemplate(
   email: string
 ): string {
   const content = `
+    <div style="padding: 40px;">
     <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">${title}</h2>
     <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
       ${description}
@@ -111,6 +115,7 @@ export function promoTemplate(
         </td>
       </tr>
     </table>
+    </div>
   `
   return baseLayout(content, email)
 }

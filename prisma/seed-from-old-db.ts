@@ -25,7 +25,8 @@ dotenv.config();
 // ---------------------------------------------------------------------------
 
 const SQL_DUMP_PATH = path.resolve(
-  "C:/Users/nidza/Downloads/altamoda_db.sql"
+  //"/Users/lukacerovic/Downloads/altamoda_db.sql"
+   "C:/Users/nidza/Downloads/altamoda_db.sql"
 );
 
 const IMAGE_URL_PREFIX =

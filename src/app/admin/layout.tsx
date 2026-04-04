@@ -18,6 +18,7 @@ import {
   Mail,
   Zap,
   Home,
+  Tags,
 } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -48,6 +49,7 @@ export default function AdminLayout({
       items: [
         { href: "/admin/homepage", label: t("admin.homepage"), icon: Home },
         { href: "/admin/products", label: t("admin.products"), icon: Package },
+        { href: "/admin/brands", label: t("admin.brands"), icon: Tags },
         { href: "/admin/orders", label: t("admin.orders"), icon: ShoppingCart },
         { href: "/admin/users", label: t("admin.users"), icon: Users },
       ],

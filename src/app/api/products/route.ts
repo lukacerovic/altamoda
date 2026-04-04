@@ -41,8 +41,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     // Logged-in B2C: hide professional products
     where.isProfessional = false
   } else if (role === 'b2b') {
-    // Logged-in B2B: show only professional products
-    where.isProfessional = true
+    // Logged-in B2B: show all products (professional + retail)
   } else if (!role) {
     // Guest: use visibility tab
     if (visibility === 'b2c') {
@@ -84,6 +83,12 @@ export const GET = withErrorHandler(async (req: Request) => {
     if (priceMin) priceFilter.gte = Number(priceMin)
     if (priceMax) priceFilter.lte = Number(priceMax)
     where[priceField] = priceFilter
+  }
+
+  // Gender filter
+  const gender = searchParams.get('gender')
+  if (gender) {
+    where.gender = gender
   }
 
   // Boolean filters
@@ -186,7 +191,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     category: p.category,
     price: role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c),
     priceB2c: Number(p.priceB2c),
-    priceB2b: p.priceB2b ? Number(p.priceB2b) : null,
+    priceB2b: (role === 'b2b' || role === 'admin') && p.priceB2b ? Number(p.priceB2b) : null,
     oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,
@@ -194,10 +199,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     isFeatured: p.isFeatured,
     isBestseller: p.isBestseller,
     stockQuantity: p.stockQuantity,
-    barcode: p.barcode,
-    vatRate: p.vatRate,
-    vatCode: p.vatCode,
-    erpId: p.erpId,
+    ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId } : {}),
     rating: ratingMap.get(p.id) || 0,
     reviewCount: p._count.reviews,
     colorProduct: p.colorProduct,
