@@ -312,7 +312,7 @@ export default function HomepagePage() {
                   type="text"
                   value={modalSearch}
                   onChange={(e) => handleModalSearch(e.target.value)}
-                  placeholder={t("admin.searchToAdd")}
+                  placeholder={t("admin.searchByNameOrCode")}
                   className="w-full pl-9 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-lg text-sm focus:bg-white focus:border-black focus:outline-none"
                   autoFocus
                 />

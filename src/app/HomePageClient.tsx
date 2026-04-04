@@ -226,24 +226,48 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
     <div className="min-h-screen bg-[#f5f0e8]">
       <Header />
 
-      {/* HERO */}
-      <section className="relative h-[600px] md:h-[750px] overflow-hidden">
-        <img src="/hero.png" alt="Hero - Professional hair care products" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2d2d2d]/70 via-[#2d2d2d]/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/30 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-light leading-[0.95] mb-6 text-white animate-slideUp" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              {t("home.heroTitle1")}<br /><em className="italic text-[#b07a87]">{t("home.heroTitle2")}</em>
-            </h1>
-            <p className="text-white/60 text-base md:text-lg mb-8 max-w-lg animate-slideUp leading-relaxed" style={{ animationDelay: "0.1s" }}>
+      {/* HERO — Split B2C / B2B */}
+      <section className="relative flex flex-col md:flex-row h-[500px] md:h-[700px] overflow-hidden">
+        {/* Soft blend between halves */}
+        <div className="hidden md:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-64 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, transparent 10%, rgba(45,45,45,0.35) 45%, rgba(45,45,45,0.35) 55%, transparent 90%)" }} />
+        <div className="md:hidden absolute inset-x-0 top-1/2 -translate-y-1/2 h-32 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 10%, rgba(45,45,45,0.35) 45%, rgba(45,45,45,0.35) 55%, transparent 90%)" }} />
+        {/* Left — B2C / Customers */}
+        <Link href="/products" className="relative w-full md:w-1/2 h-1/2 md:h-full group overflow-hidden cursor-pointer">
+          <img src="/hero.png" alt="Professional hair care products" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <div className="absolute inset-0 bg-[#2d2d2d]/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/90 via-[#2d2d2d]/40 to-[#2d2d2d]/10" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14">
+            <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/70 mb-3 md:mb-5 block">{t("home.heroForYou")}</span>
+            <h2 className="text-4xl md:text-6xl lg:text-8xl font-light leading-[0.95] mb-3 md:mb-5 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              {t("home.heroTitle1")}<br /><em className="italic text-[#d4a0ab]">{t("home.heroTitle2")}</em>
+            </h2>
+            <p className="text-white/90 text-sm md:text-lg mb-5 md:mb-8 max-w-md leading-relaxed">
               {t("home.heroSubtitle")}
             </p>
-            <div className="flex flex-wrap items-center gap-6 animate-slideUp" style={{ animationDelay: "0.2s" }}>
-              <Link href="/products" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm tracking-wide">{t("home.shopNow")}</Link>
-            </div>
+            <span className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-6 py-2.5 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide group-hover:-translate-y-0.5 group-hover:shadow-lg transition-all">
+              {t("home.shopNow")} <ArrowRight className="w-4 h-4" />
+            </span>
           </div>
-        </div>
+        </Link>
+
+        {/* Right — B2B / Professionals */}
+        <Link href="/account/login" className="relative w-full md:w-1/2 h-1/2 md:h-full group overflow-hidden cursor-pointer">
+          <img src="/b2bhero.png" alt="Salon partnership for professionals" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <div className="absolute inset-0 bg-[#2d2d2d]/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/90 via-[#2d2d2d]/40 to-[#2d2d2d]/10" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14 text-right md:text-left">
+            <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/70 mb-3 md:mb-5 block">{t("home.heroForProfessionals")}</span>
+            <h2 className="text-4xl md:text-6xl lg:text-8xl font-light leading-[0.95] mb-3 md:mb-5 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              {t("home.heroB2bTitle1")}<br /><em className="italic text-[#d4a0ab]">{t("home.heroB2bTitle2")}</em>
+            </h2>
+            <p className="text-white/90 text-sm md:text-lg mb-5 md:mb-8 max-w-md leading-relaxed ml-auto md:ml-0">
+              {t("home.heroB2bSubtitle")}
+            </p>
+            <span className="inline-flex items-center gap-2 bg-[#2d2d2d] border border-white/20 text-white px-6 py-2.5 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide group-hover:-translate-y-0.5 group-hover:shadow-lg transition-all">
+              {t("home.heroB2bCta")} <ArrowRight className="w-4 h-4" />
+            </span>
+          </div>
+        </Link>
       </section>
 
       {/* TRUST BADGES */}

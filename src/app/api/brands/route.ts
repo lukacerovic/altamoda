@@ -3,14 +3,18 @@ import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-util
 import { requireAdmin } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
 
-// GET /api/brands — All active brands with product lines
-export const GET = withErrorHandler(async () => {
+// GET /api/brands — All active brands (or all brands with ?all=true for admin)
+export const GET = withErrorHandler(async (req: Request) => {
+  const { searchParams } = new URL(req.url)
+  const showAll = searchParams.get('all') === 'true'
+
   const brands = await prisma.brand.findMany({
-    where: { isActive: true },
+    where: showAll ? {} : { isActive: true },
     include: {
       productLines: {
         orderBy: { name: 'asc' },
       },
+      _count: { select: { products: true } },
     },
     orderBy: { name: 'asc' },
   })
