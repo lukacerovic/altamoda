@@ -9,6 +9,7 @@ import {
   RotateCcw, Shield, Sparkles,
   Play, CheckCircle, X, Camera, Link2, AlertCircle,
 } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -57,8 +58,12 @@ interface Product {
   productLine: { name: string; slug: string } | null;
   category: { nameLat: string; slug: string; parent?: { nameLat: string; slug: string } | null } | null;
   description: string | null;
+  purpose: string | null;
   ingredients: string | null;
   usageInstructions: string | null;
+  warnings: string | null;
+  shelfLife: string | null;
+  importerInfo: string | null;
   priceB2c: number;
   priceB2b: number | null;
   oldPrice: number | null;
@@ -118,7 +123,19 @@ export default function ProductDetailClient({ product, related, userRole, initia
     { key: "opis", label: t("productDetail.description") },
     { key: "sastojci", label: t("productDetail.ingredients") },
     { key: "upotreba", label: t("productDetail.howToUse") },
+    { key: "deklaracija", label: "Deklaracija" },
   ];
+
+  // Helper to render HTML content safely
+  const renderHtml = (html: string | null, fallback: string) => {
+    if (!html) return <p className="text-gray-400 italic">{fallback}</p>;
+    return (
+      <div
+        className="text-gray-600 leading-relaxed [&_p]:mb-3 [&_strong]:text-gray-800 [&_strong]:font-semibold [&_div]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1"
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+      />
+    );
+  };
 
   const handleCopyLink = () => {
     navigator.clipboard?.writeText(window.location.href);
@@ -433,9 +450,51 @@ export default function ProductDetailClient({ product, related, userRole, initia
             ))}
           </div>
           <div className="py-8">
-            {activeTab === "opis" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.description || t("productDetail.noDescription")}</p></div>}
-            {activeTab === "sastojci" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.ingredients || t("productDetail.noIngredients")}</p></div>}
-            {activeTab === "upotreba" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.usageInstructions || t("productDetail.noUsageInstructions")}</p></div>}
+            {activeTab === "opis" && <div className="prose max-w-none">
+              {renderHtml(product.description, t("productDetail.noDescription"))}
+              {product.purpose && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-2">Namena</h4>
+                  {renderHtml(product.purpose, "")}
+                </div>
+              )}
+            </div>}
+            {activeTab === "sastojci" && <div className="prose max-w-none">{renderHtml(product.ingredients, t("productDetail.noIngredients"))}</div>}
+            {activeTab === "upotreba" && <div className="prose max-w-none">
+              {renderHtml(product.usageInstructions, t("productDetail.noUsageInstructions"))}
+              {product.warnings && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-semibold text-red-600 mb-2 flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> Upozorenja</h4>
+                  {renderHtml(product.warnings, "")}
+                </div>
+              )}
+            </div>}
+            {activeTab === "deklaracija" && <div className="prose max-w-none space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-gray-50 rounded-sm p-4">
+                  <h4 className="font-semibold text-gray-800 mb-1">Naziv proizvoda</h4>
+                  <p className="text-gray-600">{product.nameLat}</p>
+                </div>
+                {product.brand && (
+                  <div className="bg-gray-50 rounded-sm p-4">
+                    <h4 className="font-semibold text-gray-800 mb-1">Proizvođač / Brend</h4>
+                    <p className="text-gray-600">{product.brand.name}</p>
+                  </div>
+                )}
+                {product.shelfLife && (
+                  <div className="bg-gray-50 rounded-sm p-4">
+                    <h4 className="font-semibold text-gray-800 mb-1">Rok trajanja / PAO</h4>
+                    <p className="text-gray-600">{product.shelfLife}</p>
+                  </div>
+                )}
+                {product.importerInfo && (
+                  <div className="bg-gray-50 rounded-sm p-4">
+                    <h4 className="font-semibold text-gray-800 mb-1">Uvoznik / Odgovorno lice</h4>
+                    {renderHtml(product.importerInfo, "")}
+                  </div>
+                )}
+              </div>
+            </div>}
           </div>
         </div>
 

@@ -223,8 +223,12 @@ model Product {
   productLineId     String?  @map("product_line_id")
   categoryId        String?  @map("category_id")
   description       String?
+  purpose           String?
   ingredients       String?
   usageInstructions String?  @map("usage_instructions")
+  warnings          String?
+  shelfLife         String?  @map("shelf_life")
+  importerInfo      String?  @map("importer_info")
   priceB2c          Decimal  @map("price_b2c") @db.Decimal(10, 2)
   priceB2b          Decimal? @map("price_b2b") @db.Decimal(10, 2)
   oldPrice          Decimal? @map("old_price") @db.Decimal(10, 2)
