@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { prisma } from '@/lib/db'
 import CheckoutClient from './CheckoutClient'

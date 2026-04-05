@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/db'
 import HomePageClient from './HomePageClient'
 import type { ProductData } from './HomePageClient'

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/db'
 import ColorsPageClient from './ColorsPageClient'
 import type { Metadata } from 'next'
