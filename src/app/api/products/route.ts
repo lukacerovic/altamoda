@@ -4,6 +4,42 @@ import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 
+// Serbian diacritics: build all character-level variants so cetkica matches četkica
+function expandDiacritics(term: string): string[] {
+  const charGroups: Record<string, string[]> = {
+    s: ['s', 'š'], š: ['s', 'š'],
+    c: ['c', 'č', 'ć'], č: ['c', 'č', 'ć'], ć: ['c', 'č', 'ć'],
+    z: ['z', 'ž'], ž: ['z', 'ž'],
+    d: ['d', 'đ'], đ: ['d', 'đ'],
+  }
+  // Generate variants by replacing one char group at a time
+  // For efficiency, limit to first 8 variant positions max
+  const results = new Set<string>([term])
+  const lower = term.toLowerCase()
+
+  // Find positions that have diacritic alternatives
+  const positions: number[] = []
+  for (let i = 0; i < lower.length; i++) {
+    if (charGroups[lower[i]]) positions.push(i)
+  }
+
+  // Generate all combinations (limit to 2^8 = 256 max)
+  const maxPositions = Math.min(positions.length, 8)
+  const count = 1 << maxPositions
+  for (let mask = 0; mask < count; mask++) {
+    const chars = lower.split('')
+    for (let b = 0; b < maxPositions; b++) {
+      const pos = positions[b]
+      const alts = charGroups[chars[pos]]
+      if (alts) {
+        chars[pos] = (mask >> b) & 1 ? alts[1] : alts[0]
+      }
+    }
+    results.add(chars.join(''))
+  }
+  return Array.from(results)
+}
+
 // GET /api/products — List with filters, pagination, B2B/B2C visibility
 export const GET = withErrorHandler(async (req: Request) => {
   const { searchParams } = new URL(req.url)
@@ -97,13 +133,14 @@ export const GET = withErrorHandler(async (req: Request) => {
   if (isFeatured === 'true') where.isFeatured = true
   if (isBestseller === 'true') where.isBestseller = true
 
-  // Search
+  // Search (with Serbian diacritics support: sampon matches šampon)
   if (search) {
-    where.OR = [
-      { nameLat: { contains: search, mode: 'insensitive' } },
-      { sku: { contains: search, mode: 'insensitive' } },
-      { brand: { name: { contains: search, mode: 'insensitive' } } },
-    ]
+    const terms = expandDiacritics(search)
+    where.OR = terms.flatMap(term => [
+      { nameLat: { contains: term, mode: 'insensitive' as const } },
+      { sku: { contains: term, mode: 'insensitive' as const } },
+      { brand: { name: { contains: term, mode: 'insensitive' as const } } },
+    ])
   }
 
   // Color filters
@@ -154,10 +191,45 @@ export const GET = withErrorHandler(async (req: Request) => {
     sortOrderBy,
   ]
 
+  // For grouped products, find representative IDs (first per group matching filters)
+  const groupedInFilter = await prisma.product.groupBy({
+    by: ['groupSlug'],
+    where: { ...where, groupSlug: { not: null } },
+    _count: true,
+  })
+  const duplicateCount = groupedInFilter.reduce((sum, g) => sum + g._count - 1, 0)
+
+  const excludeIds = new Set<string>()
+  if (groupedInFilter.length > 0) {
+    const groupSlugsInFilter = groupedInFilter.map(g => g.groupSlug).filter(Boolean) as string[]
+    // Get first product per group (representative)
+    const reps = await prisma.product.findMany({
+      where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+      select: { id: true, groupSlug: true },
+      orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
+      distinct: ['groupSlug'],
+    })
+    const repIds = new Set(reps.map(r => r.id))
+
+    // Get ALL products in these groups to find non-reps to exclude
+    const allInGroups = await prisma.product.findMany({
+      where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+      select: { id: true },
+    })
+    for (const p of allInGroups) {
+      if (!repIds.has(p.id)) excludeIds.add(p.id)
+    }
+  }
+
+  // Add exclusion to where clause
+  const finalWhere = excludeIds.size > 0
+    ? { ...where, NOT: { id: { in: Array.from(excludeIds) } } }
+    : where
+
   // Query
-  const [products, total] = await Promise.all([
+  const [products, totalRaw] = await Promise.all([
     prisma.product.findMany({
-      where,
+      where: finalWhere,
       include: {
         brand: { select: { id: true, name: true, slug: true } },
         category: { select: { id: true, nameLat: true, slug: true } },
@@ -171,6 +243,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     }),
     prisma.product.count({ where }),
   ])
+  const total = totalRaw - duplicateCount
 
   // Calculate avg ratings
   const productIds = products.map(p => p.id)
@@ -181,11 +254,27 @@ export const GET = withErrorHandler(async (req: Request) => {
   })
   const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
 
+  // Get variant counts for grouped products
+  const groupSlugs = [...new Set(products.map(p => p.groupSlug).filter(Boolean))] as string[]
+  const variantCounts = groupSlugs.length > 0
+    ? await prisma.product.groupBy({
+        by: ['groupSlug'],
+        where: { groupSlug: { in: groupSlugs }, isActive: true },
+        _count: true,
+      })
+    : []
+  const variantCountMap = new Map(variantCounts.map(v => [v.groupSlug!, v._count]))
+
   // Format response — show appropriate price based on role
-  const formatted = products.map(p => ({
+  const formatted = products.map(p => {
+    // Strip color code from name for grouped products
+    const name = p.groupSlug && p.colorCode
+      ? p.nameLat.replace(p.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
+      : p.nameLat
+    return {
     id: p.id,
     sku: p.sku,
-    name: p.nameLat,
+    name,
     slug: p.slug,
     brand: p.brand,
     category: p.category,
@@ -203,7 +292,11 @@ export const GET = withErrorHandler(async (req: Request) => {
     rating: ratingMap.get(p.id) || 0,
     reviewCount: p._count.reviews,
     colorProduct: p.colorProduct,
-  }))
+    groupSlug: p.groupSlug,
+    colorCode: p.colorCode,
+    variantCount: p.groupSlug ? variantCountMap.get(p.groupSlug) || 0 : 0,
+  }
+  })
 
   return successResponse({
     products: formatted,

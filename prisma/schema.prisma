@@ -247,6 +247,9 @@ model Product {
   barcode           String?
   vatRate           Int      @default(20) @map("vat_rate")
   vatCode           String?  @map("vat_code")
+  groupSlug         String?  @map("group_slug")
+  colorCode         String?  @map("color_code")
+  colorName         String?  @map("color_name")
   seoTitle          String?  @map("seo_title")
   seoDescription    String?  @map("seo_description")
   createdAt         DateTime @default(now()) @map("created_at")

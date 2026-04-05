@@ -84,6 +84,19 @@ export default async function ProductDetailPage({ params }: PageProps) {
     take: 8,
   })
 
+  // Fetch color siblings
+  const colorSiblings = product.groupSlug
+    ? await prisma.product.findMany({
+        where: { groupSlug: product.groupSlug, isActive: true },
+        select: {
+          id: true, slug: true, nameLat: true, colorCode: true, colorName: true,
+          stockQuantity: true,
+          images: { orderBy: { sortOrder: 'asc' } },
+        },
+        orderBy: { colorCode: 'asc' },
+      })
+    : []
+
   const price = role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
 
   const serialized = {
@@ -162,5 +175,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
     userExistingRating = existingReview?.rating ?? null
   }
 
-  return <ProductDetailClient product={serialized} related={related} userRole={role} initialLiked={isInWishlist} userExistingRating={userExistingRating} />
+  const siblings = colorSiblings.map(s => ({
+    id: s.id,
+    slug: s.slug,
+    name: s.nameLat,
+    colorCode: s.colorCode,
+    colorName: s.colorName,
+    images: s.images.map(img => ({ url: img.url, altText: img.altText })),
+    inStock: s.stockQuantity > 0,
+    isActive: s.id === product.id,
+  }))
+
+  return <ProductDetailClient product={serialized} related={related} colorSiblings={siblings} userRole={role} initialLiked={isInWishlist} userExistingRating={userExistingRating} />
 }

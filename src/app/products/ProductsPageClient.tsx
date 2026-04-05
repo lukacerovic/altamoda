@@ -56,6 +56,8 @@ interface Product {
   rating: number;
   reviewCount: number;
   colorProduct: ColorProduct | null;
+  variantCount?: number;
+  groupSlug?: string | null;
 }
 
 interface BrandFilter {
@@ -252,6 +254,11 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
           )}
           {product.isProfessional && (
             <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
+          )}
+          {product.variantCount != null && product.variantCount > 1 && (
+            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-[#735b28] text-white">
+              {product.variantCount} boja
+            </span>
           )}
         </div>
         <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-sm bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">

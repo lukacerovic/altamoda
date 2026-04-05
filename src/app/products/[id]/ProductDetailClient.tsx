@@ -81,14 +81,26 @@ interface Product {
 interface Props {
   product: Product;
   related: RelatedProduct[];
+  colorSiblings?: ColorSibling[];
   userRole: string | null;
   initialLiked?: boolean;
   userExistingRating?: number | null;
 }
 
+interface ColorSibling {
+  id: string;
+  slug: string;
+  name: string;
+  colorCode: string | null;
+  colorName: string | null;
+  images: { url: string; altText: string | null }[];
+  inStock: boolean;
+  isActive: boolean;
+}
+
 const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop";
 
-export default function ProductDetailClient({ product, related, userRole, initialLiked = false, userExistingRating = null }: Props) {
+export default function ProductDetailClient({ product, related, colorSiblings = [], userRole, initialLiked = false, userExistingRating = null }: Props) {
   const { t } = useLanguage();
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
   const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
@@ -106,14 +118,27 @@ export default function ProductDetailClient({ product, related, userRole, initia
   const [addedToCart, setAddedToCart] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [selectedSibling, setSelectedSibling] = useState<ColorSibling | null>(
+    colorSiblings.find(s => s.isActive) || null
+  );
   const [reviewError, setReviewError] = useState("");
 
   const { addItem } = useCartStore();
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
 
-  const images = product.images.length > 0
-    ? product.images.map(img => img.url)
-    : [defaultImage];
+  // Show sibling images when a color variant is selected, otherwise show product's own images
+  const displayImages = selectedSibling && !selectedSibling.isActive && selectedSibling.images.length > 0
+    ? selectedSibling.images.map(img => img.url)
+    : product.images.length > 0
+      ? product.images.map(img => img.url)
+      : [defaultImage];
+  const images = displayImages;
+
+  // Strip color code from name for grouped products
+  const activeColor = colorSiblings.find(s => s.isActive);
+  const displayName = colorSiblings.length > 1 && activeColor?.colorCode
+    ? product.nameLat.replace(activeColor.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
+    : product.nameLat;
 
   const discountPct = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
@@ -262,7 +287,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
               <ChevronRight className="w-3 h-3" />
             </>
           )}
-          <span className="text-black">{product.nameLat}</span>
+          <span className="text-black">{displayName}</span>
         </nav>
 
         {/* 2-Column layout */}
@@ -305,7 +330,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 <Link href={`/products?line=${product.productLine.slug}`} className="text-xs text-secondary hover:text-black font-medium underline">{product.productLine.name}</Link>
               </div>
             )}
-            <h1 className="text-2xl md:text-3xl font-bold text-black mt-2 mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{product.nameLat}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-black mt-2 mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{displayName}</h1>
 
             {product.isProfessional && (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-xs font-medium rounded mb-4">
@@ -363,6 +388,37 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-green-700">{t("productDetail.yourB2bPrice")}</span>
                   <span className="text-lg font-bold text-green-700">{product.priceB2b.toLocaleString("sr-RS")} RSD</span>
+                </div>
+              </div>
+            )}
+
+            {/* Color Variants */}
+            {colorSiblings.length > 1 && (
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Boje ({colorSiblings.length} nijanse)
+                </h4>
+                <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1">
+                  {colorSiblings.map((sibling) => (
+                    <Link
+                      key={sibling.id}
+                      href={`/products/${sibling.slug}`}
+                      onMouseEnter={() => {
+                        setSelectedSibling(sibling);
+                        setActiveThumb(0);
+                      }}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-sm border transition-all ${
+                        sibling.isActive
+                          ? "bg-black text-white border-black"
+                          : sibling.inStock
+                            ? "bg-white text-gray-700 border-gray-200 hover:border-black"
+                            : "bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300"
+                      }`}
+                    >
+                      {sibling.colorCode || sibling.name}
+                      {!sibling.inStock && <span className="ml-1 text-[10px]">(nema)</span>}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}

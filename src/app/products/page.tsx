@@ -145,13 +145,23 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     orderBy: { name: "asc" },
   });
 
-  // Fetch categories and build tree
+  // Fetch categories with product counts, then filter out empty ones
   const flatCategories = await prisma.category.findMany({
     where: { isActive: true },
-    select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true },
+    select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true } } } } },
     orderBy: { sortOrder: "asc" },
   });
-  const categories = buildCategoryTree(flatCategories);
+
+  // Keep categories that have products directly OR have children with products
+  const catProductCount = new Map(flatCategories.map(c => [c.id, c._count.products]));
+  const hasChildrenWithProducts = (catId: string): boolean => {
+    return flatCategories.some(c => c.parentId === catId && (catProductCount.get(c.id)! > 0 || hasChildrenWithProducts(c.id)));
+  };
+  const nonEmptyCategories = flatCategories
+    .filter(c => catProductCount.get(c.id)! > 0 || hasChildrenWithProducts(c.id))
+    .map(({ _count, ...rest }) => rest);
+
+  const categories = buildCategoryTree(nonEmptyCategories);
 
   // Fetch dynamic attributes (for filter toggles)
   const attributes = await prisma.dynamicAttribute.findMany({
