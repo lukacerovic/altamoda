@@ -138,6 +138,7 @@
   "products": {
     "title": "Продукция",
     "allProducts": "Все товары",
+    "allBrands": "Все бренды",
     "filters": "Фильтры",
     "sort": "Сортировка",
     "sortNewest": "Новинки",

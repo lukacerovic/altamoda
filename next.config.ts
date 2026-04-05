@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "www.altamoda.rs" },
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
     ],
   },
   async headers() {
@@ -32,7 +33,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://www.altamoda.rs https://placehold.co https://lh3.googleusercontent.com",
+              "img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://www.altamoda.rs https://placehold.co https://lh3.googleusercontent.com https://res.cloudinary.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self'",
               "frame-ancestors 'none'",

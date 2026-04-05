@@ -57,7 +57,9 @@ function buildCategoryTree(
   return attachChildren(null);
 }
 
-export default async function ProductsPage() {
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const resolvedParams = await searchParams;
+  const brandSlug = typeof resolvedParams.brand === "string" ? resolvedParams.brand : null;
   // Get session / user role
   const session = await auth();
   const user = session?.user as { role?: string } | undefined;
@@ -143,13 +145,23 @@ export default async function ProductsPage() {
     orderBy: { name: "asc" },
   });
 
-  // Fetch categories and build tree
+  // Fetch categories with product counts, then filter out empty ones
   const flatCategories = await prisma.category.findMany({
     where: { isActive: true },
-    select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true },
+    select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true } } } } },
     orderBy: { sortOrder: "asc" },
   });
-  const categories = buildCategoryTree(flatCategories);
+
+  // Keep categories that have products directly OR have children with products
+  const catProductCount = new Map(flatCategories.map(c => [c.id, c._count.products]));
+  const hasChildrenWithProducts = (catId: string): boolean => {
+    return flatCategories.some(c => c.parentId === catId && (catProductCount.get(c.id)! > 0 || hasChildrenWithProducts(c.id)));
+  };
+  const nonEmptyCategories = flatCategories
+    .filter(c => catProductCount.get(c.id)! > 0 || hasChildrenWithProducts(c.id))
+    .map(({ _count, ...rest }) => rest);
+
+  const categories = buildCategoryTree(nonEmptyCategories);
 
   // Fetch dynamic attributes (for filter toggles)
   const attributes = await prisma.dynamicAttribute.findMany({
@@ -204,6 +216,14 @@ export default async function ProductsPage() {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([code, data]) => ({ code, name: data.name, count: data.count, hexSamples: data.hexSamples }));
 
+  // Fetch active brand info if brand filter is set
+  const activeBrand = brandSlug
+    ? await prisma.brand.findUnique({
+        where: { slug: brandSlug },
+        select: { name: true, slug: true, logoUrl: true, description: true, content: true },
+      })
+    : null;
+
   // Fetch user's wishlisted product IDs
   let wishlistedIds: string[] = [];
   if (session?.user?.id) {
@@ -225,6 +245,7 @@ export default async function ProductsPage() {
       wishlistedProductIds={wishlistedIds}
       availableColorLevels={availableColorLevels}
       availableColorUndertones={availableColorUndertones}
+      activeBrand={activeBrand}
     />
   );
 }

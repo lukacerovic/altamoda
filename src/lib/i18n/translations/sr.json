@@ -138,6 +138,7 @@
   "products": {
     "title": "Proizvodi",
     "allProducts": "Svi proizvodi",
+    "allBrands": "Svi brendovi",
     "filters": "Filteri",
     "sort": "Sortiraj",
     "sortNewest": "Najnovije",

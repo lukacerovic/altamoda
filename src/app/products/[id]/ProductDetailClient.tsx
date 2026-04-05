@@ -9,6 +9,7 @@ import {
   RotateCcw, Shield, Sparkles,
   Play, CheckCircle, X, Camera, Link2, AlertCircle,
 } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -57,8 +58,12 @@ interface Product {
   productLine: { name: string; slug: string } | null;
   category: { nameLat: string; slug: string; parent?: { nameLat: string; slug: string } | null } | null;
   description: string | null;
+  purpose: string | null;
   ingredients: string | null;
   usageInstructions: string | null;
+  warnings: string | null;
+  shelfLife: string | null;
+  importerInfo: string | null;
   priceB2c: number;
   priceB2b: number | null;
   oldPrice: number | null;
@@ -76,14 +81,26 @@ interface Product {
 interface Props {
   product: Product;
   related: RelatedProduct[];
+  colorSiblings?: ColorSibling[];
   userRole: string | null;
   initialLiked?: boolean;
   userExistingRating?: number | null;
 }
 
+interface ColorSibling {
+  id: string;
+  slug: string;
+  name: string;
+  colorCode: string | null;
+  colorName: string | null;
+  images: { url: string; altText: string | null }[];
+  inStock: boolean;
+  isActive: boolean;
+}
+
 const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop";
 
-export default function ProductDetailClient({ product, related, userRole, initialLiked = false, userExistingRating = null }: Props) {
+export default function ProductDetailClient({ product, related, colorSiblings = [], userRole, initialLiked = false, userExistingRating = null }: Props) {
   const { t } = useLanguage();
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
   const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
@@ -101,14 +118,27 @@ export default function ProductDetailClient({ product, related, userRole, initia
   const [addedToCart, setAddedToCart] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [selectedSibling, setSelectedSibling] = useState<ColorSibling | null>(
+    colorSiblings.find(s => s.isActive) || null
+  );
   const [reviewError, setReviewError] = useState("");
 
   const { addItem } = useCartStore();
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
 
-  const images = product.images.length > 0
-    ? product.images.map(img => img.url)
-    : [defaultImage];
+  // Show sibling images when a color variant is selected, otherwise show product's own images
+  const displayImages = selectedSibling && !selectedSibling.isActive && selectedSibling.images.length > 0
+    ? selectedSibling.images.map(img => img.url)
+    : product.images.length > 0
+      ? product.images.map(img => img.url)
+      : [defaultImage];
+  const images = displayImages;
+
+  // Strip color code from name for grouped products
+  const activeColor = colorSiblings.find(s => s.isActive);
+  const displayName = colorSiblings.length > 1 && activeColor?.colorCode
+    ? product.nameLat.replace(activeColor.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
+    : product.nameLat;
 
   const discountPct = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
@@ -118,7 +148,19 @@ export default function ProductDetailClient({ product, related, userRole, initia
     { key: "opis", label: t("productDetail.description") },
     { key: "sastojci", label: t("productDetail.ingredients") },
     { key: "upotreba", label: t("productDetail.howToUse") },
+    { key: "deklaracija", label: "Deklaracija" },
   ];
+
+  // Helper to render HTML content safely
+  const renderHtml = (html: string | null, fallback: string) => {
+    if (!html) return <p className="text-gray-400 italic">{fallback}</p>;
+    return (
+      <div
+        className="text-gray-600 leading-relaxed [&_p]:mb-3 [&_strong]:text-gray-800 [&_strong]:font-semibold [&_div]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1"
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+      />
+    );
+  };
 
   const handleCopyLink = () => {
     navigator.clipboard?.writeText(window.location.href);
@@ -245,7 +287,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
               <ChevronRight className="w-3 h-3" />
             </>
           )}
-          <span className="text-black">{product.nameLat}</span>
+          <span className="text-black">{displayName}</span>
         </nav>
 
         {/* 2-Column layout */}
@@ -288,7 +330,7 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 <Link href={`/products?line=${product.productLine.slug}`} className="text-xs text-secondary hover:text-black font-medium underline">{product.productLine.name}</Link>
               </div>
             )}
-            <h1 className="text-2xl md:text-3xl font-bold text-black mt-2 mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{product.nameLat}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-black mt-2 mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{displayName}</h1>
 
             {product.isProfessional && (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-xs font-medium rounded mb-4">
@@ -346,6 +388,37 @@ export default function ProductDetailClient({ product, related, userRole, initia
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-green-700">{t("productDetail.yourB2bPrice")}</span>
                   <span className="text-lg font-bold text-green-700">{product.priceB2b.toLocaleString("sr-RS")} RSD</span>
+                </div>
+              </div>
+            )}
+
+            {/* Color Variants */}
+            {colorSiblings.length > 1 && (
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Boje ({colorSiblings.length} nijanse)
+                </h4>
+                <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1">
+                  {colorSiblings.map((sibling) => (
+                    <Link
+                      key={sibling.id}
+                      href={`/products/${sibling.slug}`}
+                      onMouseEnter={() => {
+                        setSelectedSibling(sibling);
+                        setActiveThumb(0);
+                      }}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-sm border transition-all ${
+                        sibling.isActive
+                          ? "bg-black text-white border-black"
+                          : sibling.inStock
+                            ? "bg-white text-gray-700 border-gray-200 hover:border-black"
+                            : "bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300"
+                      }`}
+                    >
+                      {sibling.colorCode || sibling.name}
+                      {!sibling.inStock && <span className="ml-1 text-[10px]">(nema)</span>}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
@@ -433,9 +506,51 @@ export default function ProductDetailClient({ product, related, userRole, initia
             ))}
           </div>
           <div className="py-8">
-            {activeTab === "opis" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.description || t("productDetail.noDescription")}</p></div>}
-            {activeTab === "sastojci" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.ingredients || t("productDetail.noIngredients")}</p></div>}
-            {activeTab === "upotreba" && <div className="prose max-w-none"><p className="text-gray-600 leading-relaxed">{product.usageInstructions || t("productDetail.noUsageInstructions")}</p></div>}
+            {activeTab === "opis" && <div className="prose max-w-none">
+              {renderHtml(product.description, t("productDetail.noDescription"))}
+              {product.purpose && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-2">Namena</h4>
+                  {renderHtml(product.purpose, "")}
+                </div>
+              )}
+            </div>}
+            {activeTab === "sastojci" && <div className="prose max-w-none">{renderHtml(product.ingredients, t("productDetail.noIngredients"))}</div>}
+            {activeTab === "upotreba" && <div className="prose max-w-none">
+              {renderHtml(product.usageInstructions, t("productDetail.noUsageInstructions"))}
+              {product.warnings && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-semibold text-red-600 mb-2 flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> Upozorenja</h4>
+                  {renderHtml(product.warnings, "")}
+                </div>
+              )}
+            </div>}
+            {activeTab === "deklaracija" && <div className="prose max-w-none space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-gray-50 rounded-sm p-4">
+                  <h4 className="font-semibold text-gray-800 mb-1">Naziv proizvoda</h4>
+                  <p className="text-gray-600">{product.nameLat}</p>
+                </div>
+                {product.brand && (
+                  <div className="bg-gray-50 rounded-sm p-4">
+                    <h4 className="font-semibold text-gray-800 mb-1">Proizvođač / Brend</h4>
+                    <p className="text-gray-600">{product.brand.name}</p>
+                  </div>
+                )}
+                {product.shelfLife && (
+                  <div className="bg-gray-50 rounded-sm p-4">
+                    <h4 className="font-semibold text-gray-800 mb-1">Rok trajanja / PAO</h4>
+                    <p className="text-gray-600">{product.shelfLife}</p>
+                  </div>
+                )}
+                {product.importerInfo && (
+                  <div className="bg-gray-50 rounded-sm p-4">
+                    <h4 className="font-semibold text-gray-800 mb-1">Uvoznik / Odgovorno lice</h4>
+                    {renderHtml(product.importerInfo, "")}
+                  </div>
+                )}
+              </div>
+            </div>}
           </div>
         </div>
 

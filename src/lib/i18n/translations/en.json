@@ -138,6 +138,7 @@
   "products": {
     "title": "Products",
     "allProducts": "All Products",
+    "allBrands": "All Brands",
     "filters": "Filters",
     "sort": "Sort",
     "sortNewest": "Newest",

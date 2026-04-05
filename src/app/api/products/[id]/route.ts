@@ -75,6 +75,23 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     take: 8,
   })
 
+  // Fetch color siblings if product is part of a group
+  const colorSiblings = product.groupSlug
+    ? await prisma.product.findMany({
+        where: { groupSlug: product.groupSlug, isActive: true },
+        select: {
+          id: true,
+          slug: true,
+          nameLat: true,
+          colorCode: true,
+          colorName: true,
+          stockQuantity: true,
+          images: { where: { isPrimary: true }, take: 1 },
+        },
+        orderBy: { colorCode: 'asc' },
+      })
+    : []
+
   // Format response — hide sensitive pricing from unauthorized users
   const isB2bOrAdmin = role === 'b2b' || role === 'admin'
   const formatted = {
@@ -86,6 +103,16 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     price: role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c),
     rating: avgRating._avg.rating || 0,
     reviewCount: product._count.reviews,
+    colorSiblings: colorSiblings.map(s => ({
+      id: s.id,
+      slug: s.slug,
+      name: s.nameLat,
+      colorCode: s.colorCode,
+      colorName: s.colorName,
+      image: s.images[0]?.url || null,
+      inStock: s.stockQuantity > 0,
+      isActive: s.id === product.id,
+    })),
     related: related.map(r => ({
       id: r.id,
       name: r.nameLat,

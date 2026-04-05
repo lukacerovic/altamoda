@@ -8,6 +8,7 @@ import {
   ChevronDown, ChevronRight, Grid3X3, LayoutList,
   X, ArrowUpDown, ShoppingBag, CheckCircle,
 } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCartStore } from "@/lib/stores/cart-store";
@@ -55,6 +56,8 @@ interface Product {
   rating: number;
   reviewCount: number;
   colorProduct: ColorProduct | null;
+  variantCount?: number;
+  groupSlug?: string | null;
 }
 
 interface BrandFilter {
@@ -118,10 +121,58 @@ interface ProductsPageClientProps {
   wishlistedProductIds?: string[];
   availableColorLevels?: ColorLevelFacet[];
   availableColorUndertones?: ColorUndertoneFacet[];
+  activeBrand?: {
+    name: string;
+    slug: string;
+    logoUrl: string | null;
+    description: string | null;
+    content: string | null;
+  } | null;
 }
 
 /* ─── Helpers ─── */
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&h=500&fit=crop";
+
+/* ─── BrandHeader ─── */
+function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: string | null; description: string | null; content: string | null } }) {
+  const [expanded, setExpanded] = useState(false);
+  // Strip old altamoda.rs images but keep the rest of HTML
+  const cleanHtml = brand.content
+    ? DOMPurify.sanitize(
+        brand.content.replace(/<p[^>]*>\s*<img[^>]*altamoda\.rs[^>]*\/>\s*<\/p>/gi, "").replace(/<p>\s*<\/p>/g, ""),
+        { ALLOWED_TAGS: ["p", "strong", "em", "br", "a", "ul", "ol", "li", "h2", "h3"], ALLOWED_ATTR: ["href"] }
+      )
+    : null;
+  const hasLongContent = cleanHtml ? cleanHtml.length > 300 : false;
+
+  return (
+    <section className="bg-[#faf7f3] border-b border-stone-200">
+      <div className="max-w-4xl mx-auto px-4 py-6 text-center">
+        {brand.logoUrl ? (
+          <img src={brand.logoUrl} alt={brand.name} className="h-10 mx-auto object-contain mb-3" />
+        ) : (
+          <h2 className="text-xl font-bold text-black mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
+        )}
+        {cleanHtml && (
+          <>
+            <div
+              className={`text-stone-500 text-[13px] leading-relaxed [&_p]:mb-2 [&_strong]:text-stone-700 [&_strong]:font-semibold ${expanded ? "" : "max-h-[4.5em] overflow-hidden"}`}
+              dangerouslySetInnerHTML={{ __html: cleanHtml }}
+            />
+            {hasLongContent && (
+              <button
+                onClick={() => setExpanded((prev) => !prev)}
+                className="mt-2 text-xs font-medium text-stone-400 hover:text-black transition-colors"
+              >
+                {expanded ? "▲ Sakrij" : "▼ Prikaži više"}
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
 
 function getBadge(product: Product): string | null {
   if (product.isNew) return "NOVO";
@@ -203,6 +254,11 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
           )}
           {product.isProfessional && (
             <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
+          )}
+          {product.variantCount != null && product.variantCount > 1 && (
+            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-[#735b28] text-white">
+              {product.variantCount} boja
+            </span>
           )}
         </div>
         <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-sm bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
@@ -351,6 +407,7 @@ export default function ProductsPageClient({
   wishlistedProductIds = [],
   availableColorLevels = [],
   availableColorUndertones = [],
+  activeBrand = null,
 }: ProductsPageClientProps) {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
@@ -856,6 +913,11 @@ export default function ProductsPageClient({
     <div className="min-h-screen bg-stone-100">
       <Header />
 
+      {/* Brand Header (when filtering by brand) */}
+      {activeBrand && (
+        <BrandHeader brand={activeBrand} />
+      )}
+
       {/* Page Header */}
       <div className="bg-white border-b border-[#e8e2d9]">
         <div className="max-w-7xl mx-auto px-4 py-8">
@@ -863,13 +925,21 @@ export default function ProductsPageClient({
           <nav className="flex items-center gap-2 text-sm text-stone-400 mb-4">
             <Link href="/" className="hover:text-black transition-colors">{t("productDetail.home")}</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-black font-medium">{t("products.allProducts")}</span>
+            {activeBrand ? (
+              <>
+                <Link href="/products" className="hover:text-black transition-colors">{t("products.allProducts")}</Link>
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-black font-medium">{activeBrand.name}</span>
+              </>
+            ) : (
+              <span className="text-black font-medium">{t("products.allProducts")}</span>
+            )}
           </nav>
 
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
               <h1 className="text-3xl md:text-4xl font-light text-black" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                {t("products.allProducts")}
+                {activeBrand ? activeBrand.name : t("products.allProducts")}
               </h1>
               <p className="text-sm text-stone-400 mt-2">{pagination.total} {t("products.productsLabel")}</p>
             </div>
@@ -968,32 +1038,34 @@ export default function ProductsPageClient({
               <SortSelect value={sortBy} onChange={setSortBy} />
             </div>
 
-            {/* Brand tags */}
-            <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b border-stone-100">
-              <button
-                onClick={() => setSelectedBrands([])}
-                className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
-                  selectedBrands.length === 0
-                    ? "bg-black text-white shadow-sm"
-                    : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
-                }`}
-              >
-                {t("products.allProducts")}
-              </button>
-              {brands.map((b) => (
+            {/* Brand tags — only on general products page, not on brand-specific page */}
+            {!activeBrand && (
+              <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b border-stone-100">
                 <button
-                  key={b.slug}
-                  onClick={() => toggleBrand(b.slug)}
+                  onClick={() => setSelectedBrands([])}
                   className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
-                    selectedBrands.includes(b.slug)
+                    selectedBrands.length === 0
                       ? "bg-black text-white shadow-sm"
                       : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
                   }`}
                 >
-                  {b.name}
+                  {t("products.allBrands")}
                 </button>
-              ))}
-            </div>
+                {brands.map((b) => (
+                  <button
+                    key={b.slug}
+                    onClick={() => toggleBrand(b.slug)}
+                    className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
+                      selectedBrands.includes(b.slug)
+                        ? "bg-black text-white shadow-sm"
+                        : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
+                    }`}
+                  >
+                    {b.name}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Active filter tags */}
             {activeTags.length > 0 && (

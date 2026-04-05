@@ -45,28 +45,29 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="bg-[#faf7f3] border-b border-stone-200">
-          <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center">
-            {brand.logoUrl && (
-              <div className="mb-8">
+          <div className="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center">
+            {brand.logoUrl ? (
+              <div className="mb-4">
                 <img
                   src={brand.logoUrl}
                   alt={brand.name}
-                  className="h-16 md:h-20 mx-auto object-contain"
+                  className="h-10 md:h-14 mx-auto object-contain"
                 />
               </div>
+            ) : (
+              <h1
+                className="text-2xl md:text-3xl font-bold text-black tracking-wide"
+                style={{ fontFamily: "'Noto Serif', serif" }}
+              >
+                {brand.name}
+              </h1>
             )}
-            <h1
-              className="text-3xl md:text-5xl font-bold text-black tracking-wide"
-              style={{ fontFamily: "'Noto Serif', serif" }}
-            >
-              {brand.name}
-            </h1>
             {brand.description && (
               <p className="mt-4 text-stone-500 text-lg max-w-2xl mx-auto leading-relaxed">
                 {brand.description}
               </p>
             )}
-            <div className="mt-6 flex items-center justify-center gap-6 text-sm text-stone-400">
+            <div className="mt-3 flex items-center justify-center gap-6 text-sm text-stone-400">
               <span>{totalProducts} {t("brand.productsAvailable")}</span>
             </div>
           </div>
