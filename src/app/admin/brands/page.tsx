@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Search, ChevronLeft, Upload, Loader2, Save } from "lucide-react";
+import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import dynamic from "next/dynamic";
 
@@ -157,7 +158,7 @@ export default function AdminBrandsPage() {
               >
                 <div className="w-full h-20 bg-stone-50 rounded-sm flex items-center justify-center mb-4 overflow-hidden">
                   {brand.logoUrl ? (
-                    <img src={brand.logoUrl} alt={brand.name} className="max-h-full max-w-full object-contain p-2" />
+                    <Image src={brand.logoUrl} alt={brand.name} width={80} height={40} className="max-h-full max-w-full object-contain p-2" />
                   ) : (
                     <span className="text-2xl font-bold text-stone-300" style={{ fontFamily: "'Noto Serif', serif" }}>
                       {brand.name.charAt(0)}
@@ -240,7 +241,7 @@ export default function AdminBrandsPage() {
             <div className="flex items-center gap-4">
               <div className="w-24 h-24 bg-stone-50 border border-stone-200 rounded-sm flex items-center justify-center overflow-hidden">
                 {editLogo ? (
-                  <img src={editLogo} alt="Logo" className="max-h-full max-w-full object-contain p-2" />
+                  <Image src={editLogo} alt="Logo" width={80} height={40} className="max-h-full max-w-full object-contain p-2" />
                 ) : (
                   <span className="text-3xl font-bold text-stone-300">{editName.charAt(0)}</span>
                 )}

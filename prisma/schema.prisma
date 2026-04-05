@@ -268,6 +268,15 @@ model Product {
   bundleItems      BundleItem[]
   productAttributes ProductAttribute[]
 
+  @@index([isActive, isProfessional])
+  @@index([isActive, isFeatured])
+  @@index([isActive, isBestseller])
+  @@index([isActive, isNew])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([groupSlug])
+  @@index([isActive, createdAt])
+  @@index([isActive, priceB2c])
   @@map("products")
 }
 
@@ -282,6 +291,7 @@ model ProductImage {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, isPrimary])
   @@map("product_images")
 }
 
@@ -296,6 +306,8 @@ model ColorProduct {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([colorLevel])
+  @@index([undertoneCode])
   @@map("color_products")
 }
 
@@ -379,6 +391,7 @@ model Wishlist {
   product Product @relation(fields: [productId], references: [id])
 
   @@unique([userId, productId])
+  @@index([userId])
   @@map("wishlists")
 }
 
@@ -458,6 +471,7 @@ model Review {
   user    User    @relation(fields: [userId], references: [id])
 
   @@unique([productId, userId])
+  @@index([productId])
   @@map("reviews")
 }
 

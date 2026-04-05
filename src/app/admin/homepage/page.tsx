@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check } from "lucide-react";
+import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface SectionProduct {
@@ -167,17 +168,24 @@ export default function HomepagePage() {
       const updateBody = flagField === "onSale"
         ? { oldPrice: null }
         : { [flagField]: false };
-      await fetch(`/api/products/${productId}`, {
+      const res = await fetch(`/api/products/${productId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateBody),
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        console.error("Failed to remove product:", data);
+        alert(`Greška: ${data.error || "Neuspešno uklanjanje proizvoda"}`);
+        return;
+      }
       setSectionProducts((prev) => ({
         ...prev,
         [sectionKey]: (prev[sectionKey] || []).filter((p) => p.id !== productId),
       }));
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error("Remove product error:", err);
+      alert("Greška pri uklanjanju proizvoda");
     }
   };
 
@@ -243,9 +251,11 @@ export default function HomepagePage() {
                       >
                         <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0">
                           {product.image ? (
-                            <img
+                            <Image
                               src={product.image}
                               alt={product.name}
+                              width={64}
+                              height={64}
                               className="w-10 h-10 rounded-lg object-cover"
                             />
                           ) : (
@@ -346,7 +356,7 @@ export default function HomepagePage() {
                         </div>
                         <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0">
                           {product.image ? (
-                            <img src={product.image} alt={product.name} className="w-10 h-10 rounded-lg object-cover" />
+                            <Image src={product.image} alt={product.name} width={64} height={64} className="w-10 h-10 rounded-lg object-cover" />
                           ) : (
                             <Package size={16} className="text-[#999]" />
                           )}

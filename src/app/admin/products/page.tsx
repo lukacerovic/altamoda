@@ -27,6 +27,7 @@ import {
   Layers,
   AlertTriangle,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -1423,7 +1424,7 @@ export default function ProductsPage() {
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
                           {img.url.startsWith("/uploads/") ? (
-                            <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                            <Image src={img.url} alt={img.alt} width={80} height={80} className="w-full h-full object-cover" />
                           ) : (
                             <div className="text-center p-2">
                               <ImageIcon size={28} className="mx-auto text-[#bbb] mb-1" />

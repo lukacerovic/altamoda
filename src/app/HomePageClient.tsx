@@ -8,11 +8,14 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Instagram, Mail, Send, X, TrendingUp,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const ChatWidget = dynamic(() => import("@/components/ChatWidget"), { ssr: false });
 
 
 /* ─── Types ─── */
@@ -56,7 +59,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
   return (
     <Link href={`/products/${product.slug}`} className="product-card bg-white rounded-2xl border border-[#e0d8cc] hover:border-[#b07a87] transition-all group relative overflow-hidden flex flex-col">
       <div className="relative aspect-square overflow-hidden bg-white rounded-t-2xl">
-        <img src={product.image || defaultImg} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+        <Image src={product.image || defaultImg} alt={product.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
         {displayBadge && (
           <span className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-medium rounded-full ${
             displayBadge === newLabel ? "bg-[#8c4a5a] text-white"
@@ -233,7 +236,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <div className="md:hidden absolute inset-x-0 top-1/2 -translate-y-1/2 h-32 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 10%, rgba(45,45,45,0.35) 45%, rgba(45,45,45,0.35) 55%, transparent 90%)" }} />
         {/* Left — B2C / Customers */}
         <Link href="/products" className="relative w-full md:w-1/2 h-1/2 md:h-full group overflow-hidden cursor-pointer">
-          <img src="/hero.png" alt="Professional hair care products" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <Image src="/hero.png" alt="Professional hair care products" fill sizes="(max-width: 768px) 100vw, 50vw" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           <div className="absolute inset-0 bg-[#2d2d2d]/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/90 via-[#2d2d2d]/40 to-[#2d2d2d]/10" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14">
@@ -252,7 +255,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
         {/* Right — B2B / Professionals */}
         <Link href="/account/login" className="relative w-full md:w-1/2 h-1/2 md:h-full group overflow-hidden cursor-pointer">
-          <img src="/b2bhero.png" alt="Salon partnership for professionals" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <Image src="/b2bhero.png" alt="Salon partnership for professionals" fill sizes="(max-width: 768px) 100vw, 50vw" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           <div className="absolute inset-0 bg-[#2d2d2d]/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/90 via-[#2d2d2d]/40 to-[#2d2d2d]/10" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14 text-right md:text-left">
@@ -333,17 +336,17 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 <div className="grid grid-cols-2 gap-3">
                   {/* Left: tall image */}
                   <Link href="/products" className="group/card relative row-span-2 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all">
-                    <img src={b2cShowcaseImages[0]} alt="B2C proizvod 1" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
+                    <Image src={b2cShowcaseImages[0]} alt="B2C proizvod 1" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                   </Link>
                   {/* Right top: short image */}
                   <Link href="/products" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <img src={b2cShowcaseImages[1]} alt="B2C proizvod 2" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <Image src={b2cShowcaseImages[1]} alt="B2C proizvod 2" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                   </Link>
                   {/* Right bottom: short image */}
                   <Link href="/products" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <img src={b2cShowcaseImages[2]} alt="B2C proizvod 3" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <Image src={b2cShowcaseImages[2]} alt="B2C proizvod 3" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                   </Link>
                 </div>
@@ -367,17 +370,17 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 <div className="grid grid-cols-2 gap-3">
                   {/* Left top: short image */}
                   <Link href="/products?visibility=b2b" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <img src={b2bShowcaseImages[0]} alt="B2B proizvod 1" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <Image src={b2bShowcaseImages[0]} alt="B2B proizvod 1" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                   </Link>
                   {/* Right: tall image */}
                   <Link href="/products?visibility=b2b" className="group/card relative row-span-2 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all">
-                    <img src={b2bShowcaseImages[1]} alt="B2B proizvod 2" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
+                    <Image src={b2bShowcaseImages[1]} alt="B2B proizvod 2" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                   </Link>
                   {/* Left bottom: short image */}
                   <Link href="/products?visibility=b2b" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <img src={b2bShowcaseImages[2]} alt="B2B proizvod 3" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                    <Image src={b2bShowcaseImages[2]} alt="B2B proizvod 3" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                   </Link>
                 </div>
@@ -445,7 +448,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="relative rounded-3xl overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&h=500&fit=crop" alt="Professional salon" className="w-full h-[400px] md:h-[450px] object-cover" />
+            <Image src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&h=500&fit=crop" alt="Professional salon" fill sizes="100vw" className="w-full h-[400px] md:h-[450px] object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#2d2d2d]/85 via-[#2d2d2d]/60 to-[#2d2d2d]/30" />
             <div className="absolute inset-0 flex items-center">
               <div className="max-w-7xl mx-auto px-8 md:px-12">
@@ -469,7 +472,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
             {instagramImages.map((img, i) => (
               <div key={i} className="aspect-square rounded-2xl overflow-hidden cursor-pointer group relative">
-                <img src={img} alt={`Instagram ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={img} alt={`Instagram ${i + 1}`} fill sizes="(max-width: 768px) 33vw, 16vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <Instagram className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>

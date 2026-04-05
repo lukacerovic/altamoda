@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
@@ -115,7 +116,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                 return (
                   <div key={item.productId} className="bg-white rounded-sm overflow-hidden shadow-sm border border-stone-200/50 group hover:shadow-md transition-all">
                     <div className="relative overflow-hidden aspect-square">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={item.image} alt={item.name} width={200} height={200} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {badge && (
                         <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#c0392b]">{badge}</span>
                       )}

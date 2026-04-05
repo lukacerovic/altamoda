@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -116,7 +117,7 @@ export default function CartPage() {
                 return (
                 <div key={item.productId} className={`bg-white rounded-sm shadow-sm p-4 md:p-6 flex gap-4 ${outOfStock ? "opacity-60" : ""}`}>
                   <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0 relative">
-                    {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
+                    {item.image && <Image src={item.image} alt={item.name} width={80} height={80} className="w-full h-full object-cover" />}
                     {outOfStock && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-red-600 px-2 py-1 rounded-sm">{t("cart.outOfStock")}</span>
@@ -277,7 +278,7 @@ export default function CartPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {recommended.map((p) => (
               <Link key={p.id} href={`/products/${p.id}`} className="product-card bg-white rounded-sm shadow-sm hover:shadow-md transition-all group overflow-hidden">
-                <div className="aspect-square overflow-hidden"><img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /></div>
+                <div className="aspect-square overflow-hidden"><Image src={p.image} alt={p.name} width={80} height={80} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /></div>
                 <div className="p-4">
                   <span className="text-xs text-secondary font-medium uppercase tracking-wider">{p.brand}</span>
                   <h3 className="text-sm font-medium text-black mt-1 line-clamp-2">{p.name}</h3>

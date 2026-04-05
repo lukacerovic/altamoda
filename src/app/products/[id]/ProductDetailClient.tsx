@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
@@ -100,8 +102,10 @@ interface ColorSibling {
 
 const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop";
 
-export default function ProductDetailClient({ product, related, colorSiblings = [], userRole, initialLiked = false, userExistingRating = null }: Props) {
+export default function ProductDetailClient({ product, related, colorSiblings = [], userRole: _serverRole, initialLiked = false, userExistingRating = null }: Props) {
   const { t } = useLanguage();
+  const { data: session } = useSession();
+  const role = (session?.user as { role?: string } | undefined)?.role || _serverRole;
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
   const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
   const [reviews, setReviews] = useState<Review[]>(product.reviews);
@@ -125,6 +129,20 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
 
   const { addItem } = useCartStore();
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
+
+  // Fetch user-specific data client-side (wishlist + existing review)
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    // Check wishlist status
+    fetch('/api/wishlist')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data?.items)) {
+          setLiked(data.data.items.some((w: { productId: string }) => w.productId === product.id));
+        }
+      })
+      .catch(() => {});
+  }, [session?.user?.id, product.id]);
 
   // Show sibling images when a color variant is selected, otherwise show product's own images
   const displayImages = selectedSibling && !selectedSibling.isActive && selectedSibling.images.length > 0
@@ -295,7 +313,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           {/* IMAGE GALLERY */}
           <div>
             <div className="aspect-square rounded-sm overflow-hidden mb-4 relative bg-white">
-              <img src={images[activeThumb]} alt={product.nameLat} className="w-full h-full object-cover" />
+              <Image src={images[activeThumb]} alt={product.nameLat} width={600} height={600} className="w-full h-full object-cover" />
               {product.images[activeThumb]?.type === 'video' && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center cursor-pointer hover:bg-white transition-colors">
@@ -308,7 +326,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               <div className="grid grid-cols-4 gap-2">
                 {images.map((img, t) => (
                   <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square rounded overflow-hidden border-2 transition-colors relative ${activeThumb === t ? "border-black" : "border-transparent hover:border-gray-200"}`}>
-                    <img src={img} alt={`View ${t + 1}`} className="w-full h-full object-cover" />
+                    <Image src={img} alt={`View ${t + 1}`} width={80} height={80} className="w-full h-full object-cover" />
                     {product.images[t]?.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30"><Play className="w-5 h-5 text-white" /></div>
                     )}
@@ -370,7 +388,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             </div>
 
             {/* B2B Price hint (for guests and B2C) */}
-            {userRole !== 'b2b' && product.isProfessional && (
+            {role !== 'b2b' && product.isProfessional && (
               <div className="border-2 border-black rounded-sm p-4 mb-6 bg-stone-50">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-secondary" />
@@ -383,7 +401,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             )}
 
             {/* B2B user sees both prices */}
-            {userRole === 'b2b' && product.priceB2b && (
+            {role === 'b2b' && product.priceB2b && (
               <div className="border-2 border-green-300 rounded-sm p-4 mb-6 bg-green-50">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-green-700">{t("productDetail.yourB2bPrice")}</span>
@@ -645,7 +663,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               {related.map((p) => (
                 <Link key={p.id} href={`/products/${p.slug}`} className="bg-white rounded-sm shadow-sm hover:shadow-md transition-all group overflow-hidden">
                   <div className="aspect-square overflow-hidden bg-[#faf7f3]">
-                    <img src={p.image || defaultImage} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <Image src={p.image || defaultImage} alt={p.name} width={400} height={400} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="p-4">
                     <span className="text-xs text-secondary font-medium uppercase tracking-wider">{p.brand?.name}</span>

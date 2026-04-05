@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler, getPaginationParams } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
@@ -89,16 +90,16 @@ export const GET = withErrorHandler(async (req: Request) => {
   }
   // Admin sees everything
 
-  // Category filter (by slug)
+  // Category filter (by slug) — single query for parent + children
   if (category) {
-    const cat = await prisma.category.findUnique({ where: { slug: category } })
-    if (cat) {
-      // Include products from this category and all children
-      const childCats = await prisma.category.findMany({
-        where: { parentId: cat.id, isActive: true },
-      })
-      const catIds = [cat.id, ...childCats.map(c => c.id)]
-      where.categoryId = { in: catIds }
+    const catWithChildren = await prisma.category.findMany({
+      where: {
+        OR: [{ slug: category }, { parent: { slug: category }, isActive: true }],
+      },
+      select: { id: true },
+    })
+    if (catWithChildren.length > 0) {
+      where.categoryId = { in: catWithChildren.map(c => c.id) }
     }
   }
 
@@ -191,7 +192,8 @@ export const GET = withErrorHandler(async (req: Request) => {
     sortOrderBy,
   ]
 
-  // For grouped products, find representative IDs (first per group matching filters)
+  // For grouped products, find representatives and exclude duplicates
+  // Uses 2 queries instead of 3: groupBy for count + single query for rep IDs + all IDs
   const groupedInFilter = await prisma.product.groupBy({
     by: ['groupSlug'],
     where: { ...where, groupSlug: { not: null } },
@@ -202,20 +204,21 @@ export const GET = withErrorHandler(async (req: Request) => {
   const excludeIds = new Set<string>()
   if (groupedInFilter.length > 0) {
     const groupSlugsInFilter = groupedInFilter.map(g => g.groupSlug).filter(Boolean) as string[]
-    // Get first product per group (representative)
-    const reps = await prisma.product.findMany({
-      where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
-      select: { id: true, groupSlug: true },
-      orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
-      distinct: ['groupSlug'],
-    })
-    const repIds = new Set(reps.map(r => r.id))
 
-    // Get ALL products in these groups to find non-reps to exclude
-    const allInGroups = await prisma.product.findMany({
-      where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
-      select: { id: true },
-    })
+    // Fetch reps (distinct per group) and all group members in parallel
+    const [reps, allInGroups] = await Promise.all([
+      prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+        select: { id: true, groupSlug: true },
+        orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
+        distinct: ['groupSlug'],
+      }),
+      prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+        select: { id: true },
+      }),
+    ])
+    const repIds = new Set(reps.map(r => r.id))
     for (const p of allInGroups) {
       if (!repIds.has(p.id)) excludeIds.add(p.id)
     }
@@ -245,24 +248,25 @@ export const GET = withErrorHandler(async (req: Request) => {
   ])
   const total = totalRaw - duplicateCount
 
-  // Calculate avg ratings
+  // Calculate avg ratings + variant counts in parallel
   const productIds = products.map(p => p.id)
-  const ratings = await prisma.review.groupBy({
-    by: ['productId'],
-    where: { productId: { in: productIds } },
-    _avg: { rating: true },
-  })
-  const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
-
-  // Get variant counts for grouped products
   const groupSlugs = [...new Set(products.map(p => p.groupSlug).filter(Boolean))] as string[]
-  const variantCounts = groupSlugs.length > 0
-    ? await prisma.product.groupBy({
-        by: ['groupSlug'],
-        where: { groupSlug: { in: groupSlugs }, isActive: true },
-        _count: true,
-      })
-    : []
+
+  const [ratings, variantCounts] = await Promise.all([
+    prisma.review.groupBy({
+      by: ['productId'],
+      where: { productId: { in: productIds } },
+      _avg: { rating: true },
+    }),
+    groupSlugs.length > 0
+      ? prisma.product.groupBy({
+          by: ['groupSlug'],
+          where: { groupSlug: { in: groupSlugs }, isActive: true },
+          _count: true,
+        })
+      : Promise.resolve([]),
+  ])
+  const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
   const variantCountMap = new Map(variantCounts.map(v => [v.groupSlug!, v._count]))
 
   // Format response — show appropriate price based on role
@@ -392,6 +396,10 @@ export const POST = withErrorHandler(async (req: Request) => {
       })),
     })
   }
+
+  // Invalidate cached pages
+  revalidatePath('/')
+  revalidatePath('/products')
 
   return successResponse(product, 201)
 })

@@ -1,8 +1,8 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 120
 
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
-import { auth } from '@/lib/auth'
+import { getProductBySlugOrId } from '@/lib/cached-queries'
 import ProductDetailClient from './ProductDetailClient'
 import type { Metadata } from 'next'
 
@@ -12,61 +12,31 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
-  const product = await prisma.product.findFirst({
-    where: { OR: [{ id }, { slug: id }], isActive: true },
-    include: { brand: true, images: { where: { isPrimary: true }, take: 1 } },
-  })
+  const product = await getProductBySlugOrId(id)
 
   if (!product) return { title: 'Proizvod nije pronađen | Alta Moda' }
 
+  const primaryImage = product.images.find(img => img.isPrimary) || product.images[0]
   return {
     title: `${product.nameLat} | ${product.brand?.name || 'Alta Moda'}`,
     description: product.seoDescription || product.description?.slice(0, 160) || `Kupite ${product.nameLat} po najboljoj ceni.`,
     openGraph: {
       title: product.seoTitle || product.nameLat,
       description: product.description?.slice(0, 200) || '',
-      images: product.images[0]?.url ? [product.images[0].url] : [],
+      images: primaryImage?.url ? [primaryImage.url] : [],
     },
   }
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params
-  const session = await auth()
-  const role = (session?.user as { role?: string } | undefined)?.role || null
 
-  const product = await prisma.product.findFirst({
-    where: { OR: [{ id }, { slug: id }], isActive: true },
-    include: {
-      brand: { select: { name: true, slug: true } },
-      productLine: { select: { name: true, slug: true } },
-      category: {
-        select: { nameLat: true, slug: true, parent: { select: { nameLat: true, slug: true } } },
-      },
-      images: { orderBy: { sortOrder: 'asc' } },
-      colorProduct: true,
-      productAttributes: { include: { attribute: true } },
-      reviews: {
-        include: { user: { select: { name: true } } },
-        orderBy: { createdAt: 'desc' },
-        take: 10,
-      },
-      _count: { select: { reviews: true } },
-    },
-  })
+  // Uses React cache() — deduplicates with generateMetadata call above
+  const product = await getProductBySlugOrId(id)
 
   if (!product) notFound()
 
-  // B2C visibility check
-  if (role === 'b2c' && product.isProfessional) notFound()
-
-  // Avg rating
-  const avgRating = await prisma.review.aggregate({
-    where: { productId: product.id },
-    _avg: { rating: true },
-  })
-
-  // Related products
+  // Run all independent queries in parallel (no auth() call — page is fully cacheable)
   const relatedWhere = {
     isActive: true,
     id: { not: product.id },
@@ -74,32 +44,33 @@ export default async function ProductDetailPage({ params }: PageProps) {
       ...(product.categoryId ? [{ categoryId: product.categoryId }] : []),
       ...(product.productLineId ? [{ productLineId: product.productLineId }] : []),
     ],
-    ...(role === 'b2c' ? { isProfessional: false } : {}),
   }
 
-  const relatedProducts = await prisma.product.findMany({
-    where: relatedWhere.OR.length > 0 ? relatedWhere : { isActive: true, id: { not: product.id } },
-    include: {
-      brand: { select: { name: true, slug: true } },
-      images: { where: { isPrimary: true }, take: 1 },
-    },
-    take: 8,
-  })
-
-  // Fetch color siblings
-  const colorSiblings = product.groupSlug
-    ? await prisma.product.findMany({
-        where: { groupSlug: product.groupSlug, isActive: true },
-        select: {
-          id: true, slug: true, nameLat: true, colorCode: true, colorName: true,
-          stockQuantity: true,
-          images: { orderBy: { sortOrder: 'asc' } },
-        },
-        orderBy: { colorCode: 'asc' },
-      })
-    : []
-
-  const price = role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
+  const [avgRating, relatedProducts, colorSiblings] = await Promise.all([
+    prisma.review.aggregate({
+      where: { productId: product.id },
+      _avg: { rating: true },
+    }),
+    prisma.product.findMany({
+      where: relatedWhere.OR.length > 0 ? relatedWhere : { isActive: true, id: { not: product.id } },
+      include: {
+        brand: { select: { name: true, slug: true } },
+        images: { where: { isPrimary: true }, take: 1 },
+      },
+      take: 8,
+    }),
+    product.groupSlug
+      ? prisma.product.findMany({
+          where: { groupSlug: product.groupSlug, isActive: true },
+          select: {
+            id: true, slug: true, nameLat: true, colorCode: true, colorName: true,
+            stockQuantity: true,
+            images: { orderBy: { sortOrder: 'asc' } },
+          },
+          orderBy: { colorCode: 'asc' },
+        })
+      : Promise.resolve([]),
+  ])
 
   const serialized = {
     id: product.id,
@@ -119,7 +90,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     priceB2c: Number(product.priceB2c),
     priceB2b: product.priceB2b ? Number(product.priceB2b) : null,
     oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
-    price,
+    price: Number(product.priceB2c),
     stockQuantity: product.stockQuantity,
     isProfessional: product.isProfessional,
     isNew: product.isNew,
@@ -155,27 +126,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
     name: r.nameLat,
     slug: r.slug,
     brand: r.brand,
-    price: role === 'b2b' && r.priceB2b ? Number(r.priceB2b) : Number(r.priceB2c),
+    price: Number(r.priceB2c),
     oldPrice: r.oldPrice ? Number(r.oldPrice) : null,
     image: r.images[0]?.url || null,
     isProfessional: r.isProfessional,
   }))
-
-  // Check if user has this product in wishlist + already reviewed
-  let isInWishlist = false
-  let userExistingRating: number | null = null
-  if (session?.user?.id) {
-    const [wishlistEntry, existingReview] = await Promise.all([
-      prisma.wishlist.findUnique({
-        where: { userId_productId: { userId: session.user.id as string, productId: product.id } },
-      }),
-      prisma.review.findUnique({
-        where: { productId_userId: { productId: product.id, userId: session.user.id as string } },
-      }),
-    ])
-    isInWishlist = !!wishlistEntry
-    userExistingRating = existingReview?.rating ?? null
-  }
 
   const siblings = colorSiblings.map(s => ({
     id: s.id,
@@ -188,5 +143,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
     isActive: s.id === product.id,
   }))
 
-  return <ProductDetailClient product={serialized} related={related} colorSiblings={siblings} userRole={role} initialLiked={isInWishlist} userExistingRating={userExistingRating} />
+  // Wishlist/review status + user role are resolved client-side via useSession()
+  return <ProductDetailClient product={serialized} related={related} colorSiblings={siblings} userRole={null} initialLiked={false} userExistingRating={null} />
 }

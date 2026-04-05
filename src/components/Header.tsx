@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/stores/cart-store";
@@ -281,7 +282,7 @@ export default function Header() {
                                 className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#faf7f3] transition-colors group"
                               >
                                 {brand.logoUrl ? (
-                                  <img src={brand.logoUrl} alt={brand.name} className="w-8 h-8 object-contain flex-shrink-0" />
+                                  <Image src={brand.logoUrl} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
                                 ) : (
                                   <div className="w-8 h-8 bg-stone-100 rounded-sm flex items-center justify-center flex-shrink-0">
                                     <span className="text-xs font-bold text-stone-400">{brand.name.charAt(0)}</span>
@@ -337,9 +338,11 @@ export default function Header() {
                             <div className="w-[200px] flex-shrink-0">
                               <Link href={menuData.featured.href} className="block group">
                                 <div className="relative rounded-sm overflow-hidden aspect-[4/3]">
-                                  <img
+                                  <Image
                                     src={menuData.featured.image}
                                     alt={menuData.featured.title}
+                                    width={200}
+                                    height={200}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -367,7 +370,7 @@ export default function Header() {
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-            <img src="/logo.png" alt="Alta Moda" className="h-6 md:h-7" />
+            <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-6 md:h-7" />
           </Link>
 
           {/* Icons - right */}
@@ -428,7 +431,7 @@ export default function Header() {
                           className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#faf7f3] transition-colors"
                           onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
                         >
-                          <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-10 h-10 rounded-sm object-cover" />
+                          <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={200} height={200} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-black truncate">{p.name}</p>
                             <p className="text-[11px] text-[#874d5d] font-medium">{p.brand}</p>
@@ -453,7 +456,7 @@ export default function Header() {
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileMenu(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 bg-white overflow-y-auto animate-slideInRight">
             <div className="flex items-center justify-between p-4 border-b border-stone-200">
-              <img src="/logo.png" alt="Alta Moda" className="h-5" />
+              <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-5" />
               <button onClick={() => setMobileMenu(false)}>
                 <X className="w-5 h-5 text-black" />
               </button>
@@ -498,7 +501,7 @@ export default function Header() {
                             className="flex items-center gap-3 py-2 px-2 text-sm text-[#6b6b6b] hover:text-secondary transition-colors"
                           >
                             {brand.logoUrl ? (
-                              <img src={brand.logoUrl} alt={brand.name} className="w-6 h-6 object-contain" />
+                              <Image src={brand.logoUrl} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
                             ) : (
                               <div className="w-6 h-6 bg-stone-100 rounded-sm flex items-center justify-center">
                                 <span className="text-[10px] font-bold text-stone-400">{brand.name.charAt(0)}</span>

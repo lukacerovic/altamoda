@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
@@ -203,6 +204,11 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     await prisma.colorProduct.deleteMany({ where: { productId: id } })
   }
 
+  // Invalidate cached pages that display products
+  revalidatePath('/')
+  revalidatePath('/products')
+  revalidatePath(`/products/${product.slug || id}`)
+
   return successResponse(product)
 })
 
@@ -215,6 +221,10 @@ export const DELETE = withErrorHandler(async (_req: Request, context: unknown) =
     where: { id },
     data: { isActive: false },
   })
+
+  // Invalidate cached pages
+  revalidatePath('/')
+  revalidatePath('/products')
 
   return successResponse({ deleted: true })
 })

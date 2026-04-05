@@ -1,8 +1,7 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
 import ProductsPageClient from "./ProductsPageClient";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,38 +61,74 @@ function buildCategoryTree(
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const resolvedParams = await searchParams;
   const brandSlug = typeof resolvedParams.brand === "string" ? resolvedParams.brand : null;
-  // Get session / user role
-  const session = await auth();
-  const user = session?.user as { role?: string } | undefined;
-  const userRole = user?.role ?? null;
 
-  // Determine visibility filter based on role
-  const visibilityWhere =
-    userRole === "b2c"
-      ? { isProfessional: false }
-      : userRole === "b2b"
-        ? { isProfessional: true }
-        : {};
-
-  // Fetch initial products (page 1, limit 12)
+  // No auth() call — page is fully cacheable. Role-based filtering happens client-side via API.
   const limit = 12;
-  const [rawProducts, total] = await Promise.all([
-    prisma.product.findMany({
-      where: { isActive: true, ...visibilityWhere },
-      include: {
-        brand: { select: { id: true, name: true, slug: true } },
-        category: { select: { id: true, nameLat: true, slug: true } },
-        images: { where: { isPrimary: true }, take: 1 },
-        colorProduct: true,
-        _count: { select: { reviews: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: limit,
+  const productWhere = { isActive: true };
+
+  const [
+    [rawProducts, total],
+    brandsData,
+    flatCategories,
+    attributes,
+    colorProducts,
+    activeBrand,
+  ] = await Promise.all([
+    // Products + count
+    Promise.all([
+      prisma.product.findMany({
+        where: productWhere,
+        include: {
+          brand: { select: { id: true, name: true, slug: true } },
+          category: { select: { id: true, nameLat: true, slug: true } },
+          images: { where: { isPrimary: true }, take: 1 },
+          colorProduct: true,
+          _count: { select: { reviews: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+      }),
+      prisma.product.count({ where: productWhere }),
+    ]),
+    // Brands
+    prisma.brand.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, slug: true },
+      orderBy: { name: "asc" },
     }),
-    prisma.product.count({ where: { isActive: true, ...visibilityWhere } }),
+    // Categories
+    prisma.category.findMany({
+      where: { isActive: true },
+      select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true } } } } },
+      orderBy: { sortOrder: "asc" },
+    }),
+    // Dynamic attributes
+    prisma.dynamicAttribute.findMany({
+      where: { showInFilters: true },
+      select: {
+        id: true,
+        nameLat: true,
+        slug: true,
+        type: true,
+        options: { select: { id: true, value: true }, orderBy: { sortOrder: "asc" } },
+      },
+      orderBy: { sortOrder: "asc" },
+    }),
+    // Color facets
+    prisma.colorProduct.findMany({
+      where: { product: { isActive: true } },
+      select: { colorLevel: true, undertoneCode: true, undertoneName: true, hexValue: true },
+    }),
+    // Active brand (conditional)
+    brandSlug
+      ? prisma.brand.findUnique({
+          where: { slug: brandSlug },
+          select: { name: true, slug: true, logoUrl: true, description: true, content: true },
+        })
+      : Promise.resolve(null),
   ]);
 
-  // Get average ratings
+  // Get average ratings (needs product IDs from above)
   const productIds = rawProducts.map((p) => p.id);
   const ratings = await prisma.review.groupBy({
     by: ["productId"],
@@ -110,7 +145,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     slug: p.slug,
     brand: p.brand ? { id: p.brand.id, name: p.brand.name, slug: p.brand.slug } : null,
     category: p.category ? { id: p.category.id, nameLat: p.category.nameLat, slug: p.category.slug } : null,
-    price: userRole === "b2b" && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c),
+    price: Number(p.priceB2c),
     priceB2c: Number(p.priceB2c),
     priceB2b: p.priceB2b ? Number(p.priceB2b) : null,
     oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
@@ -140,19 +175,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     totalPages: Math.ceil(total / limit),
   };
 
-  // Fetch brands
-  const brands = await prisma.brand.findMany({
-    where: { isActive: true },
-    select: { id: true, name: true, slug: true },
-    orderBy: { name: "asc" },
-  });
-
-  // Fetch categories with product counts, then filter out empty ones
-  const flatCategories = await prisma.category.findMany({
-    where: { isActive: true },
-    select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true } } } } },
-    orderBy: { sortOrder: "asc" },
-  });
+  const brands = brandsData;
 
   // Keep categories that have products directly OR have children with products
   const catProductCount = new Map(flatCategories.map(c => [c.id, c._count.products]));
@@ -165,30 +188,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   const categories = buildCategoryTree(nonEmptyCategories);
 
-  // Fetch dynamic attributes (for filter toggles)
-  const attributes = await prisma.dynamicAttribute.findMany({
-    where: { showInFilters: true },
-    select: {
-      id: true,
-      nameLat: true,
-      slug: true,
-      type: true,
-      options: { select: { id: true, value: true }, orderBy: { sortOrder: "asc" } },
-    },
-    orderBy: { sortOrder: "asc" },
-  });
-
-  // Fetch available color facets (only colors that exist on active products)
-  const colorProducts = await prisma.colorProduct.findMany({
-    where: { product: { isActive: true } },
-    select: {
-      colorLevel: true,
-      undertoneCode: true,
-      undertoneName: true,
-      hexValue: true,
-    },
-  });
-
+  // Build color facet maps
   const colorLevelMap = new Map<number, { count: number; hexSamples: string[] }>();
   const colorUndertoneMap = new Map<string, { name: string; count: number; hexSamples: string[] }>();
 
@@ -218,24 +218,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([code, data]) => ({ code, name: data.name, count: data.count, hexSamples: data.hexSamples }));
 
-  // Fetch active brand info if brand filter is set
-  const activeBrand = brandSlug
-    ? await prisma.brand.findUnique({
-        where: { slug: brandSlug },
-        select: { name: true, slug: true, logoUrl: true, description: true, content: true },
-      })
-    : null;
-
-  // Fetch user's wishlisted product IDs
-  let wishlistedIds: string[] = [];
-  if (session?.user?.id) {
-    const wishlisted = await prisma.wishlist.findMany({
-      where: { userId: session.user.id as string },
-      select: { productId: true },
-    });
-    wishlistedIds = wishlisted.map((w) => w.productId);
-  }
-
+  // Wishlist IDs and user role resolved client-side via useSession()
   return (
     <ProductsPageClient
       initialProducts={initialProducts}
@@ -243,8 +226,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       brands={brands}
       categories={categories}
       attributes={attributes}
-      userRole={userRole}
-      wishlistedProductIds={wishlistedIds}
+      userRole={null}
+      wishlistedProductIds={[]}
       availableColorLevels={availableColorLevels}
       availableColorUndertones={availableColorUndertones}
       activeBrand={activeBrand}
