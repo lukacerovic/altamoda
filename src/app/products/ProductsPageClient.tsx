@@ -8,7 +8,7 @@ import {
   ChevronDown, ChevronRight, Grid3X3, LayoutList,
   X, ArrowUpDown, ShoppingBag, CheckCircle,
 } from "lucide-react";
-import DOMPurify from "isomorphic-dompurify";
+import DOMPurify from "dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCartStore } from "@/lib/stores/cart-store";
