@@ -1,6 +1,6 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder')
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'Altamoda <onboarding@resend.dev>'
 const SITE_URL = process.env.SITE_URL || 'http://localhost:3000'
