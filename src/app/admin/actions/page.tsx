@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Plus, X, Search, Edit3, Trash2, Zap, Tag, Calendar,
-  ChevronDown, ChevronRight, Check, Package, Percent,
-  Eye, EyeOff, Users, ShoppingBag,
+  Check, Package, Percent,
+  Eye, EyeOff, Users, ShoppingBag, Filter,
 } from "lucide-react";
 
 // ─── Types ───
 
 interface ActionProduct {
-  id: number;
+  id: string;
   name: string;
+  sku: string;
   brand: string;
   category: string;
   originalPrice: number;
@@ -20,78 +21,63 @@ interface ActionProduct {
 }
 
 interface SaleAction {
-  id: number;
+  id: string;
   name: string;
   type: "percentage" | "fixed" | "price";
   value: number;
-  target: "product" | "category" | "brand" | "all";
-  targetLabel: string;
+  targetType: "product" | "category" | "brand" | "all";
+  targetId: string | null;
   audience: "all" | "b2b" | "b2c";
-  badge: string;
-  startDate: string;
-  endDate: string;
+  badge: string | null;
+  startDate: string | null;
+  endDate: string | null;
   isActive: boolean;
   products: ActionProduct[];
 }
 
-// ─── Mock Data ───
+interface DBProduct {
+  id: string;
+  sku: string;
+  name: string;
+  slug: string;
+  brand: { id: string; name: string; slug: string } | null;
+  category: { id: string; nameLat: string; slug: string } | null;
+  priceB2c: number;
+  image: string | null;
+}
 
-const allProducts: ActionProduct[] = [
-  { id: 1, name: "Serie Expert Gold Quinoa 300ml", brand: "L'Oréal", category: "Nega kose", originalPrice: 2500, image: "" },
-  { id: 2, name: "BC Bonacure Peptide Repair 250ml", brand: "Schwarzkopf", category: "Nega kose", originalPrice: 1800, image: "" },
-  { id: 3, name: "Elixir Ultime Serum 100ml", brand: "Kérastase", category: "Ulja i serumi", originalPrice: 4200, image: "" },
-  { id: 4, name: "Oil Reflections Šampon 250ml", brand: "Wella", category: "Nega kose", originalPrice: 1950, image: "" },
-  { id: 5, name: "Moroccanoil Treatment 100ml", brand: "Moroccanoil", category: "Ulja i serumi", originalPrice: 3500, image: "" },
-  { id: 6, name: "Igora Royal 60ml - 7.0", brand: "Schwarzkopf", category: "Boje za kosu", originalPrice: 850, image: "" },
-  { id: 7, name: "Majirel 50ml - 6.0", brand: "L'Oréal", category: "Boje za kosu", originalPrice: 900, image: "" },
-  { id: 8, name: "OSIS+ Dust It", brand: "Schwarzkopf", category: "Styling", originalPrice: 1200, image: "" },
-  { id: 9, name: "No.3 Hair Perfector 100ml", brand: "Olaplex", category: "Ulja i serumi", originalPrice: 2850, image: "" },
-  { id: 10, name: "Nutritive Bain Satin 250ml", brand: "Kérastase", category: "Nega kose", originalPrice: 3400, image: "" },
-  { id: 11, name: "BlondMe Bond Maska 200ml", brand: "Schwarzkopf", category: "Nega kose", originalPrice: 3100, image: "" },
-  { id: 12, name: "Mythic Oil Huile 100ml", brand: "L'Oréal", category: "Ulja i serumi", originalPrice: 2800, image: "" },
-];
+interface BrandOption {
+  id: string;
+  name: string;
+  slug: string;
+}
 
-const initialActions: SaleAction[] = [
-  {
-    id: 1, name: "Prolećna Akcija -20%", type: "percentage", value: 20,
-    target: "category", targetLabel: "Nega kose", audience: "all", badge: "AKCIJA -20%",
-    startDate: "2026-03-01", endDate: "2026-04-30", isActive: true,
-    products: allProducts.filter(p => p.category === "Nega kose"),
-  },
-  {
-    id: 2, name: "Olaplex Vikend", type: "percentage", value: 15,
-    target: "brand", targetLabel: "Olaplex", audience: "all", badge: "-15%",
-    startDate: "2026-03-20", endDate: "2026-03-22", isActive: true,
-    products: allProducts.filter(p => p.brand === "Olaplex"),
-  },
-  {
-    id: 3, name: "B2B Specijal Boje", type: "fixed", value: 200,
-    target: "category", targetLabel: "Boje za kosu", audience: "b2b", badge: "-200 RSD",
-    startDate: "2026-03-01", endDate: "2026-06-30", isActive: true,
-    products: allProducts.filter(p => p.category === "Boje za kosu"),
-  },
-  {
-    id: 4, name: "Kérastase Serum Flash Sale", type: "price", value: 2990,
-    target: "product", targetLabel: "Elixir Ultime Serum", audience: "all", badge: "AKCIJA",
-    startDate: "2026-04-01", endDate: "2026-04-07", isActive: false,
-    products: allProducts.filter(p => p.id === 3),
-  },
-];
+interface CategoryOption {
+  id: string;
+  nameLat: string;
+  slug: string;
+}
 
 // ─── Component ───
 
 export default function ActionsPage() {
   const { t } = useLanguage();
 
-  const brands = ["L'Oréal", "Schwarzkopf", "Kérastase", "Wella", "Moroccanoil", "Olaplex", "Matrix"];
-  const categoriesList = ["Nega kose", "Boje za kosu", "Styling", "Ulja i serumi", "Aparati"];
   const badgeOptions = ["AKCIJA", "-10%", "-15%", "-20%", "-25%", "-30%", "NOVO", "RASPRODAJA", "SPECIJALNO"];
 
-  const [actions, setActions] = useState<SaleAction[]>(initialActions);
+  const [actions, setActions] = useState<SaleAction[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showPanel, setShowPanel] = useState(false);
   const [editingAction, setEditingAction] = useState<SaleAction | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive" | "scheduled">("all");
+  const [saving, setSaving] = useState(false);
+
+  // Products from DB
+  const [allProducts, setAllProducts] = useState<DBProduct[]>([]);
+  const [brands, setBrands] = useState<BrandOption[]>([]);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
 
   // Form state
   const [form, setForm] = useState({
@@ -104,35 +90,132 @@ export default function ActionsPage() {
     badge: "AKCIJA",
     startDate: "",
     endDate: "",
-    selectedProductIds: [] as number[],
+    selectedProductIds: [] as string[],
   });
 
   const [productSearch, setProductSearch] = useState("");
+  const [filterBrand, setFilterBrand] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
 
-  // Stats
-  const activeCount = actions.filter(a => a.isActive && new Date(a.endDate) >= new Date()).length;
-  const scheduledCount = actions.filter(a => a.isActive && new Date(a.startDate) > new Date()).length;
+  // Fetch promotions
+  const fetchPromotions = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/promotions");
+      const json = await res.json();
+      if (json.success) setActions(json.data);
+    } catch (err) {
+      console.error("Failed to fetch promotions:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch products, brands, categories
+  const fetchProducts = useCallback(async () => {
+    setProductsLoading(true);
+    try {
+      // Fetch first page + brands + categories in parallel
+      const [firstPageRes, brandsRes, categoriesRes] = await Promise.all([
+        fetch("/api/products?limit=100&page=1"),
+        fetch("/api/brands"),
+        fetch("/api/categories"),
+      ]);
+      const [firstPageJson, brandsJson, categoriesJson] = await Promise.all([
+        firstPageRes.json(),
+        brandsRes.json(),
+        categoriesRes.json(),
+      ]);
+
+      const allProds: DBProduct[] = [];
+      const mapProduct = (p: Record<string, unknown>) => ({
+        id: p.id as string,
+        sku: p.sku as string,
+        name: p.name as string,
+        slug: p.slug as string,
+        brand: p.brand as DBProduct["brand"],
+        category: p.category as DBProduct["category"],
+        priceB2c: (p.priceB2c ?? p.price) as number,
+        image: p.image as string | null,
+      });
+
+      if (firstPageJson.success) {
+        for (const p of firstPageJson.data.products) allProds.push(mapProduct(p));
+        const totalPages = firstPageJson.data.pagination.totalPages;
+
+        // Fetch remaining pages in parallel
+        if (totalPages > 1) {
+          const pagePromises = [];
+          for (let pg = 2; pg <= totalPages; pg++) {
+            pagePromises.push(fetch(`/api/products?limit=100&page=${pg}`).then(r => r.json()));
+          }
+          const results = await Promise.all(pagePromises);
+          for (const json of results) {
+            if (json.success) {
+              for (const p of json.data.products) allProds.push(mapProduct(p));
+            }
+          }
+        }
+      }
+      setAllProducts(allProds);
+      if (brandsJson.success) {
+        setBrands(
+          (brandsJson.data as BrandOption[]).map((b) => ({
+            id: b.id,
+            name: b.name,
+            slug: b.slug,
+          }))
+        );
+      }
+      if (categoriesJson.success) {
+        const cats: CategoryOption[] = [];
+        const extractCats = (items: Record<string, unknown>[]) => {
+          for (const item of items) {
+            cats.push({ id: item.id as string, nameLat: item.nameLat as string || item.name as string, slug: item.slug as string });
+            if (Array.isArray(item.children)) extractCats(item.children as Record<string, unknown>[]);
+          }
+        };
+        extractCats(Array.isArray(categoriesJson.data) ? categoriesJson.data : []);
+        setCategories(cats);
+      }
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+    } finally {
+      setProductsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPromotions();
+    fetchProducts();
+  }, [fetchPromotions, fetchProducts]);
+
+  // Stats helpers — compare as YYYY-MM-DD strings to avoid timezone issues
+  const todayStr = new Date().toLocaleDateString("sv-SE"); // "YYYY-MM-DD" format
+  const isActiveNow = (a: SaleAction) => {
+    if (!a.isActive) return false;
+    if (a.endDate && a.endDate < todayStr) return false;
+    if (a.startDate && a.startDate > todayStr) return false;
+    return true;
+  };
+  const isScheduled = (a: SaleAction) => a.isActive && !!a.startDate && a.startDate > todayStr;
+
+  const activeCount = actions.filter(isActiveNow).length;
+  const scheduledCount = actions.filter(a => isScheduled(a)).length;
   const totalProducts = actions.filter(a => a.isActive).reduce((sum, a) => sum + a.products.length, 0);
 
   // Filter actions
   const filtered = actions.filter(a => {
-    const matchSearch = a.name.toLowerCase().includes(search.toLowerCase()) || a.targetLabel.toLowerCase().includes(search.toLowerCase());
-    const now = new Date();
-    const start = new Date(a.startDate);
-    const end = new Date(a.endDate);
-    if (statusFilter === "active") return matchSearch && a.isActive && start <= now && end >= now;
-    if (statusFilter === "inactive") return matchSearch && (!a.isActive || end < now);
-    if (statusFilter === "scheduled") return matchSearch && a.isActive && start > now;
+    const matchSearch = a.name.toLowerCase().includes(search.toLowerCase());
+    if (statusFilter === "active") return matchSearch && isActiveNow(a);
+    if (statusFilter === "inactive") return matchSearch && (!a.isActive || (a.endDate && a.endDate < todayStr));
+    if (statusFilter === "scheduled") return matchSearch && isScheduled(a);
     return matchSearch;
   });
 
   const getStatus = (a: SaleAction) => {
-    const now = new Date();
-    const start = new Date(a.startDate);
-    const end = new Date(a.endDate);
     if (!a.isActive) return { label: t("admin.inactive"), color: "bg-gray-100 text-gray-500" };
-    if (end < now) return { label: t("admin.expired"), color: "bg-red-100 text-red-600" };
-    if (start > now) return { label: t("admin.scheduled"), color: "bg-blue-100 text-blue-600" };
+    if (a.endDate && a.endDate < todayStr) return { label: t("admin.expired"), color: "bg-red-100 text-red-600" };
+    if (a.startDate && a.startDate > todayStr) return { label: t("admin.scheduled"), color: "bg-blue-100 text-blue-600" };
     return { label: t("admin.active"), color: "bg-emerald-100 text-emerald-700" };
   };
 
@@ -143,10 +226,19 @@ export default function ActionsPage() {
     return original;
   };
 
+  const calcActionPrice = (original: number, action: SaleAction) => {
+    if (action.type === "percentage") return Math.round(original * (1 - action.value / 100));
+    if (action.type === "fixed") return Math.max(0, original - action.value);
+    if (action.type === "price") return action.value;
+    return original;
+  };
+
   const openCreate = () => {
     setEditingAction(null);
     setForm({ name: "", type: "percentage", value: "", target: "product", targetValue: "", audience: "all", badge: "AKCIJA", startDate: "", endDate: "", selectedProductIds: [] });
     setProductSearch("");
+    setFilterBrand("");
+    setFilterCategory("");
     setShowPanel(true);
   };
 
@@ -156,69 +248,109 @@ export default function ActionsPage() {
       name: action.name,
       type: action.type,
       value: action.value.toString(),
-      target: action.target,
-      targetValue: action.targetLabel,
+      target: action.targetType,
+      targetValue: action.targetId || "",
       audience: action.audience,
-      badge: action.badge,
-      startDate: action.startDate,
-      endDate: action.endDate,
+      badge: action.badge || "AKCIJA",
+      startDate: action.startDate || "",
+      endDate: action.endDate || "",
       selectedProductIds: action.products.map(p => p.id),
     });
     setProductSearch("");
+    setFilterBrand("");
+    setFilterCategory("");
     setShowPanel(true);
   };
 
-  const handleSave = () => {
-    const selectedProducts = allProducts.filter(p => form.selectedProductIds.includes(p.id));
-    const newAction: SaleAction = {
-      id: editingAction?.id || Math.max(0, ...actions.map(a => a.id)) + 1,
-      name: form.name,
-      type: form.type,
-      value: Number(form.value),
-      target: form.target,
-      targetLabel: form.target === "all" ? t("admin.allProducts") : form.targetValue,
-      audience: form.audience,
-      badge: form.badge,
-      startDate: form.startDate,
-      endDate: form.endDate,
-      isActive: true,
-      products: selectedProducts,
-    };
-    if (editingAction) {
-      setActions(actions.map(a => a.id === editingAction.id ? newAction : a));
-    } else {
-      setActions([newAction, ...actions]);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = {
+        name: form.name,
+        type: form.type,
+        value: Number(form.value),
+        targetType: form.target,
+        targetId: form.target === "product" || form.target === "all" ? null : form.targetValue,
+        audience: form.audience,
+        badge: form.badge,
+        startDate: form.startDate || null,
+        endDate: form.endDate || null,
+        isActive: true,
+        productIds: form.selectedProductIds,
+      };
+
+      const url = editingAction
+        ? `/api/admin/promotions/${editingAction.id}`
+        : "/api/admin/promotions";
+      const method = editingAction ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (json.success) {
+        await fetchPromotions();
+        setShowPanel(false);
+      }
+    } catch (err) {
+      console.error("Failed to save promotion:", err);
+    } finally {
+      setSaving(false);
     }
-    setShowPanel(false);
   };
 
-  const toggleActive = (id: number) => {
-    setActions(actions.map(a => a.id === id ? { ...a, isActive: !a.isActive } : a));
+  const toggleActive = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/promotions/${id}`, { method: "PATCH" });
+      const json = await res.json();
+      if (json.success) {
+        setActions(actions.map(a => a.id === id ? { ...a, isActive: json.data.isActive } : a));
+      }
+    } catch (err) {
+      console.error("Failed to toggle:", err);
+    }
   };
 
-  const deleteAction = (id: number) => {
-    setActions(actions.filter(a => a.id !== id));
+  const deleteAction = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/promotions/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        setActions(actions.filter(a => a.id !== id));
+      }
+    } catch (err) {
+      console.error("Failed to delete:", err);
+    }
   };
 
   // Auto-select products based on target
   const handleTargetChange = (target: string, value: string) => {
-    let ids: number[] = [];
+    let ids: string[] = [];
     if (target === "all") {
       ids = allProducts.map(p => p.id);
-    } else if (target === "brand") {
-      ids = allProducts.filter(p => p.brand === value).map(p => p.id);
-    } else if (target === "category") {
-      ids = allProducts.filter(p => p.category === value).map(p => p.id);
+    } else if (target === "brand" && value) {
+      ids = allProducts.filter(p => p.brand?.id === value).map(p => p.id);
+    } else if (target === "category" && value) {
+      ids = allProducts.filter(p => p.category?.id === value).map(p => p.id);
     }
     setForm(f => ({ ...f, target: target as typeof f.target, targetValue: value, selectedProductIds: ids }));
   };
 
-  const filteredProducts = allProducts.filter(p =>
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-    p.brand.toLowerCase().includes(productSearch.toLowerCase())
-  );
+  // Filter products by search (name, brand, SKU) + brand/category dropdowns
+  const filteredProducts = allProducts.filter(p => {
+    const searchLower = productSearch.toLowerCase();
+    const matchSearch = !productSearch ||
+      p.name.toLowerCase().includes(searchLower) ||
+      p.sku.toLowerCase().includes(searchLower) ||
+      (p.brand?.name || "").toLowerCase().includes(searchLower);
+    const matchBrand = !filterBrand || p.brand?.id === filterBrand;
+    const matchCategory = !filterCategory || p.category?.id === filterCategory;
+    return matchSearch && matchBrand && matchCategory;
+  });
 
-  const toggleProduct = (id: number) => {
+  const toggleProduct = (id: string) => {
     setForm(f => ({
       ...f,
       selectedProductIds: f.selectedProductIds.includes(id)
@@ -226,6 +358,14 @@ export default function ActionsPage() {
         : [...f.selectedProductIds, id],
     }));
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -321,10 +461,15 @@ export default function ActionsPage() {
                     </span>
                     <span className="flex items-center gap-1">
                       <ShoppingBag size={14} />
-                      {action.target === "all" ? t("admin.allProducts") : action.target === "brand" ? `${t("admin.brandTarget")} ${action.targetLabel}` : action.target === "category" ? `${t("admin.categoryTarget")} ${action.targetLabel}` : action.targetLabel}
+                      {action.targetType === "all" ? t("admin.allProducts") : action.targetType === "brand" ? `${t("admin.brandTarget")} ${action.targetId}` : action.targetType === "category" ? `${t("admin.categoryTarget")} ${action.targetId}` : t("admin.individualProducts")}
                     </span>
                     <span className="flex items-center gap-1"><Package size={14} /> {action.products.length} {t("admin.productsCount")}</span>
-                    <span className="flex items-center gap-1"><Calendar size={14} /> {action.startDate} → {action.endDate}</span>
+                    {(action.startDate || action.endDate) && (
+                      <span className="flex items-center gap-1"><Calendar size={14} /> {action.startDate || "∞"} → {action.endDate || "∞"}</span>
+                    )}
+                    {!action.startDate && !action.endDate && (
+                      <span className="flex items-center gap-1"><Calendar size={14} /> Neograničeno</span>
+                    )}
                     {action.audience !== "all" && (
                       <span className="flex items-center gap-1"><Users size={14} /> {action.audience === "b2b" ? t("admin.b2bOnly") : t("admin.b2cOnly")}</span>
                     )}
@@ -350,14 +495,16 @@ export default function ActionsPage() {
                 <div className="mt-4 pt-4 border-t border-[#f0f0f0]">
                   <div className="flex flex-wrap gap-2">
                     {action.products.slice(0, 5).map(p => {
-                      const discounted = action.type === "percentage"
-                        ? Math.round(p.originalPrice * (1 - action.value / 100))
-                        : action.type === "fixed"
-                          ? Math.max(0, p.originalPrice - action.value)
-                          : action.value;
+                      const discounted = calcActionPrice(p.originalPrice, action);
                       return (
                         <div key={p.id} className="flex items-center gap-2 bg-stone-100 rounded-sm px-3 py-2">
-                          <div className="w-8 h-8 bg-white rounded flex items-center justify-center"><Package size={14} className="text-[#999]" /></div>
+                          <div className="w-8 h-8 bg-white rounded flex items-center justify-center overflow-hidden">
+                            {p.image ? (
+                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <Package size={14} className="text-[#999]" />
+                            )}
+                          </div>
                           <div>
                             <p className="text-xs font-medium text-black truncate max-w-[150px]">{p.name}</p>
                             <div className="flex items-center gap-1.5">
@@ -457,7 +604,7 @@ export default function ActionsPage() {
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.selectBrand")}</label>
                   <select value={form.targetValue} onChange={e => handleTargetChange("brand", e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="">{t("admin.selectOption")}</option>
-                    {brands.map(b => <option key={b} value={b}>{b}</option>)}
+                    {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
                 </div>
               )}
@@ -466,7 +613,7 @@ export default function ActionsPage() {
                   <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.selectCategory")}</label>
                   <select value={form.targetValue} onChange={e => handleTargetChange("category", e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="">{t("admin.selectOption")}</option>
-                    {categoriesList.map(c => <option key={c} value={c}>{c}</option>)}
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.nameLat}</option>)}
                   </select>
                 </div>
               )}
@@ -499,41 +646,89 @@ export default function ActionsPage() {
                     <span className="text-xs text-secondary">{t("admin.autoSelectedByScope")}</span>
                   )}
                 </div>
-                <div className="relative mb-3">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
-                  <input type="text" value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder={t("admin.searchProductsList")} className="w-full pl-9 pr-4 py-2 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black" />
+
+                {/* Search + Filters */}
+                <div className="space-y-2 mb-3">
+                  <div className="relative">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                    <input
+                      type="text"
+                      value={productSearch}
+                      onChange={e => setProductSearch(e.target.value)}
+                      placeholder={t("admin.searchProductsList") + " (ime, šifra, brend...)"}
+                      className="w-full pl-9 pr-4 py-2 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                      <select
+                        value={filterBrand}
+                        onChange={e => setFilterBrand(e.target.value)}
+                        className="w-full pl-8 pr-4 py-2 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black appearance-none"
+                      >
+                        <option value="">Svi brendovi</option>
+                        {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="relative flex-1">
+                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                      <select
+                        value={filterCategory}
+                        onChange={e => setFilterCategory(e.target.value)}
+                        className="w-full pl-8 pr-4 py-2 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black appearance-none"
+                      >
+                        <option value="">Sve kategorije</option>
+                        {categories.map(c => <option key={c.id} value={c.id}>{c.nameLat}</option>)}
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <div className="max-h-64 overflow-y-auto border border-stone-200 rounded-sm divide-y divide-[#f0f0f0]">
-                  {filteredProducts.map(p => {
-                    const selected = form.selectedProductIds.includes(p.id);
-                    const discounted = calcDiscountedPrice(p.originalPrice);
-                    return (
-                      <label key={p.id} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-stone-100 transition-colors ${selected ? "bg-stone-50" : ""}`}>
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? "bg-black border-black" : "border-gray-300"}`}>
-                          {selected && <Check size={12} className="text-white" />}
-                        </div>
-                        <input type="checkbox" checked={selected} onChange={() => toggleProduct(p.id)} className="sr-only" />
-                        <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0">
-                          <Package size={14} className="text-[#999]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-black truncate">{p.name}</p>
-                          <p className="text-xs text-[#999]">{p.brand} · {p.category}</p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          {form.value && Number(form.value) > 0 ? (
-                            <>
-                              <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
-                              <p className="text-[10px] text-[#999] line-through">{p.originalPrice.toLocaleString()} RSD</p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-black">{p.originalPrice.toLocaleString()} RSD</p>
-                          )}
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
+
+                {productsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black" />
+                  </div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto border border-stone-200 rounded-sm divide-y divide-[#f0f0f0]">
+                    {filteredProducts.length === 0 && (
+                      <div className="px-4 py-8 text-center text-sm text-[#999]">Nema proizvoda</div>
+                    )}
+                    {filteredProducts.map(p => {
+                      const selected = form.selectedProductIds.includes(p.id);
+                      const discounted = calcDiscountedPrice(p.priceB2c);
+                      return (
+                        <label key={p.id} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-stone-100 transition-colors ${selected ? "bg-stone-50" : ""}`}>
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? "bg-black border-black" : "border-gray-300"}`}>
+                            {selected && <Check size={12} className="text-white" />}
+                          </div>
+                          <input type="checkbox" checked={selected} onChange={() => toggleProduct(p.id)} className="sr-only" />
+                          <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {p.image ? (
+                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <Package size={14} className="text-[#999]" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-black truncate">{p.name}</p>
+                            <p className="text-xs text-[#999]">{p.brand?.name || "—"} · {p.category?.nameLat || "—"} · {p.sku}</p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            {form.value && Number(form.value) > 0 ? (
+                              <>
+                                <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
+                                <p className="text-[10px] text-[#999] line-through">{p.priceB2c.toLocaleString()} RSD</p>
+                              </>
+                            ) : (
+                              <p className="text-sm text-black">{p.priceB2c.toLocaleString()} RSD</p>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Preview */}
@@ -542,20 +737,24 @@ export default function ActionsPage() {
                   <h4 className="text-sm font-semibold text-black mb-3 flex items-center gap-2"><Eye size={16} /> {t("admin.actionPreview")}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {allProducts.filter(p => form.selectedProductIds.includes(p.id)).slice(0, 4).map(p => {
-                      const discounted = calcDiscountedPrice(p.originalPrice);
-                      const pct = Math.round((1 - discounted / p.originalPrice) * 100);
+                      const discounted = calcDiscountedPrice(p.priceB2c);
+                      const pct = Math.round((1 - discounted / p.priceB2c) * 100);
                       return (
                         <div key={p.id} className="bg-white rounded-sm p-3 relative">
                           {pct > 0 && (
                             <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-black text-white text-[10px] font-bold rounded">-{pct}%</span>
                           )}
-                          <div className="w-full h-16 bg-stone-100 rounded mb-2 flex items-center justify-center">
-                            <Package size={20} className="text-[#ccc]" />
+                          <div className="w-full h-16 bg-stone-100 rounded mb-2 flex items-center justify-center overflow-hidden">
+                            {p.image ? (
+                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <Package size={20} className="text-[#ccc]" />
+                            )}
                           </div>
                           <p className="text-xs text-black truncate">{p.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
                             <span className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
-                            <span className="text-[10px] text-[#999] line-through">{p.originalPrice.toLocaleString()} RSD</span>
+                            <span className="text-[10px] text-[#999] line-through">{p.priceB2c.toLocaleString()} RSD</span>
                           </div>
                         </div>
                       );
@@ -568,8 +767,8 @@ export default function ActionsPage() {
             {/* Footer */}
             <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-end gap-3 flex-shrink-0">
               <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
-              <button onClick={handleSave} disabled={!form.name || !form.value || form.selectedProductIds.length === 0} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                {editingAction ? t("admin.saveChanges") : t("admin.createAction")}
+              <button onClick={handleSave} disabled={saving || !form.name || !form.value || form.selectedProductIds.length === 0} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                {saving ? "..." : editingAction ? t("admin.saveChanges") : t("admin.createAction")}
               </button>
             </div>
           </div>

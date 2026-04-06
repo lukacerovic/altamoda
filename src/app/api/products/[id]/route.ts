@@ -93,15 +93,63 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       })
     : []
 
+  // Check active promotions for this product via raw SQL
+  let promoBadge: string | null = null
+  let promoType: string | null = null
+  let promoValue = 0
+
+  try {
+    const promoRows = await prisma.$queryRaw<Array<{
+      type: string; value: number; audience: string; badge: string | null
+    }>>`
+      SELECT pr.type, pr.value, pr.audience, pr.badge
+      FROM promotion_products pp
+      JOIN promotions pr ON pr.id = pp.promotion_id
+      WHERE pp.product_id = ${product.id}
+        AND pr.is_active = true
+        AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
+        AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
+      ORDER BY pr.value DESC
+    `
+    // Pick the best promotion that matches this user's audience
+    const matched = promoRows.find(r => r.audience === 'all' || r.audience === role)
+    if (matched) {
+      promoType = matched.type
+      promoValue = Number(matched.value)
+      promoBadge = matched.badge
+    }
+  } catch {
+    // skip
+  }
+
   // Format response — hide sensitive pricing from unauthorized users
   const isB2bOrAdmin = role === 'b2b' || role === 'admin'
+  let basePrice = role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
+  let oldPrice = product.oldPrice ? Number(product.oldPrice) : null
+
+  if (promoType) {
+    let discountedPrice = basePrice
+    if (promoType === 'percentage') {
+      discountedPrice = Math.round(basePrice * (1 - promoValue / 100))
+    } else if (promoType === 'fixed') {
+      discountedPrice = Math.max(0, basePrice - promoValue)
+    } else if (promoType === 'price') {
+      discountedPrice = promoValue
+    }
+    if (discountedPrice < basePrice) {
+      oldPrice = basePrice
+      basePrice = discountedPrice
+    }
+  }
+
   const formatted = {
     ...product,
     priceB2c: Number(product.priceB2c),
     priceB2b: isB2bOrAdmin && product.priceB2b ? Number(product.priceB2b) : null,
-    oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
+    oldPrice,
     costPrice: role === 'admin' && product.costPrice ? Number(product.costPrice) : null,
-    price: role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c),
+    price: basePrice,
+    promoBadge,
     rating: avgRating._avg.rating || 0,
     reviewCount: product._count.reviews,
     colorSiblings: colorSiblings.map(s => ({
@@ -114,15 +162,46 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       inStock: s.stockQuantity > 0,
       isActive: s.id === product.id,
     })),
-    related: related.map(r => ({
-      id: r.id,
-      name: r.nameLat,
-      slug: r.slug,
-      brand: r.brand,
-      price: role === 'b2b' && r.priceB2b ? Number(r.priceB2b) : Number(r.priceB2c),
-      oldPrice: r.oldPrice ? Number(r.oldPrice) : null,
-      image: r.images[0]?.url || null,
-      isProfessional: r.isProfessional,
+    related: await Promise.all(related.map(async r => {
+      let relPrice = role === 'b2b' && r.priceB2b ? Number(r.priceB2b) : Number(r.priceB2c)
+      let relOldPrice = r.oldPrice ? Number(r.oldPrice) : null
+
+      try {
+        const relPromoRows = await prisma.$queryRaw<Array<{
+          type: string; value: number; audience: string
+        }>>`
+          SELECT pr.type, pr.value, pr.audience
+          FROM promotion_products pp
+          JOIN promotions pr ON pr.id = pp.promotion_id
+          WHERE pp.product_id = ${r.id}
+            AND pr.is_active = true
+            AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
+            AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
+          ORDER BY pr.value DESC
+        `
+        const rp = relPromoRows.find(r => r.audience === 'all' || r.audience === role)
+        if (rp) {
+          const rv = Number(rp.value)
+          let dp = relPrice
+          if (rp.type === 'percentage') dp = Math.round(relPrice * (1 - rv / 100))
+          else if (rp.type === 'fixed') dp = Math.max(0, relPrice - rv)
+          else if (rp.type === 'price') dp = rv
+          if (dp < relPrice) { relOldPrice = relPrice; relPrice = dp }
+        }
+      } catch {
+        // skip
+      }
+
+      return {
+        id: r.id,
+        name: r.nameLat,
+        slug: r.slug,
+        brand: r.brand,
+        price: relPrice,
+        oldPrice: relOldPrice,
+        image: r.images[0]?.url || null,
+        isProfessional: r.isProfessional,
+      }
     })),
   }
 
