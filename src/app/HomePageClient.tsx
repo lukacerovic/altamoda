@@ -33,6 +33,7 @@ export interface ProductData {
   isProfessional: boolean;
   stockQuantity: number;
   sku: string;
+  promoBadge?: string | null;
 }
 
 const defaultImg = "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop";
@@ -54,7 +55,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
   const [liked, setLiked] = useState(false);
   const newLabel = t("home.new");
   const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
-  const displayBadge = badge || (product.isNew ? newLabel : discountBadge);
+  const displayBadge = product.promoBadge || badge || (product.isNew ? newLabel : discountBadge);
 
   return (
     <Link href={`/products/${product.slug}`} className="product-card bg-white rounded-2xl border border-[#e0d8cc] hover:border-[#b07a87] transition-all group relative overflow-hidden flex flex-col">
@@ -84,7 +85,7 @@ function ProductCard({ product, showOld = false, badge }: { product: ProductData
           {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(product.rating) ? "fill-[#8c4a5a] text-[#8c4a5a]" : "text-[#e0d8cc]"}`} />)}
         </div>
         <div className="mt-2 flex items-center gap-2">
-          {showOld && product.oldPrice && <span className="text-sm text-[#b07a87] line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+          {(showOld || product.promoBadge) && product.oldPrice && <span className="text-sm text-[#b07a87] line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
           <span className="text-base font-semibold text-[#2d2d2d]">{product.price.toLocaleString("sr-RS")} RSD</span>
         </div>
       </div>

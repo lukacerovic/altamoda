@@ -266,6 +266,32 @@ export const GET = withErrorHandler(async (req: Request) => {
         })
       : Promise.resolve([]),
   ])
+
+  // Fetch active promotions for these products via raw SQL
+  // Store all active promotions per product, pick the best matching one later
+  const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
+  try {
+    if (productIds.length > 0) {
+      const promoRows = await prisma.$queryRaw<Array<{
+        product_id: string; type: string; value: number; audience: string; badge: string | null
+      }>>`
+        SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
+        FROM promotion_products pp
+        JOIN promotions pr ON pr.id = pp.promotion_id
+        WHERE pp.product_id = ANY(${productIds})
+          AND pr.is_active = true
+          AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
+          AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
+      `
+      for (const row of promoRows) {
+        const arr = promosByProduct.get(row.product_id) || []
+        arr.push({ type: row.type, value: Number(row.value), audience: row.audience, badge: row.badge })
+        promosByProduct.set(row.product_id, arr)
+      }
+    }
+  } catch {
+    // Promotion table may not exist yet, skip
+  }
   const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
   const variantCountMap = new Map(variantCounts.map(v => [v.groupSlug!, v._count]))
 
@@ -275,6 +301,31 @@ export const GET = withErrorHandler(async (req: Request) => {
     const name = p.groupSlug && p.colorCode
       ? p.nameLat.replace(p.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
       : p.nameLat
+
+    let basePrice = role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c)
+    let oldPrice = p.oldPrice ? Number(p.oldPrice) : null
+
+    // Apply best matching active promotion for this user's role
+    const promos = promosByProduct.get(p.id) || []
+    const promo = promos
+      .filter(pr => pr.audience === 'all' || pr.audience === role)
+      .sort((a, b) => b.value - a.value)[0] || null
+
+    if (promo) {
+      let discountedPrice = basePrice
+      if (promo.type === 'percentage') {
+        discountedPrice = Math.round(basePrice * (1 - promo.value / 100))
+      } else if (promo.type === 'fixed') {
+        discountedPrice = Math.max(0, basePrice - promo.value)
+      } else if (promo.type === 'price') {
+        discountedPrice = promo.value
+      }
+      if (discountedPrice < basePrice) {
+        oldPrice = basePrice
+        basePrice = discountedPrice
+      }
+    }
+
     return {
     id: p.id,
     sku: p.sku,
@@ -282,10 +333,10 @@ export const GET = withErrorHandler(async (req: Request) => {
     slug: p.slug,
     brand: p.brand,
     category: p.category,
-    price: role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c),
+    price: basePrice,
     priceB2c: Number(p.priceB2c),
     priceB2b: (role === 'b2b' || role === 'admin') && p.priceB2b ? Number(p.priceB2b) : null,
-    oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+    oldPrice,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,
     isNew: p.isNew,
@@ -293,6 +344,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     isBestseller: p.isBestseller,
     stockQuantity: p.stockQuantity,
     ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId } : {}),
+    promoBadge: promo?.badge || null,
     rating: ratingMap.get(p.id) || 0,
     reviewCount: p._count.reviews,
     colorProduct: p.colorProduct,

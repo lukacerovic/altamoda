@@ -60,6 +60,7 @@ interface Product {
   colorProduct: ColorProduct | null;
   variantCount?: number;
   groupSlug?: string | null;
+  promoBadge?: string | null;
 }
 
 interface BrandFilter {
@@ -177,6 +178,7 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
 }
 
 function getBadge(product: Product): string | null {
+  if (product.promoBadge) return product.promoBadge;
   if (product.isNew) return "NOVO";
   if (product.isFeatured) return "HIT";
   if (product.oldPrice && product.oldPrice > product.price) {
