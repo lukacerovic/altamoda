@@ -6,7 +6,7 @@ import {
   Heart, Star, ArrowRight, ChevronLeft, ChevronRight,
   Leaf, ShieldCheck, Award, Truck,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
-  Instagram, Mail, Send, X, TrendingUp,
+  Instagram, Mail, Send, X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -171,20 +171,23 @@ interface Props {
   saleProducts: ProductData[];
 }
 
-const b2cShowcaseImages = [
-  "/showcase/b2cProizvod1.webp",
-  "/showcase/b2cProizvod2.webp",
-  "/showcase/b2cProizvod3.webp",
-];
-
-const b2bShowcaseImages = [
-  "/showcase/b2bProizvod1.webp",
-  "/showcase/b2bproizvod2.webp",
-  "/showcase/b2bproizvod3.webp",
+const trustedBrands = [
+  { name: "Redken", slug: "redken", logo: "/brands/redken.webp" },
+  { name: "Matrix", slug: "matrix", logo: "/brands/matrix.png" },
+  { name: "L'Oréal Professionnel", slug: "loreal-professionnel", logo: "/brands/loreal.svg" },
+  { name: "Kérastase", slug: "kerastase", logo: "/brands/kerastase.png" },
+  { name: "Biolage", slug: "biolage", logo: "/brands/biolage.webp" },
+  { name: "Olaplex", slug: "olaplex", logo: "/brands/olaplex.svg" },
+  { name: "Framesi", slug: "framesi", logo: "/brands/framesi.webp" },
+  { name: "Elchim", slug: "elchim", logo: "/brands/elchim.png" },
+  { name: "L'image", slug: "limage", logo: "/brands/limage.png" },
+  { name: "Mizutani", slug: "mizutani", logo: "/brands/mizutani.png" },
+  { name: "Olivia Garden", slug: "olivia-garden", logo: "/brands/olivia-garden.png" },
+  { name: "Redken Brews", slug: "redken-brews", logo: "/brands/redken-brews.png" },
 ];
 
 /* ─── Main Page ─── */
-export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts }: Props) {
+export default function HomePageClient({ featuredProducts, newArrivals, saleProducts }: Props) {
   const { t } = useLanguage();
 
   const trustBadges = [
@@ -309,109 +312,76 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         </section>
       )}
 
-      {/* B2C & B2B SHOWCASE */}
+      {/* TRUSTED BRANDS */}
       <section className="relative overflow-hidden">
         <div className="bg-[#38202a] py-20 md:py-28">
           <div className="max-w-7xl mx-auto px-4">
             {/* Header */}
             <div className="text-center mb-14">
-              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">{t("home.shopByType")}</span>
+              <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">Autorizovani Partner</span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mt-3 mb-5 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                {t("home.forEveryone")},{" "}<em className="italic text-[#b07a87]">{t("home.forProfessionals")}</em>
+                Brendovi Kojima{" "}<em className="italic text-[#b07a87]">Verujete</em>
               </h2>
-              <p className="text-white/40 max-w-2xl mx-auto text-sm leading-relaxed">{t("home.shopByTypeDesc")}</p>
+              <p className="text-white/40 max-w-2xl mx-auto text-sm leading-relaxed">
+                Kao ovlašćeni distributer, garantujemo autentičnost svakog proizvoda. Radimo direktno sa vodećim svetskim brendovima profesionalne kozmetike za kosu.
+              </p>
             </div>
-            <div className="flex flex-col items-center lg:flex-row lg:items-start lg:justify-between gap-10 lg:gap-20">
-              {/* B2C Column */}
-              <div className="flex-1 w-full max-w-lg lg:max-w-[45%]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                    <Heart className="w-5 h-5 text-[#b07a87]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-white">{t("home.b2cTitle")}</h3>
-                    <p className="text-white/40 text-xs">{t("home.b2cDesc")}</p>
-                  </div>
-                </div>
-                {/* Pinterest-style masonry grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Left: tall image */}
-                  <Link href="/products" className="group/card relative row-span-2 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all">
-                    <Image src={b2cShowcaseImages[0]} alt="B2C proizvod 1" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  </Link>
-                  {/* Right top: short image */}
-                  <Link href="/products" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <Image src={b2cShowcaseImages[1]} alt="B2C proizvod 2" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  </Link>
-                  {/* Right bottom: short image */}
-                  <Link href="/products" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <Image src={b2cShowcaseImages[2]} alt="B2C proizvod 3" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  </Link>
-                </div>
-                <Link href="/products" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mt-5 transition-colors">
-                  {t("home.shopB2c")} <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
 
-              {/* B2B Column */}
-              <div className="flex-1 w-full max-w-lg lg:max-w-[45%]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex-1 flex flex-col items-end">
-                    <h3 className="text-lg font-medium text-white">{t("home.b2bShowcaseTitle")}</h3>
-                    <p className="text-white/40 text-xs">{t("home.b2bShowcaseDesc")}</p>
+            {/* Brand logos */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-14 gap-x-10 md:gap-x-16 mb-20">
+              {trustedBrands.map(brand => (
+                <Link
+                  key={brand.slug}
+                  href={`/products?brand=${brand.slug}`}
+                  className="group flex items-center justify-center"
+                >
+                  <div className="relative h-12 w-36 md:h-16 md:w-48">
+                    <Image
+                      src={brand.logo}
+                      alt={brand.name}
+                      fill
+                      sizes="(max-width: 768px) 144px, 192px"
+                      className="object-contain brightness-0 invert opacity-50 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105"
+                    />
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-[#b07a87]/20 flex items-center justify-center">
-                    <ShieldCheck className="w-5 h-5 text-[#b07a87]" />
-                  </div>
-                </div>
-                {/* Pinterest-style masonry grid — mirrored layout */}
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Left top: short image */}
-                  <Link href="/products?visibility=b2b" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <Image src={b2bShowcaseImages[0]} alt="B2B proizvod 1" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  </Link>
-                  {/* Right: tall image */}
-                  <Link href="/products?visibility=b2b" className="group/card relative row-span-2 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all">
-                    <Image src={b2bShowcaseImages[1]} alt="B2B proizvod 2" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" style={{ minHeight: '320px' }} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  </Link>
-                  {/* Left bottom: short image */}
-                  <Link href="/products?visibility=b2b" className="group/card relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#b07a87]/50 transition-all aspect-[4/3]">
-                    <Image src={b2bShowcaseImages[2]} alt="B2B proizvod 3" fill sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  </Link>
-                </div>
-                <Link href="/products?visibility=b2b" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mt-5 transition-colors">
-                  {t("home.shopB2b")} <ArrowRight className="w-4 h-4" />
                 </Link>
+              ))}
+            </div>
+
+            {/* Trust badges */}
+            <div className="grid grid-cols-3 gap-4 md:gap-12 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="w-11 h-11 rounded-full border border-[#b07a87]/30 flex items-center justify-center mx-auto mb-3">
+                  <ShieldCheck className="w-5 h-5 text-[#b07a87]" />
+                </div>
+                <h3 className="text-white text-sm font-medium tracking-wide">Autorizovani</h3>
+                <p className="text-white/35 text-xs mt-1.5 leading-relaxed">100% originalni proizvodi direktno od proizvođača</p>
               </div>
+              <div className="text-center">
+                <div className="w-11 h-11 rounded-full border border-[#b07a87]/30 flex items-center justify-center mx-auto mb-3">
+                  <Award className="w-5 h-5 text-[#b07a87]" />
+                </div>
+                <h3 className="text-white text-sm font-medium tracking-wide">Premium</h3>
+                <p className="text-white/35 text-xs mt-1.5 leading-relaxed">Samo provereni profesionalni brendovi</p>
+              </div>
+              <div className="text-center">
+                <div className="w-11 h-11 rounded-full border border-[#b07a87]/30 flex items-center justify-center mx-auto mb-3">
+                  <Truck className="w-5 h-5 text-[#b07a87]" />
+                </div>
+                <h3 className="text-white text-sm font-medium tracking-wide">Isporuka</h3>
+                <p className="text-white/35 text-xs mt-1.5 leading-relaxed">Isporuka na vašu adresu u najkraćem roku</p>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center mt-14">
+              <Link href="/brands" className="inline-flex items-center gap-2 text-[#b07a87]/70 hover:text-[#b07a87] text-xs tracking-[0.15em] uppercase font-medium transition-colors">
+                Pogledajte sve brendove <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
         </div>
       </section>
-
-      {/* BESTSELLERS */}
-      {bestsellers.length > 0 && (
-        <section className="py-16 bg-white border-y border-[#e0d8cc]">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-10">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-6 h-6 text-[#c4883a]" />
-                <div>
-                  <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.bestsellers")}</h2>
-                  <p className="text-[#b07a87] mt-1 text-sm">{t("home.bestsellersDesc")}</p>
-                </div>
-              </div>
-              <Link href="/products" className="hidden md:flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.viewAll")}</Link>
-            </div>
-            <ProductCarousel products={bestsellers.map((p, i) => ({ ...p, _rank: i + 1 }))} />
-          </div>
-        </section>
-      )}
 
       {/* NEW ARRIVALS */}
       {newArrivals.length > 0 && (
@@ -445,26 +415,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         </section>
       )}
 
-      {/* B2B PROMO BANNER */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="relative rounded-3xl overflow-hidden">
-            <Image src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&h=500&fit=crop" alt="Professional salon" fill sizes="100vw" className="w-full h-[400px] md:h-[450px] object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#2d2d2d]/85 via-[#2d2d2d]/60 to-[#2d2d2d]/30" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="max-w-7xl mx-auto px-8 md:px-12">
-                <span className="text-[#b07a87] text-xs tracking-[0.2em] font-medium uppercase">{t("home.forSalons")}</span>
-                <h2 className="text-3xl md:text-5xl font-light text-white mt-3 mb-5" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.b2bTitle")} <em className="italic">{t("home.b2bProfessionals")}</em></h2>
-                <p className="text-white/50 mb-8 max-w-md text-sm leading-relaxed">{t("home.b2bDescription")}</p>
-                <Link href="/account/login" className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-8 py-3.5 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg text-sm">{t("home.registerSalon")} <ArrowRight className="w-4 h-4" /></Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* INSTAGRAM FEED */}
-      <section className="py-16 bg-white border-y border-[#e0d8cc]">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.instagramHandle")}</h2>
