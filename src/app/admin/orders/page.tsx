@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Search,
@@ -351,9 +351,8 @@ export default function OrdersPage() {
               </thead>
               <tbody className="divide-y divide-[#f0f0f0]">
                 {filtered.map((order) => (
-                  <>
+                  <Fragment key={order.id}>
                     <tr
-                      key={order.id}
                       className="hover:bg-stone-100 transition-colors cursor-pointer"
                       onClick={() => toggleExpand(order.id)}
                     >
@@ -649,7 +648,7 @@ export default function OrdersPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
