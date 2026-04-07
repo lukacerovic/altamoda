@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCartStore } from '@/lib/stores/cart-store'
 import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from '@/lib/constants'
 import {
@@ -470,7 +471,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     {items.map((item) => (
                       <div key={item.productId} className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-gray-100">
-                          {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
+                          {item.image && <Image src={item.image} alt={item.name} width={64} height={64} className="w-full h-full object-cover" />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-black truncate">{item.name}</p>

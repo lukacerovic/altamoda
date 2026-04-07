@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Heart,
   Star,
@@ -118,7 +119,7 @@ export default function OutletPage() {
           {filtered.map((product) => (
             <div key={product.id} className="bg-white rounded-sm overflow-hidden shadow-sm border border-stone-200/50 group hover:shadow-md transition-all">
               <div className="relative overflow-hidden aspect-square">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={product.image} alt={product.name} width={400} height={400} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white bg-[#c0392b]">
                   -{product.discount}%
                 </span>

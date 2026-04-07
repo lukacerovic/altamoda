@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ChevronRight, Calendar, MapPin as MapPinIcon,
   Users, Clock, X, List, Grid3X3,
@@ -30,7 +31,7 @@ export default function SeminarsPage() {
     <div className="min-h-screen bg-stone-100">
       {/* Hero */}
       <section className="relative h-[280px] md:h-[350px] overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1600&h=600&fit=crop" alt="Seminari" className="absolute inset-0 w-full h-full object-cover" />
+        <Image src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1600&h=600&fit=crop" alt="Seminari" width={400} height={300} className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-stone-900/70" />
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center justify-center text-center">
           <div>
@@ -62,7 +63,7 @@ export default function SeminarsPage() {
           {seminars.map((seminar) => (
             <div key={seminar.id} className="bg-white rounded-sm shadow-sm overflow-hidden flex flex-col md:flex-row md:items-center gap-0 hover:shadow-md transition-all">
               <div className="flex-shrink-0 relative w-full md:w-56 h-44 md:h-full overflow-hidden">
-                <img src={seminar.image} alt={seminar.title} className="w-full h-full object-cover" />
+                <Image src={seminar.image} alt={seminar.title} width={400} height={300} className="w-full h-full object-cover" />
                 <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-sm px-3 py-1.5 text-center">
                   <span className="text-lg font-bold text-secondary block leading-tight">{seminar.date.split(".")[0]}</span>
                   <span className="text-[10px] text-gray-500 uppercase">{seminar.date.split(" ")[1]?.replace(".", "")}</span>
@@ -95,7 +96,7 @@ export default function SeminarsPage() {
             {pastSeminars.map((s) => (
               <div key={s.title} className="bg-white rounded-sm shadow-sm overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
                 <div className="relative h-40 overflow-hidden">
-                  <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
+                  <Image src={s.image} alt={s.title} width={400} height={300} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <span className="absolute top-3 right-3 px-2 py-1 bg-white/80 backdrop-blur-sm text-[10px] font-semibold text-gray-600 rounded">Završen</span>
                   <h3 className="absolute bottom-3 left-3 right-3 font-semibold text-white text-sm">{s.title}</h3>

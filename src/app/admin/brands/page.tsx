@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Search, ChevronLeft, Upload, Loader2, Save } from "lucide-react";
+import { Search, ChevronLeft, Upload, Loader2, Save, Plus } from "lucide-react";
+import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import dynamic from "next/dynamic";
 
@@ -26,6 +27,7 @@ export default function AdminBrandsPage() {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   // Edit form state
   const [editName, setEditName] = useState("");
@@ -87,6 +89,40 @@ export default function AdminBrandsPage() {
     }
   };
 
+  const startCreateBrand = () => {
+    setSelectedBrand(null);
+    setIsCreating(true);
+    setEditName("");
+    setEditLogo(null);
+    setEditDescription("");
+    setEditContent("");
+  };
+
+  const handleCreate = async () => {
+    if (!editName.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/brands", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName,
+          logoUrl: editLogo,
+          description: editDescription,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        await fetchBrands();
+        setIsCreating(false);
+      }
+    } catch (err) {
+      console.error("Create failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!selectedBrand) return;
     setSaving(true);
@@ -121,14 +157,23 @@ export default function AdminBrandsPage() {
   );
 
   // Brand list view
-  if (!selectedBrand) {
+  if (!selectedBrand && !isCreating) {
     return (
       <div>
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-black tracking-wide" style={{ fontFamily: "'Noto Serif', serif" }}>
-            {t("admin.brands")}
-          </h1>
-          <p className="text-stone-500 text-sm mt-1">{t("admin.brandsDesc")}</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-black tracking-wide" style={{ fontFamily: "'Noto Serif', serif" }}>
+              {t("admin.brands")}
+            </h1>
+            <p className="text-stone-500 text-sm mt-1">{t("admin.brandsDesc")}</p>
+          </div>
+          <button
+            onClick={startCreateBrand}
+            className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-stone-800 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Dodaj brend
+          </button>
         </div>
 
         {/* Search */}
@@ -157,7 +202,7 @@ export default function AdminBrandsPage() {
               >
                 <div className="w-full h-20 bg-stone-50 rounded-sm flex items-center justify-center mb-4 overflow-hidden">
                   {brand.logoUrl ? (
-                    <img src={brand.logoUrl} alt={brand.name} className="max-h-full max-w-full object-contain p-2" />
+                    <Image src={brand.logoUrl} alt={brand.name} width={80} height={40} className="max-h-full max-w-full object-contain p-2" />
                   ) : (
                     <span className="text-2xl font-bold text-stone-300" style={{ fontFamily: "'Noto Serif', serif" }}>
                       {brand.name.charAt(0)}
@@ -178,30 +223,30 @@ export default function AdminBrandsPage() {
     );
   }
 
-  // Brand editor view
+  // Brand editor view (edit or create)
   return (
     <div>
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button
-          onClick={() => setSelectedBrand(null)}
+          onClick={() => { setSelectedBrand(null); setIsCreating(false); }}
           className="p-2 hover:bg-stone-100 rounded-sm transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-black tracking-wide" style={{ fontFamily: "'Noto Serif', serif" }}>
-            {selectedBrand.name}
+            {isCreating ? "Novi brend" : selectedBrand?.name}
           </h1>
-          <p className="text-stone-500 text-sm mt-0.5">{t("admin.editBrand")}</p>
+          <p className="text-stone-500 text-sm mt-0.5">{isCreating ? "Dodaj novi brend" : t("admin.editBrand")}</p>
         </div>
         <button
-          onClick={handleSave}
-          disabled={saving}
+          onClick={isCreating ? handleCreate : handleSave}
+          disabled={saving || (isCreating && !editName.trim())}
           className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-stone-800 transition-colors disabled:opacity-50"
         >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {t("admin.save")}
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : isCreating ? <Plus className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+          {isCreating ? "Kreiraj brend" : t("admin.save")}
         </button>
       </div>
 
@@ -240,7 +285,7 @@ export default function AdminBrandsPage() {
             <div className="flex items-center gap-4">
               <div className="w-24 h-24 bg-stone-50 border border-stone-200 rounded-sm flex items-center justify-center overflow-hidden">
                 {editLogo ? (
-                  <img src={editLogo} alt="Logo" className="max-h-full max-w-full object-contain p-2" />
+                  <Image src={editLogo} alt="Logo" width={80} height={40} className="max-h-full max-w-full object-contain p-2" />
                 ) : (
                   <span className="text-3xl font-bold text-stone-300">{editName.charAt(0)}</span>
                 )}

@@ -27,6 +27,7 @@ import {
   Layers,
   AlertTriangle,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -490,17 +491,44 @@ export default function ProductsPage() {
     setShowPanel(true);
   };
 
-  const openEditPanel = (product: Product) => {
+  const openEditPanel = async (product: Product) => {
     setEditingProduct(product);
     const { id: _id, ...rest } = product;
     setFormData(rest);
+    setActiveTab("osnovno");
+    setShowPanel(true);
+
+    // Fetch full product detail to get all fields (costPrice, description, etc.)
+    try {
+      const res = await fetch(`/api/products/${product.id}`);
+      const json = await res.json();
+      if (json.success) {
+        const p = json.data;
+        setFormData(prev => ({
+          ...prev,
+          purchasePrice: p.costPrice ? Number(p.costPrice) : 0,
+          description: p.description || "",
+          ingredients: p.ingredients || "",
+          howToUse: p.usageInstructions || "",
+          weight: p.weightGrams || 0,
+          volume: p.volumeMl || 0,
+          lowStockThreshold: p.lowStockThreshold || 5,
+          stock: p.stockQuantity || 0,
+          status: p.isActive ? "active" as const : "inactive" as const,
+          seoTitle: p.seoTitle || "",
+          metaDescription: p.seoDescription || "",
+          images: p.images?.map((img: { id: string; url: string; altText: string | null; isPrimary: boolean }) => ({
+            id: img.id, url: img.url, alt: img.altText || "", isPrimary: img.isPrimary,
+          })) || prev.images,
+        }));
+      }
+    } catch { /* keep form data as-is */ }
+
     if (product.oldPrice && product.oldPrice > product.priceB2C) {
       setDiscountInput(Math.round(((product.oldPrice - product.priceB2C) / product.oldPrice) * 100).toString());
     } else {
       setDiscountInput("");
     }
-    setActiveTab("osnovno");
-    setShowPanel(true);
   };
 
   const handleSave = async () => {
@@ -524,7 +552,7 @@ export default function ProductsPage() {
       priceB2c: formData.priceB2C,
       priceB2b: formData.priceB2B || null,
       oldPrice: formData.oldPrice || null,
-      costPrice: formData.purchasePrice || null,
+      costPrice: formData.purchasePrice > 0 ? formData.purchasePrice : null,
       stockQuantity: formData.stock,
       lowStockThreshold: formData.lowStockThreshold,
       weightGrams: formData.weight || null,
@@ -1272,51 +1300,29 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className={labelCls}>{t("admin.priceB2c")} (RSD) *</label>
+                      <label className={labelCls}>{formData.badges.isProfessionalOnly ? t("admin.priceB2b") : t("admin.priceB2c")} (RSD) *</label>
                       <input
                         type="number"
-                        value={formData.priceB2C || ""}
-                        onChange={(e) => updateForm("priceB2C", Number(e.target.value) || 0)}
+                        value={formData.badges.isProfessionalOnly ? (formData.priceB2B || "") : (formData.priceB2C || "")}
+                        onChange={(e) => updateForm(formData.badges.isProfessionalOnly ? "priceB2B" : "priceB2C", Number(e.target.value) || 0)}
                         className={inputCls}
                         placeholder="0"
                       />
                     </div>
-                    <div>
-                      <label className={labelCls}>{t("admin.priceB2b")} (RSD) *</label>
-                      <input
-                        type="number"
-                        value={formData.priceB2B || ""}
-                        onChange={(e) => updateForm("priceB2B", Number(e.target.value) || 0)}
-                        className={inputCls}
-                        placeholder="0"
-                      />
-                    </div>
+                    {!formData.badges.isProfessionalOnly && (
+                      <div>
+                        <label className={labelCls}>{t("admin.priceB2b")} (RSD)</label>
+                        <input
+                          type="number"
+                          value={formData.priceB2B || ""}
+                          onChange={(e) => updateForm("priceB2B", Number(e.target.value) || 0)}
+                          className={inputCls}
+                          placeholder="0"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>{t("admin.oldPrice")}</label>
-                      <input
-                        type="number"
-                        value={formData.oldPrice || ""}
-                        onChange={(e) => handleOldPriceChange(e.target.value)}
-                        className={inputCls}
-                        placeholder={t("admin.forDiscount")}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelCls}>{t("admin.discountPercent")}</label>
-                      <input
-                        type="number"
-                        value={discountInput}
-                        onChange={(e) => handleDiscountChange(e.target.value)}
-                        className={inputCls}
-                        placeholder={t("admin.autoOrEnter")}
-                        min={0}
-                        max={99}
-                      />
-                    </div>
-                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -1361,11 +1367,14 @@ export default function ProductsPage() {
                     <label className={labelCls}>{t("admin.pricePreview")}</label>
                     <div className="border border-stone-200 rounded-sm p-4 bg-[#faf8f4]">
                       <div className="flex items-baseline gap-3">
-                        <span className="text-2xl font-bold text-black">{(formData.priceB2C || 0).toLocaleString()} RSD</span>
-                        {formData.oldPrice && formData.oldPrice > formData.priceB2C && (
+                        {formData.badges.isProfessionalOnly ? (
+                          <span className="text-2xl font-bold text-green-700">{(formData.priceB2B || 0).toLocaleString()} RSD <span className="text-sm font-normal text-green-600">B2B</span></span>
+                        ) : (
                           <>
-                            <span className="text-lg text-[#999] line-through">{formData.oldPrice.toLocaleString()} RSD</span>
-                            <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded">-{discountPercent}%</span>
+                            <span className="text-2xl font-bold text-black">{(formData.priceB2C || 0).toLocaleString()} RSD</span>
+                            {formData.priceB2B > 0 && (
+                              <span className="text-sm text-green-700 font-medium">B2B: {formData.priceB2B.toLocaleString()} RSD</span>
+                            )}
                           </>
                         )}
                       </div>
@@ -1423,7 +1432,7 @@ export default function ProductsPage() {
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
                           {img.url.startsWith("/uploads/") ? (
-                            <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                            <Image src={img.url} alt={img.alt} width={80} height={80} className="w-full h-full object-cover" />
                           ) : (
                             <div className="text-center p-2">
                               <ImageIcon size={28} className="mx-auto text-[#bbb] mb-1" />
@@ -1529,20 +1538,23 @@ export default function ProductsPage() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>
-                        <span className="flex items-center gap-1.5"><Film size={14} /> {t("admin.videoUrl")}</span>
-                      </label>
-                      <input type="url" value={formData.videoUrl} onChange={(e) => updateForm("videoUrl", e.target.value)} className={inputCls} placeholder="https://youtube.com/..." />
+                  {/* Video/GIF URLs — only show when editing existing product */}
+                  {editingProduct && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className={labelCls}>
+                          <span className="flex items-center gap-1.5"><Film size={14} /> {t("admin.videoUrl")}</span>
+                        </label>
+                        <input type="url" value={formData.videoUrl} onChange={(e) => updateForm("videoUrl", e.target.value)} className={inputCls} placeholder="https://youtube.com/..." />
+                      </div>
+                      <div>
+                        <label className={labelCls}>
+                          <span className="flex items-center gap-1.5"><FileImage size={14} /> {t("admin.gifUrl")}</span>
+                        </label>
+                        <input type="url" value={formData.gifUrl} onChange={(e) => updateForm("gifUrl", e.target.value)} className={inputCls} placeholder="https://..." />
+                      </div>
                     </div>
-                    <div>
-                      <label className={labelCls}>
-                        <span className="flex items-center gap-1.5"><FileImage size={14} /> {t("admin.gifUrl")}</span>
-                      </label>
-                      <input type="url" value={formData.gifUrl} onChange={(e) => updateForm("gifUrl", e.target.value)} className={inputCls} placeholder="https://..." />
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
 

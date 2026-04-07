@@ -1,8 +1,24 @@
 import type { Metadata } from "next";
+import { Inter, Noto_Serif } from "next/font/google";
 import AuthProvider from "@/components/providers/AuthProvider";
 import CartProvider from "@/components/providers/CartProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const notoSerif = Noto_Serif({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-noto-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Alta Moda | Profesionalna frizerska oprema i kozmetika",
@@ -26,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sr">
-      <body className="bg-surface font-body text-on-surface antialiased">
+      <body className={`${inter.variable} ${notoSerif.variable} bg-surface font-body text-on-surface antialiased`}>
         <LanguageProvider>
           <AuthProvider>
             <CartProvider>{children}</CartProvider>

@@ -54,6 +54,7 @@ enum PromotionTargetType {
 enum PromoType {
   percentage
   fixed
+  price
 }
 
 enum Audience {
@@ -267,7 +268,17 @@ model Product {
   orderItems       OrderItem[]
   bundleItems      BundleItem[]
   productAttributes ProductAttribute[]
+  promotionProducts PromotionProduct[]
 
+  @@index([isActive, isProfessional])
+  @@index([isActive, isFeatured])
+  @@index([isActive, isBestseller])
+  @@index([isActive, isNew])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([groupSlug])
+  @@index([isActive, createdAt])
+  @@index([isActive, priceB2c])
   @@map("products")
 }
 
@@ -282,6 +293,7 @@ model ProductImage {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, isPrimary])
   @@map("product_images")
 }
 
@@ -296,6 +308,8 @@ model ColorProduct {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([colorLevel])
+  @@index([undertoneCode])
   @@map("color_products")
 }
 
@@ -379,6 +393,7 @@ model Wishlist {
   product Product @relation(fields: [productId], references: [id])
 
   @@unique([userId, productId])
+  @@index([userId])
   @@map("wishlists")
 }
 
@@ -458,6 +473,7 @@ model Review {
   user    User    @relation(fields: [userId], references: [id])
 
   @@unique([productId, userId])
+  @@index([productId])
   @@map("reviews")
 }
 
@@ -471,12 +487,28 @@ model Promotion {
   targetType PromotionTargetType @map("target_type")
   targetId   String?             @map("target_id")
   audience   Audience            @default(all)
-  startDate  DateTime            @map("start_date")
-  endDate    DateTime            @map("end_date")
+  badge      String?
+  startDate  DateTime?           @map("start_date")
+  endDate    DateTime?           @map("end_date")
   isActive   Boolean             @default(true) @map("is_active")
   createdAt  DateTime            @default(now()) @map("created_at")
 
+  products PromotionProduct[]
+
   @@map("promotions")
+}
+
+model PromotionProduct {
+  id          String @id @default(cuid())
+  promotionId String @map("promotion_id")
+  productId   String @map("product_id")
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([promotionId, productId])
+  @@index([productId])
+  @@map("promotion_products")
 }
 
 model PromoCode {

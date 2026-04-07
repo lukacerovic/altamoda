@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
 import {
@@ -169,7 +170,7 @@ function WishlistSection() {
           {wishlistItems.map((item) => (
             <Link key={item.productId} href={`/products/${item.slug}`} className="bg-white rounded-sm shadow-sm overflow-hidden group">
               <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />}
+                {item.image && <Image src={item.image} alt={item.name} width={80} height={80} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />}
                 <div className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
                   <Heart className="w-4 h-4 text-red-500 fill-red-500" />
                 </div>

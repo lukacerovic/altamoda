@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search, Heart, Star, SlidersHorizontal,
   ChevronDown, ChevronRight, Grid3X3, LayoutList,
@@ -58,6 +60,7 @@ interface Product {
   colorProduct: ColorProduct | null;
   variantCount?: number;
   groupSlug?: string | null;
+  promoBadge?: string | null;
 }
 
 interface BrandFilter {
@@ -149,7 +152,7 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
     <section className="bg-[#faf7f3] border-b border-stone-200">
       <div className="max-w-4xl mx-auto px-4 py-6 text-center">
         {brand.logoUrl ? (
-          <img src={brand.logoUrl} alt={brand.name} className="h-10 mx-auto object-contain mb-3" />
+          <Image src={brand.logoUrl} alt={brand.name} width={80} height={40} className="h-10 mx-auto object-contain mb-3" />
         ) : (
           <h2 className="text-xl font-bold text-black mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
         )}
@@ -175,6 +178,7 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
 }
 
 function getBadge(product: Product): string | null {
+  if (product.promoBadge) return product.promoBadge;
   if (product.isNew) return "NOVO";
   if (product.isFeatured) return "HIT";
   if (product.oldPrice && product.oldPrice > product.price) {
@@ -243,7 +247,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   return (
     <Link href={`/products/${product.slug}`} className="group bg-white rounded-sm overflow-hidden border border-transparent hover:border-stone-200 hover:shadow-sm transition-all flex flex-col">
       <div className="relative aspect-square overflow-hidden bg-white">
-        <img src={imgSrc} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+        <Image src={imgSrc} alt={product.name} width={400} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (
             <span className={`px-2.5 py-1 text-[11px] font-semibold rounded-sm ${
@@ -403,19 +407,22 @@ export default function ProductsPageClient({
   brands,
   categories,
   attributes,
-  userRole,
-  wishlistedProductIds = [],
+  userRole: _serverRole,
+  wishlistedProductIds: _serverWishlist = [],
   availableColorLevels = [],
   availableColorUndertones = [],
   activeBrand = null,
 }: ProductsPageClientProps) {
   const { t } = useLanguage();
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string } | undefined)?.role || _serverRole;
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
   const searchParam = searchParams.get("search");
   const genderParam = searchParams.get("gender");
   const brandParam = searchParams.get("brand");
 
+  const [wishlistedProductIds, setWishlistedProductIds] = useState<string[]>(_serverWishlist);
   const wishlistedSet = new Set(wishlistedProductIds);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
@@ -464,6 +471,19 @@ export default function ProductsPageClient({
   const [visibility, setVisibility] = useState<"all" | "b2c" | "b2b">("all");
 
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Fetch wishlist IDs client-side when user is authenticated
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    fetch('/api/wishlist')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data?.items)) {
+          setWishlistedProductIds(data.data.items.map((w: { productId: string }) => w.productId));
+        }
+      })
+      .catch(() => {});
+  }, [session?.user?.id]);
 
   // Build query string from current filters
   const buildQueryString = useCallback((page: number) => {
@@ -972,7 +992,7 @@ export default function ProductsPageClient({
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
                         <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
-                          <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-10 h-10 rounded-sm object-cover" />
+                          <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={48} height={48} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-black truncate">{p.name}</p>
                             <p className="text-[11px] text-[#874d5d] font-medium">{p.brand}</p>
@@ -1108,7 +1128,7 @@ export default function ProductsPageClient({
                 ) : (
                   <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-white rounded-sm border border-transparent hover:border-[#e8e2d9] hover:shadow-sm transition-all overflow-hidden group">
                     <div className="w-36 h-36 bg-[#faf7f3] flex-shrink-0 relative overflow-hidden">
-                      <img src={p.image || PLACEHOLDER_IMG} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={400} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {p.isProfessional && (
                         <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
                       )}

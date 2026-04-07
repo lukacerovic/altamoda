@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
@@ -92,15 +93,81 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       })
     : []
 
+  // Helper: calculate discounted price for a given promo
+  const calcDiscounted = (price: number, type: string, value: number) => {
+    if (type === 'percentage') return Math.round(price * (1 - value / 100))
+    if (type === 'fixed') return Math.max(0, price - value)
+    if (type === 'price') return value
+    return price
+  }
+
+  // Helper: pick the best promotion (lowest final price) for a given base price and role
+  const pickBestPromo = (
+    promos: Array<{ type: string; value: number; audience: string; badge?: string | null }>,
+    price: number,
+    userRole: string | undefined
+  ) => {
+    const eligible = promos.filter(pr => pr.audience === 'all' || pr.audience === userRole)
+    if (eligible.length === 0) return null
+    return eligible.reduce((best, pr) => {
+      const dp = calcDiscounted(price, pr.type, pr.value)
+      const bestDp = calcDiscounted(price, best.type, best.value)
+      return dp < bestDp ? pr : best
+    })
+  }
+
+  // Check active promotions for this product and all related products in one query
+  const allProductIds = [product.id, ...related.map(r => r.id)]
+  const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
+
+  try {
+    const promoRows = await prisma.$queryRaw<Array<{
+      product_id: string; type: string; value: number; audience: string; badge: string | null
+    }>>`
+      SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
+      FROM promotion_products pp
+      JOIN promotions pr ON pr.id = pp.promotion_id
+      WHERE pp.product_id = ANY(${allProductIds})
+        AND pr.is_active = true
+        AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
+        AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
+    `
+    for (const row of promoRows) {
+      const arr = promosByProduct.get(row.product_id) || []
+      arr.push({ type: row.type, value: Number(row.value), audience: row.audience, badge: row.badge })
+      promosByProduct.set(row.product_id, arr)
+    }
+  } catch (err) {
+    console.error('[products/[id]] Failed to fetch promotions:', err)
+  }
+
+  // Apply best promotion for the main product
+  let promoBadge: string | null = null
+  const mainPromos = promosByProduct.get(product.id) || []
+
   // Format response — hide sensitive pricing from unauthorized users
   const isB2bOrAdmin = role === 'b2b' || role === 'admin'
+  let basePrice = role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
+  let oldPrice = product.oldPrice ? Number(product.oldPrice) : null
+
+  const bestPromo = pickBestPromo(mainPromos, basePrice, role)
+  if (bestPromo) {
+    const discountedPrice = calcDiscounted(basePrice, bestPromo.type, bestPromo.value)
+    if (discountedPrice < basePrice) {
+      oldPrice = basePrice
+      basePrice = discountedPrice
+      promoBadge = bestPromo.badge || null
+    }
+  }
+
   const formatted = {
     ...product,
     priceB2c: Number(product.priceB2c),
     priceB2b: isB2bOrAdmin && product.priceB2b ? Number(product.priceB2b) : null,
-    oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
+    oldPrice,
     costPrice: role === 'admin' && product.costPrice ? Number(product.costPrice) : null,
-    price: role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c),
+    price: basePrice,
+    promoBadge,
     rating: avgRating._avg.rating || 0,
     reviewCount: product._count.reviews,
     colorSiblings: colorSiblings.map(s => ({
@@ -113,16 +180,28 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       inStock: s.stockQuantity > 0,
       isActive: s.id === product.id,
     })),
-    related: related.map(r => ({
-      id: r.id,
-      name: r.nameLat,
-      slug: r.slug,
-      brand: r.brand,
-      price: role === 'b2b' && r.priceB2b ? Number(r.priceB2b) : Number(r.priceB2c),
-      oldPrice: r.oldPrice ? Number(r.oldPrice) : null,
-      image: r.images[0]?.url || null,
-      isProfessional: r.isProfessional,
-    })),
+    related: related.map(r => {
+      let relPrice = role === 'b2b' && r.priceB2b ? Number(r.priceB2b) : Number(r.priceB2c)
+      let relOldPrice = r.oldPrice ? Number(r.oldPrice) : null
+
+      const relPromos = promosByProduct.get(r.id) || []
+      const relBest = pickBestPromo(relPromos, relPrice, role)
+      if (relBest) {
+        const dp = calcDiscounted(relPrice, relBest.type, relBest.value)
+        if (dp < relPrice) { relOldPrice = relPrice; relPrice = dp }
+      }
+
+      return {
+        id: r.id,
+        name: r.nameLat,
+        slug: r.slug,
+        brand: r.brand,
+        price: relPrice,
+        oldPrice: relOldPrice,
+        image: r.images[0]?.url || null,
+        isProfessional: r.isProfessional,
+      }
+    }),
   }
 
   // Strip ERP/internal fields for non-admin users
@@ -203,6 +282,11 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     await prisma.colorProduct.deleteMany({ where: { productId: id } })
   }
 
+  // Invalidate cached pages that display products
+  revalidatePath('/')
+  revalidatePath('/products')
+  revalidatePath(`/products/${product.slug || id}`)
+
   return successResponse(product)
 })
 
@@ -215,6 +299,10 @@ export const DELETE = withErrorHandler(async (_req: Request, context: unknown) =
     where: { id },
     data: { isActive: false },
   })
+
+  // Invalidate cached pages
+  revalidatePath('/')
+  revalidatePath('/products')
 
   return successResponse({ deleted: true })
 })

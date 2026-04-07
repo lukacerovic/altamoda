@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler, getPaginationParams } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
@@ -89,16 +90,16 @@ export const GET = withErrorHandler(async (req: Request) => {
   }
   // Admin sees everything
 
-  // Category filter (by slug)
+  // Category filter (by slug) — single query for parent + children
   if (category) {
-    const cat = await prisma.category.findUnique({ where: { slug: category } })
-    if (cat) {
-      // Include products from this category and all children
-      const childCats = await prisma.category.findMany({
-        where: { parentId: cat.id, isActive: true },
-      })
-      const catIds = [cat.id, ...childCats.map(c => c.id)]
-      where.categoryId = { in: catIds }
+    const catWithChildren = await prisma.category.findMany({
+      where: {
+        OR: [{ slug: category }, { parent: { slug: category }, isActive: true }],
+      },
+      select: { id: true },
+    })
+    if (catWithChildren.length > 0) {
+      where.categoryId = { in: catWithChildren.map(c => c.id) }
     }
   }
 
@@ -191,7 +192,8 @@ export const GET = withErrorHandler(async (req: Request) => {
     sortOrderBy,
   ]
 
-  // For grouped products, find representative IDs (first per group matching filters)
+  // For grouped products, find representatives and exclude duplicates
+  // Uses 2 queries instead of 3: groupBy for count + single query for rep IDs + all IDs
   const groupedInFilter = await prisma.product.groupBy({
     by: ['groupSlug'],
     where: { ...where, groupSlug: { not: null } },
@@ -202,20 +204,21 @@ export const GET = withErrorHandler(async (req: Request) => {
   const excludeIds = new Set<string>()
   if (groupedInFilter.length > 0) {
     const groupSlugsInFilter = groupedInFilter.map(g => g.groupSlug).filter(Boolean) as string[]
-    // Get first product per group (representative)
-    const reps = await prisma.product.findMany({
-      where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
-      select: { id: true, groupSlug: true },
-      orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
-      distinct: ['groupSlug'],
-    })
-    const repIds = new Set(reps.map(r => r.id))
 
-    // Get ALL products in these groups to find non-reps to exclude
-    const allInGroups = await prisma.product.findMany({
-      where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
-      select: { id: true },
-    })
+    // Fetch reps (distinct per group) and all group members in parallel
+    const [reps, allInGroups] = await Promise.all([
+      prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+        select: { id: true, groupSlug: true },
+        orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
+        distinct: ['groupSlug'],
+      }),
+      prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+        select: { id: true },
+      }),
+    ])
+    const repIds = new Set(reps.map(r => r.id))
     for (const p of allInGroups) {
       if (!repIds.has(p.id)) excludeIds.add(p.id)
     }
@@ -245,24 +248,51 @@ export const GET = withErrorHandler(async (req: Request) => {
   ])
   const total = totalRaw - duplicateCount
 
-  // Calculate avg ratings
+  // Calculate avg ratings + variant counts in parallel
   const productIds = products.map(p => p.id)
-  const ratings = await prisma.review.groupBy({
-    by: ['productId'],
-    where: { productId: { in: productIds } },
-    _avg: { rating: true },
-  })
-  const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
-
-  // Get variant counts for grouped products
   const groupSlugs = [...new Set(products.map(p => p.groupSlug).filter(Boolean))] as string[]
-  const variantCounts = groupSlugs.length > 0
-    ? await prisma.product.groupBy({
-        by: ['groupSlug'],
-        where: { groupSlug: { in: groupSlugs }, isActive: true },
-        _count: true,
-      })
-    : []
+
+  const [ratings, variantCounts] = await Promise.all([
+    prisma.review.groupBy({
+      by: ['productId'],
+      where: { productId: { in: productIds } },
+      _avg: { rating: true },
+    }),
+    groupSlugs.length > 0
+      ? prisma.product.groupBy({
+          by: ['groupSlug'],
+          where: { groupSlug: { in: groupSlugs }, isActive: true },
+          _count: true,
+        })
+      : Promise.resolve([]),
+  ])
+
+  // Fetch active promotions for these products via raw SQL
+  // Store all active promotions per product, pick the best matching one later
+  const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
+  try {
+    if (productIds.length > 0) {
+      const promoRows = await prisma.$queryRaw<Array<{
+        product_id: string; type: string; value: number; audience: string; badge: string | null
+      }>>`
+        SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
+        FROM promotion_products pp
+        JOIN promotions pr ON pr.id = pp.promotion_id
+        WHERE pp.product_id = ANY(${productIds})
+          AND pr.is_active = true
+          AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
+          AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
+      `
+      for (const row of promoRows) {
+        const arr = promosByProduct.get(row.product_id) || []
+        arr.push({ type: row.type, value: Number(row.value), audience: row.audience, badge: row.badge })
+        promosByProduct.set(row.product_id, arr)
+      }
+    }
+  } catch (err) {
+    console.error('[products] Failed to fetch promotions:', err)
+  }
+  const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
   const variantCountMap = new Map(variantCounts.map(v => [v.groupSlug!, v._count]))
 
   // Format response — show appropriate price based on role
@@ -271,6 +301,37 @@ export const GET = withErrorHandler(async (req: Request) => {
     const name = p.groupSlug && p.colorCode
       ? p.nameLat.replace(p.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
       : p.nameLat
+
+    let basePrice = role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c)
+    let oldPrice = p.oldPrice ? Number(p.oldPrice) : null
+
+    // Helper: calculate discounted price for a promo
+    const calcDisc = (price: number, type: string, value: number) => {
+      if (type === 'percentage') return Math.round(price * (1 - value / 100))
+      if (type === 'fixed') return Math.max(0, price - value)
+      if (type === 'price') return value
+      return price
+    }
+
+    // Apply best matching active promotion (lowest final price) for this user's role
+    const promos = promosByProduct.get(p.id) || []
+    const eligible = promos.filter(pr => pr.audience === 'all' || pr.audience === role)
+    const promo = eligible.length > 0
+      ? eligible.reduce((best, pr) => {
+          const dp = calcDisc(basePrice, pr.type, pr.value)
+          const bestDp = calcDisc(basePrice, best.type, best.value)
+          return dp < bestDp ? pr : best
+        })
+      : null
+
+    if (promo) {
+      const discountedPrice = calcDisc(basePrice, promo.type, promo.value)
+      if (discountedPrice < basePrice) {
+        oldPrice = basePrice
+        basePrice = discountedPrice
+      }
+    }
+
     return {
     id: p.id,
     sku: p.sku,
@@ -278,10 +339,10 @@ export const GET = withErrorHandler(async (req: Request) => {
     slug: p.slug,
     brand: p.brand,
     category: p.category,
-    price: role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c),
+    price: basePrice,
     priceB2c: Number(p.priceB2c),
     priceB2b: (role === 'b2b' || role === 'admin') && p.priceB2b ? Number(p.priceB2b) : null,
-    oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+    oldPrice,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,
     isNew: p.isNew,
@@ -289,6 +350,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     isBestseller: p.isBestseller,
     stockQuantity: p.stockQuantity,
     ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId } : {}),
+    promoBadge: promo?.badge || null,
     rating: ratingMap.get(p.id) || 0,
     reviewCount: p._count.reviews,
     colorProduct: p.colorProduct,
@@ -392,6 +454,10 @@ export const POST = withErrorHandler(async (req: Request) => {
       })),
     })
   }
+
+  // Invalidate cached pages
+  revalidatePath('/')
+  revalidatePath('/products')
 
   return successResponse(product, 201)
 })
