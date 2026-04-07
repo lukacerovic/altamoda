@@ -93,52 +93,70 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       })
     : []
 
-  // Check active promotions for this product via raw SQL
-  let promoBadge: string | null = null
-  let promoType: string | null = null
-  let promoValue = 0
+  // Helper: calculate discounted price for a given promo
+  const calcDiscounted = (price: number, type: string, value: number) => {
+    if (type === 'percentage') return Math.round(price * (1 - value / 100))
+    if (type === 'fixed') return Math.max(0, price - value)
+    if (type === 'price') return value
+    return price
+  }
+
+  // Helper: pick the best promotion (lowest final price) for a given base price and role
+  const pickBestPromo = (
+    promos: Array<{ type: string; value: number; audience: string; badge?: string | null }>,
+    price: number,
+    userRole: string | undefined
+  ) => {
+    const eligible = promos.filter(pr => pr.audience === 'all' || pr.audience === userRole)
+    if (eligible.length === 0) return null
+    return eligible.reduce((best, pr) => {
+      const dp = calcDiscounted(price, pr.type, pr.value)
+      const bestDp = calcDiscounted(price, best.type, best.value)
+      return dp < bestDp ? pr : best
+    })
+  }
+
+  // Check active promotions for this product and all related products in one query
+  const allProductIds = [product.id, ...related.map(r => r.id)]
+  const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
 
   try {
     const promoRows = await prisma.$queryRaw<Array<{
-      type: string; value: number; audience: string; badge: string | null
+      product_id: string; type: string; value: number; audience: string; badge: string | null
     }>>`
-      SELECT pr.type, pr.value, pr.audience, pr.badge
+      SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
       FROM promotion_products pp
       JOIN promotions pr ON pr.id = pp.promotion_id
-      WHERE pp.product_id = ${product.id}
+      WHERE pp.product_id = ANY(${allProductIds})
         AND pr.is_active = true
         AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
         AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
-      ORDER BY pr.value DESC
     `
-    // Pick the best promotion that matches this user's audience
-    const matched = promoRows.find(r => r.audience === 'all' || r.audience === role)
-    if (matched) {
-      promoType = matched.type
-      promoValue = Number(matched.value)
-      promoBadge = matched.badge
+    for (const row of promoRows) {
+      const arr = promosByProduct.get(row.product_id) || []
+      arr.push({ type: row.type, value: Number(row.value), audience: row.audience, badge: row.badge })
+      promosByProduct.set(row.product_id, arr)
     }
-  } catch {
-    // skip
+  } catch (err) {
+    console.error('[products/[id]] Failed to fetch promotions:', err)
   }
+
+  // Apply best promotion for the main product
+  let promoBadge: string | null = null
+  const mainPromos = promosByProduct.get(product.id) || []
 
   // Format response — hide sensitive pricing from unauthorized users
   const isB2bOrAdmin = role === 'b2b' || role === 'admin'
   let basePrice = role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
   let oldPrice = product.oldPrice ? Number(product.oldPrice) : null
 
-  if (promoType) {
-    let discountedPrice = basePrice
-    if (promoType === 'percentage') {
-      discountedPrice = Math.round(basePrice * (1 - promoValue / 100))
-    } else if (promoType === 'fixed') {
-      discountedPrice = Math.max(0, basePrice - promoValue)
-    } else if (promoType === 'price') {
-      discountedPrice = promoValue
-    }
+  const bestPromo = pickBestPromo(mainPromos, basePrice, role)
+  if (bestPromo) {
+    const discountedPrice = calcDiscounted(basePrice, bestPromo.type, bestPromo.value)
     if (discountedPrice < basePrice) {
       oldPrice = basePrice
       basePrice = discountedPrice
+      promoBadge = bestPromo.badge || null
     }
   }
 
@@ -162,34 +180,15 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       inStock: s.stockQuantity > 0,
       isActive: s.id === product.id,
     })),
-    related: await Promise.all(related.map(async r => {
+    related: related.map(r => {
       let relPrice = role === 'b2b' && r.priceB2b ? Number(r.priceB2b) : Number(r.priceB2c)
       let relOldPrice = r.oldPrice ? Number(r.oldPrice) : null
 
-      try {
-        const relPromoRows = await prisma.$queryRaw<Array<{
-          type: string; value: number; audience: string
-        }>>`
-          SELECT pr.type, pr.value, pr.audience
-          FROM promotion_products pp
-          JOIN promotions pr ON pr.id = pp.promotion_id
-          WHERE pp.product_id = ${r.id}
-            AND pr.is_active = true
-            AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
-            AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
-          ORDER BY pr.value DESC
-        `
-        const rp = relPromoRows.find(r => r.audience === 'all' || r.audience === role)
-        if (rp) {
-          const rv = Number(rp.value)
-          let dp = relPrice
-          if (rp.type === 'percentage') dp = Math.round(relPrice * (1 - rv / 100))
-          else if (rp.type === 'fixed') dp = Math.max(0, relPrice - rv)
-          else if (rp.type === 'price') dp = rv
-          if (dp < relPrice) { relOldPrice = relPrice; relPrice = dp }
-        }
-      } catch {
-        // skip
+      const relPromos = promosByProduct.get(r.id) || []
+      const relBest = pickBestPromo(relPromos, relPrice, role)
+      if (relBest) {
+        const dp = calcDiscounted(relPrice, relBest.type, relBest.value)
+        if (dp < relPrice) { relOldPrice = relPrice; relPrice = dp }
       }
 
       return {
@@ -202,7 +201,7 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
         image: r.images[0]?.url || null,
         isProfessional: r.isProfessional,
       }
-    })),
+    }),
   }
 
   // Strip ERP/internal fields for non-admin users

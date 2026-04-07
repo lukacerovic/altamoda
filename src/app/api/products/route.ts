@@ -289,8 +289,8 @@ export const GET = withErrorHandler(async (req: Request) => {
         promosByProduct.set(row.product_id, arr)
       }
     }
-  } catch {
-    // Promotion table may not exist yet, skip
+  } catch (err) {
+    console.error('[products] Failed to fetch promotions:', err)
   }
   const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
   const variantCountMap = new Map(variantCounts.map(v => [v.groupSlug!, v._count]))
@@ -305,21 +305,27 @@ export const GET = withErrorHandler(async (req: Request) => {
     let basePrice = role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c)
     let oldPrice = p.oldPrice ? Number(p.oldPrice) : null
 
-    // Apply best matching active promotion for this user's role
+    // Helper: calculate discounted price for a promo
+    const calcDisc = (price: number, type: string, value: number) => {
+      if (type === 'percentage') return Math.round(price * (1 - value / 100))
+      if (type === 'fixed') return Math.max(0, price - value)
+      if (type === 'price') return value
+      return price
+    }
+
+    // Apply best matching active promotion (lowest final price) for this user's role
     const promos = promosByProduct.get(p.id) || []
-    const promo = promos
-      .filter(pr => pr.audience === 'all' || pr.audience === role)
-      .sort((a, b) => b.value - a.value)[0] || null
+    const eligible = promos.filter(pr => pr.audience === 'all' || pr.audience === role)
+    const promo = eligible.length > 0
+      ? eligible.reduce((best, pr) => {
+          const dp = calcDisc(basePrice, pr.type, pr.value)
+          const bestDp = calcDisc(basePrice, best.type, best.value)
+          return dp < bestDp ? pr : best
+        })
+      : null
 
     if (promo) {
-      let discountedPrice = basePrice
-      if (promo.type === 'percentage') {
-        discountedPrice = Math.round(basePrice * (1 - promo.value / 100))
-      } else if (promo.type === 'fixed') {
-        discountedPrice = Math.max(0, basePrice - promo.value)
-      } else if (promo.type === 'price') {
-        discountedPrice = promo.value
-      }
+      const discountedPrice = calcDisc(basePrice, promo.type, promo.value)
       if (discountedPrice < basePrice) {
         oldPrice = basePrice
         basePrice = discountedPrice
