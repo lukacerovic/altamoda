@@ -190,7 +190,7 @@ function HeroCarousel({ images }: { images: string[] }) {
     <section className="relative overflow-hidden group">
       {/* Main slider */}
       <div
-        className="relative h-[420px] md:h-[560px] lg:h-[680px] overflow-hidden bg-black"
+        className="relative w-full aspect-[16/9] md:aspect-[2/1] overflow-hidden bg-[#f5f0eb]"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -201,20 +201,20 @@ function HeroCarousel({ images }: { images: string[] }) {
               i === current ? "opacity-100 scale-100" : "opacity-0 scale-105"
             }`}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={src}
               alt={`Alta Moda ${i + 1}`}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority={i === 0}
+              className="absolute inset-0 w-full h-full object-contain"
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={i === 0 ? "high" : "auto"}
             />
           </div>
         ))}
 
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20 z-[1]" />
+        {/* Gradient overlay for thumbnails readability */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent z-[1]" />
 
         {/* Nav arrows — appear on hover */}
         {images.length > 1 && (
@@ -249,12 +249,11 @@ function HeroCarousel({ images }: { images: string[] }) {
                         : "w-[60px] h-[36px] md:w-[80px] md:h-[45px] opacity-60 hover:opacity-90 hover:scale-105"
                     }`}
                   >
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={src}
                       alt={`Slide ${i + 1}`}
-                      fill
-                      sizes="140px"
-                      className="object-cover"
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                     {/* Active border glow */}
                     {i === current && (
