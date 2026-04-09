@@ -166,52 +166,120 @@ function ProductCarousel({ products, showOld = false }: { products: ProductData[
 /* ─── HeroCarousel ─── */
 function HeroCarousel({ images }: { images: string[] }) {
   const [current, setCurrent] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [paused, setPaused] = useState(false);
 
-  const goNext = useCallback(() => { setCurrent(prev => (prev + 1) % images.length); }, [images.length]);
-  const goPrev = useCallback(() => { setCurrent(prev => (prev - 1 + images.length) % images.length); }, [images.length]);
-
+  // Autoplay + progress
   useEffect(() => {
-    if (images.length <= 1) return;
-    timerRef.current = setInterval(goNext, 5000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [goNext, images.length]);
+    if (images.length <= 1 || paused) return;
+    setProgress(0);
+    const progressTimer = setInterval(() => {
+      setProgress(prev => Math.min(prev + (50 / 6000) * 100, 100));
+    }, 50);
+    const slideTimer = setTimeout(() => {
+      setCurrent(prev => (prev + 1) % images.length);
+    }, 6000);
+    return () => { clearInterval(progressTimer); clearTimeout(slideTimer); };
+  }, [current, images.length, paused]);
 
-  const pause = () => { if (timerRef.current) clearInterval(timerRef.current); };
-  const resume = () => { if (images.length > 1) timerRef.current = setInterval(goNext, 5000); };
+  const goTo = (i: number) => { setCurrent(i); setProgress(0); };
+  const goNext = () => goTo((current + 1) % images.length);
+  const goPrev = () => goTo((current - 1 + images.length) % images.length);
 
   return (
-    <section
-      className="relative h-[400px] md:h-[600px] lg:h-[700px] overflow-hidden"
-      onMouseEnter={pause}
-      onMouseLeave={resume}
-    >
-      {images.map((src, i) => (
-        <Image
-          key={src}
-          src={src}
-          alt={`Alta Moda ${i + 1}`}
-          fill
-          sizes="100vw"
-          className={`object-cover transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
-          priority={i === 0}
-        />
-      ))}
-      {images.length > 1 && (
-        <>
-          <button onClick={goPrev} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10">
-            <ChevronLeft className="w-5 h-5 text-[#2d2d2d]" />
-          </button>
-          <button onClick={goNext} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10">
-            <ChevronRight className="w-5 h-5 text-[#2d2d2d]" />
-          </button>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-            {images.map((_, i) => (
-              <button key={i} onClick={() => setCurrent(i)} className={`w-2.5 h-2.5 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/40"}`} />
-            ))}
+    <section className="relative overflow-hidden group">
+      {/* Main slider */}
+      <div
+        className="relative h-[420px] md:h-[560px] lg:h-[680px] overflow-hidden bg-black"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {images.map((src, i) => (
+          <div
+            key={src}
+            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+              i === current ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            }`}
+          >
+            <Image
+              src={src}
+              alt={`Alta Moda ${i + 1}`}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={i === 0}
+            />
           </div>
-        </>
-      )}
+        ))}
+
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20 z-[1]" />
+
+        {/* Nav arrows — appear on hover */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={goPrev}
+              className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition-all z-10 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 duration-300"
+            >
+              <ChevronLeft className="w-5 h-5 text-white" />
+            </button>
+            <button
+              onClick={goNext}
+              className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition-all z-10 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300"
+            >
+              <ChevronRight className="w-5 h-5 text-white" />
+            </button>
+          </>
+        )}
+
+        {/* Bottom: thumbnails + progress indicators overlaid on image */}
+        {images.length > 1 && (
+          <div className="absolute bottom-0 left-0 right-0 z-10">
+            <div className="max-w-4xl mx-auto px-6 pb-6">
+              <div className="flex items-end justify-center gap-3">
+                {images.map((src, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goTo(i)}
+                    className={`relative overflow-hidden rounded transition-all duration-500 ${
+                      i === current
+                        ? "w-[100px] h-[56px] md:w-[140px] md:h-[75px] shadow-lg shadow-black/30"
+                        : "w-[60px] h-[36px] md:w-[80px] md:h-[45px] opacity-60 hover:opacity-90 hover:scale-105"
+                    }`}
+                  >
+                    <Image
+                      src={src}
+                      alt={`Slide ${i + 1}`}
+                      fill
+                      sizes="140px"
+                      className="object-cover"
+                    />
+                    {/* Active border glow */}
+                    {i === current && (
+                      <div className="absolute inset-0 rounded border-2 border-white shadow-[0_0_12px_rgba(255,255,255,0.3)]" />
+                    )}
+                    {/* Progress bar on active thumbnail */}
+                    {i === current && (
+                      <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-black/30">
+                        <div
+                          className="h-full bg-white transition-[width] duration-75 ease-linear"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+              {/* Slide counter */}
+              <p className="text-center text-white/50 text-[11px] mt-2 font-light tracking-widest">
+                {String(current + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
