@@ -267,6 +267,11 @@ export const GET = withErrorHandler(async (req: Request) => {
       : Promise.resolve([]),
   ])
 
+  // Auto-delete expired promotions (fire-and-forget, don't block response)
+  prisma.promotion.deleteMany({
+    where: { endDate: { not: null, lt: new Date() } },
+  }).catch(() => {})
+
   // Fetch active promotions for these products via raw SQL
   // Store all active promotions per product, pick the best matching one later
   const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
