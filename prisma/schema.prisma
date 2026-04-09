@@ -722,6 +722,13 @@ model SeoMetadata {
   @@map("seo_metadata")
 }
 
+model SiteSetting {
+  key   String @id
+  value String
+
+  @@map("site_settings")
+}
+
 model Faq {
   id          String  @id @default(cuid())
   questionLat String  @map("question_lat")

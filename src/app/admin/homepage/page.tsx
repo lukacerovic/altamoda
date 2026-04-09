@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check } from "lucide-react";
+import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check, Upload, ImageIcon, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -35,6 +35,67 @@ export default function HomepagePage() {
 
   const [sectionProducts, setSectionProducts] = useState<Record<string, SectionProduct[]>>({});
   const [loading, setLoading] = useState(true);
+
+  // Hero images state (multiple for carousel)
+  const [heroImages, setHeroImages] = useState<string[]>([]);
+  const [heroUploading, setHeroUploading] = useState(false);
+  const heroInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/site-settings?keys=heroImages")
+      .then(r => r.json())
+      .then(json => {
+        if (json.data?.heroImages) {
+          try { setHeroImages(JSON.parse(json.data.heroImages)); } catch { /* ignore */ }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveHeroImages = async (images: string[]) => {
+    setHeroImages(images);
+    await fetch("/api/admin/site-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ heroImages: JSON.stringify(images) }),
+    });
+  };
+
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setHeroUploading(true);
+    try {
+      const newUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+        const uploadJson = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadJson.error);
+        newUrls.push(uploadJson.data.url);
+      }
+      await saveHeroImages([...heroImages, ...newUrls]);
+    } catch (err) {
+      alert("Greška pri uploadu: " + (err instanceof Error ? err.message : "Nepoznata greška"));
+    } finally {
+      setHeroUploading(false);
+      if (heroInputRef.current) heroInputRef.current.value = "";
+    }
+  };
+
+  const removeHeroImage = async (index: number) => {
+    const updated = heroImages.filter((_, i) => i !== index);
+    await saveHeroImages(updated);
+  };
+
+  const moveHeroImage = async (index: number, direction: -1 | 1) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= heroImages.length) return;
+    const updated = [...heroImages];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    await saveHeroImages(updated);
+  };
 
   // Add-products modal state
   const [addModal, setAddModal] = useState<{ sectionKey: string; flagField: string } | null>(null);
@@ -205,6 +266,109 @@ export default function HomepagePage() {
         </div>
       ) : (
         <div className="space-y-6">
+          {/* Hero Carousel Section */}
+          <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#faf8f4]">
+              <div className="flex items-center gap-3">
+                <div className="text-secondary"><ImageIcon size={20} /></div>
+                <h2 className="text-lg font-serif font-bold text-black">Hero Carousel</h2>
+                <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-secondary text-xs font-semibold">
+                  {heroImages.length}
+                </span>
+              </div>
+              <button
+                onClick={() => heroInputRef.current?.click()}
+                disabled={heroUploading}
+                className="bg-black text-white hover:bg-stone-800 transition-colors px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+              >
+                {heroUploading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Plus size={16} />
+                )}
+                Dodaj slike
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-[#666] mb-4">
+                Postavite slike za hero carousel na početnoj stranici. Slike se automatski rotiraju.
+              </p>
+
+              {heroImages.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {heroImages.map((url, index) => (
+                    <div key={index} className="relative group rounded-lg overflow-hidden border border-stone-200">
+                      <div className="relative aspect-[16/7]">
+                        <Image
+                          src={url}
+                          alt={`Hero slika ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                        <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 text-white text-xs rounded">
+                          {index + 1}
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
+                      <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {index > 0 && (
+                          <button
+                            onClick={() => moveHeroImage(index, -1)}
+                            className="p-1.5 bg-white rounded shadow text-black hover:bg-stone-100 transition-colors"
+                            title="Pomeri levo"
+                          >
+                            <ChevronLeft size={14} />
+                          </button>
+                        )}
+                        {index < heroImages.length - 1 && (
+                          <button
+                            onClick={() => moveHeroImage(index, 1)}
+                            className="p-1.5 bg-white rounded shadow text-black hover:bg-stone-100 transition-colors"
+                            title="Pomeri desno"
+                          >
+                            <ChevronRight size={14} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => removeHeroImage(index)}
+                          className="p-1.5 bg-red-500 rounded shadow text-white hover:bg-red-600 transition-colors"
+                          title="Ukloni"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <button
+                  onClick={() => heroInputRef.current?.click()}
+                  disabled={heroUploading}
+                  className="w-full h-48 border-2 border-dashed border-stone-300 rounded-lg flex flex-col items-center justify-center gap-3 hover:border-black hover:bg-stone-50 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {heroUploading ? (
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent" />
+                  ) : (
+                    <>
+                      <Upload size={32} className="text-stone-400" />
+                      <span className="text-sm text-[#666]">Kliknite da postavite hero slike</span>
+                      <span className="text-xs text-[#999]">Preporučena veličina: 1920x700px</span>
+                    </>
+                  )}
+                </button>
+              )}
+              <input
+                ref={heroInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleHeroUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
           {sections.map((section) => {
             const products = sectionProducts[section.key] || [];
 

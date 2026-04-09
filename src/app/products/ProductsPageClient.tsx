@@ -1122,7 +1122,7 @@ export default function ProductsPageClient({
 
             {/* Product grid */}
             {!loading && (
-              <div className={gridView ? "grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5" : "space-y-3"}>
+              <div className={gridView ? "grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5" : "space-y-3"}>
                 {products.map((p) => gridView ? (
                   <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
                 ) : (

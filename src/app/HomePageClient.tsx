@@ -163,12 +163,66 @@ function ProductCarousel({ products, showOld = false }: { products: ProductData[
   );
 }
 
+/* ─── HeroCarousel ─── */
+function HeroCarousel({ images }: { images: string[] }) {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const goNext = useCallback(() => { setCurrent(prev => (prev + 1) % images.length); }, [images.length]);
+  const goPrev = useCallback(() => { setCurrent(prev => (prev - 1 + images.length) % images.length); }, [images.length]);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    timerRef.current = setInterval(goNext, 5000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [goNext, images.length]);
+
+  const pause = () => { if (timerRef.current) clearInterval(timerRef.current); };
+  const resume = () => { if (images.length > 1) timerRef.current = setInterval(goNext, 5000); };
+
+  return (
+    <section
+      className="relative h-[400px] md:h-[600px] lg:h-[700px] overflow-hidden"
+      onMouseEnter={pause}
+      onMouseLeave={resume}
+    >
+      {images.map((src, i) => (
+        <Image
+          key={src}
+          src={src}
+          alt={`Alta Moda ${i + 1}`}
+          fill
+          sizes="100vw"
+          className={`object-cover transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
+          priority={i === 0}
+        />
+      ))}
+      {images.length > 1 && (
+        <>
+          <button onClick={goPrev} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10">
+            <ChevronLeft className="w-5 h-5 text-[#2d2d2d]" />
+          </button>
+          <button onClick={goNext} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10">
+            <ChevronRight className="w-5 h-5 text-[#2d2d2d]" />
+          </button>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            {images.map((_, i) => (
+              <button key={i} onClick={() => setCurrent(i)} className={`w-2.5 h-2.5 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/40"}`} />
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 /* ─── Props ─── */
 interface Props {
   featuredProducts: ProductData[];
   bestsellers: ProductData[];
   newArrivals: ProductData[];
   saleProducts: ProductData[];
+  heroImages: string[];
 }
 
 const trustedBrands = [
@@ -187,7 +241,7 @@ const trustedBrands = [
 ];
 
 /* ─── Main Page ─── */
-export default function HomePageClient({ featuredProducts, newArrivals, saleProducts }: Props) {
+export default function HomePageClient({ featuredProducts, newArrivals, saleProducts, heroImages }: Props) {
   const { t } = useLanguage();
 
   const trustBadges = [
@@ -233,52 +287,11 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
     <div className="min-h-screen bg-[#f5f0e8]">
       <Header />
 
-      {/* HERO — Split B2C / B2B */}
-      <section className="relative flex flex-col md:flex-row h-[500px] md:h-[700px] overflow-hidden">
-        {/* Soft blend between halves */}
-        <div className="hidden md:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-64 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, transparent 10%, rgba(45,45,45,0.35) 45%, rgba(45,45,45,0.35) 55%, transparent 90%)" }} />
-        <div className="md:hidden absolute inset-x-0 top-1/2 -translate-y-1/2 h-32 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 10%, rgba(45,45,45,0.35) 45%, rgba(45,45,45,0.35) 55%, transparent 90%)" }} />
-        {/* Left — B2C / Customers */}
-        <Link href="/products" className="relative w-full md:w-1/2 h-1/2 md:h-full group overflow-hidden cursor-pointer">
-          <Image src="/hero.png" alt="Professional hair care products" fill sizes="(max-width: 768px) 100vw, 50vw" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-          <div className="absolute inset-0 bg-[#2d2d2d]/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/90 via-[#2d2d2d]/40 to-[#2d2d2d]/10" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14">
-            <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/70 mb-3 md:mb-5 block">{t("home.heroForYou")}</span>
-            <h2 className="text-4xl md:text-6xl lg:text-8xl font-light leading-[0.95] mb-3 md:mb-5 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              {t("home.heroTitle1")}<br /><em className="italic text-[#d4a0ab]">{t("home.heroTitle2")}</em>
-            </h2>
-            <p className="text-white/90 text-sm md:text-lg mb-5 md:mb-8 max-w-md leading-relaxed">
-              {t("home.heroSubtitle")}
-            </p>
-            <span className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-6 py-2.5 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide group-hover:-translate-y-0.5 group-hover:shadow-lg transition-all">
-              {t("home.shopNow")} <ArrowRight className="w-4 h-4" />
-            </span>
-          </div>
-        </Link>
-
-        {/* Right — B2B / Professionals */}
-        <Link href="/account/login" className="relative w-full md:w-1/2 h-1/2 md:h-full group overflow-hidden cursor-pointer">
-          <Image src="/b2bhero.png" alt="Salon partnership for professionals" fill sizes="(max-width: 768px) 100vw, 50vw" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-          <div className="absolute inset-0 bg-[#2d2d2d]/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#2d2d2d]/90 via-[#2d2d2d]/40 to-[#2d2d2d]/10" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14 text-right md:text-left">
-            <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/70 mb-3 md:mb-5 block">{t("home.heroForProfessionals")}</span>
-            <h2 className="text-4xl md:text-6xl lg:text-8xl font-light leading-[0.95] mb-3 md:mb-5 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              {t("home.heroB2bTitle1")}<br /><em className="italic text-[#d4a0ab]">{t("home.heroB2bTitle2")}</em>
-            </h2>
-            <p className="text-white/90 text-sm md:text-lg mb-5 md:mb-8 max-w-md leading-relaxed ml-auto md:ml-0">
-              {t("home.heroB2bSubtitle")}
-            </p>
-            <span className="inline-flex items-center gap-2 bg-[#2d2d2d] border border-white/20 text-white px-6 py-2.5 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide group-hover:-translate-y-0.5 group-hover:shadow-lg transition-all">
-              {t("home.heroB2bCta")} <ArrowRight className="w-4 h-4" />
-            </span>
-          </div>
-        </Link>
-      </section>
+      {/* HERO CAROUSEL */}
+      <HeroCarousel images={heroImages.length > 0 ? heroImages : ["/hero.png"]} />
 
       {/* TRUST BADGES */}
-      <section className="py-10 bg-white border-b border-[#e0d8cc]">
+      <section className="py-10 bg-white border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {trustBadges.map((badge) => { const Icon = badge.icon; return (
@@ -292,16 +305,10 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
         </div>
       </section>
 
-      {/* EDITORIAL HEADING */}
-      <section className="py-16 md:py-20 text-center bg-[#f5f0e8]">
-        <p className="text-3xl md:text-4xl lg:text-5xl text-[#2d2d2d] font-light italic max-w-3xl mx-auto px-4 leading-relaxed" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-          {t("home.editorialHeading")}
-        </p>
-      </section>
 
       {/* FEATURED PRODUCTS */}
       {featuredProducts.length > 0 && (
-        <section className="py-16 bg-white border-y border-[#e0d8cc]">
+        <section className="bg-white border-b border-[#e0d8cc]">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.featuredProducts")}</h2>
             <ProductCarousel products={featuredProducts} showOld />
@@ -348,35 +355,47 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
               ))}
             </div>
 
-            {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-4 md:gap-12 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="w-11 h-11 rounded-full border border-[#b07a87]/30 flex items-center justify-center mx-auto mb-3">
-                  <ShieldCheck className="w-5 h-5 text-[#b07a87]" />
-                </div>
-                <h3 className="text-white text-sm font-medium tracking-wide">Autorizovani</h3>
-                <p className="text-white/35 text-xs mt-1.5 leading-relaxed">100% originalni proizvodi direktno od proizvođača</p>
-              </div>
-              <div className="text-center">
-                <div className="w-11 h-11 rounded-full border border-[#b07a87]/30 flex items-center justify-center mx-auto mb-3">
-                  <Award className="w-5 h-5 text-[#b07a87]" />
-                </div>
-                <h3 className="text-white text-sm font-medium tracking-wide">Premium</h3>
-                <p className="text-white/35 text-xs mt-1.5 leading-relaxed">Samo provereni profesionalni brendovi</p>
-              </div>
-              <div className="text-center">
-                <div className="w-11 h-11 rounded-full border border-[#b07a87]/30 flex items-center justify-center mx-auto mb-3">
-                  <Truck className="w-5 h-5 text-[#b07a87]" />
-                </div>
-                <h3 className="text-white text-sm font-medium tracking-wide">Isporuka</h3>
-                <p className="text-white/35 text-xs mt-1.5 leading-relaxed">Isporuka na vašu adresu u najkraćem roku</p>
-              </div>
-            </div>
-
             {/* CTA */}
             <div className="text-center mt-14">
               <Link href="/brands" className="inline-flex items-center gap-2 text-[#b07a87]/70 hover:text-[#b07a87] text-xs tracking-[0.15em] uppercase font-medium transition-colors">
                 Pogledajte sve brendove <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* B2B / FOR PROFESSIONALS */}
+      <section className="relative overflow-hidden">
+        <div className="flex flex-col md:flex-row min-h-[400px] md:min-h-[500px]">
+          {/* Image */}
+          <div className="relative w-full md:w-1/2 h-[300px] md:h-auto">
+            <Image
+              src="/b2bhero.png"
+              alt="Salon partnership for professionals"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+          {/* Content */}
+          <div className="w-full md:w-1/2 bg-[#38202a] flex items-center">
+            <div className="p-8 md:p-14 lg:p-20">
+              <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/50 mb-4 block">
+                {t("home.heroForProfessionals")}
+              </span>
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-light leading-[0.95] mb-4 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                {t("home.heroB2bTitle1")}<br />
+                <em className="italic text-[#d4a0ab]">{t("home.heroB2bTitle2")}</em>
+              </h2>
+              <p className="text-white/70 text-sm md:text-base mb-8 max-w-md leading-relaxed">
+                {t("home.heroB2bSubtitle")}
+              </p>
+              <Link
+                href="/account/login"
+                className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-6 py-3 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide hover:-translate-y-0.5 hover:shadow-lg transition-all"
+              >
+                {t("home.heroB2bCta")} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

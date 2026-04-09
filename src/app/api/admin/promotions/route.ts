@@ -70,13 +70,11 @@ function validateValue(type: string, value: number): string | null {
 export const GET = withErrorHandler(async () => {
   await requireAdmin()
 
-  // Soft-deactivate expired promotions instead of deleting them
-  await prisma.promotion.updateMany({
+  // Auto-delete expired promotions (endDate has passed)
+  await prisma.promotion.deleteMany({
     where: {
       endDate: { not: null, lt: new Date() },
-      isActive: true,
     },
-    data: { isActive: false },
   })
 
   const promotions = await prisma.promotion.findMany({

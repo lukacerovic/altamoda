@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db'
  */
 export const getProductBySlugOrId = cache(async (id: string) => {
   return prisma.product.findFirst({
-    where: { OR: [{ id }, { slug: id }], isActive: true },
+    where: { OR: [{ id }, { slug: id }] },
     include: {
       brand: { select: { name: true, slug: true } },
       productLine: { select: { name: true, slug: true } },

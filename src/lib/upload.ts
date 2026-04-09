@@ -3,7 +3,7 @@ import path from 'path'
 import { randomUUID } from 'crypto'
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public/uploads')
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',
   'video/mp4', 'video/webm',
@@ -41,7 +41,7 @@ function verifyMagicBytes(buffer: Buffer, ext: string): boolean {
 
 export async function saveUploadedFile(file: File): Promise<string> {
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error('Fajl je prevelik (max 10MB)')
+    throw new Error('Fajl je prevelik (max 25MB)')
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
