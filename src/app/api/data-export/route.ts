@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
     case 'productImages': data = await prisma.productImage.findMany(opts); break
     case 'productLines': data = await prisma.productLine.findMany(opts); break
     case 'colorProducts': data = await prisma.colorProduct.findMany(opts); break
-    case 'users': data = await prisma.user.findMany({ ...opts, select: { id: true, name: true, email: true, role: true, status: true, phone: true, address: true, city: true, postalCode: true, createdAt: true, emailVerified: true } }); break
+    case 'users': data = await prisma.user.findMany(opts); break
     case 'orders': data = await prisma.order.findMany(opts); break
     case 'orderItems': data = await prisma.orderItem.findMany(opts); break
     case 'reviews': data = await prisma.review.findMany(opts); break
