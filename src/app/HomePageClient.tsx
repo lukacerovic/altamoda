@@ -7,7 +7,6 @@ import {
   Leaf, ShieldCheck, Award, Truck,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Instagram, Mail, Send, X,
-  ShoppingBag, Scissors,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -164,121 +163,57 @@ function ProductCarousel({ products, showOld = false }: { products: ProductData[
   );
 }
 
-/* ─── HeroCarousel ─── */
-function HeroCarousel({ images }: { images: string[] }) {
-  const [current, setCurrent] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  // Autoplay + progress
-  useEffect(() => {
-    if (images.length <= 1 || paused) return;
-    setProgress(0);
-    const progressTimer = setInterval(() => {
-      setProgress(prev => Math.min(prev + (50 / 6000) * 100, 100));
-    }, 50);
-    const slideTimer = setTimeout(() => {
-      setCurrent(prev => (prev + 1) % images.length);
-    }, 6000);
-    return () => { clearInterval(progressTimer); clearTimeout(slideTimer); };
-  }, [current, images.length, paused]);
-
-  const goTo = (i: number) => { setCurrent(i); setProgress(0); };
-  const goNext = () => goTo((current + 1) % images.length);
-  const goPrev = () => goTo((current - 1 + images.length) % images.length);
+/* ─── HeroBanners (3-panel grid) ─── */
+function HeroBanners({ images }: { images: string[] }) {
+  const left = images[0] || "/hero.png";
+  const topRight = images[1];
+  const bottomRight = images[2];
 
   return (
-    <section className="relative overflow-hidden group">
-      {/* Main slider */}
-      <div
-        className="relative w-full aspect-[16/9] overflow-hidden bg-[#f5f0eb]"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
-        {images.map((src, i) => (
-          <div
-            key={src}
-            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-              i === current ? "opacity-100 scale-100" : "opacity-0 scale-105"
-            }`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={src}
-              alt={`Alta Moda ${i + 1}`}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading={i === 0 ? "eager" : "lazy"}
-              decoding="async"
-              fetchPriority={i === 0 ? "high" : "auto"}
-            />
-          </div>
-        ))}
+    <section className="w-full">
+      <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr]">
+        {/* Left large banner – ~60% width, displays full image and sets the row height */}
+        <Link href="/products" className="block overflow-hidden group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={left}
+            alt="Banner 1"
+            className="w-full h-auto block group-hover:scale-[1.02] transition-transform duration-500"
+            loading="eager"
+            fetchPriority="high"
+          />
+        </Link>
 
-        {/* Gradient overlay for thumbnails readability */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent z-[1]" />
+        {/* Right column – ~40% width, two stacked banners matching left height */}
+        <div className="grid grid-rows-2">
+          {topRight ? (
+            <Link href="/products" className="block overflow-hidden group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={topRight}
+                alt="Banner 2"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                loading="eager"
+              />
+            </Link>
+          ) : (
+            <div className="bg-[#e0d8cc] flex items-center justify-center text-[#b07a87] text-sm">Banner 2</div>
+          )}
 
-        {/* Nav arrows — appear on hover */}
-        {images.length > 1 && (
-          <>
-            <button
-              onClick={goPrev}
-              className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition-all z-10 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 duration-300"
-            >
-              <ChevronLeft className="w-5 h-5 text-white" />
-            </button>
-            <button
-              onClick={goNext}
-              className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition-all z-10 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300"
-            >
-              <ChevronRight className="w-5 h-5 text-white" />
-            </button>
-          </>
-        )}
-
-        {/* Bottom: thumbnails + progress indicators overlaid on image */}
-        {images.length > 1 && (
-          <div className="absolute bottom-0 left-0 right-0 z-10">
-            <div className="max-w-4xl mx-auto px-6 pb-6">
-              <div className="flex items-end justify-center gap-3">
-                {images.map((src, i) => (
-                  <button
-                    key={i}
-                    onClick={() => goTo(i)}
-                    className={`relative overflow-hidden rounded transition-all duration-500 ${
-                      i === current
-                        ? "w-[100px] h-[56px] md:w-[140px] md:h-[75px] shadow-lg shadow-black/30"
-                        : "w-[60px] h-[36px] md:w-[80px] md:h-[45px] opacity-60 hover:opacity-90 hover:scale-105"
-                    }`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={src}
-                      alt={`Slide ${i + 1}`}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    {/* Active border glow */}
-                    {i === current && (
-                      <div className="absolute inset-0 rounded border-2 border-white shadow-[0_0_12px_rgba(255,255,255,0.3)]" />
-                    )}
-                    {/* Progress bar on active thumbnail */}
-                    {i === current && (
-                      <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-black/30">
-                        <div
-                          className="h-full bg-white transition-[width] duration-75 ease-linear"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-              {/* Slide counter */}
-              <p className="text-center text-white/50 text-[11px] mt-2 font-light tracking-widest">
-                {String(current + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
-              </p>
-            </div>
-          </div>
-        )}
+          {bottomRight ? (
+            <Link href="/products" className="block overflow-hidden group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bottomRight}
+                alt="Banner 3"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                loading="lazy"
+              />
+            </Link>
+          ) : (
+            <div className="bg-[#e0d8cc] flex items-center justify-center text-[#b07a87] text-sm">Banner 3</div>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -355,55 +290,10 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
     <div className="min-h-screen bg-[#f5f0e8]">
       <Header />
 
-      {/* HERO CAROUSEL */}
-      <HeroCarousel images={heroImages.length > 0 ? heroImages : ["/hero.png"]} />
+      {/* HERO BANNERS */}
+      <HeroBanners images={heroImages.length > 0 ? heroImages : ["/hero.png"]} />
 
       {/* B2C / B2B REGISTRATION */}
-      {/* B2C / B2B REGISTRATION */}
-      <section className="bg-white py-10 md:py-14">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* B2C Card */}
-            <Link
-              href="/account/register"
-              className="group relative rounded-2xl border border-[#e0d8cc] px-8 md:px-10 py-10 md:py-12 flex flex-col items-center text-center hover:border-[#b07a87] hover:shadow-md transition-all duration-300"
-            >
-              <div className="w-14 h-14 rounded-full bg-[#f5f0e8] group-hover:bg-[#8c4a5a]/10 flex items-center justify-center mb-4 transition-colors duration-300">
-                <ShoppingBag className="w-6 h-6 text-[#8c4a5a]" strokeWidth={1.5} />
-              </div>
-              <h3 className="text-2xl md:text-3xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Kupujte za Sebe
-              </h3>
-              <p className="text-sm text-[#8a7a6d] leading-relaxed max-w-sm">
-                Pronađite savršene proizvode za negu kose, kvalitetne i proverene od strane stručnjaka.
-              </p>
-              <span className="inline-flex items-center gap-2 text-sm font-medium text-[#8c4a5a] mt-5 group-hover:gap-3 transition-all duration-300">
-                Registrujte se <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            {/* B2B Card */}
-            <Link
-              href="/account/register?type=b2b"
-              className="group relative bg-[#38202a] rounded-2xl px-8 md:px-10 py-10 md:py-12 flex flex-col items-center text-center hover:shadow-md transition-all duration-300"
-            >
-              <div className="w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/15 flex items-center justify-center mb-4 transition-colors duration-300">
-                <Scissors className="w-6 h-6 text-[#d4a0ab]" strokeWidth={1.5} />
-              </div>
-              <h3 className="text-2xl md:text-3xl font-light text-white mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Za Salone & Profesionalce
-              </h3>
-              <p className="text-sm text-white/50 leading-relaxed max-w-sm">
-                Ekskluzivne veleprodajne cene, prioritetna podrška i posebne pogodnosti za registrovane salone.
-              </p>
-              <span className="inline-flex items-center gap-2 text-sm font-medium text-[#d4a0ab] mt-5 group-hover:gap-3 transition-all duration-300">
-                Postanite partner <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* TRUST BADGES */}
       <section className="py-12 md:py-16 bg-white border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
@@ -419,19 +309,27 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
         </div>
       </section>
 
-
-      {/* FEATURED PRODUCTS */}
-      {featuredProducts.length > 0 && (
-        <section className="py-16 md:py-20 bg-white border-b border-[#e0d8cc]">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.featuredProducts")}</h2>
-            <ProductCarousel products={featuredProducts} showOld />
-            <div className="text-center mt-10">
-              <Link href="/products" className="inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.viewAllProducts")}</Link>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* B2B / FOR PROFESSIONALS */}
+      <section className="bg-[#38202a]">
+        <div className="max-w-7xl mx-auto px-4 py-16 md:py-20 text-center">
+          <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/50 mb-4 block">
+            {t("home.heroForProfessionals")}
+          </span>
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-light leading-[0.95] mb-4 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            {t("home.heroB2bTitle1")}{" "}
+            <em className="italic text-[#d4a0ab]">{t("home.heroB2bTitle2")}</em>
+          </h2>
+          <p className="text-white/70 text-sm md:text-base mb-8 max-w-lg mx-auto leading-relaxed">
+            {t("home.heroB2bSubtitle")}
+          </p>
+          <Link
+            href="/account/login"
+            className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-6 py-3 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide hover:-translate-y-0.5 hover:shadow-lg transition-all"
+          >
+            {t("home.heroB2bCta")} <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
 
       {/* TRUSTED BRANDS */}
       <section className="relative overflow-hidden">
@@ -479,42 +377,18 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
         </div>
       </section>
 
-      {/* B2B / FOR PROFESSIONALS */}
-      <section className="relative overflow-hidden">
-        <div className="flex flex-col md:flex-row min-h-[400px] md:min-h-[500px]">
-          {/* Image */}
-          <div className="relative w-full md:w-1/2 h-[300px] md:h-auto">
-            <Image
-              src="/b2bhero.png"
-              alt="Salon partnership for professionals"
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-            />
-          </div>
-          {/* Content */}
-          <div className="w-full md:w-1/2 bg-[#38202a] flex items-center">
-            <div className="p-8 md:p-14 lg:p-20">
-              <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-white/50 mb-4 block">
-                {t("home.heroForProfessionals")}
-              </span>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-light leading-[0.95] mb-4 text-white" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                {t("home.heroB2bTitle1")}<br />
-                <em className="italic text-[#d4a0ab]">{t("home.heroB2bTitle2")}</em>
-              </h2>
-              <p className="text-white/70 text-sm md:text-base mb-8 max-w-md leading-relaxed">
-                {t("home.heroB2bSubtitle")}
-              </p>
-              <Link
-                href="/account/login"
-                className="inline-flex items-center gap-2 bg-white text-[#2d2d2d] px-6 py-3 md:px-8 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide hover:-translate-y-0.5 hover:shadow-lg transition-all"
-              >
-                {t("home.heroB2bCta")} <ArrowRight className="w-4 h-4" />
-              </Link>
+      {/* FEATURED PRODUCTS */}
+      {featuredProducts.length > 0 && (
+        <section className="py-16 md:py-20 bg-white border-b border-[#e0d8cc]">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.featuredProducts")}</h2>
+            <ProductCarousel products={featuredProducts} showOld />
+            <div className="text-center mt-10">
+              <Link href="/products" className="inline-flex items-center gap-1 text-sm text-[#2d2d2d] font-medium border-b border-[#2d2d2d] pb-0.5 hover:text-[#8c4a5a] hover:border-[#8c4a5a] transition-colors">{t("home.viewAllProducts")}</Link>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* NEW ARRIVALS */}
       {newArrivals.length > 0 && (

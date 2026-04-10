@@ -120,6 +120,7 @@ function useMegaMenus() {
     { name: t("nav.exploreBrands"), href: "/brands", hasMega: true, menuKey: "brands" },
     { name: t("nav.about"), href: "/about", hasMega: false, menuKey: "" },
     { name: t("nav.contact"), href: "/contact", hasMega: false, menuKey: "" },
+    { name: t("nav.educationCenter"), href: "/education", hasMega: false, menuKey: "" },
   ];
 
   return { megaMenus, navLinks };
@@ -167,7 +168,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setMobileMenu(false);
+      if (window.innerWidth >= 1280) setMobileMenu(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -233,12 +234,12 @@ export default function Header() {
       <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           {/* Mobile hamburger - left */}
-          <button onClick={() => setMobileMenu(true)} className="md:hidden text-black hover:text-secondary transition-colors">
+          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-black hover:text-secondary transition-colors">
             <Menu className="w-6 h-6" />
           </button>
 
           {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden xl:flex items-center gap-6">
             {navLinks.map((l) => {
               const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || l.menuKey === "brands");
               const menuData = megaMenus[l.menuKey] || null;
@@ -370,21 +371,21 @@ export default function Header() {
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-            <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-6 md:h-7" />
+            <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-6 xl:h-7" />
           </Link>
 
           {/* Icons - right */}
           <div className="flex items-center gap-5">
-            <div className="hidden md:block">
+            <div className="hidden xl:block">
               <LanguageToggle />
             </div>
-            <Link href={session ? "/account" : "/account/login"} className="hidden md:block hover:text-secondary transition-colors">
+            <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-secondary transition-colors">
               <User className="w-5 h-5 text-black" />
             </Link>
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-secondary transition-colors">
               <Search className="w-5 h-5 text-black" />
             </button>
-            <Link href="/wishlist" className="relative hidden md:block hover:text-secondary transition-colors">
+            <Link href="/wishlist" className="relative hidden xl:block hover:text-secondary transition-colors">
               <Heart className="w-5 h-5 text-black" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
@@ -563,7 +564,7 @@ export default function Header() {
 
               {/* Language selector in mobile menu */}
               <div className="pt-4 border-t border-stone-200 mt-2">
-                <LanguageToggle />
+                <LanguageToggle alignLeft />
               </div>
             </div>
           </div>
