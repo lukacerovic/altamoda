@@ -85,8 +85,18 @@ export default function HomepagePage() {
   };
 
   const removeHeroImage = async (index: number) => {
+    const removedUrl = heroImages[index];
     const updated = heroImages.filter((_, i) => i !== index);
     await saveHeroImages(updated);
+
+    // Delete the file from public/uploads if it's an uploaded file
+    if (removedUrl?.startsWith("/uploads/")) {
+      fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: removedUrl }),
+      }).catch(() => {});
+    }
   };
 
   const moveHeroImage = async (index: number, direction: -1 | 1) => {

@@ -7,6 +7,7 @@ import {
   Leaf, ShieldCheck, Award, Truck,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Instagram, Mail, Send, X,
+  ShoppingBag, Scissors,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -190,7 +191,7 @@ function HeroCarousel({ images }: { images: string[] }) {
     <section className="relative overflow-hidden group">
       {/* Main slider */}
       <div
-        className="relative w-full aspect-[16/9] md:aspect-[2/1] overflow-hidden bg-[#f5f0eb]"
+        className="relative w-full aspect-[16/9] overflow-hidden bg-[#f5f0eb]"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -205,7 +206,7 @@ function HeroCarousel({ images }: { images: string[] }) {
             <img
               src={src}
               alt={`Alta Moda ${i + 1}`}
-              className="absolute inset-0 w-full h-full object-contain"
+              className="absolute inset-0 w-full h-full object-cover"
               loading={i === 0 ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={i === 0 ? "high" : "auto"}
@@ -357,8 +358,54 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
       {/* HERO CAROUSEL */}
       <HeroCarousel images={heroImages.length > 0 ? heroImages : ["/hero.png"]} />
 
+      {/* B2C / B2B REGISTRATION */}
+      {/* B2C / B2B REGISTRATION */}
+      <section className="bg-white py-10 md:py-14">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* B2C Card */}
+            <Link
+              href="/account/register"
+              className="group relative rounded-2xl border border-[#e0d8cc] px-8 md:px-10 py-10 md:py-12 flex flex-col items-center text-center hover:border-[#b07a87] hover:shadow-md transition-all duration-300"
+            >
+              <div className="w-14 h-14 rounded-full bg-[#f5f0e8] group-hover:bg-[#8c4a5a]/10 flex items-center justify-center mb-4 transition-colors duration-300">
+                <ShoppingBag className="w-6 h-6 text-[#8c4a5a]" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-light text-[#2d2d2d] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Kupujte za Sebe
+              </h3>
+              <p className="text-sm text-[#8a7a6d] leading-relaxed max-w-sm">
+                Pronađite savršene proizvode za negu kose, kvalitetne i proverene od strane stručnjaka.
+              </p>
+              <span className="inline-flex items-center gap-2 text-sm font-medium text-[#8c4a5a] mt-5 group-hover:gap-3 transition-all duration-300">
+                Registrujte se <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+
+            {/* B2B Card */}
+            <Link
+              href="/account/register?type=b2b"
+              className="group relative bg-[#38202a] rounded-2xl px-8 md:px-10 py-10 md:py-12 flex flex-col items-center text-center hover:shadow-md transition-all duration-300"
+            >
+              <div className="w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/15 flex items-center justify-center mb-4 transition-colors duration-300">
+                <Scissors className="w-6 h-6 text-[#d4a0ab]" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-light text-white mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Za Salone & Profesionalce
+              </h3>
+              <p className="text-sm text-white/50 leading-relaxed max-w-sm">
+                Ekskluzivne veleprodajne cene, prioritetna podrška i posebne pogodnosti za registrovane salone.
+              </p>
+              <span className="inline-flex items-center gap-2 text-sm font-medium text-[#d4a0ab] mt-5 group-hover:gap-3 transition-all duration-300">
+                Postanite partner <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* TRUST BADGES */}
-      <section className="py-10 bg-white border-[#e0d8cc]">
+      <section className="py-12 md:py-16 bg-white border-[#e0d8cc]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {trustBadges.map((badge) => { const Icon = badge.icon; return (
@@ -375,7 +422,7 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
 
       {/* FEATURED PRODUCTS */}
       {featuredProducts.length > 0 && (
-        <section className="bg-white border-b border-[#e0d8cc]">
+        <section className="py-16 md:py-20 bg-white border-b border-[#e0d8cc]">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.featuredProducts")}</h2>
             <ProductCarousel products={featuredProducts} showOld />
@@ -471,7 +518,7 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
 
       {/* NEW ARRIVALS */}
       {newArrivals.length > 0 && (
-        <section className="py-16">
+        <section className="py-16 md:py-20">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-10">
               <div>
@@ -487,7 +534,7 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
 
       {/* SALE PRODUCTS */}
       {saleProducts.length > 0 && (
-        <section className="py-16 bg-white border-y border-[#e0d8cc]">
+        <section className="py-16 md:py-20 bg-white border-y border-[#e0d8cc]">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-10">
               <div>
@@ -502,7 +549,7 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
       )}
 
       {/* INSTAGRAM FEED */}
-      <section className="py-16 bg-white">
+      <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.instagramHandle")}</h2>
@@ -522,7 +569,7 @@ export default function HomePageClient({ featuredProducts, newArrivals, saleProd
       </section>
 
       {/* NEWSLETTER */}
-      <section className="py-16 bg-[#f5f0e8]">
+      <section className="py-16 md:py-20 bg-[#f5f0e8]">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Mail className="w-8 h-8 text-[#8c4a5a] mx-auto mb-4" />
           <h2 className="text-3xl md:text-4xl font-light text-[#2d2d2d] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("home.newsletterTitle")} <em className="italic">{t("home.newsletter")}</em></h2>

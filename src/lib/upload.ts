@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir, unlink, access } from 'fs/promises'
 import path from 'path'
 import { randomUUID } from 'crypto'
 
@@ -68,4 +68,27 @@ export async function saveUploadedFile(file: File): Promise<string> {
   await writeFile(filePath, buffer)
 
   return `/uploads/${filename}`
+}
+
+export async function deleteUploadedFile(url: string): Promise<void> {
+  // Only allow deleting files from /uploads/
+  const match = url.match(/^\/uploads\/([a-f0-9-]+\.\w+)$/)
+  if (!match) {
+    throw new Error('Nevažeća putanja fajla')
+  }
+
+  const filePath = path.join(UPLOAD_DIR, match[1])
+
+  // Ensure the resolved path is still within UPLOAD_DIR
+  const resolved = path.resolve(filePath)
+  if (!resolved.startsWith(path.resolve(UPLOAD_DIR))) {
+    throw new Error('Nevažeća putanja fajla')
+  }
+
+  try {
+    await access(resolved)
+    await unlink(resolved)
+  } catch {
+    // File doesn't exist — not an error, it may have been deleted already
+  }
 }
