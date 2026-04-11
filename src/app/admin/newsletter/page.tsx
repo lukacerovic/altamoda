@@ -3,8 +3,21 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { generateEmailPreview, extractBodyContent, isFullEmailHtml, defaultEmailOptions } from "@/lib/email-preview";
+import { generateEmailPreview, extractBodyContent, isFullEmailHtml, defaultEmailOptions, extractBodyBgImage } from "@/lib/email-preview";
 import type { EmailTemplateOptions } from "@/lib/email-preview";
+
+// Per-template default email options. Adding a new branded template? Add it
+// here so the editor and the campaign send pipeline pick up the same defaults.
+function templateDefaultOptions(templateName: string, body: string): Partial<EmailTemplateOptions> {
+  switch (templateName) {
+    case 'Akcije':
+      return { headerBgImage: '/hero.png' };
+    case 'Info':
+      return { bodyBgImage: extractBodyBgImage(body) || '/newsletter-info-bg.png' };
+    default:
+      return {};
+  }
+}
 import {
   Search,
   Download,
@@ -33,7 +46,18 @@ const TiptapEditor = dynamic(() => import("@/components/admin/TiptapEditor"), {
   ),
 });
 
-type Tab = "templates" | "subscribers";
+type Tab = "templates" | "subscribers" | "campaigns";
+
+interface Campaign {
+  id: string;
+  title: string;
+  subject: string;
+  segment: "b2b" | "b2c";
+  status: "draft" | "scheduled" | "sending" | "sent" | "failed";
+  sentAt: string | null;
+  sentCount: number;
+  createdAt: string;
+}
 
 // ── Types ──
 
@@ -69,6 +93,8 @@ interface Stats {
 export default function NewsletterPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>("templates");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaignsLoading, setCampaignsLoading] = useState(false);
 
   // Templates state
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -110,6 +136,11 @@ export default function NewsletterPage() {
   const [testEmail, setTestEmail] = useState("");
   const [testSending, setTestSending] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [inlineTestEmail, setInlineTestEmail] = useState("");
+  const [inlineTestSending, setInlineTestSending] = useState(false);
+  const [inlineTestResult, setInlineTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [bodyBgUploading, setBodyBgUploading] = useState(false);
+  const bodyBgFileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Fetch functions ──
 
@@ -155,12 +186,29 @@ export default function NewsletterPage() {
     }
   }, []);
 
+  const fetchCampaigns = useCallback(async () => {
+    setCampaignsLoading(true);
+    try {
+      const res = await fetch("/api/newsletter/campaigns?limit=50");
+      const json = await res.json();
+      if (json.success) setCampaigns(json.data.campaigns);
+    } catch (err) {
+      console.error("Failed to fetch campaigns:", err);
+    } finally {
+      setCampaignsLoading(false);
+    }
+  }, []);
+
   // ── Effects ──
 
   useEffect(() => {
     fetchTemplates();
     fetchStats();
   }, [fetchTemplates, fetchStats]);
+
+  useEffect(() => {
+    if (activeTab === "campaigns") fetchCampaigns();
+  }, [activeTab, fetchCampaigns]);
 
   useEffect(() => {
     if (activeTab === "subscribers") {
@@ -221,12 +269,10 @@ export default function NewsletterPage() {
       ? extractBodyContent(template.htmlContent)
       : template.htmlContent;
     setEditorBodyContent(body);
-    // Set header background image for Akcije template
-    if (template.name === 'Akcije') {
-      setEmailOptions({ ...defaultEmailOptions, headerBgImage: '/hero.png' });
-    } else {
-      setEmailOptions({ ...defaultEmailOptions });
-    }
+    setEmailOptions({
+      ...defaultEmailOptions,
+      ...templateDefaultOptions(template.name, body),
+    });
     setShowEmailSettings(false);
     setSendSubject(template.subject);
     setSendSegment("all");
@@ -396,6 +442,7 @@ export default function NewsletterPage() {
           subject: sendSubject,
           content: editorBodyContent,
           segment: sendSegment,
+          emailOptions,
         }),
       });
       const createJson = await createRes.json();
@@ -414,6 +461,54 @@ export default function NewsletterPage() {
       setSendResult({ ok: false, msg: "Greška pri slanju emaila" });
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleBodyBgUpload = async (file: File) => {
+    setBodyBgUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (json.success && json.data?.url) {
+        setEmailOptions({ ...emailOptions, bodyBgImage: json.data.url });
+      } else {
+        alert(json.error || "Otpremanje slike nije uspelo");
+      }
+    } catch {
+      alert("Greška pri otpremanju slike");
+    } finally {
+      setBodyBgUploading(false);
+      if (bodyBgFileInputRef.current) bodyBgFileInputRef.current.value = "";
+    }
+  };
+
+  const handleSendInlineTest = async () => {
+    if (!inlineTestEmail.trim() || !editorBodyContent.trim()) return;
+    setInlineTestSending(true);
+    setInlineTestResult(null);
+    try {
+      const res = await fetch("/api/newsletter/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: inlineTestEmail.trim(),
+          subject: sendSubject || templateForm.name || "Test",
+          html: editorBodyContent,
+          options: emailOptions,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setInlineTestResult({ ok: true, msg: `Test email poslat na ${inlineTestEmail.trim()}` });
+      } else {
+        setInlineTestResult({ ok: false, msg: json.error || "Greška pri slanju" });
+      }
+    } catch {
+      setInlineTestResult({ ok: false, msg: "Greška pri povezivanju sa serverom" });
+    } finally {
+      setInlineTestSending(false);
     }
   };
 
@@ -437,6 +532,7 @@ export default function NewsletterPage() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "templates", label: "Šabloni" },
+    { id: "campaigns", label: "Poslate kampanje" },
     { id: "subscribers", label: t("newsletter.subscribers") },
   ];
 
@@ -576,6 +672,53 @@ export default function NewsletterPage() {
                     placeholder="/hero.png ili https://... URL slike"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs text-[#666] mb-1">Pozadinska slika tela emaila (za Info šablon, opciono)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={emailOptions.bodyBgImage || ""}
+                      onChange={(e) => setEmailOptions({ ...emailOptions, bodyBgImage: e.target.value })}
+                      className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                      placeholder="https://... URL slike ili otpremi"
+                    />
+                    <input
+                      ref={bodyBgFileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleBodyBgUpload(file);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => bodyBgFileInputRef.current?.click()}
+                      disabled={bodyBgUploading}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#8c4a5a] text-[#8c4a5a] hover:bg-[#8c4a5a] hover:text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+                    >
+                      {bodyBgUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+                      {bodyBgUploading ? "Otprema..." : "Otpremi sliku"}
+                    </button>
+                  </div>
+                  {emailOptions.bodyBgImage && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <img
+                        src={emailOptions.bodyBgImage}
+                        alt="Pregled"
+                        className="w-16 h-16 object-cover rounded border border-stone-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setEmailOptions({ ...emailOptions, bodyBgImage: "" })}
+                        className="text-xs text-[#999] hover:text-red-600 underline"
+                      >
+                        Ukloni
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Footer settings */}
@@ -654,6 +797,39 @@ export default function NewsletterPage() {
               {sendResult.msg}
             </div>
           )}
+
+          {/* Inline test send — sends current template content to a single address */}
+          <div className="mt-3 pt-3 border-t border-stone-200">
+            <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">
+              Pošalji test verziju ovog šablona
+            </label>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                value={inlineTestEmail}
+                onChange={(e) => setInlineTestEmail(e.target.value)}
+                placeholder="vasa.adresa@primer.com"
+                className="flex-1 px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                onKeyDown={(e) => e.key === "Enter" && handleSendInlineTest()}
+              />
+              <button
+                onClick={handleSendInlineTest}
+                disabled={inlineTestSending || !inlineTestEmail.trim() || !editorBodyContent.trim()}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#8c4a5a] text-[#8c4a5a] hover:bg-[#8c4a5a] hover:text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+              >
+                {inlineTestSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                {inlineTestSending ? "Slanje..." : "Pošalji test"}
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] text-[#999]">
+              Šalje trenutni sadržaj šablona na navedenu adresu (sa prefiksom &quot;[TEST]&quot; u predmetu). Koristi se za proveru pre slanja svim pretplatnicima.
+            </p>
+            {inlineTestResult && (
+              <div className={`mt-2 p-2.5 rounded-lg text-xs ${inlineTestResult.ok ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                {inlineTestResult.msg}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Send Confirmation Modal */}
@@ -790,7 +966,10 @@ export default function NewsletterPage() {
                     onClick={() => openTemplateEditor(template)}
                   >
                     <iframe
-                      srcDoc={generateEmailPreview(template.htmlContent, template.name === 'Akcije' ? { ...defaultEmailOptions, headerBgImage: '/hero.png' } : undefined)}
+                      srcDoc={generateEmailPreview(template.htmlContent, {
+                        ...defaultEmailOptions,
+                        ...templateDefaultOptions(template.name, template.htmlContent),
+                      })}
                       className="w-[600px] h-[600px] border-0 pointer-events-none"
                       style={{ transform: "scale(0.38)", transformOrigin: "top left" }}
                       title={template.name}
@@ -842,6 +1021,82 @@ export default function NewsletterPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ═══ Campaigns Tab ═══ */}
+      {activeTab === "campaigns" && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-sm text-[#666]">Pregled svih poslatih i tekućih newsletter kampanja.</p>
+            <button
+              onClick={fetchCampaigns}
+              className="text-xs text-[#666] hover:text-black underline"
+            >
+              Osveži
+            </button>
+          </div>
+
+          <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-stone-100 border-b border-stone-200">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Naslov</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Predmet</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Segment</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Poslato</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Datum</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {campaignsLoading ? (
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#999]">Učitavanje...</td></tr>
+                  ) : campaigns.length === 0 ? (
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#999]">Još nema poslatih kampanja.</td></tr>
+                  ) : (
+                    campaigns.map((c) => {
+                      const statusColor: Record<Campaign["status"], string> = {
+                        draft: "bg-stone-100 text-stone-700",
+                        scheduled: "bg-blue-100 text-blue-700",
+                        sending: "bg-amber-100 text-amber-700",
+                        sent: "bg-green-100 text-green-700",
+                        failed: "bg-red-100 text-red-700",
+                      };
+                      const statusLabel: Record<Campaign["status"], string> = {
+                        draft: "Skica",
+                        scheduled: "Zakazano",
+                        sending: "U toku",
+                        sent: "Poslato",
+                        failed: "Neuspelo",
+                      };
+                      return (
+                        <tr key={c.id} className="border-b border-stone-100 hover:bg-stone-50 transition-colors">
+                          <td className="px-4 py-3 text-[#333] font-medium">{c.title}</td>
+                          <td className="px-4 py-3 text-[#666]">{c.subject}</td>
+                          <td className="px-4 py-3">
+                            <span className="text-xs uppercase tracking-wider text-[#999]">{c.segment}</span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor[c.status]}`}>
+                              {statusLabel[c.status]}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-[#666]">{c.sentCount}</td>
+                          <td className="px-4 py-3 text-[#666] text-xs">
+                            {c.sentAt
+                              ? new Date(c.sentAt).toLocaleString("sr-RS")
+                              : new Date(c.createdAt).toLocaleString("sr-RS")}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 

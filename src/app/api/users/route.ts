@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { registerB2cSchema, registerB2bSchema } from '@/lib/validations/user'
 import { registrationRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
+import { sendTransactional } from '@/lib/email'
+import { b2bSignupAdminTemplate } from '@/lib/email-templates'
 
 export const POST = withErrorHandler(async (req: Request) => {
   const rateLimitResponse = applyRateLimit(registrationRateLimiter, `register:${getClientIp(req)}`)
@@ -60,6 +62,25 @@ export const POST = withErrorHandler(async (req: Request) => {
       status: true,
     },
   })
+
+  if (isB2b) {
+    const adminEmail = process.env.ADMIN_EMAIL
+    if (adminEmail) {
+      void sendTransactional({
+        to: adminEmail,
+        subject: 'Nova B2B prijava ceka odobrenje',
+        html: b2bSignupAdminTemplate({
+          name: data.name as string,
+          email: data.email as string,
+          phone: data.phone,
+          salonName: data.salonName,
+          pib: data.pib,
+          maticniBroj: data.maticniBroj,
+          address: data.address,
+        }),
+      }).catch((err) => console.error('[email] B2B admin alert failed:', err))
+    }
+  }
 
   return successResponse(user, 201)
 })
