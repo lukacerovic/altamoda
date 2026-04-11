@@ -2,6 +2,8 @@ import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, errorResponse, ApiError } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
+import { sendTransactional } from '@/lib/email'
+import { b2bApprovedUserTemplate } from '@/lib/email-templates'
 
 // PATCH /api/users/[id]/approve — Approve a pending B2B user
 export const PATCH = withErrorHandler(async (_req: Request, context: unknown) => {
@@ -42,6 +44,15 @@ export const PATCH = withErrorHandler(async (_req: Request, context: unknown) =>
       })
     }
   })
+
+  void sendTransactional({
+    to: user.email,
+    subject: 'Vas Altamoda B2B nalog je odobren',
+    html: b2bApprovedUserTemplate({
+      name: user.name || '',
+      salonName: user.b2bProfile?.salonName,
+    }),
+  }).catch((err) => console.error('[email] B2B approval notice failed:', err))
 
   return successResponse({ message: 'B2B korisnik je uspešno odobren', userId: id })
 })

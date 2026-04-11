@@ -29,19 +29,15 @@ export const POST = withErrorHandler(async (req: Request) => {
       },
     })
 
-    // Send welcome email (non-blocking)
-    try {
-      const { sendEmail } = await import('@/lib/email')
+    void (async () => {
+      const { sendTransactional } = await import('@/lib/email')
       const { welcomeTemplate } = await import('@/lib/email-templates')
-      await sendEmail({
+      return sendTransactional({
         to: email,
         subject: 'Dobrodošli u Altamoda porodicu! 🎉',
         html: welcomeTemplate(email),
       })
-    } catch (err) {
-      console.error('Failed to send welcome email:', err)
-      // Don't fail the subscription if email fails
-    }
+    })().catch((err) => console.error('[newsletter] welcome email failed:', err))
 
     return successResponse({ message: 'Uspešno ste se ponovo prijavili na newsletter' }, 201)
   }
@@ -52,9 +48,9 @@ export const POST = withErrorHandler(async (req: Request) => {
 
   // Send welcome email (non-blocking)
   try {
-    const { sendEmail } = await import('@/lib/email')
+    const { sendTransactional } = await import('@/lib/email')
     const { welcomeTemplate } = await import('@/lib/email-templates')
-    await sendEmail({
+    await sendTransactional({
       to: email,
       subject: 'Dobrodošli u Altamoda porodicu! 🎉',
       html: welcomeTemplate(email),
