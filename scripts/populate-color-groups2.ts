@@ -19,13 +19,21 @@ function slugify(s: string): string {
 type PatternFn = (name: string) => { baseName: string; colorCode: string } | null;
 
 const patterns: PatternFn[] = [
-  // "Matrix So Color Sync/10A 90ml" or "Matrix So Color/8N Light Blonde Neutral 90ml"
+  // Multi-slash: "Matrix So Color Sync/Acidic Toner/10PG 90ml" → base: "Matrix So Color Sync 90ml", color: "10PG"
+  // Also: "Matrix So Color Sync/Fast Toner/Anti Brass 90ml" → base: "Matrix So Color Sync 90ml", color: "Anti Brass"
   (name) => {
-    const m = name.match(/^(.+?)\/(.+?)\s+(\d+ml)$/i);
-    if (m) return { baseName: `${m[1].trim()} ${m[3]}`, colorCode: m[2].trim() };
-    // Without ml: "Matrix So Color/8N"
-    const m2 = name.match(/^(.+?)\/(.+)$/);
-    if (m2 && m2[2].match(/^[A-Z0-9]/)) return { baseName: m2[1].trim(), colorCode: m2[2].trim() };
+    const parts = name.split("/");
+    if (parts.length < 2) return null;
+    const productLine = parts[0].trim();
+    const lastPart = parts[parts.length - 1].trim();
+    const volMatch = lastPart.match(/^(.+?)\s+(\d+ml)\s*$/i);
+    if (volMatch) {
+      return { baseName: `${productLine} ${volMatch[2]}`, colorCode: volMatch[1].trim() };
+    }
+    // No volume: "Product/ColorCode"
+    if (parts.length === 2 && lastPart.match(/^[A-Z0-9]/)) {
+      return { baseName: productLine, colorCode: lastPart };
+    }
     return null;
   },
 
