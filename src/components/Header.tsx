@@ -66,7 +66,6 @@ function useMegaMenus() {
         {
           title: t("nav.styling"),
           links: [
-            { name: t("nav.sprays_styling"), href: "/products?category=tekstura" },
             { name: t("nav.styling"), href: "/products?category=stajling" },
             { name: t("nav.leaveIn"), href: "/products?category=tretman" },
           ],
@@ -97,10 +96,8 @@ function useMegaMenus() {
         {
           title: t("nav.manCollection"),
           links: [
-            { name: t("nav.menShampoos"), href: "/products?category=sampon&gender=man" },
-            { name: t("nav.menStyling"), href: "/products?category=stajling&gender=man" },
-            { name: t("nav.beardCare"), href: "/products?category=nega-za-muskarce" },
-            { name: t("nav.menBodyCare"), href: "/products?category=nega-za-muskarce" },
+            { name: "Redken Brews", href: "/products?search=Brews" },
+            { name: t("nav.menColors"), href: "/products?category=color-camo" },
           ],
         },
       ],
