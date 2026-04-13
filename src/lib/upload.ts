@@ -62,15 +62,6 @@ export async function saveUploadedFile(file: File): Promise<string> {
   const key = process.env.CLOUDINARY_API_KEY
   const secret = process.env.CLOUDINARY_API_SECRET
 
-  console.log('[upload] Cloudinary config check:', {
-    cloud,
-    key,
-    secretStart: secret?.slice(0, 3),
-    secretEnd: secret?.slice(-3),
-    secretLen: secret?.length ?? 0,
-    secretCharCodes: secret ? [...secret].map(c => c.charCodeAt(0)).join(',') : 'none',
-  })
-
   if (!cloud || !key || !secret) {
     throw new Error('Cloudinary credentials not configured')
   }

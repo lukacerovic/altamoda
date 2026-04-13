@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
@@ -35,6 +36,9 @@ export const PUT = withErrorHandler(async (req: Request) => {
       })
     )
   )
+
+  // Bust the ISR cache so the homepage picks up new hero images immediately
+  revalidatePath('/')
 
   return successResponse({ updated: Object.keys(body) })
 })
