@@ -83,16 +83,14 @@ function useMegaMenus() {
           title: t("nav.hairColors"),
           links: [
             { name: t("nav.permanent"), href: "/products?category=permanentne-boje" },
-            { name: t("nav.ammoniaFree"), href: "/products?category=chromatics" },
             { name: t("nav.demiPermanent"), href: "/products?category=demi-permanentne-boje" },
+            { name: t("nav.semiPermanent"), href: "/products?category=semi-permanentne-boje" },
           ],
         },
         {
           title: t("nav.oxidantsDecolorants"),
           links: [
-            { name: t("nav.oxidant3"), href: "/products?category=oksidanti" },
-            { name: t("nav.oxidant6"), href: "/products?category=oksidanti" },
-            { name: t("nav.oxidant9"), href: "/products?category=oksidanti" },
+            { name: t("nav.oxidants"), href: "/products?category=oksidanti" },
             { name: t("nav.decolorantPowders"), href: "/products?category=dekoloranti" },
           ],
         },
