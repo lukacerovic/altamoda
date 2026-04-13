@@ -5,7 +5,6 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Search,
   Filter,
-  Download,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
@@ -115,6 +114,7 @@ export default function OrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+  const [statusDropdown, setStatusDropdown] = useState<string | null>(null);
   const perPage = 10;
 
   /* ── Fetch orders list ── */
@@ -148,6 +148,14 @@ export default function OrdersPage() {
     const interval = setInterval(() => fetchOrders(true), 30000);
     return () => clearInterval(interval);
   }, [fetchOrders]);
+
+  // Close status dropdown when clicking outside
+  useEffect(() => {
+    if (!statusDropdown) return;
+    const handleClick = () => setStatusDropdown(null);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [statusDropdown]);
 
   /* ── Fetch order detail ── */
   const fetchOrderDetail = async (orderId: string) => {
@@ -190,8 +198,11 @@ export default function OrdersPage() {
             o.id === orderId ? { ...o, status: newStatus as OrderListItem["status"] } : o
           )
         );
-        // Refresh detail if expanded
+        // Update detail status immediately and refresh for full data
         if (expandedOrder === orderId) {
+          setOrderDetail((prev) =>
+            prev ? { ...prev, status: newStatus } : prev
+          );
           fetchOrderDetail(orderId);
         }
       }
@@ -262,10 +273,6 @@ export default function OrdersPage() {
             {totalOrders} {t("admin.totalOrders")}
           </p>
         </div>
-        <button className="btn-outline-gold px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
-          <Download size={18} />
-          {t("admin.export")}
-        </button>
       </div>
 
       {/* Filters */}
@@ -383,29 +390,46 @@ export default function OrdersPage() {
                         {paymentMethodLabels[order.paymentMethod] || order.paymentMethod}
                       </td>
                       <td className="px-6 py-4">
-                        {VALID_TRANSITIONS[order.status]?.length > 0 ? (
-                          <select
-                            value={order.status}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              changeStatus(order.id, e.target.value);
+                        <div className="relative" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => {
+                              if (VALID_TRANSITIONS[order.status]?.length > 0) {
+                                setStatusDropdown(statusDropdown === order.id ? null : order.id);
+                              }
                             }}
-                            onClick={(e) => e.stopPropagation()}
                             disabled={statusUpdating === order.id}
-                            className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${statusColors[order.status]} ${statusUpdating === order.id ? "opacity-50" : ""}`}
+                            className={`px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 ${statusColors[order.status]} ${statusUpdating === order.id ? "opacity-50" : ""} ${VALID_TRANSITIONS[order.status]?.length > 0 ? "cursor-pointer" : ""}`}
                           >
-                            <option value={order.status}>{statusLabel(order.status)}</option>
-                            {VALID_TRANSITIONS[order.status].map((s) => (
-                              <option key={s} value={s}>
-                                {statusLabel(s)}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
+                            {statusUpdating === order.id ? (
+                              <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
+                            ) : null}
                             {statusLabel(order.status)}
-                          </span>
-                        )}
+                            {VALID_TRANSITIONS[order.status]?.length > 0 && (
+                              <ChevronDown size={12} />
+                            )}
+                          </button>
+                          {statusDropdown === order.id && VALID_TRANSITIONS[order.status]?.length > 0 && (
+                            <div className="absolute right-0 top-full mt-1 bg-white border border-stone-200 rounded-lg shadow-lg z-50 min-w-[160px] py-1">
+                              {VALID_TRANSITIONS[order.status].map((s) => (
+                                <button
+                                  key={s}
+                                  onClick={() => {
+                                    changeStatus(order.id, s);
+                                    setStatusDropdown(null);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 text-sm hover:bg-stone-50 flex items-center gap-2 transition-colors ${
+                                    s === "otkazano" ? "text-red-600" : s === "isporuceno" ? "text-emerald-600" : "text-[#333]"
+                                  }`}
+                                >
+                                  {s === "u_obradi" && <Package size={14} />}
+                                  {s === "isporuceno" && <CheckCircle size={14} />}
+                                  {s === "otkazano" && <XCircle size={14} />}
+                                  {statusLabel(s)}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <button className="text-[#999] hover:text-black transition-colors">
@@ -607,6 +631,42 @@ export default function OrdersPage() {
                                     </div>
                                   )}
                                 </div>
+
+                                {/* Status Actions */}
+                                {VALID_TRANSITIONS[orderDetail.status]?.length > 0 && (
+                                  <>
+                                    <h3 className="text-sm font-semibold text-black mt-4 mb-3">
+                                      Promeni status
+                                    </h3>
+                                    <div className="bg-white rounded-sm border border-stone-200 p-4 flex flex-col gap-2">
+                                      {VALID_TRANSITIONS[orderDetail.status].map((s) => (
+                                        <button
+                                          key={s}
+                                          onClick={() => changeStatus(order.id, s)}
+                                          disabled={statusUpdating === order.id}
+                                          className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                                            s === "u_obradi"
+                                              ? "bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100"
+                                              : s === "isporuceno"
+                                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                                                : "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                                          }`}
+                                        >
+                                          {statusUpdating === order.id ? (
+                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+                                          ) : (
+                                            <>
+                                              {s === "u_obradi" && <Package size={16} />}
+                                              {s === "isporuceno" && <CheckCircle size={16} />}
+                                              {s === "otkazano" && <XCircle size={16} />}
+                                            </>
+                                          )}
+                                          {statusLabel(s)}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </>
+                                )}
 
                                 {/* Payment info */}
                                 <h3 className="text-sm font-semibold text-black mt-4 mb-3">

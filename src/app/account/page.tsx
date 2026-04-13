@@ -12,16 +12,6 @@ import {
 } from "lucide-react";
 import { useLanguage, languageLabels, languageFlags, type Language } from "@/lib/i18n/LanguageContext";
 
-// ─── Mock Data ───
-
-const recentOrders = [
-  { id: "ALT-2026-0341", date: "15. mar 2026", items: 5, total: "24.500 RSD", statusKey: "delivered" as const, statusColor: "bg-green-100 text-green-700" },
-  { id: "ALT-2026-0328", date: "10. mar 2026", items: 3, total: "15.200 RSD", statusKey: "inTransit" as const, statusColor: "bg-blue-100 text-blue-700" },
-  { id: "ALT-2026-0315", date: "5. mar 2026", items: 8, total: "42.100 RSD", statusKey: "delivered" as const, statusColor: "bg-green-100 text-green-700" },
-  { id: "ALT-2026-0298", date: "28. feb 2026", items: 2, total: "8.400 RSD", statusKey: "delivered" as const, statusColor: "bg-green-100 text-green-700" },
-  { id: "ALT-2026-0285", date: "22. feb 2026", items: 12, total: "56.800 RSD", statusKey: "delivered" as const, statusColor: "bg-green-100 text-green-700" },
-];
-
 // wishlist items are now fetched from API dynamically
 
 const loyaltyBenefitKeys = [
@@ -86,37 +76,92 @@ const b2bNavKeys = [
 
 // ─── Sub-components ───
 
+const statusColorMap: Record<string, string> = {
+  novi: "bg-blue-100 text-blue-700",
+  u_obradi: "bg-yellow-100 text-yellow-700",
+  isporuceno: "bg-green-100 text-green-700",
+  otkazano: "bg-red-100 text-red-700",
+};
+
+const statusLabelMap: Record<string, string> = {
+  novi: "account.newOrder",
+  u_obradi: "account.inTransit",
+  isporuceno: "account.delivered",
+  otkazano: "account.cancelled",
+};
+
 function OrdersSection() {
   const { t } = useLanguage();
+  const [orders, setOrders] = useState<{
+    orderNumber: string;
+    createdAt: string;
+    itemCount: number;
+    total: number;
+    status: string;
+  }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/orders?limit=20")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setOrders(data.data.orders);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("sr-RS", { day: "2-digit", month: "2-digit", year: "numeric" });
+  };
+
   return (
     <>
       <h1 className="text-2xl font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.myOrders")}</h1>
-      <div className="bg-white rounded-sm shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.orderNumber")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.date")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.items")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.total")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((order) => (
-                <tr key={order.id} className="border-t border-gray-50 hover:bg-gray-50/50">
-                  <td className="px-6 py-4 text-sm font-medium text-black">{order.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{order.date}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{order.items} {t("account.itemsCount")}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-black">{order.total}</td>
-                  <td className="px-6 py-4"><span className={`px-2.5 py-1 rounded-full text-xs font-medium ${order.statusColor}`}>{t(`account.${order.statusKey}`)}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading ? (
+        <div className="bg-white rounded-sm shadow-sm p-12 text-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent mx-auto" />
         </div>
-      </div>
+      ) : orders.length === 0 ? (
+        <div className="bg-white rounded-sm shadow-sm p-12 text-center">
+          <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-black mb-2">{t("account.noOrders")}</h3>
+          <p className="text-sm text-gray-500 mb-4">{t("account.noOrdersDesc")}</p>
+          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-stone-800 text-white rounded text-sm font-medium transition-colors">{t("accountPage.browseProducts")}</Link>
+        </div>
+      ) : (
+        <div className="bg-white rounded-sm shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.orderNumber")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.date")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.items")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.total")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">{t("account.status")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order.orderNumber} className="border-t border-gray-50 hover:bg-gray-50/50">
+                    <td className="px-6 py-4 text-sm font-medium text-black">{order.orderNumber}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{formatDate(order.createdAt)}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{order.itemCount} {t("account.itemsCount")}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-black">{order.total.toLocaleString("sr-RS")} RSD</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColorMap[order.status] || "bg-gray-100 text-gray-700"}`}>
+                        {t(statusLabelMap[order.status] || order.status)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </>
   );
 }
