@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check } from "lucide-react";
+import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check, Upload, ImageIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -35,6 +35,82 @@ export default function HomepagePage() {
 
   const [sectionProducts, setSectionProducts] = useState<Record<string, SectionProduct[]>>({});
   const [loading, setLoading] = useState(true);
+
+  // Hero images state (3 fixed positions: left, top-right, bottom-right)
+  const [heroImages, setHeroImages] = useState<string[]>([]);
+  const [heroUploading, setHeroUploading] = useState<number | null>(null);
+  const heroInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+
+  useEffect(() => {
+    fetch("/api/admin/site-settings?keys=heroImages")
+      .then(r => r.json())
+      .then(json => {
+        if (json.data?.heroImages) {
+          try { setHeroImages(JSON.parse(json.data.heroImages)); } catch { /* ignore */ }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveHeroImages = async (images: string[]) => {
+    setHeroImages(images);
+    await fetch("/api/admin/site-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ heroImages: JSON.stringify(images) }),
+    });
+  };
+
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setHeroUploading(slotIndex);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+      const uploadJson = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadJson.error);
+
+      // Delete old image if it was an upload
+      const oldUrl = heroImages[slotIndex];
+      if (oldUrl?.startsWith("/uploads/")) {
+        fetch("/api/upload", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: oldUrl }),
+        }).catch(() => {});
+      }
+
+      const updated = [...heroImages];
+      // Ensure array has 3 slots
+      while (updated.length < 3) updated.push("");
+      updated[slotIndex] = uploadJson.data.url;
+      await saveHeroImages(updated);
+    } catch (err) {
+      alert("Greška pri uploadu: " + (err instanceof Error ? err.message : "Nepoznata greška"));
+    } finally {
+      setHeroUploading(null);
+      const ref = heroInputRefs[slotIndex];
+      if (ref.current) ref.current.value = "";
+    }
+  };
+
+  const removeHeroImage = async (index: number) => {
+    const removedUrl = heroImages[index];
+    const updated = [...heroImages];
+    while (updated.length < 3) updated.push("");
+    updated[index] = "";
+    await saveHeroImages(updated);
+
+    if (removedUrl?.startsWith("/uploads/")) {
+      fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: removedUrl }),
+      }).catch(() => {});
+    }
+  };
 
   // Add-products modal state
   const [addModal, setAddModal] = useState<{ sectionKey: string; flagField: string } | null>(null);
@@ -205,6 +281,118 @@ export default function HomepagePage() {
         </div>
       ) : (
         <div className="space-y-6">
+          {/* Hero Banners Section */}
+          <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#faf8f4]">
+              <div className="flex items-center gap-3">
+                <div className="text-secondary"><ImageIcon size={20} /></div>
+                <h2 className="text-lg font-serif font-bold text-black">Hero Baneri</h2>
+                <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-secondary text-xs font-semibold">
+                  {heroImages.filter(Boolean).length} / 3
+                </span>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-[#666] mb-4">
+                Postavite 3 banera za početnu stranicu. Raspored je identičan onome što kupci vide.
+              </p>
+
+              {/* Template preview – mirrors the frontend layout (2fr / 1fr, no gaps) */}
+              <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr]">
+                {/* Left large banner (slot 0) */}
+                {(() => {
+                  const slotIndex = 0;
+                  const url = heroImages[slotIndex];
+                  const label = "Levi baner (veliki)";
+                  return (
+                    <div className="relative group overflow-hidden border-2 border-dashed border-stone-300 hover:border-black transition-colors">
+                      {url ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={label} className="w-full h-auto block" />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
+                          <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 text-white text-xs rounded">{label}</div>
+                          <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => heroInputRefs[slotIndex].current?.click()} className="p-1.5 bg-white rounded shadow text-black hover:bg-stone-100 transition-colors" title="Zameni">
+                              <Upload size={14} />
+                            </button>
+                            <button onClick={() => removeHeroImage(slotIndex)} className="p-1.5 bg-red-500 rounded shadow text-white hover:bg-red-600 transition-colors" title="Ukloni">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => heroInputRefs[slotIndex].current?.click()}
+                          disabled={heroUploading === slotIndex}
+                          className="w-full h-full min-h-[280px] flex flex-col items-center justify-center gap-2 cursor-pointer"
+                        >
+                          {heroUploading === slotIndex ? (
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent" />
+                          ) : (
+                            <>
+                              <Upload size={28} className="text-stone-400" />
+                              <span className="text-sm text-[#666]">{label}</span>
+                              <span className="text-xs text-[#999]">Preporučeno: 960x400px</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                      <input ref={heroInputRefs[slotIndex]} type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, slotIndex)} className="hidden" />
+                    </div>
+                  );
+                })()}
+
+                {/* Right column – two stacked slots */}
+                <div className="grid grid-rows-2">
+                  {[
+                    { slotIndex: 1, label: "Gornji desni baner" },
+                    { slotIndex: 2, label: "Donji desni baner" },
+                  ].map(({ slotIndex, label }) => {
+                    const url = heroImages[slotIndex];
+                    return (
+                      <div key={slotIndex} className="relative group overflow-hidden border-2 border-dashed border-stone-300 hover:border-black transition-colors">
+                        {url ? (
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={url} alt={label} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
+                            <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 text-white text-xs rounded">{label}</div>
+                            <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => heroInputRefs[slotIndex].current?.click()} className="p-1.5 bg-white rounded shadow text-black hover:bg-stone-100 transition-colors" title="Zameni">
+                                <Upload size={14} />
+                              </button>
+                              <button onClick={() => removeHeroImage(slotIndex)} className="p-1.5 bg-red-500 rounded shadow text-white hover:bg-red-600 transition-colors" title="Ukloni">
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => heroInputRefs[slotIndex].current?.click()}
+                            disabled={heroUploading === slotIndex}
+                            className="w-full h-full min-h-[136px] flex flex-col items-center justify-center gap-2 cursor-pointer"
+                          >
+                            {heroUploading === slotIndex ? (
+                              <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent" />
+                            ) : (
+                              <>
+                                <Upload size={24} className="text-stone-400" />
+                                <span className="text-sm text-[#666]">{label}</span>
+                                <span className="text-xs text-[#999]">Preporučeno: 960x196px</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                        <input ref={heroInputRefs[slotIndex]} type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, slotIndex)} className="hidden" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {sections.map((section) => {
             const products = sectionProducts[section.key] || [];
 

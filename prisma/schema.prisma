@@ -623,6 +623,7 @@ model NewsletterCampaign {
   clickCount  Int               @default(0) @map("click_count")
   scheduledAt DateTime?         @map("scheduled_at")
   templateId  String?           @map("template_id")
+  emailOptions Json?            @map("email_options")
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
 
@@ -720,6 +721,13 @@ model SeoMetadata {
 
   @@unique([entityType, entityId, locale])
   @@map("seo_metadata")
+}
+
+model SiteSetting {
+  key   String @id
+  value String
+
+  @@map("site_settings")
 }
 
 model Faq {

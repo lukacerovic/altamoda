@@ -68,9 +68,9 @@ export const GET = withErrorHandler(async (req: Request) => {
   const colorUndertone = searchParams.get('colorUndertone')
   const hasColor = searchParams.get('hasColor')
 
-  // Build where clause
+  // Build where clause — admins can see inactive products too
   const where: Prisma.ProductWhereInput = {
-    isActive: true,
+    ...(role !== 'admin' ? { isActive: true } : {}),
   }
 
   // Visibility logic
@@ -267,6 +267,11 @@ export const GET = withErrorHandler(async (req: Request) => {
       : Promise.resolve([]),
   ])
 
+  // Auto-delete expired promotions (fire-and-forget, don't block response)
+  prisma.promotion.deleteMany({
+    where: { endDate: { not: null, lt: new Date() } },
+  }).catch(() => {})
+
   // Fetch active promotions for these products via raw SQL
   // Store all active promotions per product, pick the best matching one later
   const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
@@ -333,31 +338,31 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
 
     return {
-    id: p.id,
-    sku: p.sku,
-    name,
-    slug: p.slug,
-    brand: p.brand,
-    category: p.category,
-    price: basePrice,
-    priceB2c: Number(p.priceB2c),
-    priceB2b: (role === 'b2b' || role === 'admin') && p.priceB2b ? Number(p.priceB2b) : null,
-    oldPrice,
-    image: p.images[0]?.url || null,
-    isProfessional: p.isProfessional,
-    isNew: p.isNew,
-    isFeatured: p.isFeatured,
-    isBestseller: p.isBestseller,
-    stockQuantity: p.stockQuantity,
-    ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId } : {}),
-    promoBadge: promo?.badge || null,
-    rating: ratingMap.get(p.id) || 0,
-    reviewCount: p._count.reviews,
-    colorProduct: p.colorProduct,
-    groupSlug: p.groupSlug,
-    colorCode: p.colorCode,
-    variantCount: p.groupSlug ? variantCountMap.get(p.groupSlug) || 0 : 0,
-  }
+      id: p.id,
+      sku: p.sku,
+      name,
+      slug: p.slug,
+      brand: p.brand,
+      category: p.category,
+      price: basePrice,
+      priceB2c: Number(p.priceB2c),
+      priceB2b: (role === 'b2b' || role === 'admin') && p.priceB2b ? Number(p.priceB2b) : null,
+      oldPrice,
+      image: p.images[0]?.url || null,
+      isProfessional: p.isProfessional,
+      isNew: p.isNew,
+      isFeatured: p.isFeatured,
+      isBestseller: p.isBestseller,
+      stockQuantity: p.stockQuantity,
+      ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId } : {}),
+      promoBadge: promo?.badge || null,
+      rating: ratingMap.get(p.id) || 0,
+      reviewCount: p._count.reviews,
+      colorProduct: p.colorProduct,
+      groupSlug: p.groupSlug,
+      colorCode: p.colorCode,
+      variantCount: p.groupSlug ? variantCountMap.get(p.groupSlug) || 0 : 0,
+    }
   })
 
   return successResponse({

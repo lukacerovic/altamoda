@@ -2,10 +2,13 @@ import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, getPaginationParams } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { createCampaignSchema } from '@/lib/validations/newsletter'
+import { reconcileStuckCampaigns } from '@/lib/newsletter-reconcile'
 
 // GET /api/newsletter/campaigns — list campaigns (admin only)
 export const GET = withErrorHandler(async (req: Request) => {
   await requireAdmin()
+
+  await reconcileStuckCampaigns()
 
   const { searchParams } = new URL(req.url)
   const { page, limit, skip } = getPaginationParams(searchParams)
@@ -44,6 +47,7 @@ export const POST = withErrorHandler(async (req: Request) => {
       content: data.content,
       segment: data.segment,
       status: 'draft',
+      emailOptions: data.emailOptions ?? undefined,
     },
   })
 

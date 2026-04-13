@@ -1,9 +1,9 @@
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir, unlink, access } from 'fs/promises'
 import path from 'path'
 import { randomUUID } from 'crypto'
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public/uploads')
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',
   'video/mp4', 'video/webm',
@@ -41,7 +41,7 @@ function verifyMagicBytes(buffer: Buffer, ext: string): boolean {
 
 export async function saveUploadedFile(file: File): Promise<string> {
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error('Fajl je prevelik (max 10MB)')
+    throw new Error('Fajl je prevelik (max 25MB)')
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
@@ -68,4 +68,27 @@ export async function saveUploadedFile(file: File): Promise<string> {
   await writeFile(filePath, buffer)
 
   return `/uploads/${filename}`
+}
+
+export async function deleteUploadedFile(url: string): Promise<void> {
+  // Only allow deleting files from /uploads/
+  const match = url.match(/^\/uploads\/([a-f0-9-]+\.\w+)$/)
+  if (!match) {
+    throw new Error('Nevažeća putanja fajla')
+  }
+
+  const filePath = path.join(UPLOAD_DIR, match[1])
+
+  // Ensure the resolved path is still within UPLOAD_DIR
+  const resolved = path.resolve(filePath)
+  if (!resolved.startsWith(path.resolve(UPLOAD_DIR))) {
+    throw new Error('Nevažeća putanja fajla')
+  }
+
+  try {
+    await access(resolved)
+    await unlink(resolved)
+  } catch {
+    // File doesn't exist — not an error, it may have been deleted already
+  }
 }

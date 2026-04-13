@@ -21,7 +21,6 @@ export const createOrderSchema = z.object({
   }).optional(),
   paymentMethod: z.enum(['card', 'bank_transfer', 'cash_on_delivery', 'invoice']),
   shippingMethod: z.string().optional(),
-  promoCode: z.string().optional(),
   notes: z.string().optional(),
 })
 

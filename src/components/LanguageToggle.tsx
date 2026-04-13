@@ -6,7 +6,7 @@ import { useLanguage, languageLabels, languageFlags, type Language } from "@/lib
 
 const languages: Language[] = ["sr", "en", "ru"];
 
-export function LanguageToggle() {
+export function LanguageToggle({ alignLeft = false }: { alignLeft?: boolean }) {
   const { language, setLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -32,7 +32,11 @@ export function LanguageToggle() {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-2 bg-white rounded-sm border border-stone-200 shadow-lg overflow-hidden z-[60] min-w-[140px] animate-fadeIn">
+        <div
+          className={`absolute top-full mt-2 z-[60] bg-white rounded-sm border border-stone-200 shadow-lg overflow-hidden min-w-[140px] animate-fadeIn ${
+            alignLeft ? "left-0" : "right-0"
+          }`}
+        >
           {languages.map((lang) => (
             <button
               key={lang}

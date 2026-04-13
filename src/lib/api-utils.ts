@@ -48,7 +48,8 @@ export function withErrorHandler(
         return errorResponse(message || 'Validation error', 400)
       }
       console.error('API Error:', error)
-      return errorResponse('Internal server error', 500)
+      const msg = error instanceof Error ? error.message : 'Internal server error'
+      return errorResponse(msg, 500)
     }
   }
 }

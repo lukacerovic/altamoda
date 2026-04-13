@@ -11,7 +11,7 @@ import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
   ShoppingBag, Trash2, Minus, Plus, ChevronRight,
   Truck, Shield, Star, AlertCircle,
-  CheckCircle, FileText, Save, MessageSquare, Store, Sparkles,
+  CheckCircle, FileText, Store, Sparkles,
 } from "lucide-react";
 
 const recommended = [
@@ -29,8 +29,7 @@ export default function CartPage() {
   const [deliveryMethod, setDeliveryMethod] = useState("standard");
   const [b2bNoOnlinePayment, setB2bNoOnlinePayment] = useState(false);
   const [b2bInvoice, setB2bInvoice] = useState(false);
-  const [orderNotes, setOrderNotes] = useState("");
-  const [savedNotice, setSavedNotice] = useState(false);
+
   const [stockChecked, setStockChecked] = useState(false);
 
   // Layer 2: Validate stock from DB on cart page load
@@ -83,10 +82,6 @@ export default function CartPage() {
   const shipping = selectedDelivery.price;
   const total = subtotal + shipping;
 
-  const handleSaveCart = () => {
-    setSavedNotice(true);
-    setTimeout(() => setSavedNotice(false), 3000);
-  };
 
   const handleCheckout = () => {
     router.push("/checkout");
@@ -100,7 +95,11 @@ export default function CartPage() {
         </nav>
 
         <h1 className="text-3xl font-bold text-black mb-8" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.title")} ({items.length})</h1>
-
+        <div>
+          <Link href="/products" className="inline-flex items-center gap-2 text-secondary hover:text-black text-sm font-medium transition-colors mb-3">
+            &larr; {t("cart.continueShoppingLink")}
+          </Link>
+        </div>
         {items.length === 0 ? (
           <div className="text-center py-20">
             <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto mb-4" />
@@ -109,7 +108,7 @@ export default function CartPage() {
             <Link href="/products" className="inline-flex items-center gap-2 bg-black hover:bg-stone-800 text-white px-6 py-3 rounded font-medium transition-colors">{t("cart.continueShopping")}</Link>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-8 items-stretch">
             {/* CART ITEMS */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => {
@@ -203,38 +202,11 @@ export default function CartPage() {
                   </div>
                 </div>
               )}
-
-              {/* Order Notes */}
-              <div className="bg-white rounded-sm shadow-sm p-6">
-                <h3 className="text-sm font-semibold text-black mb-3 flex items-center gap-2"><MessageSquare className="w-4 h-4 text-secondary" /> {t("cart.orderNotes")}</h3>
-                <textarea
-                  value={orderNotes}
-                  onChange={(e) => setOrderNotes(e.target.value)}
-                  rows={3}
-                  placeholder={t("cart.orderNotesPlaceholder")}
-                  className="w-full border border-gray-200 rounded-sm px-4 py-3 text-sm resize-none focus:border-black focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <Link href="/products" className="inline-flex items-center gap-2 text-secondary hover:text-black text-sm font-medium transition-colors">
-                  &larr; {t("cart.continueShoppingLink")}
-                </Link>
-                <button onClick={handleSaveCart} className="inline-flex items-center gap-2 text-gray-500 hover:text-secondary text-sm font-medium transition-colors border border-gray-200 hover:border-black px-4 py-2 rounded">
-                  <Save className="w-4 h-4" /> {t("cart.saveCart")}
-                </button>
-              </div>
-
-              {savedNotice && (
-                <div className="bg-green-50 border border-green-200 rounded-sm p-3 flex items-center gap-2 text-sm text-green-700">
-                  <CheckCircle className="w-4 h-4" /> {t("cart.cartSaved")}
-                </div>
-              )}
             </div>
 
             {/* ORDER SUMMARY */}
-            <div>
-              <div className="bg-white rounded-sm shadow-sm p-6 sticky top-24">
+            <div className="flex flex-col">
+              <div className="bg-white rounded-sm shadow-sm p-6 flex-1 flex flex-col">
                 <h3 className="text-lg font-bold text-black mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.orderSummary")}</h3>
 
                 <div className="space-y-3 text-sm">
@@ -252,6 +224,8 @@ export default function CartPage() {
                     <span>{t("cart.outOfStockWarning")}</span>
                   </div>
                 )}
+
+                <div className="flex-1" />
 
                 <button onClick={handleCheckout} disabled={inStockItems.length === 0} className="w-full bg-black hover:bg-stone-800 text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                   {t("cart.proceedToCheckout")} <ChevronRight className="w-4 h-4" />
