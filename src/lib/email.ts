@@ -12,18 +12,23 @@ function requireEnv(name: string): string {
   return value
 }
 
-const RESEND_KEY = requireEnv('RESEND_API_KEY')
-const resend = new Resend(RESEND_KEY || 'dev-placeholder')
+function getResend() {
+  const key = requireEnv('RESEND_API_KEY')
+  return new Resend(key || 'dev-placeholder')
+}
 
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Altamoda <onboarding@resend.dev>'
-const SITE_URL = (() => {
+function getEmailFrom() {
+  return process.env.EMAIL_FROM || 'Altamoda <onboarding@resend.dev>'
+}
+
+function getSiteUrl() {
   const value = process.env.SITE_URL
   if (!value) {
     if (IS_PROD) throw new Error('SITE_URL is required in production')
     return 'http://localhost:3000'
   }
   return value
-})()
+}
 
 export interface SendEmailOptions {
   to: string | string[]
@@ -36,8 +41,8 @@ export interface SendEmailOptions {
 // ──────────────────────────────────────────────────────────
 
 export async function sendTransactional({ to, subject, html }: SendEmailOptions) {
-  const result = await resend.emails.send({
-    from: EMAIL_FROM,
+  const result = await getResend().emails.send({
+    from: getEmailFrom(),
     to: Array.isArray(to) ? to : [to],
     subject,
     html,
@@ -143,7 +148,7 @@ export async function sendBulk(
   for await (const email of emails as AsyncIterable<BulkEmail>) {
     try {
       await transporter.sendMail({
-        from: EMAIL_FROM,
+        from: getEmailFrom(),
         to: email.to,
         subject: email.subject,
         html: email.html,
@@ -176,7 +181,7 @@ export async function sendBulk(
 // the message on their own servers. All `<img src>`, CSS `url(...)` (header
 // background images), and `href` attributes are rewritten to use SITE_URL.
 export function rewriteAssetUrls(html: string): string {
-  const base = SITE_URL.replace(/\/$/, '')
+  const base = getSiteUrl().replace(/\/$/, '')
   const isAbsolute = (url: string) =>
     /^(https?:|data:|cid:|mailto:|tel:)/i.test(url)
   const toAbsolute = (url: string) => {
@@ -201,7 +206,7 @@ export function rewriteAssetUrls(html: string): string {
 
 export function getUnsubscribeUrl(email: string) {
   const token = Buffer.from(email).toString('base64url')
-  return `${SITE_URL}/newsletter/unsubscribe?token=${token}`
+  return `${getSiteUrl()}/newsletter/unsubscribe?token=${token}`
 }
 
-export { SITE_URL, EMAIL_FROM }
+export { getSiteUrl, getEmailFrom }
