@@ -1,18 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary'
 import { randomUUID } from 'crypto'
 
-let configured = false
-function ensureCloudinaryConfig() {
-  if (!configured) {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    })
-    configured = true
-  }
-}
-
 const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',
@@ -69,27 +57,45 @@ export async function saveUploadedFile(file: File): Promise<string> {
     throw new Error('Sadržaj fajla ne odgovara tipu fajla')
   }
 
-  ensureCloudinaryConfig()
+  // Configure fresh every call — serverless functions can have stale module state
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME
+  const key = process.env.CLOUDINARY_API_KEY
+  const secret = process.env.CLOUDINARY_API_SECRET
+
+  console.log('[upload] Cloudinary config check:', {
+    cloud: cloud ? `${cloud.slice(0, 3)}...` : 'MISSING',
+    key: key ? `${key.slice(0, 4)}...` : 'MISSING',
+    secretLen: secret?.length ?? 0,
+  })
+
+  if (!cloud || !key || !secret) {
+    throw new Error('Cloudinary credentials not configured')
+  }
+
+  cloudinary.config({ cloud_name: cloud, api_key: key, api_secret: secret })
 
   const publicId = `uploads/${randomUUID()}`
   const isVideo = file.type.startsWith('video/')
-  const resourceType = isVideo ? 'video' : 'image'
+  const resourceType = isVideo ? 'video' as const : 'image' as const
+  const dataUri = `data:${file.type};base64,${buffer.toString('base64')}`
 
-  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
-      { public_id: publicId, resource_type: resourceType, folder: 'altamoda' },
-      (error, result) => {
-        if (error || !result) return reject(error || new Error('Upload failed'))
-        resolve(result)
-      }
-    ).end(buffer)
+  const result = await cloudinary.uploader.upload(dataUri, {
+    public_id: publicId,
+    resource_type: resourceType,
+    folder: 'altamoda',
   })
 
   return result.secure_url
 }
 
 export async function deleteUploadedFile(url: string): Promise<void> {
-  ensureCloudinaryConfig()
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME
+  const key = process.env.CLOUDINARY_API_KEY
+  const secret = process.env.CLOUDINARY_API_SECRET
+  if (cloud && key && secret) {
+    cloudinary.config({ cloud_name: cloud, api_key: key, api_secret: secret })
+  }
+
   // Extract public_id from Cloudinary URL
   const match = url.match(/\/altamoda\/uploads\/([a-f0-9-]+)/)
   if (!match) {
