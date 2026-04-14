@@ -571,6 +571,35 @@ async function main() {
 
   console.log('✅ ERP Sync Logs seeded')
 
+  // ==================== SITE SETTINGS ====================
+  const siteSettings: Record<string, string> = {
+    storeName: 'Alta Moda',
+    storeEmail: 'info@altamoda.rs',
+    storePhone: '+381 11 123 4567',
+    storeAddress: 'Knez Mihailova 22, 11000 Beograd',
+    warehouseAddress: '',
+    instagram: 'https://instagram.com/altamoda.rs',
+    facebook: 'https://facebook.com/altamoda.rs',
+    tiktok: '',
+    hours_monday: '09:00 - 18:00',
+    hours_tuesday: '09:00 - 18:00',
+    hours_wednesday: '09:00 - 18:00',
+    hours_thursday: '09:00 - 18:00',
+    hours_friday: '09:00 - 18:00',
+    hours_saturday: '10:00 - 15:00',
+    hours_sunday: '',
+  }
+
+  for (const [key, value] of Object.entries(siteSettings)) {
+    await prisma.siteSetting.upsert({
+      where: { key },
+      create: { key, value },
+      update: {},
+    })
+  }
+
+  console.log('✅ Site Settings seeded')
+
   console.log('🎉 Database seeded successfully!')
 }
 

@@ -1,135 +1,212 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Settings,
-  Truck,
-  CreditCard,
-  Bell,
-  Building,
   Save,
   Globe,
   Mail,
   Phone,
   MapPin,
   Check,
+  Lock,
+  Share2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Warehouse,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-interface ToggleProps {
-  enabled: boolean;
-  onChange: () => void;
-}
-
-function Toggle({ enabled, onChange }: ToggleProps) {
-  return (
-    <button
-      onClick={onChange}
-      className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? "bg-black" : "bg-gray-300"}`}
-    >
-      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${enabled ? "translate-x-5.5" : "translate-x-0.5"}`} />
-    </button>
-  );
-}
+const SETTINGS_KEYS = [
+  "storeName",
+  "storeEmail",
+  "storePhone",
+  "storeAddress",
+  "warehouseAddress",
+  "instagram",
+  "facebook",
+  "tiktok",
+];
 
 export default function SettingsPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("general");
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // General / contact settings
+  const [storeName, setStoreName] = useState("");
+  const [storeEmail, setStoreEmail] = useState("");
+  const [storePhone, setStorePhone] = useState("");
+  const [storeAddress, setStoreAddress] = useState("");
+  const [warehouseAddress, setWarehouseAddress] = useState("");
+
+  // Social links
+  const [instagram, setInstagram] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [tiktok, setTiktok] = useState("");
+
+  // Credentials
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const tabs = [
     { id: "general", label: t("admin.general"), icon: Settings },
-    { id: "shipping", label: t("admin.delivery"), icon: Truck },
-    { id: "payment", label: t("admin.paymentTab"), icon: CreditCard },
-    { id: "notifications", label: t("admin.notificationsTab"), icon: Bell },
-    { id: "b2b", label: t("admin.b2bTab"), icon: Building },
+    { id: "social", label: t("admin.socialLinksTab"), icon: Share2 },
+    { id: "credentials", label: t("admin.credentialsTab"), icon: Lock },
   ];
 
-  // General settings
-  const [storeName, setStoreName] = useState("Alta Moda");
-  const [storeEmail, setStoreEmail] = useState("info@altamoda.rs");
-  const [storePhone, setStorePhone] = useState("+381 11 123 4567");
-  const [storeAddress, setStoreAddress] = useState("Knez Mihailova 10, Beograd");
-  const [currency, setCurrency] = useState("RSD");
-  const [language, setLanguage] = useState("sr");
+  // Load settings from backend
+  const loadSettings = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/admin/site-settings?keys=${SETTINGS_KEYS.join(",")}`
+      );
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        setStoreName(d.storeName || "");
+        setStoreEmail(d.storeEmail || "");
+        setStorePhone(d.storePhone || "");
+        setStoreAddress(d.storeAddress || "");
+        setWarehouseAddress(d.warehouseAddress || "");
+        setInstagram(d.instagram || "");
+        setFacebook(d.facebook || "");
+        setTiktok(d.tiktok || "");
+      }
+    } catch (err) {
+      console.error("Failed to load settings:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // Shipping settings
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState("5000");
-  const [shippingZones, setShippingZones] = useState([
-    { name: "Beograd", rate: "350", enabled: true },
-    { name: "Vojvodina", rate: "450", enabled: true },
-    { name: "Centralna Srbija", rate: "500", enabled: true },
-    { name: "Južna Srbija", rate: "550", enabled: true },
-    { name: "Kosovo i Metohija", rate: "650", enabled: false },
-  ]);
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
-  // Payment settings
-  const [paymentMethods, setPaymentMethods] = useState([
-    { nameKey: "creditDebitCard", descKey: "visaMastercard", enabled: true },
-    { nameKey: "cashOnDelivery", descKey: "paymentOnPickup", enabled: true },
-    { nameKey: "bankTransfer", descKey: "bankTransferDesc", enabled: true },
-    { nameKey: "paypal", descKey: "onlinePayment", enabled: false },
-    { nameKey: "citizenChecks", descKey: "installments", enabled: false },
-  ]);
+  // Save general + social + hours settings
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const body: Record<string, string> = {
+        storeName,
+        storeEmail,
+        storePhone,
+        storeAddress,
+        warehouseAddress,
+        instagram,
+        facebook,
+        tiktok,
+      };
 
-  // Notification settings
-  const [notifications, setNotifications] = useState([
-    { nameKey: "newOrder", descKey: "newOrderDesc", email: true, push: true },
-    { nameKey: "orderCancelled", descKey: "orderCancelledDesc", email: true, push: false },
-    { nameKey: "lowStock", descKey: "lowStockDesc", email: true, push: true },
-    { nameKey: "newUser", descKey: "newUserDesc", email: false, push: true },
-    { nameKey: "b2bRequest", descKey: "b2bRequestDesc", email: true, push: true },
-    { nameKey: "productReview", descKey: "productReviewDesc", email: false, push: false },
-  ]);
+      const res = await fetch("/api/admin/site-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
-  // B2B settings
-  const [b2bDiscount, setB2bDiscount] = useState("15");
-  const [b2bMinOrder, setB2bMinOrder] = useState("10000");
-  const [b2bAutoApprove, setB2bAutoApprove] = useState(false);
-  const [b2bPaymentDays, setB2bPaymentDays] = useState("30");
-  const [b2bRequirePib, setB2bRequirePib] = useState(true);
-
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const toggleShippingZone = (index: number) => {
-    setShippingZones(shippingZones.map((z, i) => i === index ? { ...z, enabled: !z.enabled } : z));
+  // Change password
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    setPasswordSuccess(false);
+
+    if (newPassword.length < 8) {
+      setPasswordError(t("admin.passwordTooShort"));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError(t("admin.passwordMismatch"));
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const res = await fetch("/api/admin/change-password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword }),
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        setPasswordSuccess(true);
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setPasswordSuccess(false), 3000);
+      } else {
+        setPasswordError(json.error || "Greška");
+      }
+    } catch {
+      setPasswordError("Greška pri promeni lozinke");
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
-  const updateShippingRate = (index: number, rate: string) => {
-    setShippingZones(shippingZones.map((z, i) => i === index ? { ...z, rate } : z));
-  };
-
-  const togglePayment = (index: number) => {
-    setPaymentMethods(paymentMethods.map((p, i) => i === index ? { ...p, enabled: !p.enabled } : p));
-  };
-
-  const toggleNotifEmail = (index: number) => {
-    setNotifications(notifications.map((n, i) => i === index ? { ...n, email: !n.email } : n));
-  };
-
-  const toggleNotifPush = (index: number) => {
-    setNotifications(notifications.map((n, i) => i === index ? { ...n, push: !n.push } : n));
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-black">{t("admin.settings")}</h1>
+          <h1 className="text-2xl font-serif font-bold text-black">
+            {t("admin.settings")}
+          </h1>
           <p className="text-sm text-[#666] mt-1">{t("admin.settingsDesc")}</p>
         </div>
-        <button
-          onClick={handleSave}
-          className={`px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 self-start transition-all ${
-            saved ? "bg-emerald-500 text-white" : "bg-black text-white hover:bg-stone-800"
-          }`}
-        >
-          {saved ? <><Check size={18} /> {t("admin.saved")}</> : <><Save size={18} /> {t("admin.saveChanges")}</>}
-        </button>
+        {activeTab !== "credentials" && (
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={`px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 self-start transition-all ${
+              saved
+                ? "bg-emerald-500 text-white"
+                : saving
+                  ? "bg-stone-400 text-white cursor-not-allowed"
+                  : "bg-black text-white hover:bg-stone-800"
+            }`}
+          >
+            {saved ? (
+              <>
+                <Check size={18} /> {t("admin.saved")}
+              </>
+            ) : saving ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />{" "}
+                {t("admin.saving")}
+              </>
+            ) : (
+              <>
+                <Save size={18} /> {t("admin.saveChanges")}
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -160,245 +237,242 @@ export default function SettingsPage() {
 
         {/* Content */}
         <div className="flex-1 bg-white rounded-sm border border-stone-200 p-6">
-          {/* General */}
+          {/* General / Contact Info */}
           {activeTab === "general" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.generalSettings")}</h2>
-                <p className="text-sm text-[#666]">{t("admin.generalSettingsDesc")}</p>
+                <h2 className="text-lg font-semibold text-black mb-1">
+                  {t("admin.contactInfo")}
+                </h2>
+                <p className="text-sm text-[#666]">
+                  {t("admin.contactInfoDesc")}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
-                    <Globe size={14} className="inline mr-1.5 text-[#999]" />
+                    <Globe
+                      size={14}
+                      className="inline mr-1.5 text-[#999]"
+                    />
                     {t("admin.storeName")}
                   </label>
-                  <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
+                  <input
+                    type="text"
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
-                    <Mail size={14} className="inline mr-1.5 text-[#999]" />
+                    <Mail
+                      size={14}
+                      className="inline mr-1.5 text-[#999]"
+                    />
                     {t("admin.emailAddress")}
                   </label>
-                  <input type="email" value={storeEmail} onChange={(e) => setStoreEmail(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
+                  <input
+                    type="email"
+                    value={storeEmail}
+                    onChange={(e) => setStoreEmail(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
-                    <Phone size={14} className="inline mr-1.5 text-[#999]" />
+                    <Phone
+                      size={14}
+                      className="inline mr-1.5 text-[#999]"
+                    />
                     {t("admin.phone")}
                   </label>
-                  <input type="text" value={storePhone} onChange={(e) => setStorePhone(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
+                  <input
+                    type="text"
+                    value={storePhone}
+                    onChange={(e) => setStorePhone(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#333] mb-1.5">
-                    <MapPin size={14} className="inline mr-1.5 text-[#999]" />
+                    <MapPin
+                      size={14}
+                      className="inline mr-1.5 text-[#999]"
+                    />
                     {t("admin.address")}
                   </label>
-                  <input type="text" value={storeAddress} onChange={(e) => setStoreAddress(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
+                  <input
+                    type="text"
+                    value={storeAddress}
+                    onChange={(e) => setStoreAddress(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
                 </div>
               </div>
 
               <div className="pt-4 border-t border-[#f0f0f0]">
-                <h3 className="text-sm font-semibold text-[#333] mb-4">{t("admin.localization")}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.currency")}</label>
-                    <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm cursor-pointer">
-                      <option value="RSD">{t("admin.rsd")}</option>
-                      <option value="EUR">{t("admin.eur")}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.language")}</label>
-                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm cursor-pointer">
-                      <option value="sr">{t("admin.serbian")}</option>
-                      <option value="en">{t("admin.english")}</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Shipping */}
-          {activeTab === "shipping" && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.deliverySettings")}</h2>
-                <p className="text-sm text-[#666]">{t("admin.deliverySettingsDesc")}</p>
-              </div>
-
-              <div className="p-4 rounded-lg bg-black/5 border border-black/20">
-                <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.freeShippingOver")}</label>
-                <div className="flex items-center gap-2">
+                <div>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                    <Warehouse
+                      size={14}
+                      className="inline mr-1.5 text-[#999]"
+                    />
+                    {t("admin.warehouseAddress")}
+                  </label>
                   <input
-                    type="number"
-                    value={freeShippingThreshold}
-                    onChange={(e) => setFreeShippingThreshold(e.target.value)}
-                    className="w-32 px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                    type="text"
+                    value={warehouseAddress}
+                    onChange={(e) => setWarehouseAddress(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
                   />
-                  <span className="text-sm text-[#666]">RSD</span>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-[#333] mb-4">{t("admin.shippingZones")}</h3>
-                <div className="space-y-3">
-                  {shippingZones.map((zone, i) => (
-                    <div key={zone.name} className={`flex items-center justify-between p-4 rounded-lg border ${zone.enabled ? "border-stone-200 bg-white" : "border-[#f0f0f0] bg-stone-100"}`}>
-                      <div className="flex items-center gap-4">
-                        <Toggle enabled={zone.enabled} onChange={() => toggleShippingZone(i)} />
-                        <span className={`text-sm font-medium ${zone.enabled ? "text-black" : "text-[#999]"}`}>{zone.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={zone.rate}
-                          onChange={(e) => updateShippingRate(i, e.target.value)}
-                          disabled={!zone.enabled}
-                          className="w-20 px-3 py-1.5 border border-stone-200 rounded-lg text-sm text-right disabled:opacity-50 disabled:bg-stone-100"
-                        />
-                        <span className="text-xs text-[#999]">RSD</span>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Payment */}
-          {activeTab === "payment" && (
+          {/* Social Links */}
+          {activeTab === "social" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.paymentMethods")}</h2>
-                <p className="text-sm text-[#666]">{t("admin.paymentMethodsDesc")}</p>
+                <h2 className="text-lg font-semibold text-black mb-1">
+                  {t("admin.socialLinks")}
+                </h2>
+                <p className="text-sm text-[#666]">
+                  {t("admin.socialLinksDesc")}
+                </p>
               </div>
 
-              <div className="space-y-3">
-                {paymentMethods.map((method, i) => (
-                  <div key={method.nameKey} className={`flex items-center justify-between p-5 rounded-lg border ${method.enabled ? "border-black/30 bg-black/5" : "border-stone-200 bg-white"}`}>
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${method.enabled ? "bg-black text-white" : "bg-stone-100 text-[#999]"}`}>
-                        <CreditCard size={20} />
-                      </div>
-                      <div>
-                        <p className={`text-sm font-medium ${method.enabled ? "text-black" : "text-[#999]"}`}>{t(`admin.${method.nameKey}`)}</p>
-                        <p className="text-xs text-[#999]">{t(`admin.${method.descKey}`)}</p>
-                      </div>
-                    </div>
-                    <Toggle enabled={method.enabled} onChange={() => togglePayment(i)} />
-                  </div>
-                ))}
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                    {t("admin.instagram")}
+                  </label>
+                  <input
+                    type="url"
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
+                    placeholder={t("admin.instagramPlaceholder")}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                    {t("admin.facebook")}
+                  </label>
+                  <input
+                    type="url"
+                    value={facebook}
+                    onChange={(e) => setFacebook(e.target.value)}
+                    placeholder={t("admin.facebookPlaceholder")}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                    {t("admin.tiktok")}
+                  </label>
+                  <input
+                    type="url"
+                    value={tiktok}
+                    onChange={(e) => setTiktok(e.target.value)}
+                    placeholder={t("admin.tiktokPlaceholder")}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
+                </div>
               </div>
             </div>
           )}
 
-          {/* Notifications */}
-          {activeTab === "notifications" && (
+          {/* Credentials */}
+          {activeTab === "credentials" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.notificationSettings")}</h2>
-                <p className="text-sm text-[#666]">{t("admin.notificationSettingsDesc")}</p>
+                <h2 className="text-lg font-semibold text-black mb-1">
+                  {t("admin.credentials")}
+                </h2>
+                <p className="text-sm text-[#666]">
+                  {t("admin.credentialsDesc")}
+                </p>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-stone-200">
-                      <th className="pb-3 text-left text-xs font-semibold text-[#666] uppercase tracking-wider">{t("admin.notification")}</th>
-                      <th className="pb-3 text-center text-xs font-semibold text-[#666] uppercase tracking-wider w-24">{t("admin.email")}</th>
-                      <th className="pb-3 text-center text-xs font-semibold text-[#666] uppercase tracking-wider w-24">{t("admin.push")}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#f0f0f0]">
-                    {notifications.map((notif, i) => (
-                      <tr key={notif.nameKey}>
-                        <td className="py-4">
-                          <p className="text-sm font-medium text-black">{t(`admin.${notif.nameKey}`)}</p>
-                          <p className="text-xs text-[#999]">{t(`admin.${notif.descKey}`)}</p>
-                        </td>
-                        <td className="py-4 text-center">
-                          <div className="flex justify-center">
-                            <Toggle enabled={notif.email} onChange={() => toggleNotifEmail(i)} />
-                          </div>
-                        </td>
-                        <td className="py-4 text-center">
-                          <div className="flex justify-center">
-                            <Toggle enabled={notif.push} onChange={() => toggleNotifPush(i)} />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* B2B */}
-          {activeTab === "b2b" && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-semibold text-black mb-1">{t("admin.b2bSettings")}</h2>
-                <p className="text-sm text-[#666]">{t("admin.b2bSettingsDesc")}</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="max-w-md space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.defaultDiscount")}</label>
-                  <input type="number" value={b2bDiscount} onChange={(e) => setB2bDiscount(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
-                  <p className="text-xs text-[#999] mt-1">{t("admin.defaultDiscountDesc")}</p>
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                    {t("admin.newPassword")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#333]"
+                    >
+                      {showNewPassword ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.minOrder")}</label>
-                  <input type="number" value={b2bMinOrder} onChange={(e) => setB2bMinOrder(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
-                  <p className="text-xs text-[#999] mt-1">{t("admin.minOrderDesc")}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.paymentTerms")}</label>
-                  <input type="number" value={b2bPaymentDays} onChange={(e) => setB2bPaymentDays(e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm" />
-                  <p className="text-xs text-[#999] mt-1">{t("admin.paymentTermsDesc")}</p>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-[#f0f0f0] space-y-4">
-                <h3 className="text-sm font-semibold text-[#333]">{t("admin.automation")}</h3>
-
-                <div className="flex items-center justify-between p-4 rounded-lg border border-stone-200">
-                  <div>
-                    <p className="text-sm font-medium text-black">{t("admin.autoApproveB2b")}</p>
-                    <p className="text-xs text-[#999]">{t("admin.autoApproveDesc")}</p>
-                  </div>
-                  <Toggle enabled={b2bAutoApprove} onChange={() => setB2bAutoApprove(!b2bAutoApprove)} />
+                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                    {t("admin.confirmPassword")}
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
+                  />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg border border-stone-200">
-                  <div>
-                    <p className="text-sm font-medium text-black">{t("admin.requiredPib")}</p>
-                    <p className="text-xs text-[#999]">{t("admin.requiredPibDesc")}</p>
-                  </div>
-                  <Toggle enabled={b2bRequirePib} onChange={() => setB2bRequirePib(!b2bRequirePib)} />
-                </div>
-              </div>
+                {passwordError && (
+                  <p className="text-sm text-red-600">{passwordError}</p>
+                )}
 
-              <div className="p-4 rounded-lg bg-[#2d2d2d] text-white">
-                <h4 className="text-sm font-semibold text-secondary mb-2">{t("admin.b2bStats")}</h4>
-                <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                  <div>
-                    <p className="text-lg sm:text-xl font-bold text-white">48</p>
-                    <p className="text-[10px] sm:text-xs text-white/50">{t("admin.activeSalons")}</p>
-                  </div>
-                  <div>
-                    <p className="text-lg sm:text-xl font-bold text-white">2</p>
-                    <p className="text-[10px] sm:text-xs text-white/50">{t("admin.pending")}</p>
-                  </div>
-                  <div>
-                    <p className="text-lg sm:text-xl font-bold text-secondary">15%</p>
-                    <p className="text-[10px] sm:text-xs text-white/50">{t("admin.avgDiscount")}</p>
-                  </div>
-                </div>
+                {passwordSuccess && (
+                  <p className="text-sm text-emerald-600 flex items-center gap-1.5">
+                    <Check size={16} />
+                    {t("admin.passwordChanged")}
+                  </p>
+                )}
+
+                <button
+                  onClick={handleChangePassword}
+                  disabled={
+                    changingPassword ||
+                    !newPassword ||
+                    !confirmPassword
+                  }
+                  className={`px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+                    changingPassword ||
+                    !newPassword ||
+                    !confirmPassword
+                      ? "bg-stone-300 text-stone-500 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-stone-800"
+                  }`}
+                >
+                  {changingPassword ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      {t("admin.saving")}
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={18} />
+                      {t("admin.changePassword")}
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           )}
