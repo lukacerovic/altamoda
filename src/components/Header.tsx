@@ -66,7 +66,6 @@ function useMegaMenus() {
         {
           title: t("nav.styling"),
           links: [
-            { name: t("nav.sprays_styling"), href: "/products?category=tekstura" },
             { name: t("nav.styling"), href: "/products?category=stajling" },
             { name: t("nav.leaveIn"), href: "/products?category=tretman" },
           ],
@@ -83,26 +82,22 @@ function useMegaMenus() {
           title: t("nav.hairColors"),
           links: [
             { name: t("nav.permanent"), href: "/products?category=permanentne-boje" },
-            { name: t("nav.ammoniaFree"), href: "/products?category=chromatics" },
             { name: t("nav.demiPermanent"), href: "/products?category=demi-permanentne-boje" },
+            { name: t("nav.semiPermanent"), href: "/products?category=semi-permanentne-boje" },
           ],
         },
         {
           title: t("nav.oxidantsDecolorants"),
           links: [
-            { name: t("nav.oxidant3"), href: "/products?category=oksidanti" },
-            { name: t("nav.oxidant6"), href: "/products?category=oksidanti" },
-            { name: t("nav.oxidant9"), href: "/products?category=oksidanti" },
+            { name: t("nav.oxidants"), href: "/products?category=oksidanti" },
             { name: t("nav.decolorantPowders"), href: "/products?category=dekoloranti" },
           ],
         },
         {
           title: t("nav.manCollection"),
           links: [
-            { name: t("nav.menShampoos"), href: "/products?category=sampon&gender=man" },
-            { name: t("nav.menStyling"), href: "/products?category=stajling&gender=man" },
-            { name: t("nav.beardCare"), href: "/products?category=nega-za-muskarce" },
-            { name: t("nav.menBodyCare"), href: "/products?category=nega-za-muskarce" },
+            { name: "Redken Brews", href: "/products?search=Brews" },
+            { name: t("nav.menColors"), href: "/products?category=color-camo" },
           ],
         },
       ],
