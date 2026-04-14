@@ -1,8 +1,6 @@
-import { writeFile, mkdir, unlink, access } from 'fs/promises'
-import path from 'path'
+import { v2 as cloudinary } from 'cloudinary'
 import { randomUUID } from 'crypto'
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public/uploads')
 const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',
@@ -15,17 +13,16 @@ const MAGIC_BYTES: Record<string, number[][]> = {
   'jpg':  [[0xFF, 0xD8, 0xFF]],
   'jpeg': [[0xFF, 0xD8, 0xFF]],
   'png':  [[0x89, 0x50, 0x4E, 0x47]],
-  'gif':  [[0x47, 0x49, 0x46, 0x38]],  // GIF8
-  'webp': [[0x52, 0x49, 0x46, 0x46]],  // RIFF (WebP container)
-  'mp4':  [[0x00, 0x00, 0x00], [0x66, 0x74, 0x79, 0x70]],  // ftyp at offset 4
-  'webm': [[0x1A, 0x45, 0xDF, 0xA3]],  // EBML header
+  'gif':  [[0x47, 0x49, 0x46, 0x38]],
+  'webp': [[0x52, 0x49, 0x46, 0x46]],
+  'mp4':  [[0x00, 0x00, 0x00], [0x66, 0x74, 0x79, 0x70]],
+  'webm': [[0x1A, 0x45, 0xDF, 0xA3]],
 }
 
 function verifyMagicBytes(buffer: Buffer, ext: string): boolean {
   const signatures = MAGIC_BYTES[ext]
   if (!signatures) return false
 
-  // MP4 has ftyp at offset 4, not offset 0
   if (ext === 'mp4') {
     if (buffer.length < 8) return false
     return buffer[4] === 0x66 && buffer[5] === 0x74 && buffer[6] === 0x79 && buffer[7] === 0x70
@@ -56,39 +53,55 @@ export async function saveUploadedFile(file: File): Promise<string> {
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
 
-  // Verify actual file content matches claimed type
   if (!verifyMagicBytes(buffer, ext)) {
     throw new Error('Sadržaj fajla ne odgovara tipu fajla')
   }
 
-  const filename = `${randomUUID()}.${ext}`
+  // Configure fresh every call — serverless functions can have stale module state
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME
+  const key = process.env.CLOUDINARY_API_KEY
+  const secret = process.env.CLOUDINARY_API_SECRET
 
-  await mkdir(UPLOAD_DIR, { recursive: true })
-  const filePath = path.join(UPLOAD_DIR, filename)
-  await writeFile(filePath, buffer)
+  if (!cloud || !key || !secret) {
+    throw new Error('Cloudinary credentials not configured')
+  }
 
-  return `/uploads/${filename}`
+  cloudinary.config({ cloud_name: cloud, api_key: key, api_secret: secret })
+
+  const publicId = `uploads/${randomUUID()}`
+  const isVideo = file.type.startsWith('video/')
+  const resourceType = isVideo ? 'video' as const : 'image' as const
+  const dataUri = `data:${file.type};base64,${buffer.toString('base64')}`
+
+  const result = await cloudinary.uploader.upload(dataUri, {
+    public_id: publicId,
+    resource_type: resourceType,
+    folder: 'altamoda',
+  })
+
+  return result.secure_url
 }
 
 export async function deleteUploadedFile(url: string): Promise<void> {
-  // Only allow deleting files from /uploads/
-  const match = url.match(/^\/uploads\/([a-f0-9-]+\.\w+)$/)
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME
+  const key = process.env.CLOUDINARY_API_KEY
+  const secret = process.env.CLOUDINARY_API_SECRET
+  if (cloud && key && secret) {
+    cloudinary.config({ cloud_name: cloud, api_key: key, api_secret: secret })
+  }
+
+  // Extract public_id from Cloudinary URL
+  const match = url.match(/\/altamoda\/uploads\/([a-f0-9-]+)/)
   if (!match) {
-    throw new Error('Nevažeća putanja fajla')
+    // Try legacy local path format /uploads/filename.ext
+    const legacyMatch = url.match(/^\/uploads\/([a-f0-9-]+)\.\w+$/)
+    if (!legacyMatch) {
+      throw new Error('Nevažeća putanja fajla')
+    }
+    // Legacy local file — nothing to delete on Cloudinary
+    return
   }
 
-  const filePath = path.join(UPLOAD_DIR, match[1])
-
-  // Ensure the resolved path is still within UPLOAD_DIR
-  const resolved = path.resolve(filePath)
-  if (!resolved.startsWith(path.resolve(UPLOAD_DIR))) {
-    throw new Error('Nevažeća putanja fajla')
-  }
-
-  try {
-    await access(resolved)
-    await unlink(resolved)
-  } catch {
-    // File doesn't exist — not an error, it may have been deleted already
-  }
+  const publicId = `altamoda/uploads/${match[1]}`
+  await cloudinary.uploader.destroy(publicId)
 }
