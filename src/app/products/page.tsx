@@ -5,7 +5,16 @@ import { prisma } from "@/lib/db";
 import ProductsPageClient from "./ProductsPageClient";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const total = await prisma.product.count({ where: { isActive: true } });
+  const [rawTotal, groupedDups] = await Promise.all([
+    prisma.product.count({ where: { isActive: true } }),
+    prisma.product.groupBy({
+      by: ['groupSlug'],
+      where: { isActive: true, groupSlug: { not: null } },
+      _count: true,
+    }),
+  ]);
+  const duplicateCount = groupedDups.reduce((sum, g) => sum + g._count - 1, 0);
+  const total = rawTotal - duplicateCount;
   return {
     title: `Svi Proizvodi (${total}) | Alta Moda`,
     description:
@@ -67,14 +76,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const productWhere = { isActive: true };
 
   const [
-    [rawProducts, total],
+    [rawProducts, rawTotal, groupedDups],
     brandsData,
     flatCategories,
     attributes,
     colorProducts,
     activeBrand,
   ] = await Promise.all([
-    // Products + count
+    // Products + count (with color group deduplication)
     Promise.all([
       prisma.product.findMany({
         where: productWhere,
@@ -89,6 +98,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         take: limit,
       }),
       prisma.product.count({ where: productWhere }),
+      prisma.product.groupBy({
+        by: ['groupSlug'],
+        where: { ...productWhere, groupSlug: { not: null } },
+        _count: true,
+      }),
     ]),
     // Brands
     prisma.brand.findMany({
@@ -127,6 +141,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         })
       : Promise.resolve(null),
   ]);
+
+  // Deduplicate color groups from total count
+  const duplicateCount = groupedDups.reduce((sum: number, g: { _count: number }) => sum + g._count - 1, 0);
+  const total = rawTotal - duplicateCount;
 
   // Get average ratings (needs product IDs from above)
   const productIds = rawProducts.map((p) => p.id);
