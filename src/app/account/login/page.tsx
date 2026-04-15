@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
-  User, Eye, EyeOff, Mail, Lock, Building2, Clock, X,
+  User, Eye, EyeOff, Mail, Lock, Building2, Clock, X, AlertCircle,
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -169,12 +169,7 @@ function LoginContent() {
           </div>
 
           <div className="p-6 md:p-8">
-            {/* Error/Success messages */}
-            {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
-                {error}
-              </div>
-            )}
+            {/* Success message (inline — only shows after B2B registration) */}
             {success && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded">
                 {success}
@@ -324,6 +319,38 @@ function LoginContent() {
           </div>
         </div>
       </div>
+
+      {/* Error Modal */}
+      {error && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
+            <div className="p-6">
+              <div className="flex justify-end">
+                <button onClick={() => setError("")} className="p-1 text-gray-400 hover:text-gray-600">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="text-center mt-2">
+                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
+                  {t("auth.errorTitle")}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {error}
+                </p>
+              </div>
+              <button
+                onClick={() => setError("")}
+                className="w-full mt-6 bg-black hover:bg-stone-800 text-white py-3 rounded font-medium transition-colors"
+              >
+                {t("auth.understood")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pending B2B Approval Modal */}
       {showPendingModal && (

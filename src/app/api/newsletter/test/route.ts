@@ -1,6 +1,6 @@
-import { withErrorHandler, successResponse } from '@/lib/api-utils'
+import { withErrorHandler, successResponse, errorResponse } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
-import { sendTransactional, rewriteAssetUrls } from '@/lib/email'
+import { sendBulk, rewriteAssetUrls } from '@/lib/email'
 import { welcomeTemplate } from '@/lib/email-templates'
 import { generateEmailPreview } from '@/lib/email-preview'
 import { testSendSchema } from '@/lib/validations/newsletter'
@@ -17,18 +17,20 @@ export const POST = withErrorHandler(async (req: Request) => {
   const limited = applyRateLimit(newsletterRateLimiter, `newsletter-test:${admin.id}`)
   if (limited) return limited as never
 
-  const { email, subject, html, options } = testSendSchema.parse(await req.json())
+  const body = testSendSchema.parse(await req.json())
 
-  const finalSubject = subject?.trim() ? `[TEST] ${subject.trim()}` : 'Altamoda - Test Email ✓'
-  const rendered = html?.trim()
-    ? generateEmailPreview(html, options)
-    : welcomeTemplate(email)
+  const finalSubject = body.subject?.trim() ? `[TEST] ${body.subject.trim()}` : 'Altamoda - Test Email ✓'
+  const rendered = body.html?.trim()
+    ? generateEmailPreview(body.html, body.options)
+    : welcomeTemplate(body.email)
 
-  await sendTransactional({
-    to: email,
-    subject: finalSubject,
-    html: rewriteAssetUrls(rendered),
-  })
+  const finalHtml = rewriteAssetUrls(rendered)
+  const result = await sendBulk([{ to: body.email, subject: finalSubject, html: finalHtml }], { total: 1 })
 
-  return successResponse({ message: `Test email poslat na ${email}` })
+  if (result.sent === 0) {
+    const reason = result.failures[0]?.error ?? 'Unknown SMTP error'
+    return errorResponse(`SMTP greška: ${reason}`, 502)
+  }
+
+  return successResponse({ message: `Test email poslat na ${body.email} (via SMTP)` })
 })

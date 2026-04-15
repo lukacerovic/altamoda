@@ -332,9 +332,10 @@
     "comingSoon": "Uskoro dostupno",
     "accountSuspended": "Vaš nalog je suspendovan. Kontaktirajte podršku za više informacija.",
     "pendingTitle": "Nalog na čekanju",
-    "pendingMessage": "Vaš B2B nalog je uspešno kreiran i trenutno je u procesu verifikacije. Naš tim pregleda sve B2B zahteve kako bi osigurao najbolju moguću uslugu.",
+    "pendingMessage": "Vaš poslovni nalog je uspešno kreiran i trenutno je u procesu verifikacije. Naš tim pregleda sve partnerske zahteve kako bi osigurao najbolju moguću uslugu.",
     "pendingNotify": "Obavestićemo vas putem emaila čim vaš nalog bude odobren i verifikovan.",
-    "understood": "Razumem"
+    "understood": "Razumem",
+    "errorTitle": "Greška"
   },
   "account": {
     "myOrders": "Moje Porudžbine",
