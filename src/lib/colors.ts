@@ -10,28 +10,28 @@
  */
 
 export const colors = {
-  // ── Brand Accent (Burgundy/Mauve) ──────────────────────────
-  accent:      '#735b28',  // Primary brand color — buttons, links, highlights
-  accentLight: '#b07a87',  // Hover states, subtle accents, scrollbar
-  accentDark:  '#594312',  // Active/pressed states, deeper emphasis
+  // ── Brand Accent (Soft Olive) ──────────────────────────────
+  accent:      '#7A7F6A',  // Primary brand color — buttons, links, highlights
+  accentLight: '#a5a995',  // Hover states, subtle accents, scrollbar
+  accentDark:  '#5c6050',  // Active/pressed states, deeper emphasis
 
-  // ── Backgrounds ────────────────────────────────────────────
-  background:  '#f3f3f3',  // Page background, warm beige
-  surface:     '#ffffff',  // Cards, modals, elevated surfaces
-  muted:       '#f3f3f3',  // Muted/disabled backgrounds (same as background)
-  lightAccent: '#e8e0d4',  // Subtle section dividers, shimmer base
+  // ── Backgrounds (Floral White / Bone) ─────────────────────
+  background:  '#FFFBF4',  // Page background, floral white
+  surface:     '#FFFBF4',  // Cards, modals, elevated surfaces
+  muted:       '#f5efe5',  // Muted/disabled backgrounds
+  lightAccent: '#D8CFBC',  // Subtle section dividers, shimmer base (bone)
 
-  // ── Text ───────────────────────────────────────────────────
-  foreground:  '#2d2d2d',  // Primary text
-  text:        '#2d2d2d',  // Alias for foreground
-  textLight:   '#6b6b6b',  // Secondary/muted text
+  // ── Text (Smoky Black) ────────────────────────────────────
+  foreground:  '#11120D',  // Primary text
+  text:        '#11120D',  // Alias for foreground
+  textLight:   '#7A7F6A',  // Secondary/muted text
 
-  // ── Dark tones ─────────────────────────────────────────────
-  dark:        '#2d2d2d',  // Dark backgrounds, footer
-  darkLight:   '#4a4a4a',  // Dark hover states, gradients
+  // ── Dark tones (Smoky Black) ──────────────────────────────
+  dark:        '#11120D',  // Dark backgrounds, footer
+  darkLight:   '#3d3e37',  // Dark hover states, gradients
 
-  // ── Borders ────────────────────────────────────────────────
-  border:      '#c4c7c7',  // Default border color (warm taupe)
+  // ── Borders (Bone) ────────────────────────────────────────
+  border:      '#D8CFBC',  // Default border color (bone)
 
   // ── Status / Feedback ──────────────────────────────────────
   success:     '#2d7a3a',  // Success messages, confirmations
@@ -42,26 +42,25 @@ export const colors = {
 /**
  * Tailwind class reference (available via @theme inline in globals.css):
  *
- *   bg-accent / text-accent / border-accent          → #735b28
- *   bg-accent-light / text-accent-light               → #b07a87
- *   bg-accent-dark / text-accent-dark                 → #594312
- *   bg-background                                     → #f3f3f3
- *   bg-surface                                        → #ffffff
- *   bg-muted                                          → #f3f3f3
- *   bg-light-accent                                   → #e8e0d4
- *   text-foreground / text-text                       → #2d2d2d
- *   text-text-light                                   → #6b6b6b
- *   bg-dark / text-dark                               → #2d2d2d
- *   bg-dark-light                                     → #4a4a4a
- *   border-border                                     → #c4c7c7
+ *   bg-accent / text-accent / border-accent          → #7A7F6A (Soft Olive)
+ *   bg-accent-light / text-accent-light               → #a5a995
+ *   bg-accent-dark / text-accent-dark                 → #5c6050
+ *   bg-background                                     → #FFFBF4 (Floral White)
+ *   bg-surface                                        → #FFFBF4
+ *   bg-muted                                          → #f5efe5
+ *   bg-light-accent                                   → #D8CFBC (Bone)
+ *   text-foreground / text-text                       → #11120D (Smoky Black)
+ *   text-text-light                                   → #7A7F6A
+ *   bg-dark / text-dark                               → #11120D
+ *   bg-dark-light                                     → #3d3e37
+ *   border-border                                     → #D8CFBC
  *   text-success / bg-success                         → #2d7a3a
  *   text-error / bg-error                             → #b5453a
  *   text-warning / bg-warning                         → #c4883a
- *   bg-warm-beige                                     → #f3f3f3
  *
  * For opacity variants use Tailwind modifiers:
- *   bg-accent/30  → rgba(140, 74, 90, 0.3)
- *   bg-dark/85    → rgba(45, 45, 45, 0.85)
+ *   bg-accent/30  → rgba(122, 127, 106, 0.3)
+ *   bg-dark/85    → rgba(17, 18, 13, 0.85)
  */
 
 export type ColorToken = keyof typeof colors;

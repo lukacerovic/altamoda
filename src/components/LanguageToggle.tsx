@@ -25,7 +25,7 @@ export function LanguageToggle({ alignLeft = false }: { alignLeft?: boolean }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 hover:opacity-70 transition-opacity text-xs uppercase tracking-widest text-stone-600"
+        className="flex items-center gap-1.5 hover:opacity-70 transition-opacity text-xs uppercase tracking-widest text-[#a5a995]"
       >
         <Globe className="w-3.5 h-3.5" />
         <span className="hidden sm:inline">{language.toUpperCase()}</span>
@@ -33,7 +33,7 @@ export function LanguageToggle({ alignLeft = false }: { alignLeft?: boolean }) {
 
       {open && (
         <div
-          className={`absolute top-full mt-2 z-[60] bg-white rounded-sm border border-stone-200 shadow-lg overflow-hidden min-w-[140px] animate-fadeIn ${
+          className={`absolute top-full mt-2 z-[60] bg-white rounded-sm border border-[#D8CFBC] shadow-lg overflow-hidden min-w-[140px] animate-fadeIn ${
             alignLeft ? "left-0" : "right-0"
           }`}
         >
@@ -46,8 +46,8 @@ export function LanguageToggle({ alignLeft = false }: { alignLeft?: boolean }) {
               }}
               className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-xs uppercase tracking-wider transition-colors ${
                 language === lang
-                  ? "bg-stone-100 text-black font-bold"
-                  : "text-stone-500 hover:bg-stone-50 hover:text-black"
+                  ? "bg-[#FFFBF4] text-[#11120D] font-bold"
+                  : "text-[#a5a995] hover:bg-[#FFFBF4] hover:text-[#11120D]"
               }`}
             >
               <span>{languageFlags[lang]}</span>

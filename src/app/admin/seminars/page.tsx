@@ -44,7 +44,7 @@ export default function SeminarsAdminPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.seminars")}</h1>
-          <p className="text-sm text-[#666] mt-1">{seminars.length} {t("admin.totalSeminars")}</p>
+          <p className="text-sm text-[#7A7F6A] mt-1">{seminars.length} {t("admin.totalSeminars")}</p>
         </div>
         <button className="btn-gold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 self-start">
           <Plus size={18} />
@@ -54,7 +54,7 @@ export default function SeminarsAdminPage() {
 
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a5a995]" />
           <input
             type="text"
             placeholder={t("admin.searchSeminars")}
@@ -76,42 +76,42 @@ export default function SeminarsAdminPage() {
                 {statusBadge(seminar.status)}
               </div>
               <h3 className="text-base font-semibold text-black mb-1">{seminar.title}</h3>
-              <p className="text-sm text-[#666] mb-4">{seminar.instructor}</p>
+              <p className="text-sm text-[#7A7F6A] mb-4">{seminar.instructor}</p>
 
-              <div className="space-y-2 text-sm text-[#666]">
+              <div className="space-y-2 text-sm text-[#7A7F6A]">
                 <div className="flex items-center gap-2">
-                  <Calendar size={14} className="text-[#999]" />
+                  <Calendar size={14} className="text-[#a5a995]" />
                   {seminar.date}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-[#999]" />
+                  <Clock size={14} className="text-[#a5a995]" />
                   {seminar.time}
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin size={14} className="text-[#999]" />
+                  <MapPin size={14} className="text-[#a5a995]" />
                   {seminar.location}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users size={14} className="text-[#999]" />
+                  <Users size={14} className="text-[#a5a995]" />
                   {seminar.registered}/{seminar.capacity} {t("admin.registered")}
                 </div>
               </div>
 
               {/* Capacity bar */}
-              <div className="mt-3 w-full h-1.5 bg-[#f0f0f0] rounded-full">
+              <div className="mt-3 w-full h-1.5 bg-[#FFFBF4] rounded-full">
                 <div
                   className={`h-full rounded-full ${seminar.registered >= seminar.capacity ? "bg-red-400" : "bg-black"}`}
                   style={{ width: `${(seminar.registered / seminar.capacity) * 100}%` }}
                 />
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[#f0f0f0] flex items-center justify-between">
+              <div className="mt-4 pt-4 border-t border-[#FFFBF4] flex items-center justify-between">
                 <span className="text-sm font-semibold text-black">
                   {seminar.price === 0 ? t("admin.free") : `${seminar.price.toLocaleString()} RSD`}
                 </span>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 text-[#999] hover:text-secondary hover:bg-black/10 rounded-lg transition-colors"><Edit3 size={15} /></button>
-                  <button className="p-1.5 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={15} /></button>
+                  <button className="p-1.5 text-[#a5a995] hover:text-secondary hover:bg-black/10 rounded-lg transition-colors"><Edit3 size={15} /></button>
+                  <button className="p-1.5 text-[#a5a995] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={15} /></button>
                 </div>
               </div>
             </div>

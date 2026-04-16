@@ -1417,11 +1417,11 @@ export const analyticsRevenueByMonth: AnalyticsRevenueByMonth[] = [
 ];
 
 export const analyticsCategoryData: AnalyticsCategoryData[] = [
-  { name: "Nega kose", value: 35, color: "#735b28" },
-  { name: "Boje za kosu", value: 28, color: "#2d2d2d" },
+  { name: "Nega kose", value: 35, color: "#7A7F6A" },
+  { name: "Boje za kosu", value: 28, color: "#11120D" },
   { name: "Styling", value: 18, color: "#6b6b6b" },
-  { name: "Ulja i serumi", value: 12, color: "#b07a87" },
-  { name: "Oprema", value: 7, color: "#594312" },
+  { name: "Ulja i serumi", value: 12, color: "#a5a995" },
+  { name: "Oprema", value: 7, color: "#5c6050" },
 ];
 
 export const analyticsBrandPerformance: AnalyticsBrandPerformance[] = [

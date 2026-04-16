@@ -177,7 +177,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-serif font-bold text-black">
             {t("admin.settings")}
           </h1>
-          <p className="text-sm text-[#666] mt-1">{t("admin.settingsDesc")}</p>
+          <p className="text-sm text-[#7A7F6A] mt-1">{t("admin.settingsDesc")}</p>
         </div>
         {activeTab !== "credentials" && (
           <button
@@ -223,7 +223,7 @@ export default function SettingsPage() {
                     className={`flex items-center gap-3 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                       activeTab === tab.id
                         ? "bg-black/10 text-secondary border-b-2 lg:border-b-0 lg:border-l-2 border-black"
-                        : "text-[#666] hover:text-black hover:bg-stone-100"
+                        : "text-[#7A7F6A] hover:text-black hover:bg-stone-100"
                     }`}
                   >
                     <Icon size={18} />
@@ -244,17 +244,17 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-semibold text-black mb-1">
                   {t("admin.contactInfo")}
                 </h2>
-                <p className="text-sm text-[#666]">
+                <p className="text-sm text-[#7A7F6A]">
                   {t("admin.contactInfoDesc")}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     <Globe
                       size={14}
-                      className="inline mr-1.5 text-[#999]"
+                      className="inline mr-1.5 text-[#a5a995]"
                     />
                     {t("admin.storeName")}
                   </label>
@@ -266,10 +266,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     <Mail
                       size={14}
-                      className="inline mr-1.5 text-[#999]"
+                      className="inline mr-1.5 text-[#a5a995]"
                     />
                     {t("admin.emailAddress")}
                   </label>
@@ -281,10 +281,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     <Phone
                       size={14}
-                      className="inline mr-1.5 text-[#999]"
+                      className="inline mr-1.5 text-[#a5a995]"
                     />
                     {t("admin.phone")}
                   </label>
@@ -296,10 +296,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     <MapPin
                       size={14}
-                      className="inline mr-1.5 text-[#999]"
+                      className="inline mr-1.5 text-[#a5a995]"
                     />
                     {t("admin.address")}
                   </label>
@@ -312,12 +312,12 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[#f0f0f0]">
+              <div className="pt-4 border-t border-[#FFFBF4]">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     <Warehouse
                       size={14}
-                      className="inline mr-1.5 text-[#999]"
+                      className="inline mr-1.5 text-[#a5a995]"
                     />
                     {t("admin.warehouseAddress")}
                   </label>
@@ -339,14 +339,14 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-semibold text-black mb-1">
                   {t("admin.socialLinks")}
                 </h2>
-                <p className="text-sm text-[#666]">
+                <p className="text-sm text-[#7A7F6A]">
                   {t("admin.socialLinksDesc")}
                 </p>
               </div>
 
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     {t("admin.instagram")}
                   </label>
                   <input
@@ -358,7 +358,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     {t("admin.facebook")}
                   </label>
                   <input
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     {t("admin.tiktok")}
                   </label>
                   <input
@@ -392,14 +392,14 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-semibold text-black mb-1">
                   {t("admin.credentials")}
                 </h2>
-                <p className="text-sm text-[#666]">
+                <p className="text-sm text-[#7A7F6A]">
                   {t("admin.credentialsDesc")}
                 </p>
               </div>
 
               <div className="max-w-md space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     {t("admin.newPassword")}
                   </label>
                   <div className="relative">
@@ -412,7 +412,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#333]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a5a995] hover:text-[#11120D]"
                     >
                       {showNewPassword ? (
                         <EyeOff size={16} />
@@ -424,7 +424,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#11120D] mb-1.5">
                     {t("admin.confirmPassword")}
                   </label>
                   <input

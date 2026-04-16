@@ -69,7 +69,7 @@ function ResizableImageView({ node, updateAttributes, deleteNode, selected }: Re
         {selected && (
           <>
             {/* Border */}
-            <div className="absolute inset-0 rounded-md ring-2 ring-[#2d2926] ring-offset-2 pointer-events-none" />
+            <div className="absolute inset-0 rounded-md ring-2 ring-[#11120D] ring-offset-2 pointer-events-none" />
 
             {/* Corner resize handles */}
             {(
@@ -83,7 +83,7 @@ function ResizableImageView({ node, updateAttributes, deleteNode, selected }: Re
               <div
                 key={h.pos}
                 onMouseDown={(e) => onResize(e, h.fromLeft)}
-                className="absolute w-3 h-3 bg-white border-2 border-[#2d2926] rounded-full z-10 hover:scale-125 transition-transform"
+                className="absolute w-3 h-3 bg-white border-2 border-[#11120D] rounded-full z-10 hover:scale-125 transition-transform"
                 style={{
                   cursor: h.cursor,
                   top: "top" in h ? h.top : undefined,
@@ -97,11 +97,11 @@ function ResizableImageView({ node, updateAttributes, deleteNode, selected }: Re
             {/* Right-edge resize bar */}
             <div
               onMouseDown={(e) => onResize(e, false)}
-              className="absolute top-1/2 -right-2 -translate-y-1/2 w-1.5 h-10 bg-[#2d2926] rounded-full cursor-ew-resize z-10 opacity-60 hover:opacity-100 transition-opacity"
+              className="absolute top-1/2 -right-2 -translate-y-1/2 w-1.5 h-10 bg-[#11120D] rounded-full cursor-ew-resize z-10 opacity-60 hover:opacity-100 transition-opacity"
             />
 
             {/* Floating toolbar below image */}
-            <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-0.5 bg-[#2d2926] text-white rounded-lg shadow-xl px-1.5 py-1 z-20">
+            <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-0.5 bg-[#11120D] text-white rounded-lg shadow-xl px-1.5 py-1 z-20">
               <ImgToolBtn onClick={() => updateAttributes({ dataAlign: "left" })} active={align === "left"} title="Levo">
                 <AlignLeft size={15} />
               </ImgToolBtn>
@@ -204,12 +204,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       attributes: {
         class: [
           "prose prose-stone prose-lg max-w-none focus:outline-none min-h-[500px] px-8 py-6",
-          "[&_h1]:text-[#2d2926] [&_h1]:font-serif [&_h1]:text-3xl [&_h1]:tracking-wide",
-          "[&_h2]:text-[#2d2926] [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:tracking-wide",
-          "[&_h3]:text-[#2d2926] [&_h3]:font-serif",
-          "[&_p]:text-[#3d3833] [&_p]:leading-relaxed",
-          "[&_a]:text-[#7c6f64] [&_a]:underline",
-          "[&_hr]:border-[#d4cdc5]",
+          "[&_h1]:text-[#11120D] [&_h1]:font-serif [&_h1]:text-3xl [&_h1]:tracking-wide",
+          "[&_h2]:text-[#11120D] [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:tracking-wide",
+          "[&_h3]:text-[#11120D] [&_h3]:font-serif",
+          "[&_p]:text-[#11120D] [&_p]:leading-relaxed",
+          "[&_a]:text-[#7A7F6A] [&_a]:underline",
+          "[&_hr]:border-[#D8CFBC]",
         ].join(" "),
       },
       handleDrop: (_view, event) => {
@@ -279,7 +279,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     <button
       type="button" onClick={onClick} title={title} disabled={disabled}
       className={`p-2 rounded-md transition-colors ${
-        isActive ? "bg-[#2d2926] text-white shadow-sm"
+        isActive ? "bg-[#11120D] text-white shadow-sm"
         : disabled ? "text-stone-300 cursor-not-allowed"
         : "text-stone-500 hover:bg-stone-100 hover:text-stone-800"
       }`}

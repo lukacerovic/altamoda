@@ -215,11 +215,11 @@ export default function BundlesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="font-serif text-2xl lg:text-3xl font-bold text-black">{t("admin.bundles")}</h1>
-          <p className="text-[#666] mt-1">{t("admin.bundlesDesc")}</p>
+          <p className="text-[#7A7F6A] mt-1">{t("admin.bundlesDesc")}</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm hover:bg-[#b8994e] transition-colors font-medium text-sm"
+          className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm hover:bg-[#7A7F6A] transition-colors font-medium text-sm"
         >
           <Plus size={18} />
           {t("admin.newBundle")}
@@ -231,7 +231,7 @@ export default function BundlesPage() {
         {bundles.map((bundle) => (
           <div key={bundle.id} className="bg-white rounded-sm border border-stone-200 overflow-hidden hover:shadow-lg transition-shadow">
             {/* Image placeholder */}
-            <div className="h-40 bg-gradient-to-br from-[#735b28]/20 to-[#735b28]/5 flex items-center justify-center relative">
+            <div className="h-40 bg-gradient-to-br from-[#7A7F6A]/20 to-[#7A7F6A]/5 flex items-center justify-center relative">
               <Package size={48} className="text-secondary/40" />
               <div className="absolute top-3 right-3">{statusBadge(bundle.status)}</div>
               {getSavings(bundle) > 0 && (
@@ -242,18 +242,18 @@ export default function BundlesPage() {
             </div>
             <div className="p-5">
               <h3 className="font-serif text-lg font-bold text-black mb-1">{bundle.name}</h3>
-              <p className="text-sm text-[#666] mb-3 line-clamp-2">{bundle.description}</p>
+              <p className="text-sm text-[#7A7F6A] mb-3 line-clamp-2">{bundle.description}</p>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs bg-stone-100 text-[#666] px-2 py-1 rounded">{bundle.products.length} {t("admin.productsCount")}</span>
-                <span className="text-xs bg-stone-100 text-[#666] px-2 py-1 rounded">{bundle.target}</span>
+                <span className="text-xs bg-stone-100 text-[#7A7F6A] px-2 py-1 rounded">{bundle.products.length} {t("admin.productsCount")}</span>
+                <span className="text-xs bg-stone-100 text-[#7A7F6A] px-2 py-1 rounded">{bundle.target}</span>
               </div>
               <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-xl font-bold text-black">{bundle.bundlePrice.toLocaleString()} RSD</span>
-                <span className="text-sm text-[#999] line-through">
+                <span className="text-sm text-[#a5a995] line-through">
                   {bundle.products.reduce((s, p) => s + p.price, 0).toLocaleString()} RSD
                 </span>
               </div>
-              <div className="text-xs text-[#999] mb-4">
+              <div className="text-xs text-[#a5a995] mb-4">
                 <Calendar size={12} className="inline mr-1" />
                 {bundle.validFrom} - {bundle.validTo}
               </div>
@@ -262,7 +262,7 @@ export default function BundlesPage() {
                   <Edit3 size={14} className="inline mr-1" />
                   {t("admin.edit")}
                 </button>
-                <button onClick={() => duplicateBundle(bundle)} className="flex-1 py-2 text-sm font-medium text-[#666] hover:bg-stone-100 rounded-sm transition-colors">
+                <button onClick={() => duplicateBundle(bundle)} className="flex-1 py-2 text-sm font-medium text-[#7A7F6A] hover:bg-stone-100 rounded-sm transition-colors">
                   <Copy size={14} className="inline mr-1" />
                   {t("admin.duplicate")}
                 </button>
@@ -285,18 +285,18 @@ export default function BundlesPage() {
             </div>
             <div className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.bundleName")}</label>
+                <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.bundleName")}</label>
                 <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="npr. Letnji set za negu" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.description")}</label>
+                <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.description")}</label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none resize-none" />
               </div>
               {/* Product selection */}
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.productsInBundle")}</label>
+                <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.productsInBundle")}</label>
                 <div className="relative mb-2">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a5a995]" />
                   <input type="text" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="w-full pl-9 pr-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder={t("admin.searchProductsList")} />
                 </div>
                 <div className="border border-stone-200 rounded-sm max-h-48 overflow-y-auto">
@@ -309,58 +309,58 @@ export default function BundlesPage() {
                         className={`flex items-center justify-between px-4 py-2.5 cursor-pointer border-b border-stone-100 last:border-0 hover:bg-stone-100 transition-colors ${isSelected ? "bg-black/5" : ""}`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isSelected ? "bg-black border-black" : "border-[#ddd]"}`}>
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isSelected ? "bg-black border-black" : "border-[#D8CFBC]"}`}>
                             {isSelected && <Check size={12} className="text-white" />}
                           </div>
-                          <span className="text-sm text-[#333]">{product.name}</span>
+                          <span className="text-sm text-[#11120D]">{product.name}</span>
                         </div>
-                        <span className="text-sm font-medium text-[#666]">{product.price.toLocaleString()} RSD</span>
+                        <span className="text-sm font-medium text-[#7A7F6A]">{product.price.toLocaleString()} RSD</span>
                       </div>
                     );
                   })}
                 </div>
                 {selectedProducts.length > 0 && (
-                  <p className="text-xs text-[#999] mt-2">{t("admin.selectedProducts")}: {selectedProducts.length} {t("admin.productsCount")} | {t("admin.totalValue")}: {totalOriginal.toLocaleString()} RSD</p>
+                  <p className="text-xs text-[#a5a995] mt-2">{t("admin.selectedProducts")}: {selectedProducts.length} {t("admin.productsCount")} | {t("admin.totalValue")}: {totalOriginal.toLocaleString()} RSD</p>
                 )}
               </div>
               {/* Price */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.bundlePrice")}</label>
+                  <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.bundlePrice")}</label>
                   <input type="number" value={form.bundlePrice} onChange={(e) => handlePriceChange(e.target.value)} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.savings")}</label>
+                  <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.savings")}</label>
                   <input type="number" value={form.savingsPercent} onChange={(e) => handleSavingsChange(e.target.value)} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
                 </div>
               </div>
               {/* Toggles */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between bg-stone-100 rounded-sm p-3">
-                  <span className="text-sm text-[#333]">{t("admin.canBuyIndividually")}</span>
+                  <span className="text-sm text-[#11120D]">{t("admin.canBuyIndividually")}</span>
                   <button onClick={() => setForm({ ...form, canBuyIndividually: !form.canBuyIndividually })}>
-                    {form.canBuyIndividually ? <ToggleRight size={28} className="text-secondary" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                    {form.canBuyIndividually ? <ToggleRight size={28} className="text-secondary" /> : <ToggleLeft size={28} className="text-[#a5a995]" />}
                   </button>
                 </div>
                 <div className="flex items-center justify-between bg-stone-100 rounded-sm p-3">
-                  <span className="text-sm text-[#333]">{t("admin.mixSalonRetail")}</span>
+                  <span className="text-sm text-[#11120D]">{t("admin.mixSalonRetail")}</span>
                   <button onClick={() => setForm({ ...form, mixSalonRetail: !form.mixSalonRetail })}>
-                    {form.mixSalonRetail ? <ToggleRight size={28} className="text-secondary" /> : <ToggleLeft size={28} className="text-[#999]" />}
+                    {form.mixSalonRetail ? <ToggleRight size={28} className="text-secondary" /> : <ToggleLeft size={28} className="text-[#a5a995]" />}
                   </button>
                 </div>
               </div>
               {/* Dates and Target */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.validFrom")}</label>
+                  <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.validFrom")}</label>
                   <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.validTo")}</label>
+                  <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.validTo")}</label>
                   <input type="date" value={form.validTo} onChange={(e) => setForm({ ...form, validTo: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1">{t("admin.targetGroup")}</label>
+                  <label className="block text-sm font-medium text-[#11120D] mb-1">{t("admin.targetGroup")}</label>
                   <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value as "Svi" | "B2B" | "B2C" })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none">
                     <option value="Svi">Svi</option>
                     <option value="B2B">B2B</option>
@@ -368,11 +368,11 @@ export default function BundlesPage() {
                   </select>
                 </div>
               </div>
-              <p className="text-xs text-[#999]">{t("admin.bundleAutoDeactivate")}</p>
+              <p className="text-xs text-[#a5a995]">{t("admin.bundleAutoDeactivate")}</p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
               <button onClick={() => setShowModal(false)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
-              <button onClick={handleCreate} className="px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#b8994e] transition-colors">{t("admin.createBundle")}</button>
+              <button onClick={handleCreate} className="px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#7A7F6A] transition-colors">{t("admin.createBundle")}</button>
             </div>
           </div>
         </div>

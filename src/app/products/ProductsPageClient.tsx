@@ -149,23 +149,23 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
   const hasLongContent = cleanHtml ? cleanHtml.length > 300 : false;
 
   return (
-    <section className="bg-[#faf7f3] border-b border-stone-200">
+    <section className="bg-[#FFFBF4] border-b border-[#D8CFBC]">
       <div className="max-w-4xl mx-auto px-4 py-6 text-center">
         {brand.logoUrl ? (
           <Image src={brand.logoUrl} alt={brand.name} width={80} height={40} className="h-10 mx-auto object-contain mb-3" />
         ) : (
-          <h2 className="text-xl font-bold text-black mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
+          <h2 className="text-xl font-bold text-[#11120D] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
         )}
         {cleanHtml && (
           <>
             <div
-              className={`text-stone-500 text-[13px] leading-relaxed [&_p]:mb-2 [&_strong]:text-stone-700 [&_strong]:font-semibold ${expanded ? "" : "max-h-[4.5em] overflow-hidden"}`}
+              className={`text-[#a5a995] text-[13px] leading-relaxed [&_p]:mb-2 [&_strong]:text-[#11120D] [&_strong]:font-semibold ${expanded ? "" : "max-h-[4.5em] overflow-hidden"}`}
               dangerouslySetInnerHTML={{ __html: cleanHtml }}
             />
             {hasLongContent && (
               <button
                 onClick={() => setExpanded((prev) => !prev)}
-                className="mt-2 text-xs font-medium text-stone-400 hover:text-black transition-colors"
+                className="mt-2 text-xs font-medium text-[#a5a995] hover:text-[#11120D] transition-colors"
               >
                 {expanded ? "▲ Sakrij" : "▼ Prikaži više"}
               </button>
@@ -245,44 +245,44 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   };
 
   return (
-    <Link href={`/products/${product.slug}`} className="group bg-white rounded-sm overflow-hidden border border-transparent hover:border-stone-200 hover:shadow-sm transition-all flex flex-col">
+    <Link href={`/products/${product.slug}`} className="group bg-white rounded-sm overflow-hidden border border-transparent hover:border-[#D8CFBC] hover:shadow-sm transition-all flex flex-col">
       <div className="relative aspect-square overflow-hidden bg-white">
         <Image src={imgSrc} alt={product.name} width={400} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (
             <span className={`px-2.5 py-1 text-[11px] font-semibold rounded-sm ${
-              badge === "NOVO" ? "bg-black text-white"
-              : badge === "HIT" ? "bg-black text-white"
+              badge === "NOVO" ? "bg-[#7A7F6A] text-white"
+              : badge === "HIT" ? "bg-[#7A7F6A] text-white"
               : "bg-[#b5453a] text-white"
             }`}>{badge}</span>
           )}
           {product.isProfessional && (
-            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
+            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-[#11120D]/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
           )}
           {product.variantCount != null && product.variantCount > 1 && (
-            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-[#735b28] text-white">
+            <span className="px-2.5 py-1 text-[11px] font-semibold rounded-sm bg-[#7A7F6A] text-white">
               {product.variantCount} boja
             </span>
           )}
         </div>
         <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-sm bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all z-10 shadow-sm">
-          <Heart className={`w-4 h-4 ${liked ? "fill-[#735b28] text-secondary" : "text-stone-400"}`} />
+          <Heart className={`w-4 h-4 ${liked ? "fill-[#7A7F6A] text-secondary" : "text-[#a5a995]"}`} />
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={handleAddToCart} disabled={outOfStock} className={`w-full text-white text-sm font-medium py-2.5 rounded-sm transition-colors flex items-center justify-center gap-2 ${outOfStock ? "bg-gray-400 cursor-not-allowed" : addedToCart ? "bg-green-600" : "bg-black hover:bg-[#1a1a1a]"}`}>
+          <button onClick={handleAddToCart} disabled={outOfStock} className={`w-full text-white text-sm font-medium py-2.5 rounded-sm transition-colors flex items-center justify-center gap-2 ${outOfStock ? "bg-[#a5a995] cursor-not-allowed" : addedToCart ? "bg-green-600" : "bg-[#7A7F6A] hover:bg-[#5c6050]"}`}>
             {outOfStock ? <>{t("products.outOfStock")}</> : addedToCart ? <><CheckCircle className="w-4 h-4" /> {t("products.addedToCart")}</> : <><ShoppingBag className="w-4 h-4" /> {t("products.addToCart")}</>}
           </button>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
         <span className="text-[11px] text-secondary font-semibold tracking-widest uppercase">{product.brand?.name ?? ""}</span>
-        <h3 className="text-sm font-medium text-black mt-1.5 line-clamp-2 flex-1 leading-snug">{product.name}</h3>
+        <h3 className="text-sm font-medium text-[#11120D] mt-1.5 line-clamp-2 flex-1 leading-snug">{product.name}</h3>
         <div className="flex items-center gap-0.5 mt-2.5">
-          {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(product.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#c4c7c7]"}`} />)}
+          {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(product.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#D8CFBC]"}`} />)}
         </div>
         <div className="mt-2.5 flex items-baseline gap-2">
-          {product.oldPrice && <span className="text-xs text-stone-400 line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-          <span className="text-[15px] font-bold text-black">{product.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold">RSD</span></span>
+          {product.oldPrice && <span className="text-xs text-[#a5a995] line-through">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+          <span className="text-[15px] font-bold text-[#11120D]">{product.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold">RSD</span></span>
         </div>
       </div>
     </Link>
@@ -293,14 +293,14 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
 function FilterSection({ title, children, defaultOpen = true, count }: { title: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="py-5 border-b border-[#f0ebe3]">
+    <div className="py-5 border-b border-[#FFFBF4]">
       <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full group">
-        <span className="text-[13px] font-semibold text-black uppercase tracking-wider">{title}</span>
+        <span className="text-[13px] font-semibold text-[#11120D] uppercase tracking-wider">{title}</span>
         <div className="flex items-center gap-2">
           {count !== undefined && count > 0 && (
-            <span className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center">{count}</span>
+            <span className="w-5 h-5 rounded-full bg-[#7A7F6A] text-white text-[10px] font-bold flex items-center justify-center">{count}</span>
           )}
-          <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`w-4 h-4 text-[#a5a995] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </div>
       </button>
       <div className={`overflow-hidden transition-all duration-300 ${open ? "max-h-[500px] opacity-100 mt-4" : "max-h-0 opacity-0 mt-0"}`}>
@@ -322,13 +322,13 @@ function CategoryTreeItem({ item, depth = 0, onSelect, selectedSlug }: { item: C
           if (hasChildren) setExpanded(!expanded);
           onSelect(item.slug);
         }}
-        className={`flex items-center gap-2.5 w-full text-[13px] py-2 rounded-sm hover:bg-stone-100 px-2 -mx-2 transition-colors ${
-          isSelected ? "font-semibold text-secondary bg-[#fdf5f7]" : depth === 0 ? "font-medium text-black" : "text-stone-500"
+        className={`flex items-center gap-2.5 w-full text-[13px] py-2 rounded-sm hover:bg-[#FFFBF4] px-2 -mx-2 transition-colors ${
+          isSelected ? "font-semibold text-secondary bg-[#FFFBF4]" : depth === 0 ? "font-medium text-[#11120D]" : "text-[#a5a995]"
         }`}
         style={{ paddingLeft: `${depth * 20 + 8}px` }}
       >
         {hasChildren && (
-          <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 text-stone-400 ${expanded ? "rotate-90" : ""}`} />
+          <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 text-[#a5a995] ${expanded ? "rotate-90" : ""}`} />
         )}
         {!hasChildren && <span className="w-3.5 flex-shrink-0" />}
         {item.nameLat}
@@ -371,24 +371,24 @@ function SortSelect({ value, onChange }: { value: string; onChange: (v: string) 
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-white border border-[#e8e2d9] rounded-sm px-4 py-2.5 text-sm text-black hover:border-[#ccc] transition-colors min-w-[180px] justify-between"
+        className="flex items-center gap-2 bg-white border border-[#D8CFBC] rounded-sm px-4 py-2.5 text-sm text-[#11120D] hover:border-[#D8CFBC] transition-colors min-w-[180px] justify-between"
       >
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-3.5 h-3.5 text-stone-400" />
+          <ArrowUpDown className="w-3.5 h-3.5 text-[#a5a995]" />
           <span>{current?.label}</span>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-[#a5a995] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute top-full right-0 mt-1.5 bg-white rounded-sm border border-[#e8e2d9] shadow-lg z-40 min-w-[200px] overflow-hidden animate-slideDown">
+        <div className="absolute top-full right-0 mt-1.5 bg-white rounded-sm border border-[#D8CFBC] shadow-lg z-40 min-w-[200px] overflow-hidden animate-slideDown">
           {options.map((opt) => (
             <button
               key={opt.value}
               onClick={() => { onChange(opt.value); setOpen(false); }}
               className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                 value === opt.value
-                  ? "bg-[#faf7f3] text-secondary font-medium"
-                  : "text-stone-500 hover:bg-[#faf7f3] hover:text-black"
+                  ? "bg-[#FFFBF4] text-secondary font-medium"
+                  : "text-[#a5a995] hover:bg-[#FFFBF4] hover:text-[#11120D]"
               }`}
             >
               {opt.label}
@@ -717,8 +717,8 @@ export default function ProductsPageClient({
               onClick={() => setSelectedGender(selectedGender === g.value ? null : g.value)}
               className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors ${
                 selectedGender === g.value
-                  ? "bg-black text-white"
-                  : "text-stone-500 hover:text-black hover:bg-stone-100"
+                  ? "bg-[#7A7F6A] text-white"
+                  : "text-[#a5a995] hover:text-[#11120D] hover:bg-[#FFFBF4]"
               }`}
             >
               {g.label}
@@ -744,23 +744,23 @@ export default function ProductsPageClient({
               placeholder="Od"
               value={priceMin}
               onChange={(e) => setPriceMin(e.target.value)}
-              className="w-full border border-[#e8e2d9] rounded-sm px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-black focus:outline-none transition-all placeholder-[#bbb]"
+              className="w-full border border-[#D8CFBC] rounded-sm px-3.5 py-2.5 text-sm bg-[#FFFBF4] focus:bg-white focus:border-black focus:outline-none transition-all placeholder-[#D8CFBC]"
             />
           </div>
-          <span className="text-[#ccc] text-sm">—</span>
+          <span className="text-[#D8CFBC] text-sm">—</span>
           <div className="flex-1">
             <input
               type="number"
               placeholder="Do"
               value={priceMax}
               onChange={(e) => setPriceMax(e.target.value)}
-              className="w-full border border-[#e8e2d9] rounded-sm px-3.5 py-2.5 text-sm bg-[#faf7f3] focus:bg-white focus:border-black focus:outline-none transition-all placeholder-[#bbb]"
+              className="w-full border border-[#D8CFBC] rounded-sm px-3.5 py-2.5 text-sm bg-[#FFFBF4] focus:bg-white focus:border-black focus:outline-none transition-all placeholder-[#D8CFBC]"
             />
           </div>
         </div>
         <button
           onClick={handlePriceApply}
-          className="mt-3 w-full bg-black hover:bg-black text-white text-sm py-2.5 rounded-sm font-medium transition-colors"
+          className="mt-3 w-full bg-[#7A7F6A] hover:bg-[#5c6050] text-white text-sm py-2.5 rounded-sm font-medium transition-colors"
         >
           Primeni
         </button>
@@ -774,7 +774,7 @@ export default function ProductsPageClient({
             {/* ── Depth / Level ── only levels that exist */}
             {availableColorLevels.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">{t("colorPage.lightnessLevel")}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#a5a995] mb-3">{t("colorPage.lightnessLevel")}</p>
                 <div className="grid grid-cols-5 gap-1.5">
                   {availableColorLevels.map(({ level, count, hexSamples }) => {
                     const labelMap: Record<number, string> = {
@@ -787,17 +787,17 @@ export default function ProductsPageClient({
                         key={level}
                         onClick={() => setFilterColorLevel(filterColorLevel === level ? null : level)}
                         className={`flex flex-col items-center gap-1 py-1.5 rounded-sm transition-all ${
-                          filterColorLevel === level ? "bg-stone-100 ring-1 ring-black" : "hover:bg-stone-50"
+                          filterColorLevel === level ? "bg-[#FFFBF4] ring-1 ring-[#11120D]" : "hover:bg-[#FFFBF4]"
                         }`}
                       >
                         <div
                           className={`w-6 h-6 rounded-full border transition-transform ${
-                            filterColorLevel === level ? "border-black scale-110 shadow-md" : "border-stone-200"
+                            filterColorLevel === level ? "border-black scale-110 shadow-md" : "border-[#D8CFBC]"
                           }`}
                           style={{ backgroundColor: displayHex }}
                         />
-                        <span className="text-[8px] text-stone-500 leading-tight text-center font-medium">{labelMap[level] || `Nivo ${level}`}</span>
-                        <span className="text-[8px] text-stone-300">({count})</span>
+                        <span className="text-[8px] text-[#a5a995] leading-tight text-center font-medium">{labelMap[level] || `Nivo ${level}`}</span>
+                        <span className="text-[8px] text-[#D8CFBC]">({count})</span>
                       </button>
                     );
                   })}
@@ -808,14 +808,14 @@ export default function ProductsPageClient({
             {/* ── Color Family (Undertone) ── only undertones that exist */}
             {availableColorUndertones.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">Porodica boja</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#a5a995] mb-3">Porodica boja</p>
                 <div className="space-y-1">
                   {availableColorUndertones.map((ut) => (
                     <button
                       key={ut.code}
                       onClick={() => setFilterUndertone(filterUndertone === ut.code ? null : ut.code)}
                       className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-sm transition-all text-left ${
-                        filterUndertone === ut.code ? "bg-stone-100 ring-1 ring-black" : "hover:bg-stone-50"
+                        filterUndertone === ut.code ? "bg-[#FFFBF4] ring-1 ring-[#11120D]" : "hover:bg-[#FFFBF4]"
                       }`}
                     >
                       {/* Show up to 3 sample hex dots */}
@@ -832,10 +832,10 @@ export default function ProductsPageClient({
                       </div>
                       <div className="min-w-0 flex-1">
                         <span className={`text-[12px] font-medium block leading-tight ${
-                          filterUndertone === ut.code ? "text-black" : "text-stone-600"
+                          filterUndertone === ut.code ? "text-[#11120D]" : "text-[#a5a995]"
                         }`}>{ut.name}</span>
                       </div>
-                      <span className="text-[10px] text-stone-300 font-medium">{ut.count}</span>
+                      <span className="text-[10px] text-[#D8CFBC] font-medium">{ut.count}</span>
                     </button>
                   ))}
                 </div>
@@ -844,30 +844,30 @@ export default function ProductsPageClient({
 
             {/* ── Active color filter tags ── */}
             {(filterColorLevel || filterUndertone || filterHasColor) && (
-              <div className="pt-3 border-t border-stone-100 space-y-2">
+              <div className="pt-3 border-t border-[#D8CFBC] space-y-2">
                 <div className="flex flex-wrap gap-1.5">
                   {filterColorLevel && (
-                    <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-[10px] font-medium px-2 py-1 rounded-sm">
+                    <span className="inline-flex items-center gap-1 bg-[#FFFBF4] text-[#11120D] text-[10px] font-medium px-2 py-1 rounded-sm">
                       Nivo {filterColorLevel}
-                      <button onClick={() => setFilterColorLevel(null)} className="text-stone-400 hover:text-black ml-0.5">&times;</button>
+                      <button onClick={() => setFilterColorLevel(null)} className="text-[#a5a995] hover:text-[#11120D] ml-0.5">&times;</button>
                     </span>
                   )}
                   {filterUndertone && (
-                    <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-[10px] font-medium px-2 py-1 rounded-sm">
+                    <span className="inline-flex items-center gap-1 bg-[#FFFBF4] text-[#11120D] text-[10px] font-medium px-2 py-1 rounded-sm">
                       {availableColorUndertones.find(u => u.code === filterUndertone)?.name || filterUndertone}
-                      <button onClick={() => setFilterUndertone(null)} className="text-stone-400 hover:text-black ml-0.5">&times;</button>
+                      <button onClick={() => setFilterUndertone(null)} className="text-[#a5a995] hover:text-[#11120D] ml-0.5">&times;</button>
                     </span>
                   )}
                   {filterHasColor && (
-                    <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 text-[10px] font-medium px-2 py-1 rounded-sm">
+                    <span className="inline-flex items-center gap-1 bg-[#FFFBF4] text-[#11120D] text-[10px] font-medium px-2 py-1 rounded-sm">
                       Samo boje
-                      <button onClick={() => setFilterHasColor(false)} className="text-stone-400 hover:text-black ml-0.5">&times;</button>
+                      <button onClick={() => setFilterHasColor(false)} className="text-[#a5a995] hover:text-[#11120D] ml-0.5">&times;</button>
                     </span>
                   )}
                 </div>
                 <button
                   onClick={() => { setFilterColorLevel(null); setFilterUndertone(null); setFilterHasColor(false); }}
-                  className="text-[10px] text-stone-400 hover:text-black transition-colors uppercase tracking-wider font-medium"
+                  className="text-[10px] text-[#a5a995] hover:text-[#11120D] transition-colors uppercase tracking-wider font-medium"
                 >
                   Resetuj filtere boja
                 </button>
@@ -875,11 +875,11 @@ export default function ProductsPageClient({
             )}
 
             {/* ── Only color products toggle ── */}
-            <label className="flex items-center justify-between cursor-pointer group py-0.5 border-t border-stone-100 pt-3">
-              <span className="text-[12px] text-stone-500 group-hover:text-black transition-colors">Prikaži samo proizvode sa bojom</span>
+            <label className="flex items-center justify-between cursor-pointer group py-0.5 border-t border-[#D8CFBC] pt-3">
+              <span className="text-[12px] text-[#a5a995] group-hover:text-[#11120D] transition-colors">Prikaži samo proizvode sa bojom</span>
               <button
                 onClick={(e) => { e.preventDefault(); setFilterHasColor(!filterHasColor); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${filterHasColor ? "bg-black" : "bg-[#c4c7c7]"}`}
+                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${filterHasColor ? "bg-[#7A7F6A]" : "bg-[#D8CFBC]"}`}
               >
                 <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-transform duration-300 ${filterHasColor ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
               </button>
@@ -892,10 +892,10 @@ export default function ProductsPageClient({
         <div className="space-y-3">
           {toggleFilters.map((f) => (
             <label key={f.key} className="flex items-center justify-between cursor-pointer group py-0.5">
-              <span className="text-[13px] text-stone-500 group-hover:text-black transition-colors">{f.label}</span>
+              <span className="text-[13px] text-[#a5a995] group-hover:text-[#11120D] transition-colors">{f.label}</span>
               <button
                 onClick={(e) => { e.preventDefault(); toggleFilter(f.key); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-black" : "bg-[#c4c7c7]"}`}
+                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#7A7F6A]" : "bg-[#D8CFBC]"}`}
               >
                 <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-transform duration-300 ${activeToggles.includes(f.key) ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
               </button>
@@ -908,7 +908,7 @@ export default function ProductsPageClient({
 
   /* ─── Visibility Tabs (guest only) ─── */
   const visibilityTabs = !userRole ? (
-    <div className="flex items-center gap-1 bg-white border border-[#e8e2d9] rounded-sm p-1 shadow-sm">
+    <div className="flex items-center gap-1 bg-white border border-[#D8CFBC] rounded-sm p-1 shadow-sm">
       {([
         { key: "all" as const, label: t("products.allProducts") },
         { key: "b2c" as const, label: t("products.retail") },
@@ -919,8 +919,8 @@ export default function ProductsPageClient({
           onClick={() => setVisibility(tab.key)}
           className={`px-4 py-2 text-sm font-medium rounded-sm transition-all ${
             visibility === tab.key
-              ? "bg-black text-white shadow-sm"
-              : "text-stone-500 hover:text-black hover:bg-[#faf7f3]"
+              ? "bg-[#7A7F6A] text-white shadow-sm"
+              : "text-[#a5a995] hover:text-[#11120D] hover:bg-[#FFFBF4]"
           }`}
         >
           {tab.label}
@@ -930,7 +930,7 @@ export default function ProductsPageClient({
   ) : null;
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-white">
       <Header />
 
       {/* Brand Header (when filtering by brand) */}
@@ -939,29 +939,29 @@ export default function ProductsPageClient({
       )}
 
       {/* Page Header */}
-      <div className="bg-white border-b border-[#e8e2d9]">
+      <div className="bg-white border-b border-[#D8CFBC]">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-stone-400 mb-4">
-            <Link href="/" className="hover:text-black transition-colors">{t("productDetail.home")}</Link>
+          <nav className="flex items-center gap-2 text-sm text-[#a5a995] mb-4">
+            <Link href="/" className="hover:text-[#11120D] transition-colors">{t("productDetail.home")}</Link>
             <ChevronRight className="w-3 h-3" />
             {activeBrand ? (
               <>
-                <Link href="/products" className="hover:text-black transition-colors">{t("products.allProducts")}</Link>
+                <Link href="/products" className="hover:text-[#11120D] transition-colors">{t("products.allProducts")}</Link>
                 <ChevronRight className="w-3 h-3" />
-                <span className="text-black font-medium">{activeBrand.name}</span>
+                <span className="text-[#11120D] font-medium">{activeBrand.name}</span>
               </>
             ) : (
-              <span className="text-black font-medium">{t("products.allProducts")}</span>
+              <span className="text-[#11120D] font-medium">{t("products.allProducts")}</span>
             )}
           </nav>
 
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl md:text-4xl font-light text-black" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              <h1 className="text-3xl md:text-4xl font-light text-[#11120D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                 {activeBrand ? activeBrand.name : t("products.allProducts")}
               </h1>
-              <p className="text-sm text-stone-400 mt-2">{pagination.total} {t("products.productsLabel")}</p>
+              <p className="text-sm text-[#a5a995] mt-2">{pagination.total} {t("products.productsLabel")}</p>
             </div>
 
             {/* Visibility tabs */}
@@ -979,25 +979,25 @@ export default function ProductsPageClient({
                   onFocus={() => searchQuery.length >= 2 && setShowSearch(true)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   placeholder={t("nav.searchPlaceholder")}
-                  className="w-full border border-stone-200 rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
+                  className="w-full border border-[#D8CFBC] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a5a995]" />
               </div>
 
               {/* Autocomplete */}
               {showSearch && searchResults.length > 0 && (
-                <div className="absolute mt-1.5 bg-white rounded-lg border border-stone-200 shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
+                <div className="absolute mt-1.5 bg-white rounded-lg border border-[#D8CFBC] shadow-xl z-40 w-full max-w-md overflow-hidden animate-slideDown">
                   <div className="p-3">
-                    <span className="text-[11px] text-stone-400 font-semibold tracking-widest uppercase">{t("nav.products")}</span>
+                    <span className="text-[11px] text-[#a5a995] font-semibold tracking-widest uppercase">{t("nav.products")}</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
-                        <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#faf7f3] transition-colors" onClick={() => setShowSearch(false)}>
+                        <Link key={p.id} href={`/products/${p.slug}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FFFBF4] transition-colors" onClick={() => setShowSearch(false)}>
                           <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={48} height={48} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-black truncate">{p.name}</p>
-                            <p className="text-[11px] text-[#874d5d] font-medium">{p.brand}</p>
+                            <p className="text-sm font-medium text-[#11120D] truncate">{p.name}</p>
+                            <p className="text-[11px] text-[#7A7F6A] font-medium">{p.brand}</p>
                           </div>
-                          <span className="text-sm font-bold text-black">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-stone-400">RSD</span></span>
+                          <span className="text-sm font-bold text-[#11120D]">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#a5a995]">RSD</span></span>
                         </Link>
                       ))}
                     </div>
@@ -1020,9 +1020,9 @@ export default function ProductsPageClient({
         <div className="flex gap-10">
           {/* SIDEBAR */}
           <aside className="hidden lg:block w-[260px] flex-shrink-0">
-            <div className="sticky top-20 bg-white rounded-sm border border-[#e8e2d9] p-6 shadow-sm">
+            <div className="sticky top-20 bg-white rounded-sm border border-[#D8CFBC] p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-[13px] font-bold text-black uppercase tracking-widest">{t("products.filters")}</h2>
+                <h2 className="text-[13px] font-bold text-[#11120D] uppercase tracking-widest">{t("products.filters")}</h2>
                 <button onClick={clearAllTags} className="text-[12px] text-secondary hover:underline font-medium">{t("products.resetFilters")}</button>
               </div>
               {filterSidebar}
@@ -1034,21 +1034,21 @@ export default function ProductsPageClient({
             {/* Toolbar */}
             <div className="flex items-center justify-between mb-6 gap-4">
               <div className="flex items-center gap-3">
-                <button onClick={() => setMobileFilter(true)} className="lg:hidden flex items-center gap-2 bg-white border border-[#e8e2d9] px-4 py-2.5 rounded-sm text-sm font-medium hover:border-[#ccc] transition-colors shadow-sm">
-                  <SlidersHorizontal className="w-4 h-4 text-stone-400" /> {t("products.filters")}
+                <button onClick={() => setMobileFilter(true)} className="lg:hidden flex items-center gap-2 bg-white border border-[#D8CFBC] px-4 py-2.5 rounded-sm text-sm font-medium hover:border-[#D8CFBC] transition-colors shadow-sm">
+                  <SlidersHorizontal className="w-4 h-4 text-[#a5a995]" /> {t("products.filters")}
                 </button>
 
                 {/* Grid / List toggle */}
-                <div className="hidden sm:flex items-center bg-white border border-[#e8e2d9] rounded-sm overflow-hidden shadow-sm">
+                <div className="hidden sm:flex items-center bg-white border border-[#D8CFBC] rounded-sm overflow-hidden shadow-sm">
                   <button
                     onClick={() => setGridView(true)}
-                    className={`p-2.5 transition-all ${gridView ? "bg-black text-white" : "text-stone-400 hover:text-black hover:bg-[#faf7f3]"}`}
+                    className={`p-2.5 transition-all ${gridView ? "bg-[#7A7F6A] text-white" : "text-[#a5a995] hover:text-[#11120D] hover:bg-[#FFFBF4]"}`}
                   >
                     <Grid3X3 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setGridView(false)}
-                    className={`p-2.5 transition-all ${!gridView ? "bg-black text-white" : "text-stone-400 hover:text-black hover:bg-[#faf7f3]"}`}
+                    className={`p-2.5 transition-all ${!gridView ? "bg-[#7A7F6A] text-white" : "text-[#a5a995] hover:text-[#11120D] hover:bg-[#FFFBF4]"}`}
                   >
                     <LayoutList className="w-4 h-4" />
                   </button>
@@ -1060,13 +1060,13 @@ export default function ProductsPageClient({
 
             {/* Brand tags — only on general products page, not on brand-specific page */}
             {!activeBrand && (
-              <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b border-stone-100">
+              <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b border-[#D8CFBC]">
                 <button
                   onClick={() => setSelectedBrands([])}
                   className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
                     selectedBrands.length === 0
-                      ? "bg-black text-white shadow-sm"
-                      : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
+                      ? "bg-[#7A7F6A] text-white shadow-sm"
+                      : "bg-[#FFFBF4] text-[#a5a995] hover:text-[#11120D] hover:bg-[#D8CFBC]"
                   }`}
                 >
                   {t("products.allBrands")}
@@ -1077,8 +1077,8 @@ export default function ProductsPageClient({
                     onClick={() => toggleBrand(b.slug)}
                     className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
                       selectedBrands.includes(b.slug)
-                        ? "bg-black text-white shadow-sm"
-                        : "bg-[#faf7f3] text-stone-500 hover:text-black hover:bg-stone-200"
+                        ? "bg-[#7A7F6A] text-white shadow-sm"
+                        : "bg-[#FFFBF4] text-[#a5a995] hover:text-[#11120D] hover:bg-[#D8CFBC]"
                     }`}
                   >
                     {b.name}
@@ -1094,13 +1094,13 @@ export default function ProductsPageClient({
                   <button
                     key={tag.key}
                     onClick={() => removeTag(tag.key)}
-                    className="group flex items-center gap-1.5 bg-white text-black pl-3.5 pr-2.5 py-2 rounded-sm text-[12px] font-medium border border-[#e8e2d9] hover:border-black hover:text-secondary transition-all shadow-sm"
+                    className="group flex items-center gap-1.5 bg-white text-[#11120D] pl-3.5 pr-2.5 py-2 rounded-sm text-[12px] font-medium border border-[#D8CFBC] hover:border-black hover:text-secondary transition-all shadow-sm"
                   >
                     {tag.label}
-                    <X className="w-3.5 h-3.5 text-[#ccc] group-hover:text-secondary transition-colors" />
+                    <X className="w-3.5 h-3.5 text-[#D8CFBC] group-hover:text-secondary transition-colors" />
                   </button>
                 ))}
-                <button onClick={clearAllTags} className="text-[12px] text-stone-400 hover:text-secondary font-medium ml-1 transition-colors">
+                <button onClick={clearAllTags} className="text-[12px] text-[#a5a995] hover:text-secondary font-medium ml-1 transition-colors">
                   {t("products.clearFilters")}
                 </button>
               </div>
@@ -1116,7 +1116,7 @@ export default function ProductsPageClient({
             {/* Loading overlay */}
             {loading && (
               <div className="flex items-center justify-center py-12">
-                <div className="w-8 h-8 border-2 border-stone-200 border-t-[#735b28] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-[#D8CFBC] border-t-[#7A7F6A] rounded-full animate-spin" />
               </div>
             )}
 
@@ -1126,27 +1126,27 @@ export default function ProductsPageClient({
                 {products.map((p) => gridView ? (
                   <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
                 ) : (
-                  <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-white rounded-sm border border-transparent hover:border-[#e8e2d9] hover:shadow-sm transition-all overflow-hidden group">
-                    <div className="w-36 h-36 bg-[#faf7f3] flex-shrink-0 relative overflow-hidden">
+                  <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-white rounded-sm border border-transparent hover:border-[#D8CFBC] hover:shadow-sm transition-all overflow-hidden group">
+                    <div className="w-36 h-36 bg-[#FFFBF4] flex-shrink-0 relative overflow-hidden">
                       <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={400} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {p.isProfessional && (
-                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-black/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
+                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-[#11120D]/80 text-white backdrop-blur-sm">{t("products.professional")}</span>
                       )}
                       {getBadge(p) && (
                         <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm ${
-                          getBadge(p) === "NOVO" ? "bg-black" : getBadge(p) === "HIT" ? "bg-black" : "bg-[#b5453a]"
+                          getBadge(p) === "NOVO" ? "bg-[#7A7F6A]" : getBadge(p) === "HIT" ? "bg-[#7A7F6A]" : "bg-[#b5453a]"
                         } text-white`}>{getBadge(p)}</span>
                       )}
                     </div>
                     <div className="p-5 flex-1 flex flex-col justify-center">
                       <span className="text-[11px] text-secondary font-semibold tracking-widest uppercase">{p.brand?.name ?? ""}</span>
-                      <h3 className="text-sm font-medium text-black mt-1">{p.name}</h3>
+                      <h3 className="text-sm font-medium text-[#11120D] mt-1">{p.name}</h3>
                       <div className="flex items-center gap-0.5 mt-2">
-                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(p.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#c4c7c7]"}`} />)}
+                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(p.rating) ? "fill-[#c4883a] text-[#c4883a]" : "text-[#D8CFBC]"}`} />)}
                       </div>
                       <div className="mt-2 flex items-baseline gap-2">
-                        {p.oldPrice && <span className="text-xs text-stone-400 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-                        <span className="text-[15px] font-bold text-black">{p.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold text-stone-400">RSD</span></span>
+                        {p.oldPrice && <span className="text-xs text-[#a5a995] line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+                        <span className="text-[15px] font-bold text-[#11120D]">{p.price.toLocaleString("sr-RS")} <span className="text-xs font-semibold text-[#a5a995]">RSD</span></span>
                       </div>
                     </div>
                   </Link>
@@ -1157,7 +1157,7 @@ export default function ProductsPageClient({
             {/* Empty state */}
             {!loading && products.length === 0 && (
               <div className="text-center py-16">
-                <p className="text-lg text-stone-400">{t("products.noProducts")}</p>
+                <p className="text-lg text-[#a5a995]">{t("products.noProducts")}</p>
               </div>
             )}
 
@@ -1170,8 +1170,8 @@ export default function ProductsPageClient({
                     onClick={() => setCurrentPage(p)}
                     className={`w-10 h-10 rounded-sm flex items-center justify-center text-sm font-medium transition-all ${
                       currentPage === p
-                        ? "bg-black text-white shadow-sm"
-                        : "bg-white text-stone-500 hover:bg-[#faf7f3] border border-[#e8e2d9]"
+                        ? "bg-[#7A7F6A] text-white shadow-sm"
+                        : "bg-white text-[#a5a995] hover:bg-[#FFFBF4] border border-[#D8CFBC]"
                     }`}
                   >
                     {p}
@@ -1180,9 +1180,9 @@ export default function ProductsPageClient({
                 {currentPage < totalPages && (
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
-                    className="w-10 h-10 rounded-sm flex items-center justify-center bg-white border border-[#e8e2d9] hover:bg-[#faf7f3] transition-colors"
+                    className="w-10 h-10 rounded-sm flex items-center justify-center bg-white border border-[#D8CFBC] hover:bg-[#FFFBF4] transition-colors"
                   >
-                    <ChevronRight className="w-4 h-4 text-stone-400" />
+                    <ChevronRight className="w-4 h-4 text-[#a5a995]" />
                   </button>
                 )}
               </div>
@@ -1196,21 +1196,21 @@ export default function ProductsPageClient({
         <>
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50" onClick={() => setMobileFilter(false)} />
           <div className="fixed left-0 top-0 bottom-0 w-[320px] bg-white z-50 overflow-y-auto animate-slideInLeft flex flex-col">
-            <div className="flex items-center justify-between p-5 border-b border-[#f0ebe3] flex-shrink-0">
+            <div className="flex items-center justify-between p-5 border-b border-[#FFFBF4] flex-shrink-0">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-secondary" />
-                <h3 className="text-[13px] font-bold uppercase tracking-widest text-black">{t("products.filters")}</h3>
+                <h3 className="text-[13px] font-bold uppercase tracking-widest text-[#11120D]">{t("products.filters")}</h3>
               </div>
-              <button onClick={() => setMobileFilter(false)} className="w-8 h-8 rounded-sm hover:bg-stone-100 flex items-center justify-center transition-colors">
-                <X className="w-5 h-5 text-stone-400" />
+              <button onClick={() => setMobileFilter(false)} className="w-8 h-8 rounded-sm hover:bg-[#FFFBF4] flex items-center justify-center transition-colors">
+                <X className="w-5 h-5 text-[#a5a995]" />
               </button>
             </div>
             <div className="p-5 flex-1 overflow-y-auto">{filterSidebar}</div>
-            <div className="p-5 border-t border-[#f0ebe3] flex-shrink-0 flex gap-3">
-              <button onClick={() => { clearAllTags(); setMobileFilter(false); }} className="flex-1 border border-[#e8e2d9] text-black py-3 rounded-sm font-medium text-sm transition-colors hover:bg-[#faf7f3]">
+            <div className="p-5 border-t border-[#FFFBF4] flex-shrink-0 flex gap-3">
+              <button onClick={() => { clearAllTags(); setMobileFilter(false); }} className="flex-1 border border-[#D8CFBC] text-[#11120D] py-3 rounded-sm font-medium text-sm transition-colors hover:bg-[#FFFBF4]">
                 {t("products.resetFilters")}
               </button>
-              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-black hover:bg-black text-white py-3 rounded-sm font-medium text-sm transition-colors">
+              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-[#7A7F6A] hover:bg-[#5c6050] text-white py-3 rounded-sm font-medium text-sm transition-colors">
                 {t("products.applyFilters")}
               </button>
             </div>

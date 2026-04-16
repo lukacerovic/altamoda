@@ -272,7 +272,7 @@ export default function HomepagePage() {
         <h1 className="text-2xl font-serif font-bold text-black">
           {t("admin.homepageManagement")}
         </h1>
-        <p className="text-sm text-[#666] mt-1">{t("admin.homepageDesc")}</p>
+        <p className="text-sm text-[#7A7F6A] mt-1">{t("admin.homepageDesc")}</p>
       </div>
 
       {loading ? (
@@ -283,7 +283,7 @@ export default function HomepagePage() {
         <div className="space-y-6">
           {/* Hero Banners Section */}
           <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#faf8f4]">
+            <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFBF4]">
               <div className="flex items-center gap-3">
                 <div className="text-secondary"><ImageIcon size={20} /></div>
                 <h2 className="text-lg font-serif font-bold text-black">Hero Baneri</h2>
@@ -293,7 +293,7 @@ export default function HomepagePage() {
               </div>
             </div>
             <div className="p-6">
-              <p className="text-sm text-[#666] mb-4">
+              <p className="text-sm text-[#7A7F6A] mb-4">
                 Postavite 3 banera za početnu stranicu. Raspored je identičan onome što kupci vide.
               </p>
 
@@ -332,8 +332,8 @@ export default function HomepagePage() {
                           ) : (
                             <>
                               <Upload size={28} className="text-stone-400" />
-                              <span className="text-sm text-[#666]">{label}</span>
-                              <span className="text-xs text-[#999]">Preporučeno: 960x400px</span>
+                              <span className="text-sm text-[#7A7F6A]">{label}</span>
+                              <span className="text-xs text-[#a5a995]">Preporučeno: 960x400px</span>
                             </>
                           )}
                         </button>
@@ -378,8 +378,8 @@ export default function HomepagePage() {
                             ) : (
                               <>
                                 <Upload size={24} className="text-stone-400" />
-                                <span className="text-sm text-[#666]">{label}</span>
-                                <span className="text-xs text-[#999]">Preporučeno: 960x196px</span>
+                                <span className="text-sm text-[#7A7F6A]">{label}</span>
+                                <span className="text-xs text-[#a5a995]">Preporučeno: 960x196px</span>
                               </>
                             )}
                           </button>
@@ -402,7 +402,7 @@ export default function HomepagePage() {
                 className="bg-white rounded-sm border border-stone-200 overflow-hidden"
               >
                 {/* Section Header */}
-                <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#faf8f4]">
+                <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFBF4]">
                   <div className="flex items-center gap-3">
                     <div className="text-secondary">{section.icon}</div>
                     <h2 className="text-lg font-serif font-bold text-black">
@@ -426,7 +426,7 @@ export default function HomepagePage() {
                 {/* Products Grid */}
                 <div className="p-6">
                   {products.length === 0 && (
-                    <p className="text-sm text-[#999] text-center py-4">
+                    <p className="text-sm text-[#a5a995] text-center py-4">
                       {section.readOnly ? t("admin.saleNote") : t("admin.noProductsMatch")}
                     </p>
                   )}
@@ -435,7 +435,7 @@ export default function HomepagePage() {
                     {products.map((product) => (
                       <div
                         key={product.id}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-stone-200 bg-[#faf8f4] group"
+                        className="flex items-center gap-3 p-3 rounded-lg border border-stone-200 bg-[#FFFBF4] group"
                       >
                         <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0">
                           {product.image ? (
@@ -447,14 +447,14 @@ export default function HomepagePage() {
                               className="w-10 h-10 rounded-lg object-cover"
                             />
                           ) : (
-                            <Package size={18} className="text-[#999]" />
+                            <Package size={18} className="text-[#a5a995]" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-black truncate">
                             {product.name}
                           </p>
-                          <p className="text-xs text-[#999]">
+                          <p className="text-xs text-[#a5a995]">
                             {product.brand?.name || ""}{" "}
                             {product.price > 0 && `· ${product.price.toLocaleString()} RSD`}
                           </p>
@@ -462,7 +462,7 @@ export default function HomepagePage() {
                         {!section.readOnly && (
                           <button
                             onClick={() => removeProduct(section.key, product.id, section.flagField)}
-                            className="p-1 text-[#999] hover:text-red-500 hover:bg-red-50 rounded sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
+                            className="p-1 text-[#a5a995] hover:text-red-500 hover:bg-red-50 rounded sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
                             title={t("admin.removeFromSection")}
                           >
                             <X size={16} />
@@ -474,7 +474,7 @@ export default function HomepagePage() {
 
                   {/* Sale section note */}
                   {section.readOnly && products.length > 0 && (
-                    <p className="mt-4 text-xs text-[#999] italic">{t("admin.saleNote")}</p>
+                    <p className="mt-4 text-xs text-[#a5a995] italic">{t("admin.saleNote")}</p>
                   )}
                 </div>
               </div>
@@ -491,13 +491,13 @@ export default function HomepagePage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
               <div>
                 <h3 className="text-lg font-serif font-bold text-black">{t("admin.addToSection")}</h3>
-                <p className="text-xs text-[#999] mt-0.5">
+                <p className="text-xs text-[#a5a995] mt-0.5">
                   {selectedToAdd.size > 0
                     ? `${selectedToAdd.size} ${selectedToAdd.size === 1 ? "proizvod izabran" : "proizvoda izabrano"}`
                     : t("admin.searchToAdd")}
                 </p>
               </div>
-              <button onClick={() => setAddModal(null)} className="p-2 text-[#999] hover:text-black hover:bg-stone-100 rounded transition-colors">
+              <button onClick={() => setAddModal(null)} className="p-2 text-[#a5a995] hover:text-black hover:bg-stone-100 rounded transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -505,7 +505,7 @@ export default function HomepagePage() {
             {/* Search */}
             <div className="px-6 py-3 border-b border-stone-100">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a5a995]" />
                 <input
                   type="text"
                   value={modalSearch}
@@ -524,7 +524,7 @@ export default function HomepagePage() {
                   <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent" />
                 </div>
               ) : modalResults.length === 0 ? (
-                <p className="text-sm text-[#999] text-center py-12">{t("admin.noProductsMatch")}</p>
+                <p className="text-sm text-[#a5a995] text-center py-12">{t("admin.noProductsMatch")}</p>
               ) : (
                 <div className="divide-y divide-stone-100">
                   {modalResults.map((product) => {
@@ -546,12 +546,12 @@ export default function HomepagePage() {
                           {product.image ? (
                             <Image src={product.image} alt={product.name} width={64} height={64} className="w-10 h-10 rounded-lg object-cover" />
                           ) : (
-                            <Package size={16} className="text-[#999]" />
+                            <Package size={16} className="text-[#a5a995]" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-black truncate">{product.name}</p>
-                          <p className="text-xs text-[#999]">
+                          <p className="text-xs text-[#a5a995]">
                             {product.brand?.name || ""} · {product.sku}
                             {product.price > 0 && ` · ${product.price.toLocaleString()} RSD`}
                           </p>
@@ -567,7 +567,7 @@ export default function HomepagePage() {
             <div className="flex items-center justify-between px-6 py-4 border-t border-stone-200 bg-white">
               <button
                 onClick={() => setAddModal(null)}
-                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors"
+                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#7A7F6A] hover:bg-stone-100 transition-colors"
               >
                 {t("admin.cancel")}
               </button>

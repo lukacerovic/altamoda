@@ -55,7 +55,7 @@ export default function OutletPage() {
     : outletProducts.filter((p) => p.discount >= 60);
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-[#FFFBF4]">
       {/* Hero */}
       <section className="relative bg-gradient-to-r from-[#c0392b] to-[#e74c3c] overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50" />
@@ -94,9 +94,9 @@ export default function OutletPage() {
       {/* Filters + Grid */}
       <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <p className="text-sm text-stone-500">{filtered.length} {t("outlet.products")}</p>
+          <p className="text-sm text-[#a5a995]">{filtered.length} {t("outlet.products")}</p>
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-stone-400" />
+            <Filter className="w-4 h-4 text-[#a5a995]" />
             {[
               { key: "all", label: t("outlet.all") },
               { key: "50+", label: "50-59%" },
@@ -106,7 +106,7 @@ export default function OutletPage() {
                 key={f.key}
                 onClick={() => setDiscountFilter(f.key)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  discountFilter === f.key ? "bg-[#c0392b] text-white" : "bg-white border border-stone-200 text-stone-500 hover:border-[#c0392b] hover:text-[#c0392b]"
+                  discountFilter === f.key ? "bg-[#b5453a] text-white" : "bg-white border border-[#D8CFBC] text-[#a5a995] hover:border-[#b5453a] hover:text-[#b5453a]"
                 }`}
               >
                 {f.label}
@@ -117,32 +117,32 @@ export default function OutletPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {filtered.map((product) => (
-            <div key={product.id} className="bg-white rounded-sm overflow-hidden shadow-sm border border-stone-200/50 group hover:shadow-md transition-all">
+            <div key={product.id} className="bg-white rounded-sm overflow-hidden shadow-sm border border-[#D8CFBC]/50 group hover:shadow-md transition-all">
               <div className="relative overflow-hidden aspect-square">
                 <Image src={product.image} alt={product.name} width={400} height={400} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white bg-[#c0392b]">
+                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white bg-[#b5453a]">
                   -{product.discount}%
                 </span>
                 <button
                   onClick={() => toggleLike(product.id)}
                   className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
                 >
-                  <Heart className={`w-4 h-4 ${liked.has(product.id) ? "fill-[#c0392b] text-[#c0392b]" : "text-stone-500"}`} />
+                  <Heart className={`w-4 h-4 ${liked.has(product.id) ? "fill-[#b5453a] text-[#b5453a]" : "text-[#a5a995]"}`} />
                 </button>
               </div>
               <div className="p-4">
                 <p className="text-[10px] font-semibold tracking-widest uppercase text-secondary mb-1">{product.brand}</p>
-                <h3 className="text-sm font-medium text-black mb-2 line-clamp-2">{product.name}</h3>
+                <h3 className="text-sm font-medium text-[#11120D] mb-2 line-clamp-2">{product.name}</h3>
                 <div className="flex items-center gap-1 mb-2">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-3 h-3 ${i < Math.floor(product.rating) ? "fill-[#735b28] text-secondary" : "text-[#c4c7c7]"}`} />
+                    <Star key={i} className={`w-3 h-3 ${i < Math.floor(product.rating) ? "fill-[#7A7F6A] text-secondary" : "text-[#D8CFBC]"}`} />
                   ))}
                 </div>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-base font-bold text-[#c0392b]">{product.salePrice.toLocaleString()} RSD</span>
-                  <span className="text-xs text-stone-400 line-through">{product.regularPrice.toLocaleString()} RSD</span>
+                  <span className="text-base font-bold text-[#b5453a]">{product.salePrice.toLocaleString()} RSD</span>
+                  <span className="text-xs text-[#a5a995] line-through">{product.regularPrice.toLocaleString()} RSD</span>
                 </div>
-                <button className="w-full py-2.5 bg-[#c0392b] hover:bg-[#a93226] text-white text-sm font-medium rounded-sm transition-colors">
+                <button className="w-full py-2.5 bg-[#b5453a] hover:bg-[#a93226] text-white text-sm font-medium rounded-sm transition-colors">
                   {t("outlet.addToCart")}
                 </button>
               </div>
