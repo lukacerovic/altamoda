@@ -14,7 +14,7 @@ import { newsletterRateLimiter, applyRateLimit } from '@/lib/rate-limit'
 export const POST = withErrorHandler(async (req: Request) => {
   const admin = await requireAdmin()
 
-  const limited = applyRateLimit(newsletterRateLimiter, `newsletter-test:${admin.id}`)
+  const limited = await applyRateLimit(newsletterRateLimiter, `newsletter-test:${admin.id}`)
   if (limited) return limited as never
 
   const body = testSendSchema.parse(await req.json())

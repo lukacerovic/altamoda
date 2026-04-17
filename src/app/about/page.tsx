@@ -2,6 +2,7 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Award, Users, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function AboutPage() {
@@ -140,21 +141,21 @@ export default function AboutPage() {
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
               <div className="space-y-6">
-                <div className="text-[#5c6050] text-4xl">&#9883;</div>
+                <Award className="w-8 h-8 text-[#5c6050]" strokeWidth={1.5} />
                 <h3 className="font-serif text-2xl">{t("about.valueHeritageTitle")}</h3>
                 <p className="text-[#11120D] font-light leading-relaxed">
                   {t("about.valueHeritageDescription")}
                 </p>
               </div>
               <div className="space-y-6">
-                <div className="text-[#5c6050] text-4xl">&#9829;</div>
+                <Users className="w-8 h-8 text-[#5c6050]" strokeWidth={1.5} />
                 <h3 className="font-serif text-2xl">{t("about.valueReliabilityTitle")}</h3>
                 <p className="text-[#11120D] font-light leading-relaxed">
                   {t("about.valueReliabilityDescription")}
                 </p>
               </div>
               <div className="space-y-6">
-                <div className="text-[#5c6050] text-4xl">&#10004;</div>
+                <Sparkles className="w-8 h-8 text-[#5c6050]" strokeWidth={1.5} />
                 <h3 className="font-serif text-2xl">{t("about.valueCurationTitle")}</h3>
                 <p className="text-[#11120D] font-light leading-relaxed">
                   {t("about.valueCurationDescription")}

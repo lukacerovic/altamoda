@@ -7,7 +7,7 @@ import { sendTransactional } from '@/lib/email'
 import { b2bSignupAdminTemplate } from '@/lib/email-templates'
 
 export const POST = withErrorHandler(async (req: Request) => {
-  const rateLimitResponse = applyRateLimit(registrationRateLimiter, `register:${getClientIp(req)}`)
+  const rateLimitResponse = await applyRateLimit(registrationRateLimiter, `register:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse as never
 
   const body = await req.json()

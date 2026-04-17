@@ -1273,9 +1273,9 @@ export const adminBanners: AdminBanner[] = [
     target: "B2C", activeFrom: "2026-03-01", activeTo: "2026-06-30", displayOrder: 3, status: "active",
   },
   {
-    id: 5, title: "Seminar - Balayage tehnike", type: "Landing page hero", position: "Category page",
+    id: 5, title: "Edukacija - Balayage tehnike", type: "Landing page hero", position: "Category page",
     desktopImage: "/banners/seminar-desktop.jpg", mobileImage: "/banners/seminar-mobile.jpg",
-    linkType: "Spoljašnji link", linkUrl: "/seminars/1", ctaText: "Prijavite se",
+    linkType: "Spoljašnji link", linkUrl: "/education", ctaText: "Saznaj više",
     target: "B2B", activeFrom: "2026-04-01", activeTo: "2026-04-15", displayOrder: 4, status: "inactive",
   },
   {

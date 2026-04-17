@@ -48,3 +48,40 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
 
   return successResponse(brand)
 })
+
+// DELETE /api/brands/[id] — Delete brand (admin)
+// Detaches all products (sets brandId = null) and removes product lines.
+// Products are NOT deleted — they remain in the catalogue without a brand.
+export const DELETE = withErrorHandler(async (_req: Request, context: unknown) => {
+  await requireAdmin()
+  const { id } = await getRouteParams<{ id: string }>(context)
+
+  const existing = await prisma.brand.findUnique({
+    where: { id },
+    include: { _count: { select: { products: true, productLines: true } } },
+  })
+  if (!existing) return errorResponse('Brend nije pronađen', 404)
+
+  // Transaction: detach products → delete product lines → delete brand
+  const result = await prisma.$transaction(async (tx) => {
+    // Detach all products (brandId is nullable in schema)
+    const detached = await tx.product.updateMany({
+      where: { brandId: id },
+      data: { brandId: null, productLineId: null },
+    })
+
+    // Remove product lines belonging to this brand
+    const linesDeleted = await tx.productLine.deleteMany({
+      where: { brandId: id },
+    })
+
+    await tx.brand.delete({ where: { id } })
+
+    return { detachedProducts: detached.count, deletedLines: linesDeleted.count }
+  })
+
+  return successResponse({
+    message: `Brend "${existing.name}" je obrisan. ${result.detachedProducts} proizvoda je ostalo bez brenda.`,
+    ...result,
+  })
+})

@@ -53,7 +53,7 @@ export const GET = withErrorHandler(async (req: Request) => {
 
 // POST /api/orders — create a new order
 export const POST = withErrorHandler(async (req: Request) => {
-  const rateLimitResponse = applyRateLimit(orderRateLimiter, `order:${getClientIp(req)}`)
+  const rateLimitResponse = await applyRateLimit(orderRateLimiter, `order:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse as never
 
   const user = await requireAuth()
