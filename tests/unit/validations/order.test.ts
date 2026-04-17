@@ -40,14 +40,20 @@ describe('Order Validations', () => {
       expect(result.billingAddress?.city).toBe('Beograd')
     })
 
-    it('accepts order with optional notes and promo code', () => {
+    it('accepts order with optional notes', () => {
       const result = createOrderSchema.parse({
         ...validOrder,
         notes: 'Dostaviti pre podne',
-        promoCode: 'POPUST10',
       })
       expect(result.notes).toBe('Dostaviti pre podne')
-      expect(result.promoCode).toBe('POPUST10')
+    })
+
+    it('accepts order with optional shippingMethod', () => {
+      const result = createOrderSchema.parse({
+        ...validOrder,
+        shippingMethod: 'express',
+      })
+      expect(result.shippingMethod).toBe('express')
     })
 
     it('rejects empty items array', () => {
