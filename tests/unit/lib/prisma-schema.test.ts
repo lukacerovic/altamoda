@@ -24,7 +24,6 @@ describe('Prisma Schema Integrity', () => {
     'Order', 'OrderItem', 'OrderStatusHistory',
     'Review',
     'Promotion', 'PromoCode',
-    'Bundle', 'BundleItem',
     'Banner',
     'NewsletterSubscriber',
     'ShippingZone', 'ShippingRate',
@@ -94,6 +93,13 @@ describe('Prisma Schema Integrity', () => {
   it('does NOT have seminars model', () => {
     expect(schema).not.toContain('model Seminar')
     expect(schema).not.toContain('seminar_registrations')
+  })
+
+  it('does NOT have Bundle models (feature removed)', () => {
+    expect(schema).not.toContain('model Bundle ')
+    expect(schema).not.toContain('model BundleItem')
+    expect(schema).not.toContain('@@map("bundles")')
+    expect(schema).not.toContain('@@map("bundle_items")')
   })
 
   // ─── Field Types ───

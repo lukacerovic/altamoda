@@ -9,7 +9,7 @@ const stockCheckLimiter = createRateLimiter({
 
 export async function POST(req: NextRequest) {
   // Rate limit to prevent inventory scraping
-  const rateLimitResponse = applyRateLimit(stockCheckLimiter, `stock:${getClientIp(req)}`)
+  const rateLimitResponse = await applyRateLimit(stockCheckLimiter, `stock:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse
 
   try {

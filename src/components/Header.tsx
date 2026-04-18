@@ -9,6 +9,7 @@ import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { resolveBrandLogo } from "@/lib/brand-logos";
 import {
   Search,
   ShoppingBag,
@@ -277,13 +278,13 @@ export default function Header() {
                                 href={`/brands/${brand.slug}`}
                                 className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#FFFBF4] transition-colors group"
                               >
-                                {brand.logoUrl ? (
-                                  <Image src={brand.logoUrl} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
+                                {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
+                                  <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
                                 ) : (
                                   <div className="w-8 h-8 bg-[#FFFBF4] rounded-sm flex items-center justify-center flex-shrink-0">
                                     <span className="text-xs font-bold text-[#a5a995]">{brand.name.charAt(0)}</span>
                                   </div>
-                                )}
+                                ); })()}
                                 <span className="text-sm text-[#7A7F6A] group-hover:text-[#11120D] transition-colors truncate">
                                   {brand.name}
                                 </span>
@@ -496,13 +497,13 @@ export default function Header() {
                             onClick={() => setMobileMenu(false)}
                             className="flex items-center gap-3 py-2 px-2 text-sm text-[#7A7F6A] hover:text-secondary transition-colors"
                           >
-                            {brand.logoUrl ? (
-                              <Image src={brand.logoUrl} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
+                            {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
+                              <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
                             ) : (
                               <div className="w-6 h-6 bg-[#FFFBF4] rounded-sm flex items-center justify-center">
                                 <span className="text-[10px] font-bold text-[#a5a995]">{brand.name.charAt(0)}</span>
                               </div>
-                            )}
+                            ); })()}
                             {brand.name}
                           </Link>
                         ))}

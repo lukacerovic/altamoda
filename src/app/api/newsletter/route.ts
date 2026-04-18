@@ -6,7 +6,7 @@ import { newsletterRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-l
 
 // POST /api/newsletter — subscribe (public)
 export const POST = withErrorHandler(async (req: Request) => {
-  const rateLimitResponse = applyRateLimit(newsletterRateLimiter, `newsletter:${getClientIp(req)}`)
+  const rateLimitResponse = await applyRateLimit(newsletterRateLimiter, `newsletter:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse as never
 
   const body = await req.json()

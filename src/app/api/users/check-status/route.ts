@@ -5,7 +5,7 @@ import { checkStatusRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-
 // POST /api/users/check-status — Check if a user account is pending/suspended
 // Used by the login page to show the correct error message
 export const POST = withErrorHandler(async (req: Request) => {
-  const rateLimitResponse = applyRateLimit(checkStatusRateLimiter, `check-status:${getClientIp(req)}`)
+  const rateLimitResponse = await applyRateLimit(checkStatusRateLimiter, `check-status:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse as never
 
   const body = await req.json()
