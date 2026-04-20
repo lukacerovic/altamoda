@@ -107,7 +107,9 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#F2ECDE] mb-5">
+      <div
+        className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-[#F2ECDE] mb-5 transition-all duration-300 ease-out group-hover:-translate-y-0.5 [box-shadow:0_0_0_1px_rgba(17,18,13,0.02),0_2px_6px_rgba(17,18,13,0.04),0_4px_8px_rgba(17,18,13,0.1)] group-hover:[box-shadow:0_0_0_1px_rgba(17,18,13,0.04),0_4px_12px_rgba(17,18,13,0.08),0_16px_32px_rgba(17,18,13,0.14)]"
+      >
         <Image
           src={product.image || defaultImg}
           alt={product.name}
@@ -116,7 +118,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           className="object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out"
         />
         {displayBadge && (
-          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#FFFBF4]/90 text-[#11120D] backdrop-blur-sm">
+          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#FFFBF4]/90 text-[#11120D] backdrop-blur-sm rounded-full">
             {displayBadge}
           </span>
         )}
@@ -243,14 +245,14 @@ function ProductCarousel({
       <button
         onClick={goPrev}
         aria-label="Previous"
-        className="absolute -left-3 md:-left-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFBF4] border border-[#D8CFBC] flex items-center justify-center hover:border-[#11120D] transition-colors z-10 shadow-sm"
+        className="absolute -left-3 md:-left-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFBF4] border border-[#D8CFBC] flex items-center justify-center hover:border-[#11120D] hover:scale-[1.08] active:scale-[0.92] transition-all duration-200 z-10 shadow-sm hover:[box-shadow:0_4px_12px_rgba(17,18,13,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#11120D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFBF4]"
       >
         <ChevronLeft className="w-4 h-4 text-[#11120D]" />
       </button>
       <button
         onClick={goNext}
         aria-label="Next"
-        className="absolute -right-3 md:-right-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFBF4] border border-[#D8CFBC] flex items-center justify-center hover:border-[#11120D] transition-colors z-10 shadow-sm"
+        className="absolute -right-3 md:-right-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFBF4] border border-[#D8CFBC] flex items-center justify-center hover:border-[#11120D] hover:scale-[1.08] active:scale-[0.92] transition-all duration-200 z-10 shadow-sm hover:[box-shadow:0_4px_12px_rgba(17,18,13,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#11120D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFBF4]"
       >
         <ChevronRight className="w-4 h-4 text-[#11120D]" />
       </button>
@@ -329,8 +331,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Od 1996.
               </span>
               <h1
-                className="text-5xl md:text-6xl lg:text-7xl font-light text-[#11120D] leading-[1.02] mb-10 tracking-tight"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-5xl md:text-6xl lg:text-7xl font-light text-[#11120D] leading-[1.02] mb-10"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
               >
                 Profesionalna nega,
                 <br />
@@ -340,12 +342,20 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Alta Moda je generalni zastupnik i distributer vodećih svetskih brendova za kosu — Redken, Matrix, Biolage, Elchim, Mizutani, L&rsquo;image. Salonski kvalitet za profesionalce i ljubitelje lepe kose.
               </p>
 
-              <Link
-                href="/products"
-                className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#11120D] border-b border-[#11120D] pb-1 hover:opacity-70 transition-opacity"
-              >
-                Istraži kolekciju <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
+                <Link
+                  href="/products"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#FFFBF4] bg-[#11120D] px-8 py-4 rounded-full hover:bg-[#2b2c24] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#11120D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFBF4]"
+                >
+                  Istraži kolekciju <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/account/login"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#11120D] px-8 py-4 rounded-full border border-[#11120D] hover:bg-[#11120D] hover:text-[#FFFBF4] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#11120D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFBF4]"
+                >
+                  Za salone <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
 
               {/* Stats row — Alta Moda heritage */}
               <div className="grid grid-cols-3 gap-6 md:gap-10 mt-16 md:mt-20 pt-10 border-t border-[#D8CFBC]/60 max-w-md">
@@ -410,9 +420,39 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
+          1.5 CATEGORY PILL BAR — Airbnb-style horizontal scroll filter
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="bg-[#FFFBF4] mt-12 md:mt-16 border-y border-[rgba(17,18,13,0.08)]">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="overflow-x-auto hide-scrollbar">
+            <div className="flex gap-2 px-6 md:px-10 py-4 md:py-5 min-w-max">
+              {[
+                { label: "Nega kose", href: "/products?category=sampon" },
+                { label: "Styling", href: "/products?category=stajling" },
+                { label: "Boje za kosu", href: "/products?category=permanentne-boje" },
+                { label: "Alati & Pribor", href: "/products?category=frizerski-pribor" },
+                { label: "Oksidanti", href: "/products?category=oksidanti" },
+                { label: "Dekoloranti", href: "/products?category=dekoloranti" },
+                { label: "Muška kolekcija", href: "/products?search=Brews" },
+                { label: "Akcije", href: "/outlet" },
+              ].map((c) => (
+                <Link
+                  key={c.label}
+                  href={c.href}
+                  className="shrink-0 text-[11px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-[rgba(17,18,13,0.1)] hover:border-[#11120D] text-[#11120D]/70 hover:text-[#11120D] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#11120D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFBF4]"
+                >
+                  {c.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
           2. BRAND MARQUEE — partner logos scrolling
       ═══════════════════════════════════════════════════════════ */}
-      <section className="border-y border-[#D8CFBC]/70 py-8 md:py-10 mt-16 md:mt-24 overflow-hidden bg-[#FFFBF4]">
+      <section className="border-y border-[rgba(17,18,13,0.08)] py-8 md:py-10 mt-16 md:mt-24 overflow-hidden bg-[#FFFBF4]">
         <div className="relative flex">
           {[0, 1].map((setIndex) => (
             <div key={setIndex} className="flex animate-marquee flex-shrink-0">
@@ -446,8 +486,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   Omiljeni proizvodi
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05] tracking-tight"
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05]"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
                   Bestseleri, <em className="italic">izabrani</em>
                   <br />
@@ -492,8 +532,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Za salone
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05] mb-8 tracking-tight"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 Partneri koji
                 <br />
@@ -526,7 +566,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/account/login"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#FFFBF4] bg-[#11120D] px-7 py-3.5 hover:bg-[#2b2c24] transition-colors"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#FFFBF4] bg-[#11120D] px-8 py-4 rounded-full hover:bg-[#2b2c24] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#11120D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#EFE7D5]"
                 >
                   Prijavi se za veleprodaju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -552,8 +592,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               Šta nas izdvaja
             </span>
             <h2
-              className="text-3xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05] tracking-tight mb-4 md:mb-6"
-              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              className="text-3xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05] mb-4 md:mb-6"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
             >
               Tri decenije
               <br />
@@ -593,8 +633,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   Upravo stiglo
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl font-light text-[#11120D] leading-[1.05] tracking-tight"
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  className="text-4xl md:text-5xl font-light text-[#11120D] leading-[1.05]"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
                   Nove <em className="italic">linije</em> i najave.
                 </h2>
@@ -634,8 +674,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Edukacija
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8 tracking-tight"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 Id Hair Academy.
                 <br />
@@ -681,7 +721,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/education"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#11120D] bg-[#FFFBF4] px-7 py-3.5 hover:bg-[#D8CFBC] transition-colors"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#11120D] bg-[#FFFBF4] px-8 py-4 rounded-full hover:bg-[#D8CFBC] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFBF4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#11120D]"
                 >
                   Istraži edukaciju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -695,7 +735,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           9. SALE — editorial card grid
       ═══════════════════════════════════════════════════════════ */}
       {saleList.length > 0 && (
-        <section className="py-20 md:py-28 bg-[#FFFBF4] border-t border-[#D8CFBC]/60">
+        <section className="py-20 md:py-28 bg-[#FFFBF4] border-t border-[rgba(17,18,13,0.08)]">
           <div className="max-w-[1400px] mx-auto px-6 md:px-10">
             <div className="flex items-end justify-between mb-14 md:mb-20 gap-8 flex-wrap">
               <div>
@@ -703,8 +743,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   Posebne ponude
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl font-light text-[#11120D] leading-[1.05] tracking-tight"
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  className="text-4xl md:text-5xl font-light text-[#11120D] leading-[1.05]"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
                   Akcije i <em className="italic">sniženja</em>.
                 </h2>
@@ -724,7 +764,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           10.5 SOCIAL — Instagram feed & social links
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#FFFBF4] border-t border-[#D8CFBC]/60">
+      <section className="py-20 md:py-28 bg-[#FFFBF4] border-t border-[rgba(17,18,13,0.08)]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="flex items-end justify-between mb-12 md:mb-16 gap-8 flex-wrap">
             <div>
@@ -732,8 +772,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Prati nas
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05] tracking-tight"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#11120D] leading-[1.05]"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 <em className="italic">@altamoda</em> na mreži.
               </h2>
@@ -811,8 +851,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Newsletter
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] tracking-tight"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05]"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 Novi proizvodi, akcije &amp; <em className="italic">saveti</em>.
               </h2>

@@ -226,8 +226,14 @@ export default function Header() {
 
   return (
     <>
-      {/* MAIN HEADER - Clean Kanva style */}
-      <header className="bg-white sticky top-0 z-50 border-b border-[#D8CFBC]">
+      {/* MAIN HEADER - translucent glass (Apple-inspired) */}
+      <header
+        className="sticky top-0 z-50 border-b border-[rgba(17,18,13,0.08)] bg-[#FFFBF4]/80"
+        style={{
+          backdropFilter: "saturate(180%) blur(20px)",
+          WebkitBackdropFilter: "saturate(180%) blur(20px)",
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           {/* Mobile hamburger - left */}
           <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#11120D] hover:text-secondary transition-colors">
