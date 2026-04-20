@@ -832,7 +832,12 @@ export default function ProductsPage() {
               {paginated.map((product) => (
                 <tr key={product.id} className="hover:bg-stone-100 transition-colors">
                   <td className="px-4 py-3">
-                    <button onClick={() => toggleSelect(product.id)} className="text-[#a5a995] hover:text-black">
+                    <button
+                      onClick={() => toggleSelect(product.id)}
+                      aria-label={selectedIds.includes(product.id) ? t("admin.deselectRow") : t("admin.selectRow")}
+                      aria-pressed={selectedIds.includes(product.id)}
+                      className="text-[#a5a995] hover:text-black"
+                    >
                       {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
                     </button>
                   </td>
@@ -885,10 +890,20 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => openEditPanel(product)} className="p-1.5 text-[#a5a995] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
+                      <button
+                        onClick={() => openEditPanel(product)}
+                        aria-label={`${t("admin.editProduct")}: ${product.name}`}
+                        title={t("admin.editProduct")}
+                        className="p-1.5 text-[#a5a995] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
+                      >
                         <Edit3 size={15} />
                       </button>
-                      <button onClick={() => handleDelete(product.id)} className="p-1.5 text-[#a5a995] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        aria-label={`${t("admin.deleteProduct")}: ${product.name}`}
+                        title={t("admin.deleteProduct")}
+                        className="p-1.5 text-[#a5a995] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
+                      >
                         <Trash2 size={15} />
                       </button>
                     </div>

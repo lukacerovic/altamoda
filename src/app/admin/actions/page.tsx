@@ -705,9 +705,10 @@ export default function ActionsPage() {
                           <input type="checkbox" checked={selected} onChange={() => toggleProduct(p.id)} className="sr-only" />
                           <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {p.image ? (
-                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={p.image} alt="" aria-hidden="true" className="w-full h-full object-cover" />
                             ) : (
-                              <Package size={14} className="text-[#a5a995]" />
+                              <Package size={14} className="text-[#a5a995]" aria-hidden="true" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">

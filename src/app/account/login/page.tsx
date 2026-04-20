@@ -52,11 +52,27 @@ function LoginContent() {
     setError("");
     setLoading(true);
 
-    const result = await signIn("credentials", {
-      email: loginEmail,
-      password: loginPassword,
-      redirect: false,
-    });
+    let result: Awaited<ReturnType<typeof signIn>>;
+    try {
+      result = await signIn("credentials", {
+        email: loginEmail,
+        password: loginPassword,
+        redirect: false,
+      });
+    } catch (err) {
+      // NextAuth's signIn() can throw when the auth endpoint returns a
+      // non-JSON / rate-limited response (e.g. 429). In that case we'd
+      // otherwise leak `TypeError: Failed to construct 'URL'` to the user.
+      console.error("signIn threw:", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/URL/i.test(msg) || /fetch/i.test(msg)) {
+        setError(t("auth.rateLimited"));
+      } else {
+        setError(t("auth.wrongCredentials"));
+      }
+      setLoading(false);
+      return;
+    }
 
     if (result?.error) {
       // Check if the user account is pending approval

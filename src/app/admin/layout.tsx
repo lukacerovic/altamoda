@@ -89,7 +89,7 @@ export default function AdminLayout({
         <div className="p-8 border-b border-stone-200 flex items-center justify-between">
           {sidebarOpen ? (
             <div>
-              <h1 className="text-xl font-bold tracking-widest text-black uppercase" style={{ fontFamily: "'Noto Serif', serif" }}>ALTAMODA</h1>
+              <span aria-label="Altamoda" className="block text-xl font-bold tracking-widest text-black uppercase" style={{ fontFamily: "'Noto Serif', serif" }}>ALTAMODA</span>
               <p className="text-stone-500 text-xs tracking-widest mt-1 uppercase">Admin Panel</p>
             </div>
           ) : (
@@ -172,7 +172,7 @@ export default function AdminLayout({
       >
         <div className="p-8 border-b border-stone-200 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold tracking-widest text-black uppercase" style={{ fontFamily: "'Noto Serif', serif" }}>ALTAMODA</h1>
+            <span aria-label="Altamoda" className="block text-xl font-bold tracking-widest text-black uppercase" style={{ fontFamily: "'Noto Serif', serif" }}>ALTAMODA</span>
             <p className="text-stone-500 text-xs tracking-widest mt-1 uppercase">Admin Panel</p>
           </div>
           <button
