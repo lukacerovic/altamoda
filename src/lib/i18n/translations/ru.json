@@ -127,7 +127,11 @@
     "subscribing": "Подписка...",
     "noThanks": "Нет, спасибо, может быть позже",
     "addToCart": "В корзину",
-    "new": "НОВИНКА"
+    "new": "НОВИНКА",
+    "tabBestsellers": "Бестселлеры",
+    "tabSale": "Акции",
+    "tabNew": "Новое",
+    "bestseller": "Бестселлер"
   },
   "products": {
     "title": "Продукция",

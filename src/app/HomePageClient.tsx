@@ -298,9 +298,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   type ProductTab = "bestsellers" | "new" | "sale";
   const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
   const tabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
-    { key: "bestsellers", label: "Bestseleri", products: bestsellerList, badge: (i: number) => (i === 2 ? "Novo" : "Bestseler"), viewAll: "/products" },
-    { key: "sale", label: "Akcija", products: saleList, viewAll: "/products?onSale=true" },
-    { key: "new", label: "Izdvojena ponuda", products: newList, badge: "Novo", viewAll: "/products?sort=new" },
+    { key: "bestsellers", label: t("home.tabBestsellers"), products: bestsellerList, badge: (i: number) => (i === 2 ? t("home.new") : t("home.bestseller")), viewAll: "/products" },
+    { key: "sale", label: t("home.tabSale"), products: saleList, viewAll: "/products?onSale=true" },
+    { key: "new", label: t("home.tabNew"), products: newList, badge: t("home.new"), viewAll: "/products?sort=new" },
   ];
   const activeTabData = tabs.find((t) => t.key === activeTab) || tabs[0];
 

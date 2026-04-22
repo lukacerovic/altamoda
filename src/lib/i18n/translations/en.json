@@ -127,7 +127,11 @@
     "subscribing": "Subscribing...",
     "noThanks": "No thanks, maybe later",
     "addToCart": "Add to Cart",
-    "new": "NEW"
+    "new": "NEW",
+    "tabBestsellers": "Bestsellers",
+    "tabSale": "Sale",
+    "tabNew": "New",
+    "bestseller": "Bestseller"
   },
   "products": {
     "title": "Products",

@@ -127,7 +127,11 @@
     "subscribing": "Prijava...",
     "noThanks": "Ne hvala, možda drugi put",
     "addToCart": "Dodaj u korpu",
-    "new": "NOVO"
+    "new": "NOVO",
+    "tabBestsellers": "Bestseleri",
+    "tabSale": "Akcije",
+    "tabNew": "Novo",
+    "bestseller": "Bestseler"
   },
   "products": {
     "title": "Proizvodi",
