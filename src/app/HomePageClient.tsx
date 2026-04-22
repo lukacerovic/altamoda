@@ -246,12 +246,15 @@ interface Props {
   saleProducts: ProductData[];
   heroImages: string[];
   heroCards?: Partial<HeroCard>[];
+  socialLinks?: { instagram?: string; facebook?: string; tiktok?: string };
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Main editorial home page — inspired by botanical-press aesthetic
 ═══════════════════════════════════════════════════════════════════ */
-export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards }: Props) {
+export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards, socialLinks }: Props) {
+  const instagramUrl = socialLinks?.instagram || "https://instagram.com";
+  const tiktokUrl = socialLinks?.tiktok || "https://tiktok.com";
   const { t } = useLanguage();
 
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -743,7 +746,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Social icons */}
             <div className="flex items-center gap-3">
               <a
-                href="https://instagram.com"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -752,7 +755,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 <Instagram className="w-4 h-4" />
               </a>
               <a
-                href="https://tiktok.com"
+                href={tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
@@ -786,7 +789,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             ].map((cell, i) => (
               <a
                 key={i}
-                href="https://instagram.com"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${cell.cls} relative overflow-hidden bg-[#F2ECDE] group rounded-[4px]`}
