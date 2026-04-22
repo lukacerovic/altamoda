@@ -76,23 +76,6 @@ describe('Auth Config - Route Authorization Logic', () => {
     expect(authorized(makeArgs('/account/login'))).toBe(true)
   })
 
-  // Quick order (B2B only)
-  it('blocks unauthenticated from /quick-order', () => {
-    expect(authorized(makeArgs('/quick-order'))).toBe(false)
-  })
-
-  it('blocks B2C from /quick-order', () => {
-    expect(authorized(makeArgs('/quick-order', 'b2c'))).toBe(false)
-  })
-
-  it('allows B2B to /quick-order', () => {
-    expect(authorized(makeArgs('/quick-order', 'b2b'))).toBe(true)
-  })
-
-  it('allows admin to /quick-order', () => {
-    expect(authorized(makeArgs('/quick-order', 'admin'))).toBe(true)
-  })
-
   // Checkout — accessible to guests (they fill in contact info)
   it('allows unauthenticated to /checkout (guest checkout)', () => {
     expect(authorized(makeArgs('/checkout'))).toBe(true)

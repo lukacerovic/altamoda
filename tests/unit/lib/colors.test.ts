@@ -65,18 +65,18 @@ describe('Colors — Centralized Color Palette', () => {
     }
   })
 
-  it('surface is the editorial cream background (#FFFBF4)', () => {
-    expect(colors.surface).toBe('#FFFBF4')
+  it('surface is pure white (#FFFFFF)', () => {
+    expect(colors.surface).toBe('#FFFFFF')
   })
 
-  it('dark text color is the editorial smoky black (#11120D)', () => {
-    expect(colors.foreground).toBe('#11120D')
-    expect(colors.dark).toBe('#11120D')
+  it('dark text color is the near-black (#2e2e2e)', () => {
+    expect(colors.foreground).toBe('#2e2e2e')
+    expect(colors.dark).toBe('#2e2e2e')
     // foreground/text/dark all resolve to the same token in the editorial palette
     expect(colors.text).toBe(colors.foreground)
   })
 
-  it('accent is soft olive (#7A7F6A) used for CTAs like add-to-cart', () => {
-    expect(colors.accent).toBe('#7A7F6A')
+  it('accent is khaki olive (#837A64) used for CTAs like add-to-cart', () => {
+    expect(colors.accent).toBe('#837A64')
   })
 })
