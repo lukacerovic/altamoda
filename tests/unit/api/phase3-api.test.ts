@@ -50,20 +50,17 @@ vi.mock('@/lib/auth-helpers', () => ({
   getCurrentUser: vi.fn(),
   requireAuth: vi.fn(),
   requireAdmin: vi.fn(),
-  requireB2b: vi.fn(),
 }))
 
 import { prisma } from '@/lib/db'
-import { requireAuth, requireAdmin, requireB2b } from '@/lib/auth-helpers'
+import { requireAuth, requireAdmin } from '@/lib/auth-helpers'
 
 const mockPrisma = vi.mocked(prisma)
 const mockRequireAuth = vi.mocked(requireAuth)
 const mockRequireAdmin = vi.mocked(requireAdmin)
-const mockRequireB2b = vi.mocked(requireB2b)
 
 const mockUser = { id: 'user-1', email: 'test@test.com', name: 'Test', role: 'b2c' }
 const mockAdminUser = { id: 'admin-1', email: 'admin@test.com', name: 'Admin', role: 'admin' }
-const mockB2bUser = { id: 'b2b-1', email: 'b2b@test.com', name: 'B2B', role: 'b2b' }
 
 // ─── Cart API ───
 
@@ -370,102 +367,4 @@ describe('Order Status API Logic', () => {
   })
 })
 
-// ─── Quick Order API ───
-
-describe('Quick Order API Logic', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    mockRequireB2b.mockResolvedValue(mockB2bUser as any)
-  })
-
-  describe('POST /api/orders/quick (type=sku)', () => {
-    it('finds product by SKU', async () => {
-      mockPrisma.product.findFirst.mockResolvedValue({
-        id: 'prod-1',
-        sku: 'MAJ-7.1',
-        nameLat: 'Majirel 7.1',
-        priceB2b: 750,
-        priceB2c: 890,
-        stockQuantity: 50,
-        brand: { name: "L'Oreal" },
-        images: [{ url: '/img.jpg' }],
-      } as any)
-
-      const { POST } = await import('@/app/api/orders/quick/route')
-      const req = new Request('http://localhost/api/orders/quick', {
-        method: 'POST',
-        body: JSON.stringify({ type: 'sku', sku: 'MAJ-7.1' }),
-      })
-      const res = await POST(req)
-      const data = await res.json()
-      expect(data.success).toBe(true)
-      expect(data.data.sku).toBe('MAJ-7.1')
-      expect(data.data.price).toBe(750) // B2B price
-    })
-
-    it('returns 404 for non-existent SKU', async () => {
-      mockPrisma.product.findFirst.mockResolvedValue(null)
-
-      const { POST } = await import('@/app/api/orders/quick/route')
-      const req = new Request('http://localhost/api/orders/quick', {
-        method: 'POST',
-        body: JSON.stringify({ type: 'sku', sku: 'NONEXIST' }),
-      })
-      const res = await POST(req)
-      expect(res.status).toBe(404)
-    })
-  })
-
-  describe('POST /api/orders/quick (type=csv)', () => {
-    it('validates CSV rows and returns summary', async () => {
-      mockPrisma.product.findMany.mockResolvedValue([
-        {
-          id: 'prod-1',
-          sku: 'MAJ-7.1',
-          nameLat: 'Majirel 7.1',
-          priceB2b: 750,
-          priceB2c: 890,
-          stockQuantity: 50,
-          brand: { name: "L'Oreal" },
-          images: [{ url: '/img.jpg' }],
-        },
-      ] as any)
-
-      const { POST } = await import('@/app/api/orders/quick/route')
-      const req = new Request('http://localhost/api/orders/quick', {
-        method: 'POST',
-        body: JSON.stringify({
-          type: 'csv',
-          rows: [
-            { sku: 'MAJ-7.1', quantity: 10 },
-            { sku: 'NONEXIST', quantity: 5 },
-          ],
-        }),
-      })
-      const res = await POST(req)
-      const data = await res.json()
-      expect(data.success).toBe(true)
-      expect(data.data.summary.found).toBe(1)
-      expect(data.data.summary.notFound).toBe(1)
-      expect(data.data.items).toHaveLength(2)
-    })
-  })
-
-  describe('POST /api/orders/quick (type=repeat)', () => {
-    it('returns 404 for order owned by another user', async () => {
-      mockPrisma.order.findUnique.mockResolvedValue({
-        id: 'ord-1',
-        userId: 'different-user',
-        items: [],
-      } as any)
-
-      const { POST } = await import('@/app/api/orders/quick/route')
-      const req = new Request('http://localhost/api/orders/quick', {
-        method: 'POST',
-        body: JSON.stringify({ type: 'repeat', orderId: 'ord-1' }),
-      })
-      const res = await POST(req)
-      expect(res.status).toBe(404)
-    })
-  })
-})
+// Quick Order API was removed — related tests removed.

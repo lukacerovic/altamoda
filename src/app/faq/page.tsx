@@ -86,15 +86,15 @@ export default function FAQPage() {
     : faqSections;
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Title */}
         <div className="text-center mb-10">
           <HelpCircle className="w-12 h-12 text-secondary mx-auto mb-4" />
-          <h1 className="text-3xl md:text-4xl font-bold text-black mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#2e2e2e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
             {t("faq.title")}
           </h1>
-          <p className="text-[#666]">{t("faq.subtitle")}</p>
+          <p className="text-[#837A64]">{t("faq.subtitle")}</p>
         </div>
 
         {/* Search */}
@@ -104,16 +104,16 @@ export default function FAQPage() {
             placeholder={t("faq.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-white border border-[#D8CFBC] rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#999]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a59d85]" />
         </div>
 
         {/* FAQ Sections */}
         <div className="space-y-8">
           {filteredSections.map((section) => (
             <div key={section.title}>
-              <h2 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-[#2e2e2e] mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-black rounded-full" />
                 {section.title}
               </h2>
@@ -122,17 +122,17 @@ export default function FAQPage() {
                   const key = `${section.title}-${idx}`;
                   const isOpen = openItems.has(key);
                   return (
-                    <div key={key} className="bg-white rounded-sm border border-stone-200/50 overflow-hidden">
+                    <div key={key} className="bg-white rounded-sm border border-[#D8CFBC]/50 overflow-hidden">
                       <button
                         onClick={() => toggleItem(key)}
-                        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-stone-100 transition-colors"
+                        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FFFFFF] transition-colors"
                       >
-                        <span className="text-sm font-medium text-[#333] pr-4">{item.q}</span>
+                        <span className="text-sm font-medium text-[#2e2e2e] pr-4">{item.q}</span>
                         <ChevronDown className={`w-5 h-5 text-secondary flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isOpen && (
                         <div className="px-5 pb-4 animate-slideDown">
-                          <p className="text-sm text-[#666] leading-relaxed">{item.a}</p>
+                          <p className="text-sm text-[#837A64] leading-relaxed">{item.a}</p>
                         </div>
                       )}
                     </div>
@@ -144,14 +144,14 @@ export default function FAQPage() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-16 bg-white rounded-sm border border-stone-200 p-8 text-center">
-          <h3 className="text-xl font-bold text-black mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
-          <p className="text-[#666] mb-6">{t("faq.notFoundDesc")}</p>
+        <div className="mt-16 bg-white rounded-sm border border-[#D8CFBC] p-8 text-center">
+          <h3 className="text-xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
+          <p className="text-[#837A64] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+381111234567" className="flex items-center justify-center gap-2 px-6 py-3 border border-stone-200 rounded-sm text-sm font-medium text-[#333] hover:border-black hover:text-secondary transition-colors">
+            <a href="tel:+381111234567" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
               <Phone className="w-4 h-4" /> +381 11 123 4567
             </a>
-            <a href="mailto:info@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-stone-200 rounded-sm text-sm font-medium text-[#333] hover:border-black hover:text-secondary transition-colors">
+            <a href="mailto:info@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
               <Mail className="w-4 h-4" /> info@altamoda.rs
             </a>
           </div>

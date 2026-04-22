@@ -30,7 +30,7 @@ function expandDiacritics(term: string): string[] {
   return Array.from(results)
 }
 
-// GET /api/products/search?q=majirel — Autocomplete (top 5)
+// GET /api/products/search?q=majirel&limit=5 — Autocomplete (default 5, admin may request up to 50)
 export const GET = withErrorHandler(async (req: Request) => {
   const { searchParams } = new URL(req.url)
   const q = searchParams.get('q')?.trim()
@@ -41,11 +41,19 @@ export const GET = withErrorHandler(async (req: Request) => {
 
   const user = await getCurrentUser()
   const role = user?.role
+
+  // Admins may override the default limit (e.g. brand picker wants more rows)
+  const requestedLimit = Number(searchParams.get('limit'))
+  const take = role === 'admin'
+    ? Math.min(50, Math.max(1, Number.isFinite(requestedLimit) ? requestedLimit : 5))
+    : 5
+
   const terms = expandDiacritics(q)
 
   const products = await prisma.product.findMany({
     where: {
-      isActive: true,
+      // Admins see inactive products too; everyone else only sees active ones
+      ...(role === 'admin' ? {} : { isActive: true }),
       ...(role === 'b2c' ? { isProfessional: false } : {}),
       OR: terms.flatMap(term => [
         { nameLat: { contains: term, mode: 'insensitive' as const } },
@@ -57,7 +65,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       brand: { select: { name: true } },
       images: { where: { isPrimary: true }, take: 1 },
     },
-    take: 5,
+    take,
     orderBy: { nameLat: 'asc' },
   })
 

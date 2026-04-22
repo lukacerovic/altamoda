@@ -41,7 +41,7 @@ const TiptapEditor = dynamic(() => import("@/components/admin/TiptapEditor"), {
   ssr: false,
   loading: () => (
     <div className="border border-stone-200 rounded-lg p-16 flex items-center justify-center bg-white">
-      <Loader2 size={24} className="animate-spin text-[#999]" />
+      <Loader2 size={24} className="animate-spin text-[#a59d85]" />
     </div>
   ),
 });
@@ -545,14 +545,14 @@ export default function NewsletterPage() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <button onClick={closeTemplateEditor} className="p-2.5 hover:bg-stone-100 rounded-lg transition-colors">
-              <ArrowLeft size={20} className="text-[#666]" />
+              <ArrowLeft size={20} className="text-[#837A64]" />
             </button>
             <div className="flex-1 min-w-0">
               <input
                 type="text"
                 value={templateForm.name}
                 onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
-                className="font-serif text-xl lg:text-2xl font-bold text-black bg-transparent border-0 border-b border-transparent hover:border-stone-300 focus:border-[#8c4a5a] focus:outline-none w-full pb-0.5 transition-colors"
+                className="font-serif text-xl lg:text-2xl font-bold text-black bg-transparent border-0 border-b border-transparent hover:border-stone-300 focus:border-[#837A64] focus:outline-none w-full pb-0.5 transition-colors"
                 placeholder="Naziv šablona..."
               />
             </div>
@@ -560,14 +560,14 @@ export default function NewsletterPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={closeTemplateEditor}
-              className="px-5 py-2.5 text-sm font-medium text-[#666] hover:text-black hover:bg-stone-100 rounded-lg transition-colors"
+              className="px-5 py-2.5 text-sm font-medium text-[#837A64] hover:text-black hover:bg-stone-100 rounded-lg transition-colors"
             >
               Otkaži
             </button>
             <button
               onClick={handleSaveTemplate}
               disabled={templateSaving}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#8c4a5a] hover:bg-[#703343] text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#837A64] hover:bg-[#6a624f] text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
             >
               {templateSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               Sačuvaj
@@ -578,22 +578,22 @@ export default function NewsletterPage() {
         {/* Subject & description row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
           <div>
-            <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
+            <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
             <input
               type="text"
               value={templateForm.subject}
               onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none transition-colors"
               placeholder="Subject line za email..."
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Opis šablona (opciono)</label>
+            <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Opis šablona (opciono)</label>
             <input
               type="text"
               value={templateForm.description}
               onChange={(e) => setTemplateForm({ ...templateForm, description: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none transition-colors"
               placeholder="Kratak opis..."
             />
           </div>
@@ -603,7 +603,7 @@ export default function NewsletterPage() {
         <div className="mb-6">
           <button
             onClick={() => setShowEmailSettings(!showEmailSettings)}
-            className="flex items-center gap-2 text-sm font-medium text-[#666] hover:text-black transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-[#837A64] hover:text-black transition-colors"
           >
             <Settings2 size={16} />
             Podešavanja zaglavlja i podnožja
@@ -614,72 +614,72 @@ export default function NewsletterPage() {
             <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4 p-5 bg-white border border-stone-200 rounded-lg">
               {/* Header settings */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Zaglavlje (Header)</h4>
+                <h4 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Zaglavlje (Header)</h4>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Naslov</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Naslov</label>
                   <input
                     type="text"
                     value={emailOptions.headerTitle || ""}
                     onChange={(e) => setEmailOptions({ ...emailOptions, headerTitle: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     placeholder="ALTAMODA"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Podnaslov</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Podnaslov</label>
                   <input
                     type="text"
                     value={emailOptions.headerSubtitle || ""}
                     onChange={(e) => setEmailOptions({ ...emailOptions, headerSubtitle: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     placeholder="Heritage"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Boja pozadine</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Boja pozadine</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
-                      value={emailOptions.headerBg || "#2d2926"}
+                      value={emailOptions.headerBg || "#2e2e2e"}
                       onChange={(e) => setEmailOptions({ ...emailOptions, headerBg: e.target.value })}
                       className="w-9 h-9 rounded border border-stone-200 cursor-pointer"
                     />
                     <input
                       type="text"
-                      value={emailOptions.headerBg || "#2d2926"}
+                      value={emailOptions.headerBg || "#2e2e2e"}
                       onChange={(e) => setEmailOptions({ ...emailOptions, headerBg: e.target.value })}
-                      className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm font-mono focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                      className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm font-mono focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Logo slika (opciono — zamenjuje tekst)</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Logo slika (opciono — zamenjuje tekst)</label>
                   <input
                     type="text"
                     value={emailOptions.headerImage || ""}
                     onChange={(e) => setEmailOptions({ ...emailOptions, headerImage: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     placeholder="https://... URL logo slike"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Pozadinska slika zaglavlja (opciono)</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Pozadinska slika zaglavlja (opciono)</label>
                   <input
                     type="text"
                     value={emailOptions.headerBgImage || ""}
                     onChange={(e) => setEmailOptions({ ...emailOptions, headerBgImage: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     placeholder="/hero.png ili https://... URL slike"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Pozadinska slika tela emaila (za Info šablon, opciono)</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Pozadinska slika tela emaila (za Info šablon, opciono)</label>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={emailOptions.bodyBgImage || ""}
                       onChange={(e) => setEmailOptions({ ...emailOptions, bodyBgImage: e.target.value })}
-                      className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                      className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                       placeholder="https://... URL slike ili otpremi"
                     />
                     <input
@@ -696,7 +696,7 @@ export default function NewsletterPage() {
                       type="button"
                       onClick={() => bodyBgFileInputRef.current?.click()}
                       disabled={bodyBgUploading}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#8c4a5a] text-[#8c4a5a] hover:bg-[#8c4a5a] hover:text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#837A64] text-[#837A64] hover:bg-[#837A64] hover:text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
                     >
                       {bodyBgUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
                       {bodyBgUploading ? "Otprema..." : "Otpremi sliku"}
@@ -712,7 +712,7 @@ export default function NewsletterPage() {
                       <button
                         type="button"
                         onClick={() => setEmailOptions({ ...emailOptions, bodyBgImage: "" })}
-                        className="text-xs text-[#999] hover:text-red-600 underline"
+                        className="text-xs text-[#a59d85] hover:text-red-600 underline"
                       >
                         Ukloni
                       </button>
@@ -723,24 +723,24 @@ export default function NewsletterPage() {
 
               {/* Footer settings */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Podnožje (Footer)</h4>
+                <h4 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Podnožje (Footer)</h4>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Tekst podnožja</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Tekst podnožja</label>
                   <input
                     type="text"
                     value={emailOptions.footerText || ""}
                     onChange={(e) => setEmailOptions({ ...emailOptions, footerText: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     placeholder="Altamoda Heritage"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#666] mb-1">Copyright</label>
+                  <label className="block text-xs text-[#837A64] mb-1">Copyright</label>
                   <input
                     type="text"
                     value={emailOptions.footerCopyright || ""}
                     onChange={(e) => setEmailOptions({ ...emailOptions, footerCopyright: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                     placeholder="© 2026 · Sva prava zadrzana"
                   />
                 </div>
@@ -753,21 +753,21 @@ export default function NewsletterPage() {
         <div className="mb-6 p-4 bg-white border border-stone-200 rounded-lg">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
             <div className="lg:col-span-4">
-              <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
+              <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
               <input
                 type="text"
                 value={sendSubject}
                 onChange={(e) => setSendSubject(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#2d2926] focus:ring-1 focus:ring-[#2d2926]/20 focus:outline-none transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#2e2e2e] focus:ring-1 focus:ring-[#2e2e2e]/20 focus:outline-none transition-colors"
                 placeholder="Subject line za email..."
               />
             </div>
             <div className="lg:col-span-3">
-              <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">Publika</label>
+              <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Publika</label>
               <select
                 value={sendSegment}
                 onChange={(e) => setSendSegment(e.target.value as "all" | "b2b" | "b2c")}
-                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#2d2926] focus:ring-1 focus:ring-[#2d2926]/20 focus:outline-none transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#2e2e2e] focus:ring-1 focus:ring-[#2e2e2e]/20 focus:outline-none transition-colors"
               >
                 <option value="all">Svi pretplatnici</option>
                 <option value="b2c">B2C — Krajnji kupci</option>
@@ -776,16 +776,16 @@ export default function NewsletterPage() {
             </div>
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-lg">
-                <Users size={16} className="text-[#999]" />
-                <span className="text-sm font-semibold text-[#2d2926]">{sendRecipientCount}</span>
-                <span className="text-xs text-[#999]">prim.</span>
+                <Users size={16} className="text-[#a59d85]" />
+                <span className="text-sm font-semibold text-[#2e2e2e]">{sendRecipientCount}</span>
+                <span className="text-xs text-[#a59d85]">prim.</span>
               </div>
             </div>
             <div className="lg:col-span-3">
               <button
                 onClick={() => setShowSendConfirm(true)}
                 disabled={sending || !sendSubject.trim() || !editorBodyContent.trim() || sendRecipientCount === 0}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#2d2926] hover:bg-black text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#2e2e2e] hover:bg-black text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
               >
                 <Send size={16} />
                 Pošalji newsletter
@@ -800,7 +800,7 @@ export default function NewsletterPage() {
 
           {/* Inline test send — sends current template content to a single address */}
           <div className="mt-3 pt-3 border-t border-stone-200">
-            <label className="block text-xs font-medium text-[#999] uppercase tracking-wider mb-1">
+            <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">
               Pošalji test verziju ovog šablona
             </label>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -809,19 +809,19 @@ export default function NewsletterPage() {
                 value={inlineTestEmail}
                 onChange={(e) => setInlineTestEmail(e.target.value)}
                 placeholder="vasa.adresa@primer.com"
-                className="flex-1 px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#8c4a5a] focus:ring-1 focus:ring-[#8c4a5a]/20 focus:outline-none"
+                className="flex-1 px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm focus:border-[#837A64] focus:ring-1 focus:ring-[#837A64]/20 focus:outline-none"
                 onKeyDown={(e) => e.key === "Enter" && handleSendInlineTest()}
               />
               <button
                 onClick={handleSendInlineTest}
                 disabled={inlineTestSending || !inlineTestEmail.trim() || !editorBodyContent.trim()}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#8c4a5a] text-[#8c4a5a] hover:bg-[#8c4a5a] hover:text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#837A64] text-[#837A64] hover:bg-[#837A64] hover:text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
               >
                 {inlineTestSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                 {inlineTestSending ? "Slanje..." : "Pošalji test"}
               </button>
             </div>
-            <p className="mt-1 text-[11px] text-[#999]">
+            <p className="mt-1 text-[11px] text-[#a59d85]">
               Šalje trenutni sadržaj šablona na navedenu adresu (sa prefiksom &quot;[TEST]&quot; u predmetu). Koristi se za proveru pre slanja svim pretplatnicima.
             </p>
             {inlineTestResult && (
@@ -841,7 +841,7 @@ export default function NewsletterPage() {
                 <button onClick={() => setShowSendConfirm(false)} className="p-1 hover:bg-stone-100 rounded-lg"><X size={20} /></button>
               </div>
               <div className="p-6">
-                <p className="text-sm text-[#333]">
+                <p className="text-sm text-[#2e2e2e]">
                   Da li ste sigurni da želite da pošaljete <strong>&quot;{sendSubject}&quot;</strong> na{" "}
                   <strong>{sendRecipientCount}</strong>{" "}
                   {sendSegment === "all" ? "pretplatnika" : `${sendSegment.toUpperCase()} pretplatnika`}?
@@ -854,7 +854,7 @@ export default function NewsletterPage() {
                 <button
                   onClick={handleSendFromTemplate}
                   disabled={sending}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2d2926] text-white rounded-lg text-sm font-semibold hover:bg-black transition-colors disabled:opacity-40"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2e2e2e] text-white rounded-lg text-sm font-semibold hover:bg-black transition-colors disabled:opacity-40"
                 >
                   {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                   {sending ? "Slanje..." : "Potvrdi i pošalji"}
@@ -869,8 +869,8 @@ export default function NewsletterPage() {
           {/* Left: WYSIWYG Editor */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Editor</h3>
-              <span className="text-[10px] text-[#999]">Pišite tekst, dodajte slike i formatirajte sadržaj</span>
+              <h3 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Editor</h3>
+              <span className="text-[10px] text-[#a59d85]">Pišite tekst, dodajte slike i formatirajte sadržaj</span>
             </div>
             <TiptapEditor
               content={editorBodyContent}
@@ -881,8 +881,8 @@ export default function NewsletterPage() {
           {/* Right: Live Email Preview */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Pregled emaila</h3>
-              <span className="text-[10px] font-semibold text-[#8c4a5a] bg-[#8c4a5a]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <h3 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Pregled emaila</h3>
+              <span className="text-[10px] font-semibold text-[#837A64] bg-[#837A64]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 Uživo
               </span>
             </div>
@@ -913,11 +913,11 @@ export default function NewsletterPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="font-serif text-2xl lg:text-3xl font-bold text-black">{t("newsletter.title")}</h1>
-          <p className="text-[#666] mt-1">{t("newsletter.subtitle")}</p>
+          <p className="text-[#837A64] mt-1">{t("newsletter.subtitle")}</p>
         </div>
         <button
           onClick={() => { setShowTestModal(true); setTestResult(null); setTestEmail(""); }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#8c4a5a] hover:bg-[#703343] text-white text-sm font-medium rounded-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#837A64] hover:bg-[#6a624f] text-white text-sm font-medium rounded-sm transition-colors"
         >
           <Send className="w-4 h-4" /> Pošalji test email
         </button>
@@ -929,7 +929,7 @@ export default function NewsletterPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab.id ? "bg-white text-black shadow-sm" : "text-[#666] hover:text-[#333]"}`}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab.id ? "bg-white text-black shadow-sm" : "text-[#837A64] hover:text-[#2e2e2e]"}`}
           >
             {tab.label}
           </button>
@@ -940,18 +940,18 @@ export default function NewsletterPage() {
       {activeTab === "templates" && (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-[#666]">Upravljajte email šablonima za vaše newsletter kampanje.</p>
+            <p className="text-sm text-[#837A64]">Upravljajte email šablonima za vaše newsletter kampanje.</p>
           </div>
 
           {templatesLoading || seeding ? (
             <div className="bg-white rounded-sm border border-stone-200 p-12 flex flex-col items-center justify-center">
-              <Loader2 size={28} className="animate-spin text-[#999] mb-3" />
-              <span className="text-[#999] text-sm">{seeding ? "Kreiranje podrazumevanih šablona..." : "Učitavanje šablona..."}</span>
+              <Loader2 size={28} className="animate-spin text-[#a59d85] mb-3" />
+              <span className="text-[#a59d85] text-sm">{seeding ? "Kreiranje podrazumevanih šablona..." : "Učitavanje šablona..."}</span>
             </div>
           ) : templates.length === 0 ? (
             <div className="bg-white rounded-sm border border-stone-200 p-12 text-center">
-              <FileText size={40} className="mx-auto text-[#999] mb-3" />
-              <p className="text-[#666]">Nema šablona. Kliknite &quot;Novi šablon&quot; da kreirate prvi.</p>
+              <FileText size={40} className="mx-auto text-[#a59d85] mb-3" />
+              <p className="text-[#837A64]">Nema šablona. Kliknite &quot;Novi šablon&quot; da kreirate prvi.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -978,12 +978,12 @@ export default function NewsletterPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30 pointer-events-none" />
                     {template.isDefault && (
-                      <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 bg-[#8c4a5a]/90 text-white text-[10px] font-semibold rounded-full uppercase tracking-wider backdrop-blur-sm">
+                      <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 bg-[#837A64]/90 text-white text-[10px] font-semibold rounded-full uppercase tracking-wider backdrop-blur-sm">
                         Podrazumevani
                       </span>
                     )}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm text-[#333] text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm text-[#2e2e2e] text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
                         Uredi šablon
                       </span>
                     </div>
@@ -993,16 +993,16 @@ export default function NewsletterPage() {
                   <div className="p-4">
                     <h3 className="font-semibold text-black text-sm mb-0.5">{template.name}</h3>
                     {template.description && (
-                      <p className="text-xs text-[#999] mb-2.5 line-clamp-2">{template.description}</p>
+                      <p className="text-xs text-[#a59d85] mb-2.5 line-clamp-2">{template.description}</p>
                     )}
-                    <p className="text-xs text-[#999] mb-3">
+                    <p className="text-xs text-[#a59d85] mb-3">
                       Poslednja izmena: {new Date(template.updatedAt).toLocaleDateString("sr-RS")}
                     </p>
 
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openTemplateEditor(template)}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#8c4a5a] text-white rounded-lg text-xs font-semibold hover:bg-[#703343] transition-colors"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#837A64] text-white rounded-lg text-xs font-semibold hover:bg-[#6a624f] transition-colors"
                       >
                         <Pencil size={13} /> Uredi
                       </button>
@@ -1028,10 +1028,10 @@ export default function NewsletterPage() {
       {activeTab === "campaigns" && (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-[#666]">Pregled svih poslatih i tekućih newsletter kampanja.</p>
+            <p className="text-sm text-[#837A64]">Pregled svih poslatih i tekućih newsletter kampanja.</p>
             <button
               onClick={fetchCampaigns}
-              className="text-xs text-[#666] hover:text-black underline"
+              className="text-xs text-[#837A64] hover:text-black underline"
             >
               Osveži
             </button>
@@ -1042,19 +1042,19 @@ export default function NewsletterPage() {
               <table className="w-full text-sm">
                 <thead className="bg-stone-100 border-b border-stone-200">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Naslov</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Predmet</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Segment</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Poslato</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">Datum</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">Naslov</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">Predmet</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">Segment</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">Poslato</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">Datum</th>
                   </tr>
                 </thead>
                 <tbody>
                   {campaignsLoading ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#999]">Učitavanje...</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#a59d85]">Učitavanje...</td></tr>
                   ) : campaigns.length === 0 ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#999]">Još nema poslatih kampanja.</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#a59d85]">Još nema poslatih kampanja.</td></tr>
                   ) : (
                     campaigns.map((c) => {
                       const statusColor: Record<Campaign["status"], string> = {
@@ -1073,18 +1073,18 @@ export default function NewsletterPage() {
                       };
                       return (
                         <tr key={c.id} className="border-b border-stone-100 hover:bg-stone-50 transition-colors">
-                          <td className="px-4 py-3 text-[#333] font-medium">{c.title}</td>
-                          <td className="px-4 py-3 text-[#666]">{c.subject}</td>
+                          <td className="px-4 py-3 text-[#2e2e2e] font-medium">{c.title}</td>
+                          <td className="px-4 py-3 text-[#837A64]">{c.subject}</td>
                           <td className="px-4 py-3">
-                            <span className="text-xs uppercase tracking-wider text-[#999]">{c.segment}</span>
+                            <span className="text-xs uppercase tracking-wider text-[#a59d85]">{c.segment}</span>
                           </td>
                           <td className="px-4 py-3">
                             <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor[c.status]}`}>
                               {statusLabel[c.status]}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-[#666]">{c.sentCount}</td>
-                          <td className="px-4 py-3 text-[#666] text-xs">
+                          <td className="px-4 py-3 text-[#837A64]">{c.sentCount}</td>
+                          <td className="px-4 py-3 text-[#837A64] text-xs">
                             {c.sentAt
                               ? new Date(c.sentAt).toLocaleString("sr-RS")
                               : new Date(c.createdAt).toLocaleString("sr-RS")}
@@ -1108,7 +1108,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-sm border border-stone-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#999] uppercase tracking-wider">{t("newsletter.totalActive")}</p>
+                  <p className="text-xs text-[#a59d85] uppercase tracking-wider">{t("newsletter.totalActive")}</p>
                   <p className="text-2xl font-bold text-black mt-1">{stats.totalActive}</p>
                 </div>
                 <div className="w-10 h-10 rounded-sm bg-black/10 flex items-center justify-center">
@@ -1119,7 +1119,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-sm border border-stone-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#999] uppercase tracking-wider">{t("newsletter.b2bSubscribers")}</p>
+                  <p className="text-xs text-[#a59d85] uppercase tracking-wider">{t("newsletter.b2bSubscribers")}</p>
                   <p className="text-2xl font-bold text-blue-600 mt-1">{stats.b2bCount}</p>
                 </div>
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">B2B</span>
@@ -1128,7 +1128,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-sm border border-stone-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#999] uppercase tracking-wider">{t("newsletter.b2cSubscribers")}</p>
+                  <p className="text-xs text-[#a59d85] uppercase tracking-wider">{t("newsletter.b2cSubscribers")}</p>
                   <p className="text-2xl font-bold text-green-600 mt-1">{stats.b2cCount}</p>
                 </div>
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">B2C</span>
@@ -1140,7 +1140,7 @@ export default function NewsletterPage() {
           <div className="bg-white rounded-sm border border-stone-200 p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
                 <input type="text" placeholder={t("newsletter.searchPlaceholder")} value={search} onChange={(e) => handleSearchChange(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
               </div>
               <select value={segmentFilter} onChange={(e) => handleSegmentChange(e.target.value)} className="px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none">
@@ -1160,25 +1160,25 @@ export default function NewsletterPage() {
               <table className="w-full text-sm">
                 <thead className="bg-stone-100 border-b border-stone-200">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.email")}</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.segment")}</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.subscribeDate")}</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.status")}</th>
-                    <th className="text-left px-4 py-3 font-semibold text-[#666]">{t("newsletter.actions")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">{t("newsletter.email")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">{t("newsletter.segment")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">{t("newsletter.subscribeDate")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">{t("newsletter.status")}</th>
+                    <th className="text-left px-4 py-3 font-semibold text-[#837A64]">{t("newsletter.actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.loading")}</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#a59d85]">{t("newsletter.loading")}</td></tr>
                   ) : subscribers.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#999]">{t("newsletter.noSubscribers")}</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#a59d85]">{t("newsletter.noSubscribers")}</td></tr>
                   ) : (
                     subscribers.map((sub) => (
                       <tr key={sub.id} className="border-b border-stone-100 hover:bg-stone-100 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <Mail size={14} className="text-secondary" />
-                            <span className="text-[#333]">{sub.email}</span>
+                            <span className="text-[#2e2e2e]">{sub.email}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -1186,7 +1186,7 @@ export default function NewsletterPage() {
                             {sub.segment.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-[#666]">{new Date(sub.subscribedAt).toLocaleDateString("sr-RS")}</td>
+                        <td className="px-4 py-3 text-[#837A64]">{new Date(sub.subscribedAt).toLocaleDateString("sr-RS")}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sub.isSubscribed ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                             {sub.isSubscribed ? t("newsletter.active") : t("newsletter.unsubscribed")}
@@ -1205,7 +1205,7 @@ export default function NewsletterPage() {
             </div>
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-4 py-3 border-t border-stone-200">
-                <span className="text-sm text-[#666]">{t("newsletter.pageOf")} {page} {t("newsletter.of")} {totalPages} ({total} {t("newsletter.totalLabel")})</span>
+                <span className="text-sm text-[#837A64]">{t("newsletter.pageOf")} {page} {t("newsletter.of")} {totalPages} ({total} {t("newsletter.totalLabel")})</span>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 border border-stone-200 rounded-sm hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     <ChevronLeft size={16} />
@@ -1232,21 +1232,21 @@ export default function NewsletterPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Naziv šablona</label>
+                <label className="block text-sm font-medium text-[#2e2e2e] mb-1">Naziv šablona</label>
                 <input type="text" value={templateForm.name} onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="npr. Letnja Akcija" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Subject (predmet emaila)</label>
+                <label className="block text-sm font-medium text-[#2e2e2e] mb-1">Subject (predmet emaila)</label>
                 <input type="text" value={templateForm.subject} onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="Subject line za email..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1">Opis (opciono)</label>
+                <label className="block text-sm font-medium text-[#2e2e2e] mb-1">Opis (opciono)</label>
                 <input type="text" value={templateForm.description} onChange={(e) => setTemplateForm({ ...templateForm, description: e.target.value })} className="w-full px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" placeholder="Kratak opis šablona..." />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
               <button onClick={() => setShowNewTemplateModal(false)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">Otkaži</button>
-              <button onClick={handleCreateTemplate} disabled={!templateForm.name.trim() || !templateForm.subject.trim() || templateSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#b8994e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button onClick={handleCreateTemplate} disabled={!templateForm.name.trim() || !templateForm.subject.trim() || templateSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-[#837A64] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                 {templateSaving && <Loader2 size={16} className="animate-spin" />}
                 Kreiraj šablon
               </button>
@@ -1264,7 +1264,7 @@ export default function NewsletterPage() {
               <button onClick={() => setShowDeleteConfirm(null)} className="p-1 hover:bg-stone-100 rounded-sm"><X size={20} /></button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-[#333]">Da li ste sigurni da želite da obrišete šablon &quot;{showDeleteConfirm.name}&quot;? Ova akcija se ne može poništiti.</p>
+              <p className="text-sm text-[#2e2e2e]">Da li ste sigurni da želite da obrišete šablon &quot;{showDeleteConfirm.name}&quot;? Ova akcija se ne može poništiti.</p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
               <button onClick={() => setShowDeleteConfirm(null)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">Otkaži</button>
@@ -1282,9 +1282,9 @@ export default function NewsletterPage() {
           <div className="bg-white rounded-sm max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-black">Pošalji test email</h3>
-              <button onClick={() => setShowTestModal(false)} className="text-[#999] hover:text-black"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowTestModal(false)} className="text-[#a59d85] hover:text-black"><X className="w-5 h-5" /></button>
             </div>
-            <p className="text-sm text-[#666] mb-4">Unesite email adresu na koju želite da pošaljete probni newsletter email.</p>
+            <p className="text-sm text-[#837A64] mb-4">Unesite email adresu na koju želite da pošaljete probni newsletter email.</p>
             <input
               type="email"
               value={testEmail}
@@ -1299,8 +1299,8 @@ export default function NewsletterPage() {
               </div>
             )}
             <div className="flex gap-3">
-              <button onClick={() => setShowTestModal(false)} className="flex-1 px-4 py-2.5 border border-stone-200 text-[#666] rounded-sm text-sm font-medium hover:bg-stone-50 transition-colors">Otkaži</button>
-              <button onClick={handleSendTest} disabled={testSending || !testEmail.trim()} className="flex-1 px-4 py-2.5 bg-[#8c4a5a] hover:bg-[#703343] text-white rounded-sm text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+              <button onClick={() => setShowTestModal(false)} className="flex-1 px-4 py-2.5 border border-stone-200 text-[#837A64] rounded-sm text-sm font-medium hover:bg-stone-50 transition-colors">Otkaži</button>
+              <button onClick={handleSendTest} disabled={testSending || !testEmail.trim()} className="flex-1 px-4 py-2.5 bg-[#837A64] hover:bg-[#6a624f] text-white rounded-sm text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {testSending ? <><Loader2 className="w-4 h-4 animate-spin" /> Slanje...</> : <><Send className="w-4 h-4" /> Pošalji</>}
               </button>
             </div>

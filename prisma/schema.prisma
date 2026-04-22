@@ -266,7 +266,6 @@ model Product {
   cartItems        CartItem[]
   wishlists        Wishlist[]
   orderItems       OrderItem[]
-  bundleItems      BundleItem[]
   productAttributes ProductAttribute[]
   promotionProducts PromotionProduct[]
 
@@ -529,37 +528,6 @@ model PromoCode {
   orders Order[]
 
   @@map("promo_codes")
-}
-
-// ==================== BUNDLES ====================
-
-model Bundle {
-  id            String  @id @default(cuid())
-  nameLat       String  @map("name_lat")
-  nameCyr       String? @map("name_cyr")
-  slug          String  @unique
-  description   String?
-  bundlePrice   Decimal @map("bundle_price") @db.Decimal(10, 2)
-  originalPrice Decimal @map("original_price") @db.Decimal(10, 2)
-  imageUrl      String? @map("image_url")
-  isActive      Boolean @default(true) @map("is_active")
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  items BundleItem[]
-
-  @@map("bundles")
-}
-
-model BundleItem {
-  id        String @id @default(cuid())
-  bundleId  String @map("bundle_id")
-  productId String @map("product_id")
-  quantity  Int    @default(1)
-
-  bundle  Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
-
-  @@map("bundle_items")
 }
 
 // ==================== CONTENT ====================

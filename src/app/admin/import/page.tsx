@@ -102,16 +102,16 @@ export default function ImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f4]">
+    <div className="min-h-screen bg-[#FFFFFF]">
       {/* Header */}
       <div className="border-b border-stone-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
           <Link href="/admin/products" className="p-2 hover:bg-stone-100 rounded-sm transition-colors">
-            <ArrowLeft size={18} className="text-[#666]" />
+            <ArrowLeft size={18} className="text-[#837A64]" />
           </Link>
           <div>
             <h1 className="text-lg font-semibold text-black">Uvoz proizvoda</h1>
-            <p className="text-sm text-[#999]">Uvezite proizvode, kategorije i barkodove iz jednog ili više fajlova</p>
+            <p className="text-sm text-[#a59d85]">Uvezite proizvode, kategorije i barkodove iz jednog ili više fajlova</p>
           </div>
         </div>
       </div>
@@ -149,24 +149,24 @@ export default function ImportPage() {
                 onChange={(e) => { if (e.target.files) addFiles(e.target.files); e.target.value = ''; }}
                 className="hidden"
               />
-              <Upload size={40} className="mx-auto text-[#ccc] mb-3" />
-              <p className="text-sm text-[#666]">Prevucite fajlove ovde ili <span className="text-black font-medium underline">izaberite fajlove</span></p>
-              <p className="text-xs text-[#999] mt-1">CSV, XLSX ili XLS • Više fajlova odjednom • Maksimalno 10MB po fajlu</p>
+              <Upload size={40} className="mx-auto text-[#D8CFBC] mb-3" />
+              <p className="text-sm text-[#837A64]">Prevucite fajlove ovde ili <span className="text-black font-medium underline">izaberite fajlove</span></p>
+              <p className="text-xs text-[#a59d85] mt-1">CSV, XLSX ili XLS • Više fajlova odjednom • Maksimalno 10MB po fajlu</p>
             </div>
 
             {/* Selected files list */}
             {files.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-[#999] font-medium uppercase tracking-wider">{files.length} {files.length === 1 ? 'fajl izabran' : 'fajlova izabrano'}</p>
+                <p className="text-xs text-[#a59d85] font-medium uppercase tracking-wider">{files.length} {files.length === 1 ? 'fajl izabran' : 'fajlova izabrano'}</p>
                 {files.map((f, i) => (
                   <div key={f.name} className="flex items-center gap-3 bg-white border border-stone-200 rounded-sm px-4 py-2.5">
                     <FileSpreadsheet size={20} className="text-green-600 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-black truncate">{f.name}</p>
-                      <p className="text-xs text-[#999]">{formatSize(f.size)}</p>
+                      <p className="text-xs text-[#a59d85]">{formatSize(f.size)}</p>
                     </div>
                     <button onClick={() => removeFile(i)} className="p-1 hover:bg-stone-100 rounded-sm">
-                      <X size={16} className="text-[#999]" />
+                      <X size={16} className="text-[#a59d85]" />
                     </button>
                   </div>
                 ))}
@@ -223,19 +223,19 @@ export default function ImportPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
                 <p className="text-2xl font-bold text-green-600">{result.totals.created}</p>
-                <p className="text-xs text-[#999] mt-1">Kreirano</p>
+                <p className="text-xs text-[#a59d85] mt-1">Kreirano</p>
               </div>
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
                 <p className="text-2xl font-bold text-blue-600">{result.totals.updated}</p>
-                <p className="text-xs text-[#999] mt-1">Ažurirano</p>
+                <p className="text-xs text-[#a59d85] mt-1">Ažurirano</p>
               </div>
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className="text-2xl font-bold text-[#999]">{result.totals.skipped}</p>
-                <p className="text-xs text-[#999] mt-1">Preskočeno</p>
+                <p className="text-2xl font-bold text-[#a59d85]">{result.totals.skipped}</p>
+                <p className="text-xs text-[#a59d85] mt-1">Preskočeno</p>
               </div>
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className={`text-2xl font-bold ${result.totals.errors > 0 ? "text-red-500" : "text-[#999]"}`}>{result.totals.errors}</p>
-                <p className="text-xs text-[#999] mt-1">Grešaka</p>
+                <p className={`text-2xl font-bold ${result.totals.errors > 0 ? "text-red-500" : "text-[#a59d85]"}`}>{result.totals.errors}</p>
+                <p className="text-xs text-[#a59d85] mt-1">Grešaka</p>
               </div>
             </div>
 
@@ -256,15 +256,15 @@ export default function ImportPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-black truncate">{fr.fileName}</p>
-                      <p className="text-xs text-[#999]">{fr.fileLabel} • {fr.rows} redova</p>
+                      <p className="text-xs text-[#a59d85]">{fr.fileLabel} • {fr.rows} redova</p>
                     </div>
                     <div className="flex items-center gap-3 text-xs">
                       {fr.created > 0 && <span className="text-green-600 font-medium">+{fr.created}</span>}
                       {fr.updated > 0 && <span className="text-blue-600 font-medium">~{fr.updated}</span>}
-                      {fr.skipped > 0 && <span className="text-[#999]">-{fr.skipped}</span>}
+                      {fr.skipped > 0 && <span className="text-[#a59d85]">-{fr.skipped}</span>}
                       {fr.errors.length > 0 && <span className="text-red-500 font-medium">{fr.errors.length} gr.</span>}
                     </div>
-                    {isExpanded ? <ChevronUp size={16} className="text-[#999]" /> : <ChevronDown size={16} className="text-[#999]" />}
+                    {isExpanded ? <ChevronUp size={16} className="text-[#a59d85]" /> : <ChevronDown size={16} className="text-[#a59d85]" />}
                   </button>
 
                   {isExpanded && (
@@ -286,7 +286,7 @@ export default function ImportPage() {
                         <div className="max-h-48 overflow-y-auto">
                           {fr.errors.map((err, i) => (
                             <div key={i} className="py-1.5 border-b border-stone-100 last:border-0 text-xs">
-                              <span className="text-[#999] mr-1">Red {err.row}</span>
+                              <span className="text-[#a59d85] mr-1">Red {err.row}</span>
                               {err.name && <span className="text-black font-medium mr-1">{err.name}</span>}
                               <span className="text-red-600">{err.error}</span>
                             </div>

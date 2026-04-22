@@ -69,7 +69,7 @@ function ResizableImageView({ node, updateAttributes, deleteNode, selected }: Re
         {selected && (
           <>
             {/* Border */}
-            <div className="absolute inset-0 rounded-md ring-2 ring-[#2d2926] ring-offset-2 pointer-events-none" />
+            <div className="absolute inset-0 rounded-md ring-2 ring-[#2e2e2e] ring-offset-2 pointer-events-none" />
 
             {/* Corner resize handles */}
             {(
@@ -83,7 +83,7 @@ function ResizableImageView({ node, updateAttributes, deleteNode, selected }: Re
               <div
                 key={h.pos}
                 onMouseDown={(e) => onResize(e, h.fromLeft)}
-                className="absolute w-3 h-3 bg-white border-2 border-[#2d2926] rounded-full z-10 hover:scale-125 transition-transform"
+                className="absolute w-3 h-3 bg-white border-2 border-[#2e2e2e] rounded-full z-10 hover:scale-125 transition-transform"
                 style={{
                   cursor: h.cursor,
                   top: "top" in h ? h.top : undefined,
@@ -97,11 +97,11 @@ function ResizableImageView({ node, updateAttributes, deleteNode, selected }: Re
             {/* Right-edge resize bar */}
             <div
               onMouseDown={(e) => onResize(e, false)}
-              className="absolute top-1/2 -right-2 -translate-y-1/2 w-1.5 h-10 bg-[#2d2926] rounded-full cursor-ew-resize z-10 opacity-60 hover:opacity-100 transition-opacity"
+              className="absolute top-1/2 -right-2 -translate-y-1/2 w-1.5 h-10 bg-[#2e2e2e] rounded-full cursor-ew-resize z-10 opacity-60 hover:opacity-100 transition-opacity"
             />
 
             {/* Floating toolbar below image */}
-            <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-0.5 bg-[#2d2926] text-white rounded-lg shadow-xl px-1.5 py-1 z-20">
+            <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-0.5 bg-[#2e2e2e] text-white rounded-lg shadow-xl px-1.5 py-1 z-20">
               <ImgToolBtn onClick={() => updateAttributes({ dataAlign: "left" })} active={align === "left"} title="Levo">
                 <AlignLeft size={15} />
               </ImgToolBtn>
@@ -204,12 +204,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       attributes: {
         class: [
           "prose prose-stone prose-lg max-w-none focus:outline-none min-h-[500px] px-8 py-6",
-          "[&_h1]:text-[#2d2926] [&_h1]:font-serif [&_h1]:text-3xl [&_h1]:tracking-wide",
-          "[&_h2]:text-[#2d2926] [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:tracking-wide",
-          "[&_h3]:text-[#2d2926] [&_h3]:font-serif",
-          "[&_p]:text-[#3d3833] [&_p]:leading-relaxed",
-          "[&_a]:text-[#7c6f64] [&_a]:underline",
-          "[&_hr]:border-[#d4cdc5]",
+          "[&_h1]:text-[#2e2e2e] [&_h1]:font-serif [&_h1]:text-3xl [&_h1]:tracking-wide",
+          "[&_h2]:text-[#2e2e2e] [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:tracking-wide",
+          "[&_h3]:text-[#2e2e2e] [&_h3]:font-serif",
+          "[&_p]:text-[#2e2e2e] [&_p]:leading-relaxed",
+          "[&_a]:text-[#837A64] [&_a]:underline",
+          "[&_hr]:border-[#D8CFBC]",
         ].join(" "),
       },
       handleDrop: (_view, event) => {
@@ -265,10 +265,42 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     if (file) { uploadImage(file); e.target.value = ""; }
   };
 
-  const addLink = () => {
+  const [linkModal, setLinkModal] = useState<{ open: boolean; url: string; text: string }>({
+    open: false, url: "", text: "",
+  });
+
+  const openLinkModal = () => {
     if (!editor) return;
-    const url = window.prompt("URL linka:");
-    if (url) editor.chain().focus().setLink({ href: url }).run();
+    const { from, to } = editor.state.selection;
+    const selectedText = editor.state.doc.textBetween(from, to, " ");
+    const existingAttrs = editor.getAttributes("link") as { href?: string };
+    setLinkModal({
+      open: true,
+      url: existingAttrs.href || "",
+      text: selectedText,
+    });
+  };
+
+  const applyLink = () => {
+    if (!editor) return;
+    const { url, text } = linkModal;
+    const trimmed = url.trim();
+    if (!trimmed) { setLinkModal((s) => ({ ...s, open: false })); return; }
+    const href = /^(https?:\/\/|mailto:|tel:|\/)/i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const { from, to } = editor.state.selection;
+    if (from === to && text.trim()) {
+      // No selection + custom text: insert the text and link it
+      editor.chain().focus().insertContent({ type: "text", text, marks: [{ type: "link", attrs: { href } }] }).run();
+    } else {
+      editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
+    }
+    setLinkModal({ open: false, url: "", text: "" });
+  };
+
+  const removeLink = () => {
+    if (!editor) return;
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    setLinkModal({ open: false, url: "", text: "" });
   };
 
   if (!editor) return null;
@@ -279,7 +311,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     <button
       type="button" onClick={onClick} title={title} disabled={disabled}
       className={`p-2 rounded-md transition-colors ${
-        isActive ? "bg-[#2d2926] text-white shadow-sm"
+        isActive ? "bg-[#2e2e2e] text-white shadow-sm"
         : disabled ? "text-stone-300 cursor-not-allowed"
         : "text-stone-500 hover:bg-stone-100 hover:text-stone-800"
       }`}
@@ -309,7 +341,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive("orderedList")} title="Numerisana lista"><ListOrdered size={18} /></Btn>
         <Sep />
         <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Linija"><Minus size={18} /></Btn>
-        <Btn onClick={addLink} isActive={editor.isActive("link")} title="Dodaj link"><LinkIcon size={18} /></Btn>
+        <Btn onClick={openLinkModal} isActive={editor.isActive("link")} title="Dodaj link"><LinkIcon size={18} /></Btn>
         <Btn onClick={() => fileInputRef.current?.click()} title="Dodaj sliku" disabled={uploading}>
           {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
         </Btn>
@@ -330,6 +362,77 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
           Prevucite sliku ili kliknite <Upload size={10} /> · Kliknite sliku za promenu veličine i pozicije
         </p>
       </div>
+
+      {linkModal.open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tiptap-link-modal-title"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        >
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setLinkModal((s) => ({ ...s, open: false }))}
+          />
+          <div className="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-stone-200">
+            <div className="px-5 py-4 border-b border-stone-200">
+              <h3 id="tiptap-link-modal-title" className="text-base font-semibold text-stone-900">Dodaj link</h3>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label htmlFor="tiptap-link-url" className="block text-xs font-medium text-stone-600 mb-1.5">URL</label>
+                <input
+                  id="tiptap-link-url"
+                  type="url"
+                  value={linkModal.url}
+                  onChange={(e) => setLinkModal((s) => ({ ...s, url: e.target.value }))}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyLink(); } }}
+                  placeholder="https://example.com"
+                  autoFocus
+                  className="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-stone-900"
+                />
+              </div>
+              {editor.state.selection.empty && (
+                <div>
+                  <label htmlFor="tiptap-link-text" className="block text-xs font-medium text-stone-600 mb-1.5">Tekst (opciono)</label>
+                  <input
+                    id="tiptap-link-text"
+                    type="text"
+                    value={linkModal.text}
+                    onChange={(e) => setLinkModal((s) => ({ ...s, text: e.target.value }))}
+                    placeholder="Tekst koji će biti prikazan"
+                    className="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-stone-900"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="px-5 py-3 border-t border-stone-200 flex items-center justify-between bg-stone-50/60">
+              {editor.isActive("link") ? (
+                <button type="button" onClick={removeLink} className="text-xs text-red-600 hover:text-red-700 font-medium">
+                  Ukloni link
+                </button>
+              ) : <span />}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLinkModal((s) => ({ ...s, open: false }))}
+                  className="px-4 py-2 text-sm text-stone-700 hover:bg-stone-100 rounded-md"
+                >
+                  Otkaži
+                </button>
+                <button
+                  type="button"
+                  onClick={applyLink}
+                  disabled={!linkModal.url.trim()}
+                  className="px-4 py-2 text-sm bg-[#2e2e2e] text-white rounded-md hover:bg-[#2b2c24] disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Sačuvaj
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

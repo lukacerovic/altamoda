@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -88,12 +89,28 @@ export default function AdminLayout({
         {/* Logo */}
         <div className="p-8 border-b border-stone-200 flex items-center justify-between">
           {sidebarOpen ? (
-            <div>
-              <h1 className="text-xl font-bold tracking-widest text-black uppercase" style={{ fontFamily: "'Noto Serif', serif" }}>ALTAMODA</h1>
-              <p className="text-stone-500 text-xs tracking-widest mt-1 uppercase">Admin Panel</p>
-            </div>
+            <Link href="/" aria-label="Altamoda početna" className="block">
+              <Image
+                src="/logo.png"
+                alt="Altamoda"
+                width={742}
+                height={134}
+                priority
+                className="h-8 w-auto"
+              />
+              <p className="text-stone-500 text-xs tracking-widest mt-2 uppercase">Admin Panel</p>
+            </Link>
           ) : (
-            <span className="text-lg font-bold text-black mx-auto" style={{ fontFamily: "'Noto Serif', serif" }}>A</span>
+            <Link href="/" aria-label="Altamoda početna" className="mx-auto block">
+              <Image
+                src="/logo.png"
+                alt="Altamoda"
+                width={742}
+                height={134}
+                priority
+                className="h-6 w-auto"
+              />
+            </Link>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -171,10 +188,17 @@ export default function AdminLayout({
         }`}
       >
         <div className="p-8 border-b border-stone-200 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold tracking-widest text-black uppercase" style={{ fontFamily: "'Noto Serif', serif" }}>ALTAMODA</h1>
-            <p className="text-stone-500 text-xs tracking-widest mt-1 uppercase">Admin Panel</p>
-          </div>
+          <Link href="/" aria-label="Altamoda početna" className="block" onClick={() => setMobileMenuOpen(false)}>
+            <Image
+              src="/logo.png"
+              alt="Altamoda"
+              width={742}
+              height={134}
+              priority
+              className="h-8 w-auto"
+            />
+            <p className="text-stone-500 text-xs tracking-widest mt-2 uppercase">Admin Panel</p>
+          </Link>
           <button
             onClick={() => setMobileMenuOpen(false)}
             className="text-stone-400 hover:text-black"

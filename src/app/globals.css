@@ -3,63 +3,63 @@
 @theme inline {
   /* ── The Modern Atelier – Design Tokens ── */
 
-  /* Primary: Black – authoritative, elegant */
-  --color-primary: #000000;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #1c1b1b;
-  --color-on-primary-container: #858383;
+  /* Primary: Smoky Black – authoritative, elegant */
+  --color-primary: #2e2e2e;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #383838;
+  --color-on-primary-container: #a59d85;
 
-  /* Secondary: Dark Gold – luxury accent */
-  --color-secondary: #735b28;
-  --color-on-secondary: #ffffff;
-  --color-secondary-container: #fedb9c;
-  --color-on-secondary-container: #785f2b;
+  /* Secondary: Soft Olive – natural accent */
+  --color-secondary: #837A64;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #D8CFBC;
+  --color-on-secondary-container: #6a624f;
 
-  /* Surfaces */
-  --color-surface: #f9f9f9;
-  --color-surface-dim: #dadada;
-  --color-surface-bright: #f9f9f9;
+  /* Surfaces – Floral White / Bone spectrum */
+  --color-surface: #FFFFFF;
+  --color-surface-dim: #D8CFBC;
+  --color-surface-bright: #FFFFFF;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f3f3f3;
-  --color-surface-container: #eeeeee;
-  --color-surface-container-high: #e8e8e8;
-  --color-surface-container-highest: #e2e2e2;
-  --color-surface-variant: #e2e2e2;
+  --color-surface-container-low: #FFFFFF;
+  --color-surface-container: #f5efe5;
+  --color-surface-container-high: #ebe4d6;
+  --color-surface-container-highest: #e1d9ca;
+  --color-surface-variant: #D8CFBC;
 
-  /* Text */
-  --color-on-surface: #1a1c1c;
-  --color-on-surface-variant: #444748;
-  --color-on-background: #1a1c1c;
-  --color-background: #f9f9f9;
-  --color-foreground: #1a1c1c;
+  /* Text – Smoky Black tones */
+  --color-on-surface: #2e2e2e;
+  --color-on-surface-variant: #555555;
+  --color-on-background: #2e2e2e;
+  --color-background: #FFFFFF;
+  --color-foreground: #2e2e2e;
 
   /* Outline */
-  --color-outline: #747878;
-  --color-outline-variant: #c4c7c7;
+  --color-outline: #837A64;
+  --color-outline-variant: #D8CFBC;
 
   /* Error */
   --color-error: #ba1a1a;
-  --color-on-error: #ffffff;
+  --color-on-error: #FFFFFF;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
   /* Inverse */
-  --color-inverse-surface: #2f3131;
-  --color-inverse-on-surface: #f1f1f1;
-  --color-inverse-primary: #c8c6c5;
+  --color-inverse-surface: #2e2e2e;
+  --color-inverse-on-surface: #FFFFFF;
+  --color-inverse-primary: #a59d85;
 
   /* Legacy aliases for gradual migration */
-  --color-accent: #735b28;
-  --color-accent-light: #e3c285;
-  --color-accent-dark: #594312;
-  --color-dark: #1a1c1c;
-  --color-dark-light: #444748;
-  --color-text: #1a1c1c;
-  --color-text-light: #747878;
-  --color-border: #c4c7c7;
+  --color-accent: #837A64;
+  --color-accent-light: #a59d85;
+  --color-accent-dark: #6a624f;
+  --color-dark: #2e2e2e;
+  --color-dark-light: #555555;
+  --color-text: #2e2e2e;
+  --color-text-light: #837A64;
+  --color-border: #D8CFBC;
   --color-success: #2d7a3a;
   --color-warning: #c4883a;
-  --color-muted: #f3f3f3;
+  --color-muted: #f5efe5;
 
   /* Typography */
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -147,9 +147,18 @@ body {
 .animate-slideInLeft { animation: slideInLeft 0.3s ease-out forwards; }
 .animate-scaleIn { animation: scaleIn 0.3s ease-out forwards; }
 
+/* Brand marquee infinite scroll */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee {
+  animation: marquee 100s linear infinite;
+}
+
 /* Glass effect */
 .bg-glass {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 251, 244, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -223,7 +232,7 @@ body {
 
 /* Selection color */
 ::selection {
-  background-color: rgba(115, 91, 40, 0.2);
+  background-color: rgba(122, 127, 106, 0.2);
   color: var(--color-on-surface);
 }
 

@@ -49,7 +49,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fef9f1',
+        backgroundColor: '#FFFFFF',
         fontFamily: "'Georgia', 'Times New Roman', serif",
         padding: '20px',
       }}
@@ -68,7 +68,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
         <div
           style={{
             padding: '32px 40px 24px',
-            backgroundColor: '#8c4a5a',
+            backgroundColor: '#837A64',
             textAlign: 'center',
           }}
         >
@@ -106,7 +106,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                 style={{
                   margin: '0 0 16px',
                   fontSize: '22px',
-                  color: '#8c4a5a',
+                  color: '#837A64',
                 }}
               >
                 Uspesno ste se odjavili
@@ -116,7 +116,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                   margin: 0,
                   fontSize: '16px',
                   lineHeight: 1.6,
-                  color: '#1d1c17',
+                  color: '#2e2e2e',
                 }}
               >
                 Vasa email adresa je uklonjena sa nase newsletter liste.
@@ -130,7 +130,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                 style={{
                   margin: '0 0 16px',
                   fontSize: '22px',
-                  color: '#8c4a5a',
+                  color: '#837A64',
                 }}
               >
                 Greska
@@ -140,7 +140,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                   margin: 0,
                   fontSize: '16px',
                   lineHeight: 1.6,
-                  color: '#1d1c17',
+                  color: '#2e2e2e',
                 }}
               >
                 {errorMessage}
@@ -153,7 +153,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
         <div
           style={{
             padding: '24px 40px',
-            backgroundColor: '#f5f0e8',
+            backgroundColor: '#FFFFFF',
             borderTop: '1px solid #e8e0d4',
             textAlign: 'center',
           }}

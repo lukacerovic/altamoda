@@ -373,7 +373,7 @@ export default function ActionsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.actionsAndDiscounts")}</h1>
-          <p className="text-sm text-[#666] mt-1">{t("admin.manageActionsDesc")}</p>
+          <p className="text-sm text-[#837A64] mt-1">{t("admin.manageActionsDesc")}</p>
         </div>
         <button onClick={openCreate} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
           <Plus size={18} /> {t("admin.newAction")}
@@ -386,7 +386,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-secondary" /></div>
             <div>
-              <p className="text-xs text-[#999]">{t("admin.totalActions")}</p>
+              <p className="text-xs text-[#a59d85]">{t("admin.totalActions")}</p>
               <p className="text-xl font-bold text-black">{actions.length}</p>
             </div>
           </div>
@@ -395,7 +395,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-emerald-50 flex items-center justify-center"><Check size={20} className="text-emerald-600" /></div>
             <div>
-              <p className="text-xs text-[#999]">{t("admin.activeActions")}</p>
+              <p className="text-xs text-[#a59d85]">{t("admin.activeActions")}</p>
               <p className="text-xl font-bold text-black">{activeCount}</p>
             </div>
           </div>
@@ -404,7 +404,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-blue-50 flex items-center justify-center"><Calendar size={20} className="text-blue-600" /></div>
             <div>
-              <p className="text-xs text-[#999]">{t("admin.scheduledActions")}</p>
+              <p className="text-xs text-[#a59d85]">{t("admin.scheduledActions")}</p>
               <p className="text-xl font-bold text-black">{scheduledCount}</p>
             </div>
           </div>
@@ -413,7 +413,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-purple-50 flex items-center justify-center"><Package size={20} className="text-purple-600" /></div>
             <div>
-              <p className="text-xs text-[#999]">{t("admin.productsOnSale")}</p>
+              <p className="text-xs text-[#a59d85]">{t("admin.productsOnSale")}</p>
               <p className="text-xl font-bold text-black">{totalProducts}</p>
             </div>
           </div>
@@ -424,12 +424,12 @@ export default function ActionsPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t("admin.searchActions")} className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black" />
           </div>
           <div className="flex flex-wrap gap-2">
             {(["all", "active", "scheduled", "inactive"] as const).map(s => (
-              <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 sm:px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-black text-white" : "bg-stone-100 text-[#666] hover:bg-[#c4c7c7]"}`}>
+              <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 sm:px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-black text-white" : "bg-stone-100 text-[#837A64] hover:bg-[#D8CFBC]"}`}>
                 {s === "all" ? t("admin.all") : s === "active" ? t("admin.active") : s === "scheduled" ? t("admin.scheduled") : t("admin.inactive")}
               </button>
             ))}
@@ -453,7 +453,7 @@ export default function ActionsPage() {
                       <span className="px-2 py-0.5 rounded bg-black text-white text-xs font-bold">{action.badge}</span>
                     )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-[#666]">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-[#837A64]">
                     <span className="flex items-center gap-1">
                       {action.type === "percentage" && <><Percent size={14} /> {action.value}% {t("admin.discount")}</>}
                       {action.type === "fixed" && <><Tag size={14} /> -{action.value} RSD</>}
@@ -481,10 +481,10 @@ export default function ActionsPage() {
                   <button onClick={() => toggleActive(action.id)} className={`p-2 rounded-sm transition-colors ${action.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-50"}`} title={action.isActive ? t("admin.deactivate") : t("admin.activate")}>
                     {action.isActive ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
-                  <button onClick={() => openEdit(action)} className="p-2 text-[#999] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
+                  <button onClick={() => openEdit(action)} className="p-2 text-[#a59d85] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
                     <Edit3 size={18} />
                   </button>
-                  <button onClick={() => deleteAction(action.id)} className="p-2 text-[#999] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
+                  <button onClick={() => deleteAction(action.id)} className="p-2 text-[#a59d85] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -492,7 +492,7 @@ export default function ActionsPage() {
 
               {/* Products preview */}
               {action.products.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-[#f0f0f0]">
+                <div className="mt-4 pt-4 border-t border-[#FFFFFF]">
                   <div className="flex flex-wrap gap-2">
                     {action.products.slice(0, 5).map(p => {
                       const discounted = calcActionPrice(p.originalPrice, action);
@@ -502,14 +502,14 @@ export default function ActionsPage() {
                             {p.image ? (
                               <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                             ) : (
-                              <Package size={14} className="text-[#999]" />
+                              <Package size={14} className="text-[#a59d85]" />
                             )}
                           </div>
                           <div>
                             <p className="text-xs font-medium text-black truncate max-w-[150px]">{p.name}</p>
                             <div className="flex items-center gap-1.5">
                               <span className="text-xs font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
-                              <span className="text-[10px] text-[#999] line-through">{p.originalPrice.toLocaleString()} RSD</span>
+                              <span className="text-[10px] text-[#a59d85] line-through">{p.originalPrice.toLocaleString()} RSD</span>
                             </div>
                           </div>
                         </div>
@@ -531,7 +531,7 @@ export default function ActionsPage() {
           <div className="bg-white rounded-sm border border-stone-200 p-12 text-center">
             <Zap size={48} className="text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-black mb-2">{t("admin.noActions")}</h3>
-            <p className="text-sm text-[#666] mb-4">{t("admin.createActionDesc")}</p>
+            <p className="text-sm text-[#837A64] mb-4">{t("admin.createActionDesc")}</p>
             <button onClick={openCreate} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm">{t("admin.newAction")}</button>
           </div>
         )}
@@ -547,7 +547,7 @@ export default function ActionsPage() {
               <h2 className="text-lg font-serif font-bold text-black">
                 {editingAction ? t("admin.editAction") : t("admin.newAction")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-1 text-[#999] hover:text-black"><X size={20} /></button>
+              <button onClick={() => setShowPanel(false)} className="p-1 text-[#a59d85] hover:text-black"><X size={20} /></button>
             </div>
 
             {/* Body */}
@@ -555,14 +555,14 @@ export default function ActionsPage() {
 
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.actionName")}</label>
+                <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.actionName")}</label>
                 <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" placeholder="npr. Prolećna Akcija -20%" />
               </div>
 
               {/* Type & Value */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.discountType")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.discountType")}</label>
                   <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as typeof form.type })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="percentage">{t("admin.percentage")}</option>
                     <option value="fixed">{t("admin.fixedAmount")}</option>
@@ -570,7 +570,7 @@ export default function ActionsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
                     {form.type === "percentage" ? t("admin.percentDiscount") : form.type === "fixed" ? t("admin.amountDiscount") : t("admin.newPrice")}
                   </label>
                   <input type="number" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" placeholder="0" />
@@ -580,7 +580,7 @@ export default function ActionsPage() {
               {/* Target & Audience */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.applyTo")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.applyTo")}</label>
                   <select value={form.target} onChange={e => handleTargetChange(e.target.value, "")} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="product">{t("admin.individualProducts")}</option>
                     <option value="category">{t("admin.entireCategory")}</option>
@@ -589,7 +589,7 @@ export default function ActionsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.targetAudience")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.targetAudience")}</label>
                   <select value={form.audience} onChange={e => setForm({ ...form, audience: e.target.value as typeof form.audience })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="all">{t("admin.allUsers")}</option>
                     <option value="b2b">{t("admin.b2bOnlySalons")}</option>
@@ -601,7 +601,7 @@ export default function ActionsPage() {
               {/* Target Value (brand or category select) */}
               {form.target === "brand" && (
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.selectBrand")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.selectBrand")}</label>
                   <select value={form.targetValue} onChange={e => handleTargetChange("brand", e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="">{t("admin.selectOption")}</option>
                     {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -610,7 +610,7 @@ export default function ActionsPage() {
               )}
               {form.target === "category" && (
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.selectCategory")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.selectCategory")}</label>
                   <select value={form.targetValue} onChange={e => handleTargetChange("category", e.target.value)} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     <option value="">{t("admin.selectOption")}</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.nameLat}</option>)}
@@ -621,17 +621,17 @@ export default function ActionsPage() {
               {/* Badge & Dates */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.badge")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.badge")}</label>
                   <select value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm">
                     {badgeOptions.map(b => <option key={b} value={b}>{b}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.startDate")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.startDate")}</label>
                   <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#333] mb-1.5">{t("admin.endDate")}</label>
+                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("admin.endDate")}</label>
                   <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} className="w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm" />
                 </div>
               </div>
@@ -639,7 +639,7 @@ export default function ActionsPage() {
               {/* Product Selection */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-medium text-[#333]">
+                  <label className="text-sm font-medium text-[#2e2e2e]">
                     {`${t("admin.productsSelected")} (${form.selectedProductIds.length})`}
                   </label>
                   {form.target !== "product" && (
@@ -650,7 +650,7 @@ export default function ActionsPage() {
                 {/* Search + Filters */}
                 <div className="space-y-2 mb-3">
                   <div className="relative">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
                     <input
                       type="text"
                       value={productSearch}
@@ -661,7 +661,7 @@ export default function ActionsPage() {
                   </div>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
                       <select
                         value={filterBrand}
                         onChange={e => setFilterBrand(e.target.value)}
@@ -672,7 +672,7 @@ export default function ActionsPage() {
                       </select>
                     </div>
                     <div className="relative flex-1">
-                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
                       <select
                         value={filterCategory}
                         onChange={e => setFilterCategory(e.target.value)}
@@ -690,9 +690,9 @@ export default function ActionsPage() {
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black" />
                   </div>
                 ) : (
-                  <div className="max-h-64 overflow-y-auto border border-stone-200 rounded-sm divide-y divide-[#f0f0f0]">
+                  <div className="max-h-64 overflow-y-auto border border-stone-200 rounded-sm divide-y divide-[#FFFFFF]">
                     {filteredProducts.length === 0 && (
-                      <div className="px-4 py-8 text-center text-sm text-[#999]">Nema proizvoda</div>
+                      <div className="px-4 py-8 text-center text-sm text-[#a59d85]">Nema proizvoda</div>
                     )}
                     {filteredProducts.map(p => {
                       const selected = form.selectedProductIds.includes(p.id);
@@ -705,20 +705,21 @@ export default function ActionsPage() {
                           <input type="checkbox" checked={selected} onChange={() => toggleProduct(p.id)} className="sr-only" />
                           <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {p.image ? (
-                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={p.image} alt="" aria-hidden="true" className="w-full h-full object-cover" />
                             ) : (
-                              <Package size={14} className="text-[#999]" />
+                              <Package size={14} className="text-[#a59d85]" aria-hidden="true" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm text-black truncate">{p.name}</p>
-                            <p className="text-xs text-[#999]">{p.brand?.name || "—"} · {p.category?.nameLat || "—"} · {p.sku}</p>
+                            <p className="text-xs text-[#a59d85]">{p.brand?.name || "—"} · {p.category?.nameLat || "—"} · {p.sku}</p>
                           </div>
                           <div className="text-right flex-shrink-0">
                             {form.value && Number(form.value) > 0 ? (
                               <>
                                 <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
-                                <p className="text-[10px] text-[#999] line-through">{p.priceB2c.toLocaleString()} RSD</p>
+                                <p className="text-[10px] text-[#a59d85] line-through">{p.priceB2c.toLocaleString()} RSD</p>
                               </>
                             ) : (
                               <p className="text-sm text-black">{p.priceB2c.toLocaleString()} RSD</p>
@@ -748,13 +749,13 @@ export default function ActionsPage() {
                             {p.image ? (
                               <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                             ) : (
-                              <Package size={20} className="text-[#ccc]" />
+                              <Package size={20} className="text-[#D8CFBC]" />
                             )}
                           </div>
                           <p className="text-xs text-black truncate">{p.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
                             <span className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
-                            <span className="text-[10px] text-[#999] line-through">{p.priceB2c.toLocaleString()} RSD</span>
+                            <span className="text-[10px] text-[#a59d85] line-through">{p.priceB2c.toLocaleString()} RSD</span>
                           </div>
                         </div>
                       );
@@ -766,7 +767,7 @@ export default function ActionsPage() {
 
             {/* Footer */}
             <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-end gap-3 flex-shrink-0">
-              <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#666] hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
+              <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#837A64] hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
               <button onClick={handleSave} disabled={saving || !form.name || !form.value || form.selectedProductIds.length === 0} className="bg-black text-white hover:bg-stone-800 transition-colors px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                 {saving ? "..." : editingAction ? t("admin.saveChanges") : t("admin.createAction")}
               </button>
