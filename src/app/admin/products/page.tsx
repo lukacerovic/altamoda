@@ -59,7 +59,9 @@ interface Product {
   status: "active" | "inactive";
   badges: { isNew: boolean; isFeatured: boolean; isBestseller: boolean; isProfessionalOnly: boolean };
   description: string;
+  benefits?: string;
   ingredients: string;
+  declaration?: string;
   howToUse: string;
   images: ProductImage[];
   colorLevel?: number;
@@ -273,7 +275,9 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   status: "active",
   badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
   description: "",
+  benefits: "",
   ingredients: "",
+  declaration: "",
   howToUse: "",
   images: [],
   seoTitle: "",
@@ -384,7 +388,9 @@ export default function ProductsPage() {
               isProfessionalOnly: (p.isProfessional || false) as boolean,
             },
             description: "",
+            benefits: "",
             ingredients: "",
+            declaration: "",
             howToUse: "",
             images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
             seoTitle: "",
@@ -468,7 +474,9 @@ export default function ProductsPage() {
           ...prev,
           purchasePrice: p.costPrice ? Number(p.costPrice) : 0,
           description: p.description || "",
+          benefits: p.benefits || "",
           ingredients: p.ingredients || "",
+          declaration: p.declaration || "",
           howToUse: p.usageInstructions || "",
           weight: p.weightGrams || 0,
           volume: p.volumeMl || 0,
@@ -518,7 +526,9 @@ export default function ProductsPage() {
       weightGrams: formData.weight || null,
       volumeMl: formData.volume || null,
       description: formData.description || null,
+      benefits: formData.benefits || null,
       ingredients: formData.ingredients || null,
+      declaration: formData.declaration || null,
       usageInstructions: formData.howToUse || null,
       isProfessional: formData.badges.isProfessionalOnly,
       isNew: formData.badges.isNew,
@@ -1384,9 +1394,19 @@ export default function ProductsPage() {
                     <textarea
                       value={formData.description}
                       onChange={(e) => updateForm("description", e.target.value)}
-                      rows={6}
+                      rows={4}
                       className={inputCls + " resize-y"}
                       placeholder={t("admin.detailedDescription")}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>{t("admin.benefits")}</label>
+                    <textarea
+                      value={formData.benefits || ""}
+                      onChange={(e) => updateForm("benefits", e.target.value)}
+                      rows={4}
+                      className={inputCls + " resize-y"}
+                      placeholder={t("admin.benefitsPlaceholder")}
                     />
                   </div>
                   <div>
@@ -1397,6 +1417,16 @@ export default function ProductsPage() {
                       rows={4}
                       className={inputCls + " resize-y"}
                       placeholder="Aqua, Sodium Laureth Sulfate..."
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>{t("admin.declaration")}</label>
+                    <textarea
+                      value={formData.declaration || ""}
+                      onChange={(e) => updateForm("declaration", e.target.value)}
+                      rows={4}
+                      className={inputCls + " resize-y"}
+                      placeholder={t("admin.declarationPlaceholder")}
                     />
                   </div>
                   <div>

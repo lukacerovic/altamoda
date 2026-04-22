@@ -61,7 +61,9 @@ interface Product {
   category: { nameLat: string; slug: string; parent?: { nameLat: string; slug: string } | null } | null;
   description: string | null;
   purpose: string | null;
+  benefits: string | null;
   ingredients: string | null;
+  declaration: string | null;
   usageInstructions: string | null;
   warnings: string | null;
   shelfLife: string | null;
@@ -112,7 +114,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   const [reviewCount, setReviewCount] = useState(product.reviewCount);
   const [avgRating, setAvgRating] = useState(product.rating);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("opis");
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [liked, setLiked] = useState(initialLiked);
   const [wishlistMessage, setWishlistMessage] = useState("");
   const [activeThumb, setActiveThumb] = useState(0);
@@ -162,12 +164,25 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
 
+  const hasText = (v: string | null | undefined) => !!(v && v.trim());
+
   const tabs = [
-    { key: "opis", label: t("productDetail.description") },
-    { key: "sastojci", label: t("productDetail.ingredients") },
-    { key: "upotreba", label: t("productDetail.howToUse") },
-    { key: "deklaracija", label: "Deklaracija" },
-  ];
+    { key: "opis", label: t("productDetail.description"), content: product.description },
+    { key: "benefiti", label: t("productDetail.benefits"), content: product.benefits },
+    { key: "sastojci", label: t("productDetail.ingredients"), content: product.ingredients },
+    { key: "deklaracija", label: t("productDetail.declaration"), content: product.declaration },
+    { key: "upotreba", label: t("productDetail.howToUse"), content: product.usageInstructions },
+  ].filter(tab => hasText(tab.content));
+
+  useEffect(() => {
+    if (tabs.length === 0) {
+      if (activeTab !== null) setActiveTab(null);
+      return;
+    }
+    if (!activeTab || !tabs.some(t => t.key === activeTab)) {
+      setActiveTab(tabs[0].key);
+    }
+  }, [tabs, activeTab]);
 
   // Helper to render HTML content safely
   const renderHtml = (html: string | null, fallback: string) => {
@@ -522,69 +537,39 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
         </div>
 
         {/* TABS */}
-        <div className="mt-20 md:mt-28">
-          <div className="flex items-end border-b border-[#D8CFBC]/60 gap-8 md:gap-10 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`pb-4 text-[10px] uppercase tracking-[0.28em] font-medium transition-colors relative whitespace-nowrap ${
-                  activeTab === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/60 hover:text-[#2e2e2e]"
-                }`}
-              >
-                {tab.label}
-                {activeTab === tab.key && <span className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#2e2e2e]" />}
-              </button>
-            ))}
+        {tabs.length > 0 && (
+          <div className="mt-20 md:mt-28">
+            <div className="flex items-end border-b border-[#D8CFBC]/60 gap-8 md:gap-10 overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`pb-4 text-[10px] uppercase tracking-[0.28em] font-medium transition-colors relative whitespace-nowrap ${
+                    activeTab === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/60 hover:text-[#2e2e2e]"
+                  }`}
+                >
+                  {tab.label}
+                  {activeTab === tab.key && <span className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#2e2e2e]" />}
+                </button>
+              ))}
+            </div>
+            <div className="py-10 md:py-14 max-w-4xl">
+              {tabs.map((tab) => activeTab === tab.key && (
+                <div key={tab.key} className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">
+                  {renderHtml(tab.content, "")}
+                  {tab.key === "upotreba" && product.warnings && (
+                    <div className="mt-8 pt-8 border-t border-[#D8CFBC]/60">
+                      <h4 className="text-[10px] uppercase tracking-[0.28em] text-red-700 font-medium mb-3 flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5" /> {t("productDetail.warnings")}
+                      </h4>
+                      {renderHtml(product.warnings, "")}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="py-10 md:py-14 max-w-4xl">
-            {activeTab === "opis" && <div className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">
-              {renderHtml(product.description, t("productDetail.noDescription"))}
-              {product.purpose && (
-                <div className="mt-8 pt-8 border-t border-[#D8CFBC]/60">
-                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-3">Namena</h4>
-                  {renderHtml(product.purpose, "")}
-                </div>
-              )}
-            </div>}
-            {activeTab === "sastojci" && <div className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">{renderHtml(product.ingredients, t("productDetail.noIngredients"))}</div>}
-            {activeTab === "upotreba" && <div className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">
-              {renderHtml(product.usageInstructions, t("productDetail.noUsageInstructions"))}
-              {product.warnings && (
-                <div className="mt-8 pt-8 border-t border-[#D8CFBC]/60">
-                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-red-700 font-medium mb-3 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Upozorenja</h4>
-                  {renderHtml(product.warnings, "")}
-                </div>
-              )}
-            </div>}
-            {activeTab === "deklaracija" && <div className="max-w-none">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-[#D8CFBC]/60">
-                <div className="p-6 border-b md:border-r border-[#D8CFBC]/60">
-                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Naziv proizvoda</h4>
-                  <p className="text-[13px] text-[#2e2e2e]/70">{product.nameLat}</p>
-                </div>
-                {product.brand && (
-                  <div className="p-6 border-b border-[#D8CFBC]/60">
-                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Proizvođač / Brend</h4>
-                    <p className="text-[13px] text-[#2e2e2e]/70">{product.brand.name}</p>
-                  </div>
-                )}
-                {product.shelfLife && (
-                  <div className="p-6 border-b md:border-r border-[#D8CFBC]/60">
-                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Rok trajanja / PAO</h4>
-                    <p className="text-[13px] text-[#2e2e2e]/70">{product.shelfLife}</p>
-                  </div>
-                )}
-                {product.importerInfo && (
-                  <div className="p-6 border-b border-[#D8CFBC]/60">
-                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Uvoznik / Odgovorno lice</h4>
-                    <div className="text-[13px] text-[#2e2e2e]/70">{renderHtml(product.importerInfo, "")}</div>
-                  </div>
-                )}
-              </div>
-            </div>}
-          </div>
-        </div>
+        )}
 
         {/* REVIEWS SECTION */}
         <div className="mt-16 md:mt-24 pt-12 border-t border-[#D8CFBC]/60">
