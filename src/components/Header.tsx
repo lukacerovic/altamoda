@@ -228,7 +228,7 @@ export default function Header() {
     <>
       {/* MAIN HEADER - translucent glass (Apple-inspired) */}
       <header
-        className="sticky top-0 z-50 border-b border-[rgba(17,18,13,0.08)] bg-[#FFFBF4]/80"
+        className="sticky top-0 z-50 border-b border-[rgba(17,18,13,0.08)] bg-[#FFFFFF]/80"
         style={{
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
@@ -236,7 +236,7 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           {/* Mobile hamburger - left */}
-          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#11120D] hover:text-secondary transition-colors">
+          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#2e2e2e] hover:text-secondary transition-colors">
             <Menu className="w-6 h-6" />
           </button>
 
@@ -255,7 +255,7 @@ export default function Header() {
                 >
                   <Link
                     href={l.href}
-                    className="text-sm text-[#11120D] hover:text-secondary transition-colors tracking-normal font-normal flex items-center gap-1"
+                    className="text-sm text-[#2e2e2e] hover:text-secondary transition-colors tracking-normal font-normal flex items-center gap-1"
                   >
                     {l.name}
                     {hasMega && <ChevronDown className="w-3 h-3" />}
@@ -272,7 +272,7 @@ export default function Header() {
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-sm border border-[#D8CFBC] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#11120D] via-[#a5a995] to-[#11120D]" />
+                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#a59d85] to-[#2e2e2e]" />
                         <div className="p-5">
                           <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-4">
                             {t("nav.ourBrands")}
@@ -282,16 +282,16 @@ export default function Header() {
                               <Link
                                 key={brand.id}
                                 href={`/brands/${brand.slug}`}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#FFFBF4] transition-colors group"
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#FFFFFF] transition-colors group"
                               >
                                 {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                                   <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
                                 ) : (
-                                  <div className="w-8 h-8 bg-[#FFFBF4] rounded-sm flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs font-bold text-[#a5a995]">{brand.name.charAt(0)}</span>
+                                  <div className="w-8 h-8 bg-[#FFFFFF] rounded-sm flex items-center justify-center flex-shrink-0">
+                                    <span className="text-xs font-bold text-[#a59d85]">{brand.name.charAt(0)}</span>
                                   </div>
                                 ); })()}
-                                <span className="text-sm text-[#7A7F6A] group-hover:text-[#11120D] transition-colors truncate">
+                                <span className="text-sm text-[#837A64] group-hover:text-[#2e2e2e] transition-colors truncate">
                                   {brand.name}
                                 </span>
                               </Link>
@@ -313,7 +313,7 @@ export default function Header() {
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-sm border border-[#D8CFBC] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#11120D] via-[#a5a995] to-[#11120D]" />
+                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#a59d85] to-[#2e2e2e]" />
                         <div className="p-6 flex gap-8">
                           <div className="flex-1 flex gap-8">
                             {menuData.columns.map((col) => (
@@ -326,7 +326,7 @@ export default function Header() {
                                     <li key={link.name}>
                                       <Link
                                         href={link.href}
-                                        className="text-sm text-[#7A7F6A] hover:text-secondary transition-colors flex items-center gap-1 group"
+                                        className="text-sm text-[#837A64] hover:text-secondary transition-colors flex items-center gap-1 group"
                                       >
                                         <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
                                         {link.name}
@@ -353,7 +353,7 @@ export default function Header() {
                                     <p className="text-white text-sm font-medium">
                                       {menuData.featured.title}
                                     </p>
-                                    <span className="text-[#a5a995] text-xs font-medium flex items-center gap-1 mt-1">
+                                    <span className="text-[#a59d85] text-xs font-medium flex items-center gap-1 mt-1">
                                       {menuData.featured.cta}
                                       <ChevronRight className="w-3 h-3" />
                                     </span>
@@ -382,13 +382,13 @@ export default function Header() {
               <LanguageToggle />
             </div>
             <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-secondary transition-colors">
-              <User className="w-5 h-5 text-[#11120D]" />
+              <User className="w-5 h-5 text-[#2e2e2e]" />
             </Link>
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-secondary transition-colors">
-              <Search className="w-5 h-5 text-[#11120D]" />
+              <Search className="w-5 h-5 text-[#2e2e2e]" />
             </button>
             <Link href="/wishlist" className="relative hidden xl:block hover:text-secondary transition-colors">
-              <Heart className="w-5 h-5 text-[#11120D]" />
+              <Heart className="w-5 h-5 text-[#2e2e2e]" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
                   {wishlistCount > 99 ? "99+" : wishlistCount}
@@ -396,7 +396,7 @@ export default function Header() {
               )}
             </Link>
             <Link href="/cart" className="relative hover:text-secondary transition-colors">
-              <ShoppingBag className="w-5 h-5 text-[#11120D]" />
+              <ShoppingBag className="w-5 h-5 text-[#2e2e2e]" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
                   {cartItemCount > 99 ? "99+" : cartItemCount}
@@ -420,27 +420,27 @@ export default function Header() {
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   className="w-full border border-[#D8CFBC] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a5a995]" />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a59d85]" />
               </div>
               {searchResults.length > 0 && (
                 <div className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-[#D8CFBC] shadow-xl overflow-hidden">
                   <div className="p-3">
-                    <span className="text-[11px] text-[#a5a995] font-semibold tracking-widest uppercase">Proizvodi</span>
+                    <span className="text-[11px] text-[#a59d85] font-semibold tracking-widest uppercase">Proizvodi</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
                         <Link
                           key={p.id}
                           href={`/products/${p.slug}`}
-                          className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FFFBF4] transition-colors"
+                          className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#FFFFFF] transition-colors"
                           onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
                         >
                           <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={200} height={200} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#11120D] truncate">{p.name}</p>
-                            <p className="text-[11px] text-[#7A7F6A] font-medium">{p.brand}</p>
+                            <p className="text-sm font-medium text-[#2e2e2e] truncate">{p.name}</p>
+                            <p className="text-[11px] text-[#837A64] font-medium">{p.brand}</p>
                           </div>
-                          <span className="text-sm font-bold text-[#11120D]">
-                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#a5a995]">RSD</span>
+                          <span className="text-sm font-bold text-[#2e2e2e]">
+                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#a59d85]">RSD</span>
                           </span>
                         </Link>
                       ))}
@@ -461,7 +461,7 @@ export default function Header() {
             <div className="flex items-center justify-between p-4 border-b border-[#D8CFBC]">
               <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-5" />
               <button onClick={() => setMobileMenu(false)}>
-                <X className="w-5 h-5 text-[#11120D]" />
+                <X className="w-5 h-5 text-[#2e2e2e]" />
               </button>
             </div>
             <div className="p-4 space-y-1">
@@ -476,7 +476,7 @@ export default function Header() {
                       <Link
                         href={l.href}
                         onClick={() => setMobileMenu(false)}
-                        className="flex-1 py-3 px-2 text-[#11120D] hover:text-secondary text-sm font-normal tracking-normal"
+                        className="flex-1 py-3 px-2 text-[#2e2e2e] hover:text-secondary text-sm font-normal tracking-normal"
                       >
                         {l.name}
                       </Link>
@@ -501,13 +501,13 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#7A7F6A] hover:text-secondary transition-colors"
+                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#837A64] hover:text-secondary transition-colors"
                           >
                             {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                               <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
                             ) : (
-                              <div className="w-6 h-6 bg-[#FFFBF4] rounded-sm flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-[#a5a995]">{brand.name.charAt(0)}</span>
+                              <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center">
+                                <span className="text-[10px] font-bold text-[#a59d85]">{brand.name.charAt(0)}</span>
                               </div>
                             ); })()}
                             {brand.name}
@@ -528,7 +528,7 @@ export default function Header() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block py-2 px-2 text-sm text-[#7A7F6A] hover:text-secondary transition-colors"
+                                className="block py-2 px-2 text-sm text-[#837A64] hover:text-secondary transition-colors"
                               >
                                 {link.name}
                               </Link>
@@ -546,7 +546,7 @@ export default function Header() {
                 <Link
                   href={session ? "/account" : "/account/login"}
                   onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#11120D] hover:text-secondary text-sm"
+                  className="flex items-center gap-3 py-3 px-2 text-[#2e2e2e] hover:text-secondary text-sm"
                 >
                   <User className="w-5 h-5" />
                   {session ? t("nav.account") || "Account" : t("nav.login") || "Login"}
@@ -554,7 +554,7 @@ export default function Header() {
                 <Link
                   href="/wishlist"
                   onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#11120D] hover:text-secondary text-sm"
+                  className="flex items-center gap-3 py-3 px-2 text-[#2e2e2e] hover:text-secondary text-sm"
                 >
                   <Heart className="w-5 h-5" />
                   {t("nav.wishlist") || "Wishlist"}

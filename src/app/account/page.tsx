@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
 import {
-  Package, Heart, ChevronRight, RotateCcw, LogOut,
+  Package, Heart, ChevronRight, LogOut,
   CreditCard, TrendingUp, Award, Percent, CheckCircle,
   BarChart3, AlertTriangle, Globe,
 } from "lucide-react";
@@ -118,7 +118,7 @@ function OrdersSection() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#11120D] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.myOrders")}</h1>
+      <h1 className="text-2xl font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.myOrders")}</h1>
       {loading ? (
         <div className="bg-white rounded-sm shadow-sm p-12 text-center">
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent mx-auto" />
@@ -126,9 +126,9 @@ function OrdersSection() {
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-sm shadow-sm p-12 text-center">
           <Package className="w-12 h-12 text-[#D8CFBC] mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[#11120D] mb-2">{t("account.noOrders")}</h3>
-          <p className="text-sm text-[#a5a995] mb-4">{t("account.noOrdersDesc")}</p>
-          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-[#11120D] text-white rounded text-sm font-medium transition-colors">{t("accountPage.browseProducts")}</Link>
+          <h3 className="text-lg font-semibold text-[#2e2e2e] mb-2">{t("account.noOrders")}</h3>
+          <p className="text-sm text-[#a59d85] mb-4">{t("account.noOrdersDesc")}</p>
+          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-[#2e2e2e] text-white rounded text-sm font-medium transition-colors">{t("accountPage.browseProducts")}</Link>
         </div>
       ) : (
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
@@ -136,22 +136,22 @@ function OrdersSection() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#D8CFBC]">
-                  <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-6 py-3">{t("account.orderNumber")}</th>
-                  <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-6 py-3">{t("account.date")}</th>
-                  <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-6 py-3">{t("account.items")}</th>
-                  <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-6 py-3">{t("account.total")}</th>
-                  <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-6 py-3">{t("account.status")}</th>
+                  <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-6 py-3">{t("account.orderNumber")}</th>
+                  <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-6 py-3">{t("account.date")}</th>
+                  <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-6 py-3">{t("account.items")}</th>
+                  <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-6 py-3">{t("account.total")}</th>
+                  <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-6 py-3">{t("account.status")}</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.orderNumber} className="border-t border-[#D8CFBC] hover:bg-[#FFFBF4]/50">
-                    <td className="px-6 py-4 text-sm font-medium text-[#11120D]">{order.orderNumber}</td>
-                    <td className="px-6 py-4 text-sm text-[#a5a995]">{formatDate(order.createdAt)}</td>
-                    <td className="px-6 py-4 text-sm text-[#a5a995]">{order.itemCount} {t("account.itemsCount")}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-[#11120D]">{order.total.toLocaleString("sr-RS")} RSD</td>
+                  <tr key={order.orderNumber} className="border-t border-[#D8CFBC] hover:bg-[#FFFFFF]/50">
+                    <td className="px-6 py-4 text-sm font-medium text-[#2e2e2e]">{order.orderNumber}</td>
+                    <td className="px-6 py-4 text-sm text-[#a59d85]">{formatDate(order.createdAt)}</td>
+                    <td className="px-6 py-4 text-sm text-[#a59d85]">{order.itemCount} {t("account.itemsCount")}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-[#2e2e2e]">{order.total.toLocaleString("sr-RS")} RSD</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColorMap[order.status] || "bg-[#FFFBF4] text-[#11120D]"}`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColorMap[order.status] || "bg-[#FFFFFF] text-[#2e2e2e]"}`}>
                         {t(statusLabelMap[order.status] || order.status)}
                       </span>
                     </td>
@@ -190,8 +190,8 @@ function WishlistSection() {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#11120D]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.wishlist")}</h1>
-        <Link href="/wishlist" className="text-sm text-secondary hover:text-[#11120D] font-medium flex items-center gap-1">
+        <h1 className="text-2xl font-bold text-[#2e2e2e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.wishlist")}</h1>
+        <Link href="/wishlist" className="text-sm text-secondary hover:text-[#2e2e2e] font-medium flex items-center gap-1">
           {t("accountPage.viewAll")} <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
@@ -201,36 +201,36 @@ function WishlistSection() {
         </div>
       ) : loading ? (
         <div className="bg-white rounded-sm shadow-sm p-12 text-center">
-          <p className="text-sm text-[#a5a995]">{t("accountPage.loading")}</p>
+          <p className="text-sm text-[#a59d85]">{t("accountPage.loading")}</p>
         </div>
       ) : wishlistItems.length === 0 ? (
         <div className="bg-white rounded-sm shadow-sm p-12 text-center">
           <Heart className="w-12 h-12 text-[#D8CFBC] mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[#11120D] mb-2">{t("accountPage.emptyWishlist")}</h3>
-          <p className="text-sm text-[#a5a995] mb-4">{t("accountPage.emptyWishlistDesc")}</p>
-          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-[#11120D] text-white rounded text-sm font-medium transition-colors">{t("accountPage.browseProducts")}</Link>
+          <h3 className="text-lg font-semibold text-[#2e2e2e] mb-2">{t("accountPage.emptyWishlist")}</h3>
+          <p className="text-sm text-[#a59d85] mb-4">{t("accountPage.emptyWishlistDesc")}</p>
+          <Link href="/products" className="inline-block px-6 py-2.5 bg-black hover:bg-[#2e2e2e] text-white rounded text-sm font-medium transition-colors">{t("accountPage.browseProducts")}</Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {wishlistItems.map((item) => (
             <Link key={item.productId} href={`/products/${item.slug}`} className="bg-white rounded-sm shadow-sm overflow-hidden group">
-              <div className="aspect-square bg-[#FFFBF4] relative overflow-hidden">
+              <div className="aspect-square bg-[#FFFFFF] relative overflow-hidden">
                 {item.image && <Image src={item.image} alt={item.name} width={80} height={80} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />}
                 <div className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
                   <Heart className="w-4 h-4 text-red-500 fill-red-500" />
                 </div>
                 {!item.inStock && (
                   <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                    <span className="px-4 py-2 bg-[#11120D] text-white text-xs font-semibold rounded-full">{t("accountPage.outOfStock")}</span>
+                    <span className="px-4 py-2 bg-[#2e2e2e] text-white text-xs font-semibold rounded-full">{t("accountPage.outOfStock")}</span>
                   </div>
                 )}
               </div>
               <div className="p-4">
-                <span className="text-xs text-[#a5a995]">{item.brand}</span>
-                <h4 className="text-sm font-medium text-[#11120D] mt-1">{item.name}</h4>
+                <span className="text-xs text-[#a59d85]">{item.brand}</span>
+                <h4 className="text-sm font-medium text-[#2e2e2e] mt-1">{item.name}</h4>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm font-bold text-secondary">{item.price.toLocaleString("sr-RS")} RSD</span>
-                  {item.oldPrice && item.oldPrice > item.price && <span className="text-xs text-[#a5a995] line-through">{item.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+                  {item.oldPrice && item.oldPrice > item.price && <span className="text-xs text-[#a59d85] line-through">{item.oldPrice.toLocaleString("sr-RS")} RSD</span>}
                 </div>
               </div>
             </Link>
@@ -245,34 +245,34 @@ function B2bPricesSection() {
   const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#11120D] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("accountPage.b2bPricesTitle")}</h1>
+      <h1 className="text-2xl font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("accountPage.b2bPricesTitle")}</h1>
 
       <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
-        <h3 className="font-semibold text-[#11120D] flex items-center gap-2 mb-4"><Percent className="w-5 h-5 text-secondary" /> {t("accountPage.rabatScale")}</h3>
-        <p className="text-sm text-[#a5a995] mb-4">{t("accountPage.rabatDesc")} <strong className="text-[#11120D]">142.500 RSD</strong></p>
+        <h3 className="font-semibold text-[#2e2e2e] flex items-center gap-2 mb-4"><Percent className="w-5 h-5 text-secondary" /> {t("accountPage.rabatScale")}</h3>
+        <p className="text-sm text-[#a59d85] mb-4">{t("accountPage.rabatDesc")} <strong className="text-[#2e2e2e]">142.500 RSD</strong></p>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#D8CFBC]">
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-3">{t("accountPage.monthlyTurnover")}</th>
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-3">{t("accountPage.rabat")}</th>
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-3">{t("account.status")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-3">{t("accountPage.monthlyTurnover")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-3">{t("accountPage.rabat")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-3">{t("account.status")}</th>
               </tr>
             </thead>
             <tbody>
               {rabatScale.map((r, i) => {
                 const isActive = i === 2;
                 return (
-                  <tr key={r.range} className={`border-b border-[#D8CFBC] ${isActive ? "bg-[#FFFBF4]" : "hover:bg-[#FFFBF4]/50"}`}>
-                    <td className="px-4 py-3 text-sm text-[#a5a995]">{r.range}</td>
-                    <td className="px-4 py-3 text-sm font-bold text-[#11120D]">{r.discount}</td>
+                  <tr key={r.range} className={`border-b border-[#D8CFBC] ${isActive ? "bg-[#FFFFFF]" : "hover:bg-[#FFFFFF]/50"}`}>
+                    <td className="px-4 py-3 text-sm text-[#a59d85]">{r.range}</td>
+                    <td className="px-4 py-3 text-sm font-bold text-[#2e2e2e]">{r.discount}</td>
                     <td className="px-4 py-3">
                       {isActive ? (
                         <span className="inline-flex items-center gap-1 px-2 py-1 bg-black text-white text-xs font-medium rounded-full"><CheckCircle className="w-3 h-3" /> {t("accountPage.active")}</span>
                       ) : i < 2 ? (
                         <span className="text-xs text-green-600">{t("accountPage.achieved")}</span>
                       ) : (
-                        <span className="text-xs text-[#a5a995]">{t("accountPage.remaining")} {i === 3 ? "57.500 RSD" : ""}</span>
+                        <span className="text-xs text-[#a59d85]">{t("accountPage.remaining")} {i === 3 ? "57.500 RSD" : ""}</span>
                       )}
                     </td>
                   </tr>
@@ -285,24 +285,24 @@ function B2bPricesSection() {
 
       {/* Monthly Spending Chart */}
       <div className="bg-white rounded-sm shadow-sm p-6">
-        <h3 className="font-semibold text-[#11120D] flex items-center gap-2 mb-6"><BarChart3 className="w-5 h-5 text-secondary" /> {t("accountPage.monthlySpending")}</h3>
+        <h3 className="font-semibold text-[#2e2e2e] flex items-center gap-2 mb-6"><BarChart3 className="w-5 h-5 text-secondary" /> {t("accountPage.monthlySpending")}</h3>
         <div className="flex items-end gap-4 h-48">
           {monthlySpending.map((m) => {
             const maxSpending = Math.max(...monthlySpending.map((s) => s.amount));
             return (
               <div key={m.monthKey} className="flex-1 flex flex-col items-center gap-2">
-                <span className="text-xs font-medium text-[#11120D]">{(m.amount / 1000).toFixed(0)}k</span>
-                <div className="w-full bg-[#FFFBF4] rounded-t relative" style={{ height: `${(m.amount / maxSpending) * 100}%` }}>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#7A7F6A] to-[#a5a995] rounded-t" />
+                <span className="text-xs font-medium text-[#2e2e2e]">{(m.amount / 1000).toFixed(0)}k</span>
+                <div className="w-full bg-[#FFFFFF] rounded-t relative" style={{ height: `${(m.amount / maxSpending) * 100}%` }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#837A64] to-[#a59d85] rounded-t" />
                 </div>
-                <span className="text-xs text-[#a5a995]">{t(m.monthKey)}</span>
+                <span className="text-xs text-[#a59d85]">{t(m.monthKey)}</span>
               </div>
             );
           })}
         </div>
         <div className="mt-4 pt-4 border-t border-[#D8CFBC] flex items-center justify-between text-sm">
-          <span className="text-[#a5a995]">{t("accountPage.totalForPeriod")}:</span>
-          <span className="font-bold text-[#11120D]">{monthlySpending.reduce((s, m) => s + m.amount, 0).toLocaleString("sr-RS")} RSD</span>
+          <span className="text-[#a59d85]">{t("accountPage.totalForPeriod")}:</span>
+          <span className="font-bold text-[#2e2e2e]">{monthlySpending.reduce((s, m) => s + m.amount, 0).toLocaleString("sr-RS")} RSD</span>
         </div>
       </div>
     </>
@@ -313,41 +313,41 @@ function B2bBalanceSection() {
   const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#11120D] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.balanceDebts")}</h1>
+      <h1 className="text-2xl font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.balanceDebts")}</h1>
 
       <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-red-50 rounded-sm p-4 text-center">
-            <span className="text-xs text-[#a5a995]">{t("accountPage.outstandingDebt")}</span>
+            <span className="text-xs text-[#a59d85]">{t("accountPage.outstandingDebt")}</span>
             <p className="text-xl font-bold text-red-600 mt-1">{currentDebt.toLocaleString("sr-RS")} RSD</p>
           </div>
           <div className="bg-green-50 rounded-sm p-4 text-center">
-            <span className="text-xs text-[#a5a995]">{t("accountPage.totalPaid")} (2026)</span>
+            <span className="text-xs text-[#a59d85]">{t("accountPage.totalPaid")} (2026)</span>
             <p className="text-xl font-bold text-green-600 mt-1">317.200 RSD</p>
           </div>
           <div className="bg-blue-50 rounded-sm p-4 text-center">
-            <span className="text-xs text-[#a5a995]">{t("accountPage.creditLimit")}</span>
+            <span className="text-xs text-[#a59d85]">{t("accountPage.creditLimit")}</span>
             <p className="text-xl font-bold text-blue-600 mt-1">500.000 RSD</p>
           </div>
         </div>
 
-        <h4 className="text-sm font-semibold text-[#11120D] mb-3">{t("account.paymentHistory")}</h4>
+        <h4 className="text-sm font-semibold text-[#2e2e2e] mb-3">{t("account.paymentHistory")}</h4>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#D8CFBC]">
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-2">{t("account.paymentDate")}</th>
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-2">{t("account.paymentAmount")}</th>
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-2">{t("account.paymentMethod")}</th>
-                <th className="text-left text-xs font-medium text-[#a5a995] uppercase tracking-wider px-4 py-2">{t("account.paymentStatus")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-2">{t("account.paymentDate")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-2">{t("account.paymentAmount")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-2">{t("account.paymentMethod")}</th>
+                <th className="text-left text-xs font-medium text-[#a59d85] uppercase tracking-wider px-4 py-2">{t("account.paymentStatus")}</th>
               </tr>
             </thead>
             <tbody>
               {paymentHistoryData.map((p, i) => (
-                <tr key={i} className="border-b border-[#D8CFBC] hover:bg-[#FFFBF4]/50">
-                  <td className="px-4 py-3 text-sm text-[#a5a995]">{p.date}</td>
-                  <td className="px-4 py-3 text-sm font-medium text-[#11120D]">{p.amount}</td>
-                  <td className="px-4 py-3 text-sm text-[#a5a995]">{t(`accountPage.method_${p.methodKey}`)}</td>
+                <tr key={i} className="border-b border-[#D8CFBC] hover:bg-[#FFFFFF]/50">
+                  <td className="px-4 py-3 text-sm text-[#a59d85]">{p.date}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-[#2e2e2e]">{p.amount}</td>
+                  <td className="px-4 py-3 text-sm text-[#a59d85]">{t(`accountPage.method_${p.methodKey}`)}</td>
                   <td className={`px-4 py-3 text-sm font-medium ${p.statusColor}`}>{t(`account.${p.statusKey}`)}</td>
                 </tr>
               ))}
@@ -363,34 +363,34 @@ function B2bLoyaltySection() {
   const { t } = useLanguage();
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#11120D] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.loyaltyProgram")}</h1>
+      <h1 className="text-2xl font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.loyaltyProgram")}</h1>
 
       <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#11120D] flex items-center gap-2"><Award className="w-5 h-5 text-secondary" /> {t("accountPage.yourLevel")}</h3>
-          <span className="text-sm text-secondary font-medium px-3 py-1 bg-[#FFFBF4] rounded-full">{t(loyaltyLevelKeys[currentLevelIndex])}</span>
+          <h3 className="font-semibold text-[#2e2e2e] flex items-center gap-2"><Award className="w-5 h-5 text-secondary" /> {t("accountPage.yourLevel")}</h3>
+          <span className="text-sm text-secondary font-medium px-3 py-1 bg-[#FFFFFF] rounded-full">{t(loyaltyLevelKeys[currentLevelIndex])}</span>
         </div>
-        <div className="w-full bg-[#FFFBF4] rounded-full h-3 mb-2">
-          <div className="bg-gradient-to-r from-[#7A7F6A] to-[#a5a995] h-3 rounded-full" style={{ width: `${(currentPoints / nextLevelThreshold) * 100}%` }} />
+        <div className="w-full bg-[#FFFFFF] rounded-full h-3 mb-2">
+          <div className="bg-gradient-to-r from-[#837A64] to-[#a59d85] h-3 rounded-full" style={{ width: `${(currentPoints / nextLevelThreshold) * 100}%` }} />
         </div>
-        <div className="flex justify-between text-xs text-[#a5a995]">
+        <div className="flex justify-between text-xs text-[#a59d85]">
           <span>{currentPoints.toLocaleString("sr-RS")} {t("account.points")}</span>
           <span>{nextLevelThreshold.toLocaleString("sr-RS")} {t("accountPage.forLevel")} {t(loyaltyLevelKeys[currentLevelIndex + 1]) || "max"} {t("accountPage.level")}</span>
         </div>
-        <p className="text-sm text-[#a5a995] mt-3">{t("accountPage.pointsRemaining").replace("{points}", (nextLevelThreshold - currentPoints).toLocaleString("sr-RS"))}</p>
+        <p className="text-sm text-[#a59d85] mt-3">{t("accountPage.pointsRemaining").replace("{points}", (nextLevelThreshold - currentPoints).toLocaleString("sr-RS"))}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {loyaltyLevelKeys.map((levelKey, idx) => (
-            <div key={levelKey} className={`rounded-sm p-4 border-2 transition-all ${idx === currentLevelIndex ? "border-black bg-[#FFFBF4]" : idx < currentLevelIndex ? "border-green-200 bg-green-50/50" : "border-[#D8CFBC] bg-[#FFFBF4]/50"}`}>
+            <div key={levelKey} className={`rounded-sm p-4 border-2 transition-all ${idx === currentLevelIndex ? "border-black bg-[#FFFFFF]" : idx < currentLevelIndex ? "border-green-200 bg-green-50/50" : "border-[#D8CFBC] bg-[#FFFFFF]/50"}`}>
               <div className="flex items-center justify-between mb-2">
-                <h4 className={`font-semibold text-sm ${idx === currentLevelIndex ? "text-secondary" : "text-[#11120D]"}`}>{t(levelKey)}</h4>
+                <h4 className={`font-semibold text-sm ${idx === currentLevelIndex ? "text-secondary" : "text-[#2e2e2e]"}`}>{t(levelKey)}</h4>
                 {idx === currentLevelIndex && <span className="text-[10px] bg-black text-white px-2 py-0.5 rounded-full">{t("accountPage.current")}</span>}
                 {idx < currentLevelIndex && <CheckCircle className="w-4 h-4 text-green-500" />}
               </div>
-              <p className="text-[10px] text-[#a5a995] mb-2">{loyaltyLevelMeta[idx].min.toLocaleString("sr-RS")} - {loyaltyLevelMeta[idx].max.toLocaleString("sr-RS")} {t("account.points")}</p>
+              <p className="text-[10px] text-[#a59d85] mb-2">{loyaltyLevelMeta[idx].min.toLocaleString("sr-RS")} - {loyaltyLevelMeta[idx].max.toLocaleString("sr-RS")} {t("account.points")}</p>
               <ul className="space-y-1">
                 {loyaltyBenefitKeys[idx].map((bKey) => (
-                  <li key={bKey} className="text-xs text-[#a5a995] flex items-start gap-1">
+                  <li key={bKey} className="text-xs text-[#a59d85] flex items-start gap-1">
                     <span className="text-secondary mt-0.5">&#8226;</span> {t(bKey)}
                   </li>
                 ))}
@@ -401,12 +401,12 @@ function B2bLoyaltySection() {
 
         <div className="mt-6 pt-4 border-t border-[#D8CFBC] flex items-center justify-between">
           <div>
-            <span className="text-sm text-[#a5a995]">{t("accountPage.currentPointBalance")}</span>
-            <p className="text-2xl font-bold text-secondary">{currentPoints.toLocaleString("sr-RS")} <span className="text-sm font-normal text-[#a5a995]">{t("account.points")}</span></p>
+            <span className="text-sm text-[#a59d85]">{t("accountPage.currentPointBalance")}</span>
+            <p className="text-2xl font-bold text-secondary">{currentPoints.toLocaleString("sr-RS")} <span className="text-sm font-normal text-[#a59d85]">{t("account.points")}</span></p>
           </div>
           <div className="text-right">
-            <span className="text-sm text-[#a5a995]">{t("accountPage.discountValue")}</span>
-            <p className="text-lg font-bold text-[#11120D]">{(currentPoints * 10).toLocaleString("sr-RS")} RSD</p>
+            <span className="text-sm text-[#a59d85]">{t("accountPage.discountValue")}</span>
+            <p className="text-lg font-bold text-[#2e2e2e]">{(currentPoints * 10).toLocaleString("sr-RS")} RSD</p>
           </div>
         </div>
       </div>
@@ -436,10 +436,10 @@ export default function AccountPage() {
   const userLabel = isB2b ? t("accountPage.b2bPartner") : t("accountPage.buyer");
 
   return (
-    <div className="min-h-screen bg-[#FFFBF4]">
+    <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <nav className="flex items-center gap-2 text-sm text-[#a5a995] mb-6">
-          <Link href="/" className="hover:text-secondary">{t("accountPage.breadcrumbHome")}</Link><ChevronRight className="w-3 h-3" /><span className="text-[#11120D]">{t("accountPage.breadcrumbAccount")}</span>
+        <nav className="flex items-center gap-2 text-sm text-[#a59d85] mb-6">
+          <Link href="/" className="hover:text-secondary">{t("accountPage.breadcrumbHome")}</Link><ChevronRight className="w-3 h-3" /><span className="text-[#2e2e2e]">{t("accountPage.breadcrumbAccount")}</span>
         </nav>
 
         {/* B2B Debt Warning */}
@@ -458,9 +458,9 @@ export default function AccountPage() {
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-white rounded-sm shadow-sm p-4 mb-4">
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#D8CFBC]">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#7A7F6A] to-[#5c6050] flex items-center justify-center text-white font-bold text-lg">{userInitials}</div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#837A64] to-[#6a624f] flex items-center justify-center text-white font-bold text-lg">{userInitials}</div>
                 <div>
-                  <h3 className="font-semibold text-[#11120D]">{userName}</h3>
+                  <h3 className="font-semibold text-[#2e2e2e]">{userName}</h3>
                   <span className="text-xs text-secondary">{userLabel}</span>
                 </div>
               </div>
@@ -468,7 +468,7 @@ export default function AccountPage() {
                 {sidebarNavKeys.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <button key={item.key} onClick={() => setActiveSection(item.key)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors ${activeSection === item.key ? "bg-[#FFFBF4] text-secondary" : "text-[#a5a995] hover:bg-[#FFFBF4] hover:text-[#11120D]"}`}>
+                    <button key={item.key} onClick={() => setActiveSection(item.key)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors ${activeSection === item.key ? "bg-[#FFFFFF] text-secondary" : "text-[#a59d85] hover:bg-[#FFFFFF] hover:text-[#2e2e2e]"}`}>
                       <Icon className="w-4 h-4" /> {t(item.labelKey)}
                     </button>
                   );
@@ -476,16 +476,9 @@ export default function AccountPage() {
               </nav>
             </div>
 
-            {/* Quick Order shortcut for B2B */}
-            {isB2b && (
-              <Link href="/quick-order" className="flex items-center gap-2 w-full px-4 py-3 mb-4 bg-[#FFFBF4] rounded-sm text-sm font-medium text-secondary hover:bg-black hover:text-white transition-colors">
-                <RotateCcw className="w-4 h-4" /> {t("accountPage.quickOrder")}
-              </Link>
-            )}
-
             {/* Language selector */}
             <div className="bg-white rounded-sm shadow-sm p-4 mb-4">
-              <h4 className="text-xs font-medium text-[#a5a995] uppercase tracking-wider mb-3 flex items-center gap-2">
+              <h4 className="text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-3 flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5" /> {t("common.language")}
               </h4>
               <div className="space-y-1">
@@ -495,8 +488,8 @@ export default function AccountPage() {
                     onClick={() => setLanguage(lang)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
                       language === lang
-                        ? "bg-[#FFFBF4] text-secondary font-medium"
-                        : "text-[#a5a995] hover:bg-[#FFFBF4]"
+                        ? "bg-[#FFFFFF] text-secondary font-medium"
+                        : "text-[#a59d85] hover:bg-[#FFFFFF]"
                     }`}
                   >
                     <span>{languageFlags[lang]}</span>
@@ -508,7 +501,7 @@ export default function AccountPage() {
 
             <button
               onClick={() => signOut({ callbackUrl: "/account/login" })}
-              className="w-full flex items-center justify-center gap-2 text-sm text-[#a5a995] hover:text-[#b5453a] transition-colors py-2"
+              className="w-full flex items-center justify-center gap-2 text-sm text-[#a59d85] hover:text-[#b5453a] transition-colors py-2"
             >
               <LogOut className="w-4 h-4" /> {t("account.logout")}
             </button>
@@ -521,7 +514,7 @@ export default function AccountPage() {
               {sidebarNavKeys.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <button key={item.key} onClick={() => setActiveSection(item.key)} className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeSection === item.key ? "bg-black text-white" : "bg-white text-[#a5a995] border border-[#D8CFBC]"}`}>
+                  <button key={item.key} onClick={() => setActiveSection(item.key)} className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeSection === item.key ? "bg-black text-white" : "bg-white text-[#a59d85] border border-[#D8CFBC]"}`}>
                     <Icon className="w-3.5 h-3.5" /> {t(item.labelKey)}
                   </button>
                 );

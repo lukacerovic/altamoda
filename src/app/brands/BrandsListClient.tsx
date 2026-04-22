@@ -23,15 +23,15 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
       <Header />
       <main className="min-h-screen bg-white">
         {/* Hero */}
-        <section className="bg-[#FFFBF4] border-b border-[#D8CFBC]">
+        <section className="bg-[#FFFFFF] border-b border-[#D8CFBC]">
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20 text-center">
             <h1
-              className="text-3xl md:text-4xl font-bold text-[#11120D] tracking-wide"
+              className="text-3xl md:text-4xl font-bold text-[#2e2e2e] tracking-wide"
               style={{ fontFamily: "'Noto Serif', serif" }}
             >
               {t("nav.ourBrands")}
             </h1>
-            <p className="mt-3 text-[#a5a995] text-lg max-w-xl mx-auto">
+            <p className="mt-3 text-[#a59d85] text-lg max-w-xl mx-auto">
               {t("brand.browseDescription")}
             </p>
           </div>
@@ -55,18 +55,18 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                     />
                   ) : (
                     <span
-                      className="text-3xl font-bold text-[#D8CFBC] group-hover:text-[#11120D] transition-colors"
+                      className="text-3xl font-bold text-[#D8CFBC] group-hover:text-[#2e2e2e] transition-colors"
                       style={{ fontFamily: "'Noto Serif', serif" }}
                     >
                       {brand.name}
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-semibold text-[#11120D] text-center">{brand.name}</h3>
+                <h3 className="text-lg font-semibold text-[#2e2e2e] text-center">{brand.name}</h3>
                 {brand.description && (
-                  <p className="text-sm text-[#a5a995] text-center mt-2 line-clamp-2">{brand.description}</p>
+                  <p className="text-sm text-[#a59d85] text-center mt-2 line-clamp-2">{brand.description}</p>
                 )}
-                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[#a5a995] group-hover:text-[#11120D] transition-colors">
+                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[#a59d85] group-hover:text-[#2e2e2e] transition-colors">
                   <span>{brand._count.products} {t("admin.productsCount")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>

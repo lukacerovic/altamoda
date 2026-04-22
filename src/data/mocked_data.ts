@@ -158,21 +158,6 @@ export interface WishlistItem {
   image: string;
 }
 
-export interface QuickOrderProduct {
-  code: string;
-  name: string;
-  brand: string;
-  price: number;
-  category: string;
-}
-
-export interface RecentB2BOrder {
-  id: string;
-  date: string;
-  items: number;
-  total: number;
-}
-
 export interface OutletProduct {
   id: number;
   name: string;
@@ -830,30 +815,6 @@ export const wishlistItems: WishlistItem[] = [
 
 
 // =============================================================================
-// QUICK ORDER — Products, Recent B2B Orders
-// =============================================================================
-
-export const quickOrderProducts: QuickOrderProduct[] = [
-  { code: "MAJ-7.1", name: "Majirel 7.1 Pepeljasto Plava 50ml", brand: "L'Oréal", price: 890, category: "Boja" },
-  { code: "MAJ-6.0", name: "Majirel 6.0 Tamno Plava 50ml", brand: "L'Oréal", price: 890, category: "Boja" },
-  { code: "IGO-6-0", name: "Igora Royal 6-0 60ml", brand: "Schwarzkopf", price: 790, category: "Boja" },
-  { code: "IGO-7-1", name: "Igora Royal 7-1 60ml", brand: "Schwarzkopf", price: 790, category: "Boja" },
-  { code: "OXI-6", name: "Oxydant Creme 6% 1000ml", brand: "L'Oréal", price: 690, category: "Oksidant" },
-  { code: "OXI-9", name: "Oxydant Creme 9% 1000ml", brand: "L'Oréal", price: 690, category: "Oksidant" },
-  { code: "ABS-SH", name: "Absolut Repair Šampon 1500ml", brand: "L'Oréal", price: 5490, category: "Šampon" },
-  { code: "ABS-MS", name: "Absolut Repair Maska 500ml", brand: "L'Oréal", price: 4890, category: "Maska" },
-  { code: "BC-REP", name: "BC Repair Rescue Šampon 1000ml", brand: "Schwarzkopf", price: 3290, category: "Šampon" },
-  { code: "KER-BN", name: "Bain Satin 1 Šampon 1000ml", brand: "Kérastase", price: 5890, category: "Šampon" },
-];
-
-export const quickOrderRecentOrders: RecentB2BOrder[] = [
-  { id: "ORD-2847", date: "10. Mar 2025", items: 12, total: 28450 },
-  { id: "ORD-2831", date: "25. Feb 2025", items: 8, total: 19200 },
-  { id: "ORD-2815", date: "12. Feb 2025", items: 15, total: 34600 },
-];
-
-
-// =============================================================================
 // OUTLET — Products
 // =============================================================================
 
@@ -1417,11 +1378,11 @@ export const analyticsRevenueByMonth: AnalyticsRevenueByMonth[] = [
 ];
 
 export const analyticsCategoryData: AnalyticsCategoryData[] = [
-  { name: "Nega kose", value: 35, color: "#7A7F6A" },
-  { name: "Boje za kosu", value: 28, color: "#11120D" },
+  { name: "Nega kose", value: 35, color: "#837A64" },
+  { name: "Boje za kosu", value: 28, color: "#2e2e2e" },
   { name: "Styling", value: 18, color: "#6b6b6b" },
-  { name: "Ulja i serumi", value: 12, color: "#a5a995" },
-  { name: "Oprema", value: 7, color: "#5c6050" },
+  { name: "Ulja i serumi", value: 12, color: "#a59d85" },
+  { name: "Oprema", value: 7, color: "#6a624f" },
 ];
 
 export const analyticsBrandPerformance: AnalyticsBrandPerformance[] = [

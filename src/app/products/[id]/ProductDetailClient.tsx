@@ -171,10 +171,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
 
   // Helper to render HTML content safely
   const renderHtml = (html: string | null, fallback: string) => {
-    if (!html) return <p className="text-[#11120D]/60 italic">{fallback}</p>;
+    if (!html) return <p className="text-[#2e2e2e]/60 italic">{fallback}</p>;
     return (
       <div
-        className="text-[#11120D]/60 leading-relaxed [&_p]:mb-3 [&_strong]:text-[#11120D] [&_strong]:font-semibold [&_div]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1"
+        className="text-[#2e2e2e]/60 leading-relaxed [&_p]:mb-3 [&_strong]:text-[#2e2e2e] [&_strong]:font-semibold [&_div]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1"
         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
       />
     );
@@ -291,21 +291,21 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBF4]" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
+    <div className="min-h-screen bg-[#FFFFFF]" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
       <Header />
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-10 md:pt-14 pb-10">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#11120D]/60 mb-10">
-          <Link href="/" className="hover:text-[#11120D] transition-colors">{t("productDetail.home")}</Link><ChevronRight className="w-3 h-3" />
-          <Link href="/products" className="hover:text-[#11120D] transition-colors">{t("productDetail.products")}</Link><ChevronRight className="w-3 h-3" />
+        <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#2e2e2e]/60 mb-10">
+          <Link href="/" className="hover:text-[#2e2e2e] transition-colors">{t("productDetail.home")}</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/products" className="hover:text-[#2e2e2e] transition-colors">{t("productDetail.products")}</Link><ChevronRight className="w-3 h-3" />
           {product.category && (
             <>
-              <Link href={`/products?category=${product.category.slug}`} className="hover:text-[#11120D] transition-colors">{product.category.nameLat}</Link>
+              <Link href={`/products?category=${product.category.slug}`} className="hover:text-[#2e2e2e] transition-colors">{product.category.nameLat}</Link>
               <ChevronRight className="w-3 h-3" />
             </>
           )}
-          <span className="text-[#11120D]">{displayName}</span>
+          <span className="text-[#2e2e2e]">{displayName}</span>
         </nav>
 
         {/* 2-Column layout */}
@@ -315,9 +315,9 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             <div className="aspect-square overflow-hidden mb-4 relative bg-[#F2ECDE]">
               <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-cover" />
               {product.images[activeThumb]?.type === 'video' && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#11120D]/30">
-                  <div className="w-16 h-16 rounded-full bg-[#FFFBF4]/90 flex items-center justify-center cursor-pointer hover:bg-[#FFFBF4] transition-colors">
-                    <Play className="w-7 h-7 text-[#11120D] ml-1" />
+                <div className="absolute inset-0 flex items-center justify-center bg-[#2e2e2e]/30">
+                  <div className="w-16 h-16 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center cursor-pointer hover:bg-[#FFFFFF] transition-colors">
+                    <Play className="w-7 h-7 text-[#2e2e2e] ml-1" />
                   </div>
                 </div>
               )}
@@ -325,13 +325,13 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
                 {images.map((img, t) => (
-                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#F2ECDE] ${activeThumb === t ? "ring-1 ring-[#11120D]" : "opacity-70 hover:opacity-100"}`}>
+                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#F2ECDE] ${activeThumb === t ? "ring-1 ring-[#2e2e2e]" : "opacity-70 hover:opacity-100"}`}>
                     <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-cover" />
                     {product.images[t]?.type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-[#11120D]/40"><Play className="w-5 h-5 text-[#FFFBF4]" /></div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#2e2e2e]/40"><Play className="w-5 h-5 text-[#FFFFFF]" /></div>
                     )}
                     {product.images[t]?.type === 'gif' && (
-                      <span className="absolute top-1 right-1 bg-[#11120D] text-[#FFFBF4] text-[8px] font-medium px-1.5 py-0.5 uppercase tracking-wider">GIF</span>
+                      <span className="absolute top-1 right-1 bg-[#2e2e2e] text-[#FFFFFF] text-[8px] font-medium px-1.5 py-0.5 uppercase tracking-wider">GIF</span>
                     )}
                   </button>
                 ))}
@@ -342,36 +342,36 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           {/* PRODUCT INFO */}
           <div className="lg:pt-4">
             {product.brand && (
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#11120D]/60 font-medium block mb-3">{product.brand.name}</span>
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-3">{product.brand.name}</span>
             )}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#11120D] leading-[1.05] tracking-tight mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#2e2e2e] leading-[1.05] tracking-tight mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               {displayName}
             </h1>
 
             {product.productLine && (
               <div className="flex items-center gap-2 mb-5">
-                <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60">{t("productDetail.productLine")}</span>
-                <Link href={`/products?line=${product.productLine.slug}`} className="text-[11px] uppercase tracking-[0.22em] text-[#11120D] hover:opacity-60 transition-opacity border-b border-[#11120D] pb-0.5">{product.productLine.name}</Link>
+                <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60">{t("productDetail.productLine")}</span>
+                <Link href={`/products?line=${product.productLine.slug}`} className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e] hover:opacity-60 transition-opacity border-b border-[#2e2e2e] pb-0.5">{product.productLine.name}</Link>
               </div>
             )}
 
             {product.isProfessional && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#11120D] text-[#FFFBF4] text-[10px] uppercase tracking-[0.22em] font-medium mb-5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2e2e2e] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] font-medium mb-5">
                 <AlertCircle className="w-3.5 h-3.5" /> {t("productDetail.professionalOnly")}
               </div>
             )}
 
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(avgRating) ? "fill-[#11120D] text-[#11120D]" : "fill-[#11120D]/15 text-[#11120D]/25"}`} />)}
+                {[...Array(5)].map((_, i) => <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(avgRating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />)}
               </div>
-              <span className="text-[11px] uppercase tracking-[0.18em] text-[#11120D]/60">{avgRating.toFixed(1)} · {reviewCount} {t("productDetail.reviews")}</span>
+              <span className="text-[11px] uppercase tracking-[0.18em] text-[#2e2e2e]/60">{avgRating.toFixed(1)} · {reviewCount} {t("productDetail.reviews")}</span>
             </div>
 
             {/* Stock */}
             <div className="mb-6">
               {product.stockQuantity > 0 ? (
-                <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-[#11120D]/70 font-medium">
+                <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]/70 font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-600" /> {t("productDetail.inStock")} · {product.stockQuantity} {t("productDetail.pcs")}
                 </span>
               ) : (
@@ -384,22 +384,22 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {/* Price */}
             <div className="flex items-baseline gap-4 mb-6 pb-6 border-b border-[#D8CFBC]/60">
               {product.oldPrice && (
-                <span className="text-[#11120D]/50 line-through text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.oldPrice.toLocaleString("sr-RS")} RSD</span>
+                <span className="text-[#2e2e2e]/50 line-through text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.oldPrice.toLocaleString("sr-RS")} RSD</span>
               )}
-              <span className="text-4xl md:text-5xl font-light text-[#11120D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.price.toLocaleString("sr-RS")} <span className="text-xl">RSD</span></span>
+              <span className="text-4xl md:text-5xl font-light text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.price.toLocaleString("sr-RS")} <span className="text-xl">RSD</span></span>
               {discountPct > 0 && (
-                <span className="bg-[#b5453a] text-[#FFFBF4] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">-{discountPct}%</span>
+                <span className="bg-[#b5453a] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">-{discountPct}%</span>
               )}
             </div>
 
             {/* B2B Price hint (for guests and B2C) */}
             {role !== 'b2b' && product.isProfessional && (
-              <div className="border border-[#11120D] p-4 mb-6 bg-[#EFE7D5]/40">
+              <div className="border border-[#2e2e2e] p-4 mb-6 bg-[#EFE7D5]/40">
                 <div className="flex items-center gap-3">
-                  <Sparkles className="w-4 h-4 text-[#11120D]" />
+                  <Sparkles className="w-4 h-4 text-[#2e2e2e]" />
                   <div>
-                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#11120D] font-medium">{t("productDetail.b2bPrice")}</span>
-                    <p className="text-[11px] text-[#11120D]/60 mt-0.5">{t("productDetail.b2bPriceHint")}</p>
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e] font-medium">{t("productDetail.b2bPrice")}</span>
+                    <p className="text-[11px] text-[#2e2e2e]/60 mt-0.5">{t("productDetail.b2bPriceHint")}</p>
                   </div>
                 </div>
               </div>
@@ -418,7 +418,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {/* Color Variants */}
             {colorSiblings.length > 1 && (
               <div className="mb-6">
-                <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-3">
+                <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-3">
                   Boje · {colorSiblings.length} nijanse
                 </h4>
                 <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1">
@@ -432,10 +432,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                       }}
                       className={`px-3 py-2 text-[10px] uppercase tracking-[0.18em] font-medium border transition-all ${
                         sibling.isActive
-                          ? "bg-[#11120D] text-[#FFFBF4] border-[#11120D]"
+                          ? "bg-[#2e2e2e] text-[#FFFFFF] border-[#2e2e2e]"
                           : sibling.inStock
-                            ? "text-[#11120D] border-[#D8CFBC] hover:border-[#11120D]"
-                            : "text-[#11120D]/40 border-[#D8CFBC]"
+                            ? "text-[#2e2e2e] border-[#D8CFBC] hover:border-[#2e2e2e]"
+                            : "text-[#2e2e2e]/40 border-[#D8CFBC]"
                       }`}
                     >
                       {sibling.colorCode || sibling.name}
@@ -449,14 +449,14 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {/* Quantity + Add to cart */}
             <div className="flex items-center gap-3 mb-5">
               <div className="flex items-center border border-[#D8CFBC]">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Minus className="w-3.5 h-3.5 text-[#11120D]" /></button>
-                <span className="w-10 text-center text-sm text-[#11120D]">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Plus className="w-3.5 h-3.5 text-[#11120D]" /></button>
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Minus className="w-3.5 h-3.5 text-[#2e2e2e]" /></button>
+                <span className="w-10 text-center text-sm text-[#2e2e2e]">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Plus className="w-3.5 h-3.5 text-[#2e2e2e]" /></button>
               </div>
               <button
                 onClick={handleAddToCart}
                 disabled={outOfStock}
-                className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#11120D]/60 cursor-not-allowed" : addedToCart ? "bg-[#5c6050] text-[#FFFBF4]" : "bg-[#7A7F6A] hover:bg-[#5c6050] text-[#FFFBF4]"}`}
+                className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#FFFFFF]" : "bg-[#837A64] hover:bg-[#6a624f] text-[#FFFFFF]"}`}
               >
                 {outOfStock ? (
                   <>{t("products.outOfStock")}</>
@@ -466,54 +466,54 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                   <><ShoppingBag className="w-4 h-4" /> {t("productDetail.addToCart")}</>
                 )}
               </button>
-              <button onClick={handleToggleWishlist} className={`w-12 h-12 border flex items-center justify-center transition-colors ${liked ? "border-[#b5453a] bg-[#b5453a]/5" : "border-[#D8CFBC] hover:border-[#11120D]"}`}>
-                <Heart className={`w-4 h-4 ${liked ? "fill-[#b5453a] text-[#b5453a]" : "text-[#11120D]"}`} />
+              <button onClick={handleToggleWishlist} className={`w-12 h-12 border flex items-center justify-center transition-colors ${liked ? "border-[#b5453a] bg-[#b5453a]/5" : "border-[#D8CFBC] hover:border-[#2e2e2e]"}`}>
+                <Heart className={`w-4 h-4 ${liked ? "fill-[#b5453a] text-[#b5453a]" : "text-[#2e2e2e]"}`} />
               </button>
             </div>
 
             {/* Wishlist message */}
             {wishlistMessage && (
-              <div className="mb-4 p-3 bg-[#EFE7D5]/40 border border-[#D8CFBC] text-sm text-[#11120D] flex items-center gap-2">
+              <div className="mb-4 p-3 bg-[#EFE7D5]/40 border border-[#D8CFBC] text-sm text-[#2e2e2e] flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {wishlistMessage}
-                <Link href="/account/login" className="ml-auto text-[11px] uppercase tracking-[0.22em] font-medium hover:opacity-60 border-b border-[#11120D] pb-0.5 whitespace-nowrap">{t("productDetail.loginLink")}</Link>
+                <Link href="/account/login" className="ml-auto text-[11px] uppercase tracking-[0.22em] font-medium hover:opacity-60 border-b border-[#2e2e2e] pb-0.5 whitespace-nowrap">{t("productDetail.loginLink")}</Link>
               </div>
             )}
 
             {/* Share */}
             <div className="flex items-center gap-3 mb-8">
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#11120D]/60 font-medium">{t("productDetail.share")}</span>
-              <button onClick={handleCopyLink} className={`h-7 px-3 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors ${linkCopied ? "text-green-700" : "text-[#11120D]/60 hover:text-[#11120D]"}`}>
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium">{t("productDetail.share")}</span>
+              <button onClick={handleCopyLink} className={`h-7 px-3 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors ${linkCopied ? "text-green-700" : "text-[#2e2e2e]/60 hover:text-[#2e2e2e]"}`}>
                 {linkCopied ? <><CheckCircle className="w-3 h-3" /> {t("productDetail.linkCopied")}</> : <><Link2 className="w-3 h-3" /> {t("productDetail.copyLink")}</>}
               </button>
             </div>
 
             {/* Delivery info */}
             <div className="border-t border-[#D8CFBC]/60 pt-6 space-y-4">
-              <div className="flex items-start gap-3 text-[12px] text-[#11120D]/80"><Truck className="w-4 h-4 text-[#11120D] flex-shrink-0 mt-0.5" /><span><strong className="text-[#11120D] font-medium">{t("productDetail.freeShipping")}</strong> — {t("productDetail.freeShippingNote")}</span></div>
-              <div className="flex items-start gap-3 text-[12px] text-[#11120D]/80"><RotateCcw className="w-4 h-4 text-[#11120D] flex-shrink-0 mt-0.5" /><span><strong className="text-[#11120D] font-medium">{t("productDetail.returnPolicy")}</strong> — {t("productDetail.returnPolicyNote")}</span></div>
-              <div className="flex items-start gap-3 text-[12px] text-[#11120D]/80"><Shield className="w-4 h-4 text-[#11120D] flex-shrink-0 mt-0.5" /><span><strong className="text-[#11120D] font-medium">{t("productDetail.originalProducts")}</strong> — {t("productDetail.originalProductsNote")}</span></div>
+              <div className="flex items-start gap-3 text-[12px] text-[#2e2e2e]/80"><Truck className="w-4 h-4 text-[#2e2e2e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#2e2e2e] font-medium">{t("productDetail.freeShipping")}</strong> — {t("productDetail.freeShippingNote")}</span></div>
+              <div className="flex items-start gap-3 text-[12px] text-[#2e2e2e]/80"><RotateCcw className="w-4 h-4 text-[#2e2e2e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#2e2e2e] font-medium">{t("productDetail.returnPolicy")}</strong> — {t("productDetail.returnPolicyNote")}</span></div>
+              <div className="flex items-start gap-3 text-[12px] text-[#2e2e2e]/80"><Shield className="w-4 h-4 text-[#2e2e2e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#2e2e2e] font-medium">{t("productDetail.originalProducts")}</strong> — {t("productDetail.originalProductsNote")}</span></div>
             </div>
 
             {/* Color Section */}
             {product.colorProduct && (
               <div className="mt-8 border border-[#D8CFBC] p-6 bg-[#EFE7D5]/30">
-                <h3 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-5">{t("productDetail.colorInfo")}</h3>
+                <h3 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-5">{t("productDetail.colorInfo")}</h3>
                 <div className="grid grid-cols-2 gap-4 mb-5">
                   <div>
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60">{t("productDetail.colorLevel")}</span>
-                    <p className="text-xl font-light text-[#11120D] mt-1" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.colorProduct.colorLevel}</p>
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60">{t("productDetail.colorLevel")}</span>
+                    <p className="text-xl font-light text-[#2e2e2e] mt-1" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.colorProduct.colorLevel}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60">{t("productDetail.colorUndertone")}</span>
-                    <p className="text-xl font-light text-[#11120D] mt-1" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.colorProduct.undertoneName}</p>
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60">{t("productDetail.colorUndertone")}</span>
+                    <p className="text-xl font-light text-[#2e2e2e] mt-1" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.colorProduct.undertoneName}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 pt-4 border-t border-[#D8CFBC]/60">
                   <div className="w-10 h-10 rounded-full border border-[#D8CFBC]" style={{ backgroundColor: product.colorProduct.hexValue }} />
                   <div>
-                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#11120D] font-medium">{product.colorProduct.shadeCode}</span>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60 mt-0.5">{product.colorProduct.undertoneName}</p>
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e] font-medium">{product.colorProduct.shadeCode}</span>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 mt-0.5">{product.colorProduct.undertoneName}</p>
                   </div>
                 </div>
               </div>
@@ -529,26 +529,26 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`pb-4 text-[10px] uppercase tracking-[0.28em] font-medium transition-colors relative whitespace-nowrap ${
-                  activeTab === tab.key ? "text-[#11120D]" : "text-[#11120D]/60 hover:text-[#11120D]"
+                  activeTab === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/60 hover:text-[#2e2e2e]"
                 }`}
               >
                 {tab.label}
-                {activeTab === tab.key && <span className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#11120D]" />}
+                {activeTab === tab.key && <span className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#2e2e2e]" />}
               </button>
             ))}
           </div>
           <div className="py-10 md:py-14 max-w-4xl">
-            {activeTab === "opis" && <div className="prose max-w-none text-[14px] text-[#11120D]/80 leading-[1.8]">
+            {activeTab === "opis" && <div className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">
               {renderHtml(product.description, t("productDetail.noDescription"))}
               {product.purpose && (
                 <div className="mt-8 pt-8 border-t border-[#D8CFBC]/60">
-                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-3">Namena</h4>
+                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-3">Namena</h4>
                   {renderHtml(product.purpose, "")}
                 </div>
               )}
             </div>}
-            {activeTab === "sastojci" && <div className="prose max-w-none text-[14px] text-[#11120D]/80 leading-[1.8]">{renderHtml(product.ingredients, t("productDetail.noIngredients"))}</div>}
-            {activeTab === "upotreba" && <div className="prose max-w-none text-[14px] text-[#11120D]/80 leading-[1.8]">
+            {activeTab === "sastojci" && <div className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">{renderHtml(product.ingredients, t("productDetail.noIngredients"))}</div>}
+            {activeTab === "upotreba" && <div className="prose max-w-none text-[14px] text-[#2e2e2e]/80 leading-[1.8]">
               {renderHtml(product.usageInstructions, t("productDetail.noUsageInstructions"))}
               {product.warnings && (
                 <div className="mt-8 pt-8 border-t border-[#D8CFBC]/60">
@@ -560,25 +560,25 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {activeTab === "deklaracija" && <div className="max-w-none">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-[#D8CFBC]/60">
                 <div className="p-6 border-b md:border-r border-[#D8CFBC]/60">
-                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-2">Naziv proizvoda</h4>
-                  <p className="text-[13px] text-[#11120D]/70">{product.nameLat}</p>
+                  <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Naziv proizvoda</h4>
+                  <p className="text-[13px] text-[#2e2e2e]/70">{product.nameLat}</p>
                 </div>
                 {product.brand && (
                   <div className="p-6 border-b border-[#D8CFBC]/60">
-                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-2">Proizvođač / Brend</h4>
-                    <p className="text-[13px] text-[#11120D]/70">{product.brand.name}</p>
+                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Proizvođač / Brend</h4>
+                    <p className="text-[13px] text-[#2e2e2e]/70">{product.brand.name}</p>
                   </div>
                 )}
                 {product.shelfLife && (
                   <div className="p-6 border-b md:border-r border-[#D8CFBC]/60">
-                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-2">Rok trajanja / PAO</h4>
-                    <p className="text-[13px] text-[#11120D]/70">{product.shelfLife}</p>
+                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Rok trajanja / PAO</h4>
+                    <p className="text-[13px] text-[#2e2e2e]/70">{product.shelfLife}</p>
                   </div>
                 )}
                 {product.importerInfo && (
                   <div className="p-6 border-b border-[#D8CFBC]/60">
-                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#11120D] font-medium mb-2">Uvoznik / Odgovorno lice</h4>
-                    <div className="text-[13px] text-[#11120D]/70">{renderHtml(product.importerInfo, "")}</div>
+                    <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e] font-medium mb-2">Uvoznik / Odgovorno lice</h4>
+                    <div className="text-[13px] text-[#2e2e2e]/70">{renderHtml(product.importerInfo, "")}</div>
                   </div>
                 )}
               </div>
@@ -591,13 +591,13 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 md:mb-14">
             <div>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#11120D]/60 font-medium block mb-4">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
                 Recenzije
               </span>
-              <h2 className="text-3xl md:text-4xl font-light text-[#11120D] leading-[1.05] tracking-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              <h2 className="text-3xl md:text-4xl font-light text-[#2e2e2e] leading-[1.05] tracking-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                 {t("productDetail.customerReviews")}
               </h2>
-              <p className="text-[13px] text-[#11120D]/60 leading-relaxed mt-3 max-w-md">
+              <p className="text-[13px] text-[#2e2e2e]/60 leading-relaxed mt-3 max-w-md">
                 {reviewCount === 0 ? t("productDetail.beFirstToReview") : t("productDetail.seeWhatOthersSay")}
               </p>
             </div>
@@ -605,28 +605,28 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             <div className="flex items-center justify-between md:justify-start gap-6 md:gap-8 w-full md:w-auto">
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl md:text-5xl font-light text-[#11120D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{avgRating.toFixed(1)}</span>
-                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60">/ 5</span>
+                  <span className="text-4xl md:text-5xl font-light text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{avgRating.toFixed(1)}</span>
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60">/ 5</span>
                 </div>
                 <div className="flex items-center gap-0.5 mt-2">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(avgRating) ? "fill-[#11120D] text-[#11120D]" : "fill-[#11120D]/15 text-[#11120D]/25"}`} />
+                    <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(avgRating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />
                   ))}
                 </div>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60 mt-2">{reviewCount} {t("productDetail.reviews")}</p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 mt-2">{reviewCount} {t("productDetail.reviews")}</p>
               </div>
 
               {hasAlreadyReviewed ? (
                 <div className="text-right md:text-left">
-                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60 block mb-1">{t("productDetail.yourRating")}</span>
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 block mb-1">{t("productDetail.yourRating")}</span>
                   <div className="flex items-center gap-0.5 justify-end md:justify-start">
-                    {[1,2,3,4,5].map((s) => <Star key={s} className={`w-3.5 h-3.5 ${s <= currentUserRating! ? "fill-[#11120D] text-[#11120D]" : "fill-[#11120D]/15 text-[#11120D]/25"}`} />)}
+                    {[1,2,3,4,5].map((s) => <Star key={s} className={`w-3.5 h-3.5 ${s <= currentUserRating! ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />)}
                   </div>
                 </div>
               ) : (
                 <button
                   onClick={() => setShowReviewForm(true)}
-                  className="px-5 md:px-6 py-3 bg-[#11120D] hover:bg-[#2b2c24] text-[#FFFBF4] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+                  className="px-5 md:px-6 py-3 bg-[#2e2e2e] hover:bg-[#2b2c24] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
                 >
                   <Star className="w-3.5 h-3.5" /> {t("productDetail.rateProduct")}
                 </button>
@@ -637,12 +637,12 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           {/* Review list */}
           {reviews.length === 0 ? (
             <div className="text-center py-14 border-t border-[#D8CFBC]/60">
-              <Star className="w-8 h-8 text-[#11120D]/20 mx-auto mb-4" />
-              <p className="text-[#11120D]/60 text-[14px]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.noReviews")}</p>
+              <Star className="w-8 h-8 text-[#2e2e2e]/20 mx-auto mb-4" />
+              <p className="text-[#2e2e2e]/60 text-[14px]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.noReviews")}</p>
               {!hasAlreadyReviewed && (
                 <button
                   onClick={() => setShowReviewForm(true)}
-                  className="mt-6 px-6 py-3 bg-[#11120D] hover:bg-[#2b2c24] text-[#FFFBF4] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors inline-flex items-center gap-2"
+                  className="mt-6 px-6 py-3 bg-[#2e2e2e] hover:bg-[#2b2c24] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors inline-flex items-center gap-2"
                 >
                   <Star className="w-3.5 h-3.5" /> {t("productDetail.addFirstReview")}
                 </button>
@@ -653,16 +653,16 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               {reviews.map((r) => (
                 <div key={r.id} className="flex items-start gap-4 py-6 border-b border-[#D8CFBC]/60">
                   <div className="w-10 h-10 rounded-full bg-[#EFE7D5] flex items-center justify-center flex-shrink-0">
-                    <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-[#11120D]">{r.user.name.charAt(0).toUpperCase()}</span>
+                    <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-[#2e2e2e]">{r.user.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#11120D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{r.user.name}</span>
-                      <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60">{new Date(r.createdAt).toLocaleDateString("sr-RS")}</span>
+                      <span className="text-sm text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{r.user.name}</span>
+                      <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60">{new Date(r.createdAt).toLocaleDateString("sr-RS")}</span>
                     </div>
                     <div className="flex items-center gap-0.5 mt-1.5">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-3 h-3 ${i < r.rating ? "fill-[#11120D] text-[#11120D]" : "fill-[#11120D]/15 text-[#11120D]/25"}`} />
+                        <Star key={i} className={`w-3 h-3 ${i < r.rating ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />
                       ))}
                     </div>
                   </div>
@@ -677,14 +677,14 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           <section className="mt-20 md:mt-28 mb-16 pt-12 border-t border-[#D8CFBC]/60">
             <div className="flex items-end justify-between gap-4 mb-10 md:mb-14">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#11120D]/60 font-medium block mb-4">
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
                   Takođe
                 </span>
-                <h2 className="text-3xl md:text-4xl font-light text-[#11120D] leading-[1.05] tracking-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                <h2 className="text-3xl md:text-4xl font-light text-[#2e2e2e] leading-[1.05] tracking-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                   Srodni <em className="italic">rituali</em>.
                 </h2>
               </div>
-              <Link href="/products" className="text-[10px] uppercase tracking-[0.22em] font-medium text-[#11120D] border-b border-[#11120D] pb-0.5 hover:opacity-60 transition-opacity">Pogledaj sve</Link>
+              <Link href="/products" className="text-[10px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] border-b border-[#2e2e2e] pb-0.5 hover:opacity-60 transition-opacity">Pogledaj sve</Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               {related.map((p) => (
@@ -693,10 +693,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     <Image src={p.image || defaultImage} alt={p.name} width={500} height={625} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#11120D]/60 font-medium block mb-1.5">{p.brand?.name}</span>
-                    <h3 className="text-base text-[#11120D] line-clamp-2 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{p.name}</h3>
-                    <div className="mt-2 flex items-baseline gap-2 text-sm text-[#11120D]">
-                      {p.oldPrice && <span className="text-[#11120D]/60 line-through text-xs">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium block mb-1.5">{p.brand?.name}</span>
+                    <h3 className="text-base text-[#2e2e2e] line-clamp-2 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{p.name}</h3>
+                    <div className="mt-2 flex items-baseline gap-2 text-sm text-[#2e2e2e]">
+                      {p.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
                       <span>{p.price.toLocaleString("sr-RS")} RSD</span>
                     </div>
                   </div>
@@ -710,37 +710,37 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
       {/* Review Form Modal */}
       {showReviewForm && (
         <>
-          <div className="fixed inset-0 bg-[#11120D]/50 z-50" onClick={() => setShowReviewForm(false)} />
+          <div className="fixed inset-0 bg-[#2e2e2e]/50 z-50" onClick={() => setShowReviewForm(false)} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-[#FFFBF4] max-w-md w-full p-8 md:p-10 relative max-h-[90vh] overflow-y-auto">
-              <button onClick={() => setShowReviewForm(false)} className="absolute top-5 right-5"><X className="w-4 h-4 text-[#11120D]/60 hover:text-[#11120D]" /></button>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#11120D]/60 font-medium block mb-3">Ocena</span>
-              <h3 className="text-2xl font-light text-[#11120D] leading-tight mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.rateThisProduct")}</h3>
-              <p className="text-[12px] text-[#11120D]/60 mb-8">{product.nameLat}</p>
+            <div className="bg-[#FFFFFF] max-w-md w-full p-8 md:p-10 relative max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setShowReviewForm(false)} className="absolute top-5 right-5"><X className="w-4 h-4 text-[#2e2e2e]/60 hover:text-[#2e2e2e]" /></button>
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-3">Ocena</span>
+              <h3 className="text-2xl font-light text-[#2e2e2e] leading-tight mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.rateThisProduct")}</h3>
+              <p className="text-[12px] text-[#2e2e2e]/60 mb-8">{product.nameLat}</p>
 
               {reviewSuccess ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-3" />
-                  <p className="text-[#11120D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.reviewSuccess")}</p>
+                  <p className="text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.reviewSuccess")}</p>
                 </div>
               ) : (
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.22em] font-medium text-[#11120D] mb-3">{t("productDetail.tapToRate")}</label>
+                    <label className="block text-[10px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] mb-3">{t("productDetail.tapToRate")}</label>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button key={star} onClick={() => setReviewRating(star)} className="p-1">
-                          <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? "fill-[#11120D] text-[#11120D]" : "fill-[#11120D]/15 text-[#11120D]/25 hover:text-[#11120D]"}`} />
+                          <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25 hover:text-[#2e2e2e]"}`} />
                         </button>
                       ))}
-                      {reviewRating > 0 && <span className="text-[11px] uppercase tracking-[0.22em] text-[#11120D]/60 ml-2">{reviewRating}/5</span>}
+                      {reviewRating > 0 && <span className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 ml-2">{reviewRating}/5</span>}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.22em] font-medium text-[#11120D] mb-2">{t("productDetail.photoOptional")}</label>
-                    <div className="border border-dashed border-[#D8CFBC] p-6 text-center hover:border-[#11120D] transition-colors cursor-pointer">
-                      <Camera className="w-7 h-7 text-[#11120D]/40 mx-auto mb-2" />
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[#11120D]/60">{t("productDetail.clickToAddPhoto")}</p>
+                    <label className="block text-[10px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] mb-2">{t("productDetail.photoOptional")}</label>
+                    <div className="border border-dashed border-[#D8CFBC] p-6 text-center hover:border-[#2e2e2e] transition-colors cursor-pointer">
+                      <Camera className="w-7 h-7 text-[#2e2e2e]/40 mx-auto mb-2" />
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-[#2e2e2e]/60">{t("productDetail.clickToAddPhoto")}</p>
                     </div>
                   </div>
                   {reviewError && (
@@ -751,7 +751,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                   <button
                     onClick={handleSubmitReview}
                     disabled={reviewRating === 0 || reviewSubmitting}
-                    className="w-full bg-[#11120D] hover:bg-[#2b2c24] text-[#FFFBF4] py-3.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-40"
+                    className="w-full bg-[#2e2e2e] hover:bg-[#2b2c24] text-[#FFFFFF] py-3.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-40"
                   >
                     {reviewSubmitting ? t("productDetail.submitting") : t("productDetail.submitReview")}
                   </button>

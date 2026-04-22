@@ -33,8 +33,8 @@ export default async function HomePage() {
     images: { where: { isPrimary: true }, take: 1 },
   }
 
-  // Fetch all product sets + hero image setting in parallel
-  const [featured, bestsellers, newArrivals, saleProducts, heroSetting] = await Promise.all([
+  // Fetch all product sets + hero settings in parallel
+  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true, isFeatured: true },
       include: productInclude,
@@ -60,6 +60,7 @@ export default async function HomePage() {
       orderBy: { createdAt: 'desc' },
     }),
     prisma.siteSetting.findUnique({ where: { key: 'heroImages' } }),
+    prisma.siteSetting.findUnique({ where: { key: 'heroCards' } }),
   ])
 
   // Get all product IDs for rating lookup
@@ -82,6 +83,7 @@ export default async function HomePage() {
       newArrivals={newArrivals.map(p => formatProduct(p, getRating(p.id)))}
       saleProducts={saleProducts.map(p => formatProduct(p, getRating(p.id)))}
       heroImages={heroSetting?.value ? (() => { try { return JSON.parse(heroSetting.value); } catch { return []; } })() : []}
+      heroCards={heroCardsSetting?.value ? (() => { try { return JSON.parse(heroCardsSetting.value); } catch { return []; } })() : []}
     />
   )
 }

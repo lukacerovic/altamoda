@@ -10,34 +10,34 @@ function ConfirmationContent() {
   const orderNumber = searchParams.get('orderNumber') ?? ''
 
   return (
-    <div className="min-h-screen bg-[#FFFBF4] flex items-center justify-center">
+    <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-sm shadow-sm p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
 
-          <h1 className="text-2xl font-bold text-[#11120D] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
+          <h1 className="text-2xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
             Porudžbina primljena!
           </h1>
-          <p className="text-[#a5a995] mb-6">Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.</p>
+          <p className="text-[#a59d85] mb-6">Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.</p>
 
           {orderNumber && (
-            <div className="bg-[#FFFBF4] rounded-lg p-4 mb-6">
+            <div className="bg-[#FFFFFF] rounded-lg p-4 mb-6">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Package className="w-5 h-5 text-secondary" />
-                <span className="text-sm font-semibold text-[#11120D]">Broj porudžbine</span>
+                <span className="text-sm font-semibold text-[#2e2e2e]">Broj porudžbine</span>
               </div>
               <span className="text-xl font-bold text-secondary">{orderNumber}</span>
             </div>
           )}
 
-          <p className="text-sm text-[#a5a995] mb-6">
+          <p className="text-sm text-[#a59d85] mb-6">
             Poslali smo vam email sa potvrdom porudžbine i detaljima o dostavi.
           </p>
 
           <div className="space-y-3">
-            <Link href="/products" className="w-full bg-black hover:bg-[#11120D] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
+            <Link href="/products" className="w-full bg-black hover:bg-[#2e2e2e] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
               Nastavi kupovinu <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -50,8 +50,8 @@ function ConfirmationContent() {
 export default function ConfirmationPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FFFBF4] flex items-center justify-center">
-        <div className="text-[#a5a995]">Učitavanje...</div>
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
+        <div className="text-[#a59d85]">Učitavanje...</div>
       </div>
     }>
       <ConfirmationContent />

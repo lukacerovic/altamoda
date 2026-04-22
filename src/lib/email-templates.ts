@@ -1,8 +1,8 @@
 import { getUnsubscribeUrl } from './email'
 
-const BRAND_BG = '#FFFBF4'
-const BRAND_PRIMARY = '#7A7F6A'
-const BRAND_TEXT = '#11120D'
+const BRAND_BG = '#FFFFFF'
+const BRAND_PRIMARY = '#837A64'
+const BRAND_TEXT = '#2e2e2e'
 
 interface BaseLayoutOptions {
   /** Recipient email — required when showUnsubscribe is true */
@@ -46,7 +46,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
             <td style="padding: 0;">${content}</td>
           </tr>
           <tr>
-            <td style="padding: 24px 40px; background-color: #FFFBF4; border-top: 1px solid #e8e0d4;">
+            <td style="padding: 24px 40px; background-color: #FFFFFF; border-top: 1px solid #e8e0d4;">
               <p style="margin: 0 0 ${footerUnsub ? '8px' : '0'}; font-size: 12px; color: #8a8578; text-align: center;">
                 &copy; ${new Date().getFullYear()} Altamoda Heritage. Sva prava zadrzana.
               </p>

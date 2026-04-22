@@ -4,58 +4,58 @@
   /* ── The Modern Atelier – Design Tokens ── */
 
   /* Primary: Smoky Black – authoritative, elegant */
-  --color-primary: #11120D;
-  --color-on-primary: #FFFBF4;
-  --color-primary-container: #1e1f19;
-  --color-on-primary-container: #9a9d8f;
+  --color-primary: #2e2e2e;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #383838;
+  --color-on-primary-container: #a59d85;
 
   /* Secondary: Soft Olive – natural accent */
-  --color-secondary: #7A7F6A;
-  --color-on-secondary: #FFFBF4;
+  --color-secondary: #837A64;
+  --color-on-secondary: #FFFFFF;
   --color-secondary-container: #D8CFBC;
-  --color-on-secondary-container: #5c6050;
+  --color-on-secondary-container: #6a624f;
 
   /* Surfaces – Floral White / Bone spectrum */
-  --color-surface: #FFFBF4;
+  --color-surface: #FFFFFF;
   --color-surface-dim: #D8CFBC;
-  --color-surface-bright: #FFFBF4;
+  --color-surface-bright: #FFFFFF;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #FFFBF4;
+  --color-surface-container-low: #FFFFFF;
   --color-surface-container: #f5efe5;
   --color-surface-container-high: #ebe4d6;
   --color-surface-container-highest: #e1d9ca;
   --color-surface-variant: #D8CFBC;
 
   /* Text – Smoky Black tones */
-  --color-on-surface: #11120D;
-  --color-on-surface-variant: #3d3e37;
-  --color-on-background: #11120D;
-  --color-background: #FFFBF4;
-  --color-foreground: #11120D;
+  --color-on-surface: #2e2e2e;
+  --color-on-surface-variant: #555555;
+  --color-on-background: #2e2e2e;
+  --color-background: #FFFFFF;
+  --color-foreground: #2e2e2e;
 
   /* Outline */
-  --color-outline: #7A7F6A;
+  --color-outline: #837A64;
   --color-outline-variant: #D8CFBC;
 
   /* Error */
   --color-error: #ba1a1a;
-  --color-on-error: #FFFBF4;
+  --color-on-error: #FFFFFF;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
   /* Inverse */
-  --color-inverse-surface: #11120D;
-  --color-inverse-on-surface: #FFFBF4;
-  --color-inverse-primary: #a3a795;
+  --color-inverse-surface: #2e2e2e;
+  --color-inverse-on-surface: #FFFFFF;
+  --color-inverse-primary: #a59d85;
 
   /* Legacy aliases for gradual migration */
-  --color-accent: #7A7F6A;
-  --color-accent-light: #a5a995;
-  --color-accent-dark: #5c6050;
-  --color-dark: #11120D;
-  --color-dark-light: #3d3e37;
-  --color-text: #11120D;
-  --color-text-light: #7A7F6A;
+  --color-accent: #837A64;
+  --color-accent-light: #a59d85;
+  --color-accent-dark: #6a624f;
+  --color-dark: #2e2e2e;
+  --color-dark-light: #555555;
+  --color-text: #2e2e2e;
+  --color-text-light: #837A64;
   --color-border: #D8CFBC;
   --color-success: #2d7a3a;
   --color-warning: #c4883a;
@@ -153,7 +153,7 @@ body {
   100% { transform: translateX(-100%); }
 }
 .animate-marquee {
-  animation: marquee 25s linear infinite;
+  animation: marquee 100s linear infinite;
 }
 
 /* Glass effect */

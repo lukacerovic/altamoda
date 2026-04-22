@@ -55,12 +55,12 @@ export default function CookieConsent() {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             {/* Icon + Text */}
             <div className="flex items-start gap-3 flex-1">
-              <div className="w-10 h-10 rounded-sm bg-[#FFFBF4] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Cookie className="w-5 h-5 text-[#a5a995]" />
+              <div className="w-10 h-10 rounded-sm bg-[#FFFFFF] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Cookie className="w-5 h-5 text-[#a59d85]" />
               </div>
-              <p className="text-xs text-[#a5a995] leading-relaxed tracking-wide">
+              <p className="text-xs text-[#a59d85] leading-relaxed tracking-wide">
                 {t("cookie.text")}{" "}
-                <a href="#" className="text-[#11120D] hover:underline font-medium">
+                <a href="#" className="text-[#2e2e2e] hover:underline font-medium">
                   {t("cookie.cookiePolicy")}
                 </a>
                 .
@@ -71,7 +71,7 @@ export default function CookieConsent() {
             <div className="flex items-center gap-3 flex-shrink-0">
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-[#D8CFBC] text-[#11120D] rounded-sm text-xs font-bold uppercase tracking-widest hover:border-black hover:text-[#11120D] transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-[#D8CFBC] text-[#2e2e2e] rounded-sm text-xs font-bold uppercase tracking-widest hover:border-black hover:text-[#2e2e2e] transition-colors"
               >
                 {t("cookie.settings")}
                 {showSettings ? (
@@ -82,7 +82,7 @@ export default function CookieConsent() {
               </button>
               <button
                 onClick={acceptAll}
-                className="px-6 py-2.5 bg-black hover:bg-[#11120D] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors"
+                className="px-6 py-2.5 bg-black hover:bg-[#2e2e2e] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors"
               >
                 {t("cookie.acceptAll")}
               </button>
@@ -96,8 +96,8 @@ export default function CookieConsent() {
                 {/* Necessary */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-bold text-[#11120D]">{t("cookie.necessaryCookies")}</span>
-                    <p className="text-xs text-[#a5a995] mt-0.5">
+                    <span className="text-sm font-bold text-[#2e2e2e]">{t("cookie.necessaryCookies")}</span>
+                    <p className="text-xs text-[#a59d85] mt-0.5">
                       {t("cookie.necessaryDesc")}
                     </p>
                   </div>
@@ -121,8 +121,8 @@ export default function CookieConsent() {
                 {/* Analytics */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-bold text-[#11120D]">{t("cookie.analyticsCookies")}</span>
-                    <p className="text-xs text-[#a5a995] mt-0.5">
+                    <span className="text-sm font-bold text-[#2e2e2e]">{t("cookie.analyticsCookies")}</span>
+                    <p className="text-xs text-[#a59d85] mt-0.5">
                       {t("cookie.analyticsDesc")}
                     </p>
                   </div>
@@ -143,8 +143,8 @@ export default function CookieConsent() {
                 {/* Marketing */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-bold text-[#11120D]">{t("cookie.marketingCookies")}</span>
-                    <p className="text-xs text-[#a5a995] mt-0.5">
+                    <span className="text-sm font-bold text-[#2e2e2e]">{t("cookie.marketingCookies")}</span>
+                    <p className="text-xs text-[#a59d85] mt-0.5">
                       {t("cookie.marketingDesc")}
                     </p>
                   </div>
@@ -164,7 +164,7 @@ export default function CookieConsent() {
 
                 <button
                   onClick={saveSettings}
-                  className="mt-2 px-6 py-2.5 bg-black hover:bg-[#11120D] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors self-start"
+                  className="mt-2 px-6 py-2.5 bg-black hover:bg-[#2e2e2e] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors self-start"
                 >
                   {t("cookie.saveSettings")}
                 </button>

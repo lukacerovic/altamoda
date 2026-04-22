@@ -75,13 +75,13 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBF4]">
+    <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#a5a995] mb-6">
+        <div className="flex items-center gap-2 text-sm text-[#a59d85] mb-6">
           <Link href="/" className="hover:text-secondary">{t("wishlist.home")}</Link>
           <span>/</span>
-          <span className="text-[#11120D]">{t("wishlist.title")}</span>
+          <span className="text-[#2e2e2e]">{t("wishlist.title")}</span>
         </div>
 
         {removeError && (
@@ -95,15 +95,15 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             {/* Title + Actions */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-secondary fill-[#7A7F6A]" />
-                <h1 className="text-3xl font-bold text-[#11120D]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
-                <span className="text-sm text-[#a5a995]">({items.length} {t("wishlist.itemCount")})</span>
+                <Heart className="w-6 h-6 text-secondary fill-[#837A64]" />
+                <h1 className="text-3xl font-bold text-[#2e2e2e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
+                <span className="text-sm text-[#a59d85]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 border border-[#D8CFBC] text-[#7A7F6A] text-sm rounded-sm hover:bg-[#FFFBF4] transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2 border border-[#D8CFBC] text-[#837A64] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
                   <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
-                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-black hover:bg-[#11120D] text-white text-sm font-medium rounded-sm transition-colors">
+                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-black hover:bg-[#2e2e2e] text-white text-sm font-medium rounded-sm transition-colors">
                   <ShoppingCart className="w-4 h-4" /> {t("wishlist.addAllToCart")}
                 </button>
               </div>
@@ -122,7 +122,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       )}
                       {!item.inStock && (
                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                          <span className="px-4 py-2 bg-[#11120D] text-white text-xs font-semibold rounded-full">{t("wishlist.unavailable")}</span>
+                          <span className="px-4 py-2 bg-[#2e2e2e] text-white text-xs font-semibold rounded-full">{t("wishlist.unavailable")}</span>
                         </div>
                       )}
                       <button
@@ -134,20 +134,20 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                     </div>
                     <div className="p-4">
                       <p className="text-[10px] font-semibold tracking-widest uppercase text-secondary mb-1">{item.brand}</p>
-                      <h3 className="text-sm font-medium text-[#11120D] mb-2 line-clamp-2 leading-snug">{item.name}</h3>
+                      <h3 className="text-sm font-medium text-[#2e2e2e] mb-2 line-clamp-2 leading-snug">{item.name}</h3>
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#7A7F6A] text-secondary" : "text-[#D8CFBC]"}`} />
+                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#837A64] text-secondary" : "text-[#D8CFBC]"}`} />
                         ))}
                       </div>
                       <div className="flex items-center gap-2 mb-3">
                         {item.oldPrice && item.oldPrice > item.price ? (
                           <>
                             <span className="text-base font-bold text-[#b5453a]">{item.price.toLocaleString()} RSD</span>
-                            <span className="text-xs text-[#a5a995] line-through">{item.oldPrice.toLocaleString()} RSD</span>
+                            <span className="text-xs text-[#a59d85] line-through">{item.oldPrice.toLocaleString()} RSD</span>
                           </>
                         ) : (
-                          <span className="text-base font-bold text-[#11120D]">{item.price.toLocaleString()} RSD</span>
+                          <span className="text-base font-bold text-[#2e2e2e]">{item.price.toLocaleString()} RSD</span>
                         )}
                       </div>
                       <button
@@ -155,8 +155,8 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         onClick={() => addToCart(item)}
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
-                            ? "bg-black hover:bg-[#11120D] text-white"
-                            : "bg-[#D8CFBC] text-[#a5a995] cursor-not-allowed"
+                            ? "bg-black hover:bg-[#2e2e2e] text-white"
+                            : "bg-[#D8CFBC] text-[#a59d85] cursor-not-allowed"
                         }`}
                       >
                         {item.inStock ? t("wishlist.addToCart") : t("wishlist.unavailable")}
@@ -171,9 +171,9 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
           /* Empty State */
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-[#D8CFBC] mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-[#11120D] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.emptyTitle")}</h2>
-            <p className="text-[#7A7F6A] mb-6">{t("wishlist.emptyDesc")}</p>
-            <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-black hover:bg-[#11120D] text-white font-medium rounded-sm transition-colors">
+            <h2 className="text-2xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.emptyTitle")}</h2>
+            <p className="text-[#837A64] mb-6">{t("wishlist.emptyDesc")}</p>
+            <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-black hover:bg-[#2e2e2e] text-white font-medium rounded-sm transition-colors">
               {t("productDetail.products")}
             </Link>
           </div>

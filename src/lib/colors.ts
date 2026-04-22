@@ -11,23 +11,23 @@
 
 export const colors = {
   // ── Brand Accent (Soft Olive) ──────────────────────────────
-  accent:      '#7A7F6A',  // Primary brand color — buttons, links, highlights
-  accentLight: '#a5a995',  // Hover states, subtle accents, scrollbar
-  accentDark:  '#5c6050',  // Active/pressed states, deeper emphasis
+  accent:      '#837A64',  // Primary brand color — buttons, links, highlights
+  accentLight: '#a59d85',  // Hover states, subtle accents, scrollbar
+  accentDark:  '#6a624f',  // Active/pressed states, deeper emphasis
 
   // ── Backgrounds (Floral White / Bone) ─────────────────────
-  background:  '#FFFBF4',  // Page background, floral white
-  surface:     '#FFFBF4',  // Cards, modals, elevated surfaces
+  background:  '#FFFFFF',  // Page background, floral white
+  surface:     '#FFFFFF',  // Cards, modals, elevated surfaces
   muted:       '#f5efe5',  // Muted/disabled backgrounds
   lightAccent: '#D8CFBC',  // Subtle section dividers, shimmer base (bone)
 
   // ── Text (Smoky Black) ────────────────────────────────────
-  foreground:  '#11120D',  // Primary text
-  text:        '#11120D',  // Alias for foreground
-  textLight:   '#7A7F6A',  // Secondary/muted text
+  foreground:  '#2e2e2e',  // Primary text
+  text:        '#2e2e2e',  // Alias for foreground
+  textLight:   '#837A64',  // Secondary/muted text
 
   // ── Dark tones (Smoky Black) ──────────────────────────────
-  dark:        '#11120D',  // Dark backgrounds, footer
+  dark:        '#2e2e2e',  // Dark backgrounds, footer
   darkLight:   '#3d3e37',  // Dark hover states, gradients
 
   // ── Borders (Bone) ────────────────────────────────────────
@@ -42,16 +42,16 @@ export const colors = {
 /**
  * Tailwind class reference (available via @theme inline in globals.css):
  *
- *   bg-accent / text-accent / border-accent          → #7A7F6A (Soft Olive)
- *   bg-accent-light / text-accent-light               → #a5a995
- *   bg-accent-dark / text-accent-dark                 → #5c6050
- *   bg-background                                     → #FFFBF4 (Floral White)
- *   bg-surface                                        → #FFFBF4
+ *   bg-accent / text-accent / border-accent          → #837A64 (Soft Olive)
+ *   bg-accent-light / text-accent-light               → #a59d85
+ *   bg-accent-dark / text-accent-dark                 → #6a624f
+ *   bg-background                                     → #FFFFFF (Floral White)
+ *   bg-surface                                        → #FFFFFF
  *   bg-muted                                          → #f5efe5
  *   bg-light-accent                                   → #D8CFBC (Bone)
- *   text-foreground / text-text                       → #11120D (Smoky Black)
- *   text-text-light                                   → #7A7F6A
- *   bg-dark / text-dark                               → #11120D
+ *   text-foreground / text-text                       → #2e2e2e (Smoky Black)
+ *   text-text-light                                   → #837A64
+ *   bg-dark / text-dark                               → #2e2e2e
  *   bg-dark-light                                     → #3d3e37
  *   border-border                                     → #D8CFBC
  *   text-success / bg-success                         → #2d7a3a
