@@ -7,13 +7,24 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL
+  const isProd = process.env.NODE_ENV === 'production'
+
+  // Serverless-friendly pool:
+  // - small max so we don't exhaust DB's connection cap across many warm instances
+  // - short idle timeout so pooled connections don't get killed server-side while cached
+  // - reasonable connection timeout for cold-start DB handshake
   const adapter = new PrismaPg({
     connectionString,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+    ssl: isProd ? { rejectUnauthorized: false } : undefined,
+    max: 1,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 10_000,
+    keepAlive: true,
   })
   return new PrismaClient({ adapter })
 }
 
+// Cache client across warm serverless invocations too — without this, every warm
+// request creates a fresh PrismaClient + pg.Pool, leaking connections.
 export const prisma = globalForPrisma.prisma ?? createPrismaClient()
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+globalForPrisma.prisma = prisma
