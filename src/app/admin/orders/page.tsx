@@ -325,7 +325,7 @@ export default function OrdersPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <Package size={40} className="mx-auto text-[#D8CFBC] mb-3" />
-            <p className="text-sm text-[#837A64]">{t("admin.noProductsMatch")}</p>
+            <p className="text-sm text-[#837A64]">{t("admin.noOrdersMatch")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Star, ShoppingBag, ArrowRight } from "lucide-react";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
