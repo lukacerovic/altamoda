@@ -504,8 +504,11 @@ export default function ProductsPage() {
     const errors: string[] = [];
     if (!formData.name.trim()) errors.push(t("admin.productName"));
     if (!formData.sku.trim()) errors.push(t("admin.skuCode"));
-    if (!formData.priceB2C || formData.priceB2C <= 0) errors.push(t("admin.priceB2c"));
-    if (!formData.priceB2B || formData.priceB2B <= 0) errors.push(t("admin.priceB2b"));
+    if (formData.badges.isProfessionalOnly) {
+      if (!formData.priceB2B || formData.priceB2B <= 0) errors.push(t("admin.priceB2b"));
+    } else {
+      if (!formData.priceB2C || formData.priceB2C <= 0) errors.push(t("admin.priceB2c"));
+    }
     if (formData.stock === undefined || formData.stock < 0) errors.push(t("admin.stockQuantity"));
 
     if (errors.length > 0) {
@@ -517,7 +520,13 @@ export default function ProductsPage() {
     const apiBody = {
       nameLat: formData.name,
       sku: formData.sku,
-      priceB2c: formData.priceB2C,
+      // B2B-only products still need a non-null priceB2c (schema constraint);
+      // mirror priceB2b into priceB2c so the DB is satisfied and the public
+      // storefront — which only ever reads priceB2c for unauth'd users — has a
+      // sensible fallback price to hide behind the "sign-in for wholesale" UX.
+      priceB2c: formData.badges.isProfessionalOnly
+        ? (formData.priceB2C || formData.priceB2B)
+        : formData.priceB2C,
       priceB2b: formData.priceB2B || null,
       oldPrice: formData.oldPrice || null,
       costPrice: formData.purchasePrice > 0 ? formData.purchasePrice : null,
@@ -1650,7 +1659,7 @@ export default function ProductsPage() {
                 onClick={() => setValidationErrors([])}
                 className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
               >
-                {t("admin.understood") || "Razumem"}
+                {t("auth.understood")}
               </button>
             </div>
           </div>
