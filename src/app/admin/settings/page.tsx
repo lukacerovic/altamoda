@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import {
   Settings,
   Save,
@@ -15,8 +16,13 @@ import {
   EyeOff,
   Loader2,
   Warehouse,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const DEFAULT_LOGO = "/logo.png";
 
 const SETTINGS_KEYS = [
   "storeName",
@@ -27,6 +33,7 @@ const SETTINGS_KEYS = [
   "instagram",
   "facebook",
   "tiktok",
+  "logoUrl",
 ];
 
 export default function SettingsPage() {
@@ -48,6 +55,12 @@ export default function SettingsPage() {
   const [facebook, setFacebook] = useState("");
   const [tiktok, setTiktok] = useState("");
 
+  // Branding
+  const [logoUrl, setLogoUrl] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoError, setLogoError] = useState("");
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
   // Credentials
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -58,6 +71,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "general", label: t("admin.general"), icon: Settings },
+    { id: "branding", label: "Branding", icon: ImageIcon },
     { id: "social", label: t("admin.socialLinksTab"), icon: Share2 },
     { id: "credentials", label: t("admin.credentialsTab"), icon: Lock },
   ];
@@ -79,6 +93,7 @@ export default function SettingsPage() {
         setInstagram(d.instagram || "");
         setFacebook(d.facebook || "");
         setTiktok(d.tiktok || "");
+        setLogoUrl(d.logoUrl || "");
       }
     } catch (err) {
       console.error("Failed to load settings:", err);
@@ -104,6 +119,7 @@ export default function SettingsPage() {
         instagram,
         facebook,
         tiktok,
+        logoUrl,
       };
 
       const res = await fetch("/api/admin/site-settings", {
@@ -120,6 +136,66 @@ export default function SettingsPage() {
       console.error("Failed to save settings:", err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Upload new logo — saves file and persists URL in one step so preview survives reloads
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoError("");
+
+    if (!file.type.startsWith("image/")) {
+      setLogoError("Fajl mora biti slika");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError("Slika je veća od 5MB");
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok || !json?.data?.url) {
+        setLogoError(json?.error || "Greška pri uploadu");
+        return;
+      }
+
+      const newUrl = json.data.url as string;
+      const saveRes = await fetch("/api/admin/site-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logoUrl: newUrl }),
+      });
+      if (saveRes.ok) {
+        setLogoUrl(newUrl);
+      } else {
+        setLogoError("Logo je otpremljen, ali nije sačuvan");
+      }
+    } catch {
+      setLogoError("Greška pri uploadu");
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  };
+
+  // Reset logo back to default (clears saved URL; UI falls back to /logo.png)
+  const handleResetLogo = async () => {
+    setLogoError("");
+    try {
+      await fetch("/api/admin/site-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logoUrl: "" }),
+      });
+      setLogoUrl("");
+    } catch {
+      setLogoError("Greška pri resetovanju");
     }
   };
 
@@ -327,6 +403,63 @@ export default function SettingsPage() {
                     onChange={(e) => setWarehouseAddress(e.target.value)}
                     className="w-full px-4 py-2.5 border border-stone-200 rounded-lg text-sm"
                   />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Branding — logo upload */}
+          {activeTab === "branding" && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-semibold text-black mb-1">Logo</h2>
+                <p className="text-sm text-[#837A64]">
+                  Otpremi logo koji će se prikazivati u zaglavlju sajta. Ako nijedan logo nije otpremljen, koristi se podrazumevani ALTAMODA logo.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start gap-6">
+                <div className="w-40 h-40 rounded-lg border border-stone-200 bg-white flex items-center justify-center overflow-hidden">
+                  <Image
+                    src={logoUrl || DEFAULT_LOGO}
+                    alt="Logo"
+                    width={160}
+                    height={160}
+                    className="object-contain p-4"
+                  />
+                </div>
+
+                <div className="flex-1 space-y-3">
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="px-4 py-2 rounded-lg text-sm font-medium bg-black text-white hover:bg-stone-800 flex items-center gap-2 disabled:opacity-60"
+                    >
+                      {uploadingLogo ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                      {uploadingLogo ? t("admin.saving") : (logoUrl ? "Zameni logo" : "Otpremi logo")}
+                    </button>
+                    {logoUrl && (
+                      <button
+                        onClick={handleResetLogo}
+                        className="px-4 py-2 rounded-lg text-sm font-medium border border-stone-200 text-[#2e2e2e] hover:bg-stone-100 flex items-center gap-2"
+                      >
+                        <Trash2 size={16} />
+                        Vrati podrazumevani
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-[#837A64]">
+                    PNG, JPG ili SVG, maks. 5MB. Preporučeno: transparentna pozadina, visina ~64px.
+                  </p>
+                  {logoError && <p className="text-sm text-red-600">{logoError}</p>}
                 </div>
               </div>
             </div>

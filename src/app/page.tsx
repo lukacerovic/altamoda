@@ -33,8 +33,8 @@ export default async function HomePage() {
     images: { where: { isPrimary: true }, take: 1 },
   }
 
-  // Fetch all product sets + hero settings in parallel
-  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting] = await Promise.all([
+  // Fetch all product sets + hero settings + social links in parallel
+  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting, socialSettings] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true, isFeatured: true },
       include: productInclude,
@@ -61,7 +61,11 @@ export default async function HomePage() {
     }),
     prisma.siteSetting.findUnique({ where: { key: 'heroImages' } }),
     prisma.siteSetting.findUnique({ where: { key: 'heroCards' } }),
+    prisma.siteSetting.findMany({ where: { key: { in: ['instagram', 'facebook', 'tiktok'] } } }),
   ])
+
+  const socialMap: Record<string, string> = {}
+  for (const s of socialSettings) socialMap[s.key] = s.value
 
   // Get all product IDs for rating lookup
   const allProducts = [...featured, ...bestsellers, ...newArrivals, ...saleProducts]
@@ -84,6 +88,11 @@ export default async function HomePage() {
       saleProducts={saleProducts.map(p => formatProduct(p, getRating(p.id)))}
       heroImages={heroSetting?.value ? (() => { try { return JSON.parse(heroSetting.value); } catch { return []; } })() : []}
       heroCards={heroCardsSetting?.value ? (() => { try { return JSON.parse(heroCardsSetting.value); } catch { return []; } })() : []}
+      socialLinks={{
+        instagram: socialMap.instagram || '',
+        facebook: socialMap.facebook || '',
+        tiktok: socialMap.tiktok || '',
+      }}
     />
   )
 }

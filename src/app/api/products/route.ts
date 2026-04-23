@@ -4,42 +4,7 @@ import { successResponse, errorResponse, withErrorHandler, getPaginationParams }
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
-
-// Serbian diacritics: build all character-level variants so cetkica matches četkica
-function expandDiacritics(term: string): string[] {
-  const charGroups: Record<string, string[]> = {
-    s: ['s', 'š'], š: ['s', 'š'],
-    c: ['c', 'č', 'ć'], č: ['c', 'č', 'ć'], ć: ['c', 'č', 'ć'],
-    z: ['z', 'ž'], ž: ['z', 'ž'],
-    d: ['d', 'đ'], đ: ['d', 'đ'],
-  }
-  // Generate variants by replacing one char group at a time
-  // For efficiency, limit to first 8 variant positions max
-  const results = new Set<string>([term])
-  const lower = term.toLowerCase()
-
-  // Find positions that have diacritic alternatives
-  const positions: number[] = []
-  for (let i = 0; i < lower.length; i++) {
-    if (charGroups[lower[i]]) positions.push(i)
-  }
-
-  // Generate all combinations (limit to 2^8 = 256 max)
-  const maxPositions = Math.min(positions.length, 8)
-  const count = 1 << maxPositions
-  for (let mask = 0; mask < count; mask++) {
-    const chars = lower.split('')
-    for (let b = 0; b < maxPositions; b++) {
-      const pos = positions[b]
-      const alts = charGroups[chars[pos]]
-      if (alts) {
-        chars[pos] = (mask >> b) & 1 ? alts[1] : alts[0]
-      }
-    }
-    results.add(chars.join(''))
-  }
-  return Array.from(results)
-}
+import { findFuzzyProductIds } from '@/lib/fuzzy-search'
 
 // GET /api/products — List with filters, pagination, B2B/B2C visibility
 export const GET = withErrorHandler(async (req: Request) => {
@@ -134,14 +99,12 @@ export const GET = withErrorHandler(async (req: Request) => {
   if (isFeatured === 'true') where.isFeatured = true
   if (isBestseller === 'true') where.isBestseller = true
 
-  // Search (with Serbian diacritics support: sampon matches šampon)
+  // Fuzzy search via pg_trgm + diacritic-aware ILIKE. Returns candidate IDs ranked by similarity;
+  // downstream filters (category/price/etc.) still apply through the normal where clause.
+  // Empty result ⇒ force zero matches so other filters don't resurrect unrelated products.
   if (search) {
-    const terms = expandDiacritics(search)
-    where.OR = terms.flatMap(term => [
-      { nameLat: { contains: term, mode: 'insensitive' as const } },
-      { sku: { contains: term, mode: 'insensitive' as const } },
-      { brand: { name: { contains: term, mode: 'insensitive' as const } } },
-    ])
+    const candidateIds = await findFuzzyProductIds(search)
+    where.id = { in: candidateIds.length > 0 ? candidateIds : ['__no_match__'] }
   }
 
   // Color filters
@@ -404,7 +367,9 @@ export const POST = withErrorHandler(async (req: Request) => {
       productLineId: body.productLineId || null,
       categoryId: body.categoryId || null,
       description: body.description,
+      benefits: body.benefits,
       ingredients: body.ingredients,
+      declaration: body.declaration,
       usageInstructions: body.usageInstructions,
       priceB2c: body.priceB2c,
       priceB2b: body.priceB2b,
