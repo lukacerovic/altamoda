@@ -172,7 +172,7 @@ export default function UsersPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
             <input
               type="text"
               placeholder={t("admin.searchUsers")}
@@ -238,7 +238,7 @@ export default function UsersPage() {
         <div className={`bg-white rounded-sm border border-stone-200 overflow-hidden ${selectedUser ? "lg:flex-1" : "w-full"}`}>
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 size={24} className="animate-spin text-[#a59d85]" />
+              <Loader2 size={24} className="animate-spin text-[#837A64]" />
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -257,7 +257,7 @@ export default function UsersPage() {
                 <tbody className="divide-y divide-[#FFFFFF]">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#a59d85]">
+                      <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#837A64]">
                         {t("admin.noUsersFound")}
                       </td>
                     </tr>
@@ -265,12 +265,12 @@ export default function UsersPage() {
                     <tr key={user.id} className={`hover:bg-stone-100 transition-colors cursor-pointer ${selectedUser?.id === user.id ? "bg-black/5" : ""}`} onClick={() => setSelectedUser(user)}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${user.status === "pending" ? "bg-yellow-50 text-yellow-600" : "bg-stone-100 text-[#a59d85]"}`}>
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${user.status === "pending" ? "bg-yellow-50 text-yellow-600" : "bg-stone-100 text-[#837A64]"}`}>
                             <User size={16} />
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-black truncate">{user.name}</p>
-                            <p className="text-xs text-[#a59d85] truncate">{user.email}</p>
+                            <p className="text-xs text-[#837A64] truncate">{user.email}</p>
                           </div>
                         </div>
                       </td>
@@ -280,7 +280,7 @@ export default function UsersPage() {
                       <td className="px-6 py-4 text-sm font-medium text-black">{user.totalSpent.toLocaleString()} RSD</td>
                       <td className="px-6 py-4">{statusBadge(user.status)}</td>
                       <td className="px-6 py-4">
-                        <button className="p-1.5 text-[#a59d85] hover:text-secondary rounded-sm transition-colors">
+                        <button className="p-1.5 text-[#837A64] hover:text-secondary rounded-sm transition-colors">
                           <Eye size={16} />
                         </button>
                       </td>
@@ -326,7 +326,7 @@ export default function UsersPage() {
           <div className="w-full lg:w-96 bg-white rounded-sm border border-stone-200 overflow-hidden flex-shrink-0">
             <div className="p-6 border-b border-stone-200 flex items-center justify-between">
               <h3 className="font-semibold text-black">{t("admin.userDetails")}</h3>
-              <button onClick={() => setSelectedUser(null)} className="p-1 text-[#a59d85] hover:text-black">
+              <button onClick={() => setSelectedUser(null)} className="p-1 text-[#837A64] hover:text-black">
                 <X size={18} />
               </button>
             </div>
@@ -347,17 +347,17 @@ export default function UsersPage() {
               {/* Info */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <Mail size={14} className="text-[#a59d85]" />
+                  <Mail size={14} className="text-[#837A64]" />
                   <span className="text-[#2e2e2e]">{selectedUser.email}</span>
                 </div>
                 {selectedUser.phone && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Phone size={14} className="text-[#a59d85]" />
+                    <Phone size={14} className="text-[#837A64]" />
                     <span className="text-[#2e2e2e]">{selectedUser.phone}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-sm">
-                  <Calendar size={14} className="text-[#a59d85]" />
+                  <Calendar size={14} className="text-[#837A64]" />
                   <span className="text-[#2e2e2e]">{t("admin.registration")}: {formatDate(selectedUser.createdAt)}</span>
                 </div>
               </div>
@@ -368,20 +368,20 @@ export default function UsersPage() {
                   <h5 className="text-xs font-semibold text-[#837A64] uppercase tracking-wider mb-3">{t("admin.b2bData")}</h5>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <Building size={14} className="text-[#a59d85]" />
+                      <Building size={14} className="text-[#837A64]" />
                       <span className="text-[#2e2e2e]">{selectedUser.b2bProfile.salonName}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="text-xs font-medium text-[#a59d85] w-[14px] text-center">PIB</span>
+                      <span className="text-xs font-medium text-[#837A64] w-[14px] text-center">PIB</span>
                       <span className="text-[#2e2e2e]">{selectedUser.b2bProfile.pib}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <Hash size={14} className="text-[#a59d85]" />
+                      <Hash size={14} className="text-[#837A64]" />
                       <span className="text-[#2e2e2e]">{t("admin.maticniBroj")}: {selectedUser.b2bProfile.maticniBroj}</span>
                     </div>
                     {selectedUser.b2bProfile.address && (
                       <div className="flex items-center gap-2 text-sm">
-                        <MapPin size={14} className="text-[#a59d85]" />
+                        <MapPin size={14} className="text-[#837A64]" />
                         <span className="text-[#2e2e2e]">{selectedUser.b2bProfile.address}</span>
                       </div>
                     )}
@@ -401,11 +401,11 @@ export default function UsersPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-sm bg-stone-100 text-center">
                   <p className="text-xl font-bold text-black">{selectedUser.ordersCount}</p>
-                  <p className="text-xs text-[#a59d85]">{t("admin.orders")}</p>
+                  <p className="text-xs text-[#837A64]">{t("admin.orders")}</p>
                 </div>
                 <div className="p-3 rounded-sm bg-stone-100 text-center">
                   <p className="text-xl font-bold text-black">{selectedUser.totalSpent > 1000 ? `${(selectedUser.totalSpent / 1000).toFixed(0)}k` : selectedUser.totalSpent}</p>
-                  <p className="text-xs text-[#a59d85]">{t("admin.rsdSpent")}</p>
+                  <p className="text-xs text-[#837A64]">{t("admin.rsdSpent")}</p>
                 </div>
               </div>
 

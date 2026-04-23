@@ -225,7 +225,9 @@ model Product {
   categoryId        String?  @map("category_id")
   description       String?
   purpose           String?
+  benefits          String?
   ingredients       String?
+  declaration       String?
   usageInstructions String?  @map("usage_instructions")
   warnings          String?
   shelfLife         String?  @map("shelf_life")

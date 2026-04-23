@@ -189,7 +189,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
       <Header />
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-[#a59d85] mb-6">
+        <nav className="flex items-center gap-2 text-sm text-[#837A64] mb-6">
           <Link href="/" className="hover:text-secondary">{t("nav.home") || "Početna"}</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-[#2e2e2e]">{t("colors.title")}</span>
@@ -200,7 +200,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
           <h1 className="text-3xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
             {t("colors.title")}
           </h1>
-          <p className="text-[#a59d85]">{t("colors.subtitle")}</p>
+          <p className="text-[#837A64]">{t("colors.subtitle")}</p>
         </div>
 
         {/* Brand line tabs */}
@@ -212,7 +212,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
               className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 activeBrand === b.slug
                   ? "bg-black text-white shadow-sm"
-                  : "bg-white text-[#a59d85] border border-[#D8CFBC] hover:border-black"
+                  : "bg-white text-[#837A64] border border-[#D8CFBC] hover:border-black"
               }`}
             >
               {b.name} <span className="text-xs opacity-70">({b.count})</span>
@@ -225,7 +225,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
           <div className="flex flex-wrap items-center gap-4">
             {/* Search */}
             <div className="relative flex-1 min-w-[200px]">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
               <input
                 type="text"
                 placeholder={t("colors.searchPlaceholder")}
@@ -238,7 +238,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             {/* Mobile filter toggle */}
             <button
               onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className="sm:hidden flex items-center gap-2 px-4 py-2 bg-[#FFFFFF] rounded-sm text-sm text-[#a59d85]"
+              className="sm:hidden flex items-center gap-2 px-4 py-2 bg-[#FFFFFF] rounded-sm text-sm text-[#837A64]"
             >
               <Filter size={16} /> {t("colors.filters")}
             </button>
@@ -247,12 +247,12 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             <div className="hidden sm:flex items-center gap-4">
               {/* Level filter */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#a59d85] uppercase">{t("colors.lightLevel")}</span>
+                <span className="text-xs font-semibold text-[#837A64] uppercase">{t("colors.lightLevel")}</span>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setFilterLevel(null)}
                     className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                      !filterLevel ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85] hover:bg-[#D8CFBC]"
+                      !filterLevel ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64] hover:bg-[#D8CFBC]"
                     }`}
                   >
                     {t("colors.all")}
@@ -262,7 +262,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                       key={l}
                       onClick={() => setFilterLevel(filterLevel === l ? null : l)}
                       className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
-                        filterLevel === l ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85] hover:bg-[#D8CFBC]"
+                        filterLevel === l ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64] hover:bg-[#D8CFBC]"
                       }`}
                     >
                       {l}
@@ -273,12 +273,12 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
 
               {/* Undertone filter */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#a59d85] uppercase">{t("colors.undertone")}</span>
+                <span className="text-xs font-semibold text-[#837A64] uppercase">{t("colors.undertone")}</span>
                 <div className="flex gap-1 flex-wrap">
                   <button
                     onClick={() => setFilterUndertone(null)}
                     className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                      !filterUndertone ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85] hover:bg-[#D8CFBC]"
+                      !filterUndertone ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64] hover:bg-[#D8CFBC]"
                     }`}
                   >
                     {t("colors.all")}
@@ -288,7 +288,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                       key={ut.key}
                       onClick={() => setFilterUndertone(filterUndertone === ut.key ? null : ut.key)}
                       className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                        filterUndertone === ut.key ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85] hover:bg-[#D8CFBC]"
+                        filterUndertone === ut.key ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64] hover:bg-[#D8CFBC]"
                       }`}
                     >
                       {language === "en" ? ut.label : ut.labelSr}
@@ -302,14 +302,14 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             <div className="flex border border-[#D8CFBC] rounded-sm overflow-hidden">
               <button
                 onClick={() => setViewMode("matrix")}
-                className={`p-2 ${viewMode === "matrix" ? "bg-black text-white" : "bg-white text-[#a59d85] hover:bg-[#FFFFFF]"}`}
+                className={`p-2 ${viewMode === "matrix" ? "bg-black text-white" : "bg-white text-[#837A64] hover:bg-[#FFFFFF]"}`}
                 title={t("colors.matrixView")}
               >
                 <Grid3X3 size={16} />
               </button>
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 ${viewMode === "grid" ? "bg-black text-white" : "bg-white text-[#a59d85] hover:bg-[#FFFFFF]"}`}
+                className={`p-2 ${viewMode === "grid" ? "bg-black text-white" : "bg-white text-[#837A64] hover:bg-[#FFFFFF]"}`}
                 title={t("colors.gridView")}
               >
                 <LayoutGrid size={16} />
@@ -330,11 +330,11 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
           {showMobileFilters && (
             <div className="sm:hidden mt-4 pt-4 border-t border-[#D8CFBC] space-y-4">
               <div>
-                <span className="text-xs font-semibold text-[#a59d85] uppercase mb-2 block">{t("colors.lightLevel")}</span>
+                <span className="text-xs font-semibold text-[#837A64] uppercase mb-2 block">{t("colors.lightLevel")}</span>
                 <div className="flex gap-1.5 flex-wrap">
                   <button
                     onClick={() => setFilterLevel(null)}
-                    className={`w-8 h-8 rounded text-xs font-medium ${!filterLevel ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85]"}`}
+                    className={`w-8 h-8 rounded text-xs font-medium ${!filterLevel ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64]"}`}
                   >
                     {t("colors.all")}
                   </button>
@@ -342,7 +342,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                     <button
                       key={l}
                       onClick={() => setFilterLevel(filterLevel === l ? null : l)}
-                      className={`w-8 h-8 rounded text-xs font-medium ${filterLevel === l ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85]"}`}
+                      className={`w-8 h-8 rounded text-xs font-medium ${filterLevel === l ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64]"}`}
                     >
                       {l}
                     </button>
@@ -350,11 +350,11 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                 </div>
               </div>
               <div>
-                <span className="text-xs font-semibold text-[#a59d85] uppercase mb-2 block">{t("colors.undertone")}</span>
+                <span className="text-xs font-semibold text-[#837A64] uppercase mb-2 block">{t("colors.undertone")}</span>
                 <div className="flex gap-1.5 flex-wrap">
                   <button
                     onClick={() => setFilterUndertone(null)}
-                    className={`px-3 h-8 rounded text-xs font-medium ${!filterUndertone ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85]"}`}
+                    className={`px-3 h-8 rounded text-xs font-medium ${!filterUndertone ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64]"}`}
                   >
                     {t("colors.all")}
                   </button>
@@ -362,7 +362,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                     <button
                       key={ut.key}
                       onClick={() => setFilterUndertone(filterUndertone === ut.key ? null : ut.key)}
-                      className={`px-3 h-8 rounded text-xs font-medium ${filterUndertone === ut.key ? "bg-black text-white" : "bg-[#FFFFFF] text-[#a59d85]"}`}
+                      className={`px-3 h-8 rounded text-xs font-medium ${filterUndertone === ut.key ? "bg-black text-white" : "bg-[#FFFFFF] text-[#837A64]"}`}
                     >
                       {language === "en" ? ut.label : ut.labelSr}
                     </button>
@@ -375,7 +375,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
 
         {/* Results count */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-[#a59d85]">
+          <p className="text-sm text-[#837A64]">
             {loading ? t("colors.loading") : `${displayColors.length} ${t("colors.shades")}`}
           </p>
         </div>
@@ -387,8 +387,8 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             {recentlyViewed.length > 0 && !hasActiveFilters && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock size={14} className="text-[#a59d85]" />
-                  <span className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">{t("colors.recentlyViewed")}</span>
+                  <Clock size={14} className="text-[#837A64]" />
+                  <span className="text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("colors.recentlyViewed")}</span>
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {recentlyViewed.map((c) => (
@@ -398,7 +398,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                       className="flex items-center gap-2 px-3 py-2 bg-white rounded-sm border border-[#D8CFBC] hover:border-black transition-colors whitespace-nowrap flex-shrink-0"
                     >
                       <div className="w-6 h-6 rounded-full border border-white shadow-sm" style={{ backgroundColor: c.hexValue }} />
-                      <span className="text-xs font-medium text-[#a59d85]">{c.shadeCode}</span>
+                      <span className="text-xs font-medium text-[#837A64]">{c.shadeCode}</span>
                     </button>
                   ))}
                 </div>
@@ -412,11 +412,11 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                   <table className="w-full">
                     <thead>
                       <tr className="bg-[#FFFFFF]/50">
-                        <th className="sticky left-0 z-10 bg-[#FFFFFF]/80 backdrop-blur-sm px-4 py-3 text-left text-xs font-semibold text-[#a59d85] uppercase w-44">
+                        <th className="sticky left-0 z-10 bg-[#FFFFFF]/80 backdrop-blur-sm px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase w-44">
                           {t("colors.lightLevel")}
                         </th>
                         {matrixData.undertones.map((ut) => (
-                          <th key={ut} className="px-3 py-3 text-center text-xs font-semibold text-[#a59d85] uppercase min-w-[72px]">
+                          <th key={ut} className="px-3 py-3 text-center text-xs font-semibold text-[#837A64] uppercase min-w-[72px]">
                             {getUndertoneName(ut)}
                           </th>
                         ))}
@@ -430,7 +430,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                               <div className="w-8 h-8 rounded-full bg-[#FFFFFF] flex items-center justify-center text-sm font-bold text-[#2e2e2e]">
                                 {level}
                               </div>
-                              <span className="text-xs text-[#a59d85] hidden sm:block">{getLevelName(level)}</span>
+                              <span className="text-xs text-[#837A64] hidden sm:block">{getLevelName(level)}</span>
                             </div>
                           </td>
                           {matrixData.undertones.map((ut) => {
@@ -453,7 +453,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                                           }`}
                                           style={{ backgroundColor: c.hexValue }}
                                         />
-                                        <span className="text-[9px] text-[#a59d85] block mt-0.5 font-medium">{c.shadeCode}</span>
+                                        <span className="text-[9px] text-[#837A64] block mt-0.5 font-medium">{c.shadeCode}</span>
                                         {/* Tooltip */}
                                         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-2 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                                           {c.name}
@@ -478,7 +478,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
 
                 {displayColors.length === 0 && !loading && (
                   <div className="p-12 text-center">
-                    <p className="text-[#a59d85]">{t("colors.noColors")}</p>
+                    <p className="text-[#837A64]">{t("colors.noColors")}</p>
                   </div>
                 )}
               </div>
@@ -489,7 +489,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
               <>
                 {displayColors.length === 0 && !loading ? (
                   <div className="bg-white rounded-sm p-12 text-center">
-                    <p className="text-[#a59d85]">{t("colors.noColors")}</p>
+                    <p className="text-[#837A64]">{t("colors.noColors")}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
@@ -509,7 +509,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                           }`}
                           style={{ backgroundColor: color.hexValue }}
                         />
-                        <span className="text-[10px] text-[#a59d85] font-medium">{color.shadeCode}</span>
+                        <span className="text-[10px] text-[#837A64] font-medium">{color.shadeCode}</span>
                         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-2 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                           {color.name}
                           <br />
@@ -530,7 +530,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
               <div className="bg-white rounded-sm shadow-sm p-6 sticky top-24">
                 <button
                   onClick={() => setSelectedColor(null)}
-                  className="absolute top-3 right-3 text-[#a59d85] hover:text-[#a59d85]"
+                  className="absolute top-3 right-3 text-[#837A64] hover:text-[#837A64]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -542,20 +542,20 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                     {selectedColor.productLine?.name || selectedColor.brand?.name}
                   </span>
                   <h3 className="text-lg font-bold text-[#2e2e2e] mt-1">{selectedColor.shadeCode}</h3>
-                  <p className="text-sm text-[#a59d85]">{selectedColor.name}</p>
+                  <p className="text-sm text-[#837A64]">{selectedColor.name}</p>
                 </div>
 
                 <div className="space-y-2 text-sm mb-6">
                   <div className="flex justify-between py-1.5 border-b border-[#D8CFBC]">
-                    <span className="text-[#a59d85]">{t("colors.level")}</span>
+                    <span className="text-[#837A64]">{t("colors.level")}</span>
                     <span className="font-medium">{selectedColor.level} — {getLevelName(selectedColor.level)}</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-[#D8CFBC]">
-                    <span className="text-[#a59d85]">{t("colors.undertone")}</span>
+                    <span className="text-[#837A64]">{t("colors.undertone")}</span>
                     <span className="font-medium">{selectedColor.undertoneName}</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-[#D8CFBC]">
-                    <span className="text-[#a59d85]">{t("colors.price")}</span>
+                    <span className="text-[#837A64]">{t("colors.price")}</span>
                     <span className="font-bold text-[#2e2e2e]">{selectedColor.price.toLocaleString("sr-RS")} RSD</span>
                   </div>
                 </div>
@@ -572,7 +572,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
 
                 {/* Quick navigation: adjacent shades */}
                 <div className="mt-6 pt-4 border-t border-[#D8CFBC]">
-                  <p className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider mb-3">{t("colors.similarShades")}</p>
+                  <p className="text-xs font-semibold text-[#837A64] uppercase tracking-wider mb-3">{t("colors.similarShades")}</p>
                   <div className="flex flex-wrap gap-2">
                     {displayColors
                       .filter(
@@ -589,7 +589,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                           className="flex items-center gap-1.5 px-2 py-1 bg-[#FFFFFF] rounded-full hover:bg-[#D8CFBC] transition-colors"
                         >
                           <div className="w-5 h-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: c.hexValue }} />
-                          <span className="text-[10px] font-medium text-[#a59d85]">{c.shadeCode}</span>
+                          <span className="text-[10px] font-medium text-[#837A64]">{c.shadeCode}</span>
                         </button>
                       ))}
                   </div>
@@ -604,7 +604,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
           <div className="lg:hidden fixed inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 p-6 border-t border-[#D8CFBC]">
             <button
               onClick={() => setSelectedColor(null)}
-              className="absolute top-3 right-3 text-[#a59d85] hover:text-[#a59d85]"
+              className="absolute top-3 right-3 text-[#837A64] hover:text-[#837A64]"
             >
               <X className="w-5 h-5" />
             </button>
@@ -614,10 +614,10 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
               <div>
                 <span className="text-xs text-secondary font-medium uppercase">{selectedColor.productLine?.name}</span>
                 <h3 className="text-lg font-bold text-[#2e2e2e]">{selectedColor.shadeCode}</h3>
-                <p className="text-sm text-[#a59d85]">{selectedColor.name}</p>
+                <p className="text-sm text-[#837A64]">{selectedColor.name}</p>
               </div>
               <div className="ml-auto text-right">
-                <p className="text-sm text-[#a59d85]">{t("colors.level")} {selectedColor.level} · {selectedColor.undertoneName}</p>
+                <p className="text-sm text-[#837A64]">{t("colors.level")} {selectedColor.level} · {selectedColor.undertoneName}</p>
                 <p className="text-lg font-bold text-[#2e2e2e]">{selectedColor.price.toLocaleString("sr-RS")} RSD</p>
               </div>
             </div>

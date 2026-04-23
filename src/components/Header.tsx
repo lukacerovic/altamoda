@@ -10,6 +10,7 @@ import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { resolveBrandLogo } from "@/lib/brand-logos";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 import {
   Search,
   ShoppingBag,
@@ -142,6 +143,8 @@ export default function Header() {
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [brands, setBrands] = useState<BrandItem[]>(cachedBrands);
+  const siteSettings = useSiteSettings(["logoUrl"]);
+  const logoSrc = siteSettings.logoUrl || "/logo.png";
 
   // Fetch brands for the nav dropdown (cached across mounts)
   useEffect(() => {
@@ -373,7 +376,7 @@ export default function Header() {
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-            <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-6 xl:h-7" />
+            <Image src={logoSrc} alt="Alta Moda" width={140} height={40} className="h-6 xl:h-7" unoptimized />
           </Link>
 
           {/* Icons - right */}
@@ -459,7 +462,7 @@ export default function Header() {
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileMenu(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 bg-white overflow-y-auto animate-slideInRight">
             <div className="flex items-center justify-between p-4 border-b border-[#D8CFBC]">
-              <Image src="/logo.png" alt="Alta Moda" width={140} height={40} className="h-5" />
+              <Image src={logoSrc} alt="Alta Moda" width={140} height={40} className="h-5" unoptimized />
               <button onClick={() => setMobileMenu(false)}>
                 <X className="w-5 h-5 text-[#2e2e2e]" />
               </button>

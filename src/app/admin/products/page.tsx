@@ -19,7 +19,6 @@ import {
   Upload,
   Image as ImageIcon,
   Star,
-  Film,
   FileImage,
   Palette,
   ShieldCheck,
@@ -60,11 +59,11 @@ interface Product {
   status: "active" | "inactive";
   badges: { isNew: boolean; isFeatured: boolean; isBestseller: boolean; isProfessionalOnly: boolean };
   description: string;
+  benefits?: string;
   ingredients: string;
+  declaration?: string;
   howToUse: string;
   images: ProductImage[];
-  videoUrl: string;
-  gifUrl: string;
   colorLevel?: number;
   colorUndertone?: string;
   colorHex?: string;
@@ -77,16 +76,9 @@ interface Product {
   vatRate: number;
   vatCode: string;
   erpId: string;
-  attributes: {
-    sulfateFree: boolean;
-    parabenFree: boolean;
-    ammoniaFree: boolean;
-    vegan: boolean;
-    hairTypes: string[];
-  };
 }
 
-type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe" | "atributi";
+type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe";
 
 /* ───────────────────────── Constants ───────────────────────── */
 
@@ -110,7 +102,7 @@ const categoryHierarchy: Record<string, string[]> = {
   "Aparati": ["Aparati za kosu"],
 };
 
-/* colorUndertones and hairTypeOptions moved inside component to use t() */
+/* colorUndertones moved inside component to use t() */
 
 /* ───────────────────────── Mock Data ───────────────────────── */
 
@@ -124,10 +116,8 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Sodium Laureth Sulfate, Argan Oil...",
     howToUse: "Nanesite na mokru kosu, upenite i isperite. Ponovite po potrebi.",
     images: [{ id: 1, url: "/products/redken1.jpg", alt: "Redken All Soft \u0161ampon", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Redken All Soft \u0160ampon | Alta Moda", metaDescription: "Profesionalni \u0161ampon za suvu kosu. Redken All Soft linija.", slug: "redken-all-soft-shampoo-300ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Lomljiva"] },
   },
   {
     id: 2, name: "Matrix Total Results Repair 300ml", sku: "MAT-TR-R300", brand: "Matrix", productLine: "Total Results",
@@ -138,10 +128,8 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Sodium Laureth Sulfate, Ceramide Complex...",
     howToUse: "Nanesite na mokru kosu, masirajte i isperite.",
     images: [{ id: 1, url: "/products/matrix1.jpg", alt: "Matrix Total Results Repair", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Matrix Total Results Repair | Alta Moda", metaDescription: "Matrix Total Results Repair \u0161ampon za obnovu kose.", slug: "matrix-total-results-repair-300ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["O\u0161te\u0107ena", "Normalna"] },
   },
   {
     id: 3, name: "Framesi Morphosis Serum 100ml", sku: "FRA-MO-S100", brand: "Framesi", productLine: "Morphosis",
@@ -152,10 +140,8 @@ const initialProducts: Product[] = [
     ingredients: "Cyclopentasiloxane, Dimethiconol, Argan Oil...",
     howToUse: "Nanesite 1-2 pumpe na suvu ili vla\u017enu kosu.",
     images: [{ id: 1, url: "/products/framesi1.jpg", alt: "Framesi Morphosis Serum", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Framesi Morphosis Serum | Alta Moda", metaDescription: "Luksuzni serum za sjaj kose. Framesi Morphosis.", slug: "framesi-morphosis-serum-100ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Normalna", "Farbana"] },
   },
   {
     id: 4, name: "Biolage Hydra Source \u0160ampon 250ml", sku: "BIO-HS-S250", brand: "Biolage", productLine: "Hydra Source",
@@ -166,10 +152,8 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Sodium Laureth Sulfate, Aloe Extract...",
     howToUse: "Nanesite na mokru kosu, masirajte i isperite.",
     images: [{ id: 1, url: "/products/biolage1.jpg", alt: "Biolage Hydra Source \u0161ampon", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Biolage Hydra Source \u0160ampon | Alta Moda", metaDescription: "Biolage Hydra Source \u0161ampon za hidrataciju.", slug: "biolage-hydra-source-sampon-250ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["Normalna", "Suva"] },
   },
   {
     id: 5, name: "Olivia Garden Ceramic Ion Brush 45mm", sku: "OG-CI-B45", brand: "Olivia Garden", productLine: "Ceramic + Ion",
@@ -180,10 +164,8 @@ const initialProducts: Product[] = [
     ingredients: "",
     howToUse: "Koristite prilikom feniranja za glatku i sjajnu kosu.",
     images: [{ id: 1, url: "/products/oliviagarden1.jpg", alt: "Olivia Garden Ceramic Ion Brush", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Olivia Garden Ceramic Ion Brush | Alta Moda", metaDescription: "Profesionalna \u010detka za feniranje.", slug: "olivia-garden-ceramic-ion-brush-45mm",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
     id: 6, name: "Framesi Framcolor 60ml - 7.0", sku: "FRA-FC-700", brand: "Framesi", productLine: "Framcolor",
@@ -194,11 +176,9 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Cetearyl Alcohol, Propylene Glycol...",
     howToUse: "Pome\u0161ajte 1:1 sa razvo\u010diva\u010dem. Nanesite i ostavite 30-45 min.",
     images: [{ id: 1, url: "/products/framesi-color1.jpg", alt: "Framesi Framcolor 7.0", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     colorLevel: 7, colorUndertone: "N", colorHex: "#8B6914", shadeCode: "7-0",
     seoTitle: "Framesi Framcolor 7-0 | Alta Moda", metaDescription: "Framesi Framcolor 7-0 permanentna boja.", slug: "framesi-framcolor-7-0",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
     id: 7, name: "Matrix SoColor 60ml - 6N", sku: "MAT-SC-6N", brand: "Matrix", productLine: "SoColor",
@@ -209,11 +189,9 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Cetearyl Alcohol, Hexylene Glycol...",
     howToUse: "Pome\u0161ajte sa oksidansom u srazmeri 1:1.5. Vreme delovanja 35 min.",
     images: [{ id: 1, url: "/products/matrix-socolor1.jpg", alt: "Matrix SoColor 6N", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     colorLevel: 6, colorUndertone: "N", colorHex: "#6B4226", shadeCode: "6N",
     seoTitle: "Matrix SoColor 6N | Alta Moda", metaDescription: "Matrix SoColor 6N permanentna boja.", slug: "matrix-socolor-6n",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
     id: 8, name: "Redken Brews Clay Pomade", sku: "RED-BR-CP01", brand: "Redken", productLine: "Brews",
@@ -224,10 +202,8 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Kaolin, Beeswax...",
     howToUse: "Nanesite malu koli\u010dinu na suvu kosu i oblikujte.",
     images: [{ id: 1, url: "/products/redken-brews1.jpg", alt: "Redken Brews Clay Pomade", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Redken Brews Clay Pomade | Alta Moda", metaDescription: "Redken Brews Clay Pomade za matiran izgled.", slug: "redken-brews-clay-pomade",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["Normalna", "Masna"] },
   },
   {
     id: 9, name: "Biolage Strength Recovery Maska 250ml", sku: "BIO-SR-M250", brand: "Biolage", productLine: "Strength Recovery",
@@ -238,10 +214,8 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Cetearyl Alcohol, Squalane...",
     howToUse: "Nanesite na opranu kosu, ostavite 5 min i isperite.",
     images: [{ id: 1, url: "/products/biolage-sr1.jpg", alt: "Biolage Strength Recovery Maska", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Biolage Strength Recovery Maska | Alta Moda", metaDescription: "Biolage Strength Recovery maska za obnovu kose.", slug: "biolage-strength-recovery-maska-250ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: true, hairTypes: ["O\u0161te\u0107ena", "Suva"] },
   },
   {
     id: 10, name: "Elchim 3900 Healthy Ionic Fen", sku: "ELC-39-HI01", brand: "Elchim", productLine: "3900 Healthy Ionic",
@@ -252,10 +226,8 @@ const initialProducts: Product[] = [
     ingredients: "",
     howToUse: "Koristite sa difuzerom ili koncentratorom.",
     images: [{ id: 1, url: "/products/elchim1.jpg", alt: "Elchim 3900 Healthy Ionic", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Elchim 3900 Healthy Ionic | Alta Moda", metaDescription: "Elchim 3900 profesionalni fen.", slug: "elchim-3900-healthy-ionic",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
   },
   {
     id: 11, name: "Framesi Color Lover Shampoo 500ml", sku: "FRA-CL-S500", brand: "Framesi", productLine: "Color Lover",
@@ -266,10 +238,8 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Sodium Laureth Sulfate, Quinoa Extract...",
     howToUse: "Nanesite na mokru kosu, upenite i isperite.",
     images: [{ id: 1, url: "/products/framesi-cl1.jpg", alt: "Framesi Color Lover Shampoo", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Framesi Color Lover Shampoo | Alta Moda", metaDescription: "Framesi Color Lover \u0161ampon za farbanu kosu.", slug: "framesi-color-lover-shampoo-500ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Farbana", "Normalna"] },
   },
   {
     id: 12, name: "Redken Extreme Ulje 100ml", sku: "RED-EX-U100", brand: "Redken", productLine: "Extreme",
@@ -280,10 +250,8 @@ const initialProducts: Product[] = [
     ingredients: "Cyclomethicone, Dimethiconol, Argania Spinosa Oil...",
     howToUse: "Nanesite 1-2 kapi na krajeve kose.",
     images: [{ id: 1, url: "/products/redken-extreme1.jpg", alt: "Redken Extreme Ulje", isPrimary: true }],
-    videoUrl: "", gifUrl: "",
     seoTitle: "Redken Extreme Ulje | Alta Moda", metaDescription: "Redken Extreme hranljivo ulje za kosu.", slug: "redken-extreme-ulje-100ml",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
-    attributes: { sulfateFree: true, parabenFree: true, ammoniaFree: true, vegan: false, hairTypes: ["Suva", "Normalna", "O\u0161te\u0107ena"] },
   },
 ];
 
@@ -307,11 +275,11 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   status: "active",
   badges: { isNew: false, isFeatured: false, isBestseller: false, isProfessionalOnly: false },
   description: "",
+  benefits: "",
   ingredients: "",
+  declaration: "",
   howToUse: "",
   images: [],
-  videoUrl: "",
-  gifUrl: "",
   seoTitle: "",
   metaDescription: "",
   slug: "",
@@ -319,7 +287,6 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   vatRate: 20,
   vatCode: "R2",
   erpId: "",
-  attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
 });
 
 /* ───────────────────────── Helpers ───────────────────────── */
@@ -342,6 +309,8 @@ export default function ProductsPage() {
   const [brandFilter, setBrandFilter] = useState("__all__");
   const [categoryFilter, setCategoryFilter] = useState("__all__");
   const [statusFilter, setStatusFilter] = useState("__all__");
+  // __all__ | retail | professional — matches Product.badges.isProfessionalOnly
+  const [userTypeFilter, setUserTypeFilter] = useState("__all__");
   const [currentPage, setCurrentPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -368,6 +337,9 @@ export default function ProductsPage() {
 
   // Category & filter helpers
   const allCategoryNames = [...new Set([...Object.keys(categoryHierarchy), ...Object.keys(customCategories)])];
+  // Merge hardcoded brand list with brands actually present in the loaded products so
+  // admin-created brands show up in the dropdown without a hardcode update.
+  const availableBrands = [...new Set([...brandNames, ...products.map((p) => p.brand).filter(Boolean)])].sort();
   const getAllSubcategories = (cat: string): string[] => [
     ...(categoryHierarchy[cat] || []),
     ...(customCategories[cat] || []),
@@ -382,15 +354,6 @@ export default function ProductsPage() {
     { value: "V", label: "V - Ljubičasti" },
     { value: "M", label: "M - Mahagoni" },
     { value: "B", label: "B - Braon" },
-  ];
-
-  const hairTypeOptions = [
-    { value: "Normalna", label: t("admin.normal") },
-    { value: "Suva", label: t("admin.dry") },
-    { value: "Masna", label: t("admin.oily") },
-    { value: "Farbana", label: t("admin.colored") },
-    { value: "Oštećena", label: t("admin.damaged") },
-    { value: "Kovrđava", label: t("admin.curly") },
   ];
 
   const perPage = 8;
@@ -425,11 +388,11 @@ export default function ProductsPage() {
               isProfessionalOnly: (p.isProfessional || false) as boolean,
             },
             description: "",
+            benefits: "",
             ingredients: "",
+            declaration: "",
             howToUse: "",
             images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
-            videoUrl: "",
-            gifUrl: "",
             seoTitle: "",
             metaDescription: "",
             slug: (p.slug || "") as string,
@@ -437,7 +400,6 @@ export default function ProductsPage() {
             vatRate: (p.vatRate ?? 20) as number,
             vatCode: (p.vatCode || (p.vatRate === 10 ? "R1" : "R2")) as string,
             erpId: (p.erpId || "") as string,
-            attributes: { sulfateFree: false, parabenFree: false, ammoniaFree: false, vegan: false, hairTypes: [] },
           }));
           setProducts(mapped);
           setApiLoaded(true);
@@ -471,9 +433,13 @@ export default function ProductsPage() {
         statusFilter === "__all__" ||
         (statusFilter === "active" && p.status === "active") ||
         (statusFilter === "inactive" && p.status === "inactive");
-      return matchSearch && matchBrand && matchCategory && matchStatus;
+      const matchUserType =
+        userTypeFilter === "__all__" ||
+        (userTypeFilter === "professional" && p.badges.isProfessionalOnly) ||
+        (userTypeFilter === "retail" && !p.badges.isProfessionalOnly);
+      return matchSearch && matchBrand && matchCategory && matchStatus && matchUserType;
     });
-  }, [products, search, brandFilter, categoryFilter, statusFilter, t]);
+  }, [products, search, brandFilter, categoryFilter, statusFilter, userTypeFilter, t]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -508,7 +474,9 @@ export default function ProductsPage() {
           ...prev,
           purchasePrice: p.costPrice ? Number(p.costPrice) : 0,
           description: p.description || "",
+          benefits: p.benefits || "",
           ingredients: p.ingredients || "",
+          declaration: p.declaration || "",
           howToUse: p.usageInstructions || "",
           weight: p.weightGrams || 0,
           volume: p.volumeMl || 0,
@@ -536,8 +504,11 @@ export default function ProductsPage() {
     const errors: string[] = [];
     if (!formData.name.trim()) errors.push(t("admin.productName"));
     if (!formData.sku.trim()) errors.push(t("admin.skuCode"));
-    if (!formData.priceB2C || formData.priceB2C <= 0) errors.push(t("admin.priceB2c"));
-    if (!formData.priceB2B || formData.priceB2B <= 0) errors.push(t("admin.priceB2b"));
+    if (formData.badges.isProfessionalOnly) {
+      if (!formData.priceB2B || formData.priceB2B <= 0) errors.push(t("admin.priceB2b"));
+    } else {
+      if (!formData.priceB2C || formData.priceB2C <= 0) errors.push(t("admin.priceB2c"));
+    }
     if (formData.stock === undefined || formData.stock < 0) errors.push(t("admin.stockQuantity"));
 
     if (errors.length > 0) {
@@ -549,7 +520,13 @@ export default function ProductsPage() {
     const apiBody = {
       nameLat: formData.name,
       sku: formData.sku,
-      priceB2c: formData.priceB2C,
+      // B2B-only products still need a non-null priceB2c (schema constraint);
+      // mirror priceB2b into priceB2c so the DB is satisfied and the public
+      // storefront — which only ever reads priceB2c for unauth'd users — has a
+      // sensible fallback price to hide behind the "sign-in for wholesale" UX.
+      priceB2c: formData.badges.isProfessionalOnly
+        ? (formData.priceB2C || formData.priceB2B)
+        : formData.priceB2C,
       priceB2b: formData.priceB2B || null,
       oldPrice: formData.oldPrice || null,
       costPrice: formData.purchasePrice > 0 ? formData.purchasePrice : null,
@@ -558,7 +535,9 @@ export default function ProductsPage() {
       weightGrams: formData.weight || null,
       volumeMl: formData.volume || null,
       description: formData.description || null,
+      benefits: formData.benefits || null,
       ingredients: formData.ingredients || null,
+      declaration: formData.declaration || null,
       usageInstructions: formData.howToUse || null,
       isProfessional: formData.badges.isProfessionalOnly,
       isNew: formData.badges.isNew,
@@ -592,27 +571,38 @@ export default function ProductsPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(apiBody),
         });
-        if (res.ok) {
-          setProducts(products.map((p) => (p.id === editingProduct.id ? { ...formData, id: editingProduct.id } : p)));
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data?.success === false) {
+          setValidationErrors([data?.error || `Greška pri čuvanju (${res.status})`]);
+          setSaving(false);
+          return;
         }
+        // Re-fetch from server so list reflects persisted DB state (avoids stale optimistic data)
+        fetchProducts();
       } else {
         const res = await fetch("/api/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(apiBody),
         });
-        const data = await res.json();
-        if (data.success) {
-          const newProduct: Product = {
-            ...formData,
-            id: data.data.id,
-            images: formData.images.length > 0 ? formData.images : [{ id: 1, url: "/products/placeholder.jpg", alt: formData.name, isPrimary: true }],
-          };
-          setProducts([newProduct, ...products]);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data?.success === false) {
+          setValidationErrors([data?.error || `Greška pri čuvanju (${res.status})`]);
+          setSaving(false);
+          return;
         }
+        const newProduct: Product = {
+          ...formData,
+          id: data.data.id,
+          images: formData.images.length > 0 ? formData.images : [{ id: 1, url: "/products/placeholder.jpg", alt: formData.name, isPrimary: true }],
+        };
+        setProducts([newProduct, ...products]);
       }
     } catch (err) {
       console.error("Save failed:", err);
+      setValidationErrors([(err as Error).message || "Greška pri čuvanju"]);
+      setSaving(false);
+      return;
     }
     setSaving(false);
     setShowPanel(false);
@@ -704,11 +694,10 @@ export default function ProductsPage() {
     { key: "sadrzaj", label: t("admin.productDescription"), icon: <FileImage size={16} /> },
     { key: "mediji", label: t("admin.productImages"), icon: <ImageIcon size={16} /> },
     { key: "zalihe", label: t("admin.stock"), icon: <Package size={16} /> },
-    { key: "atributi", label: t("admin.productAttributes"), icon: <ShieldCheck size={16} /> },
   ];
 
   /* ── Common input class ── */
-  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#a59d85]";
+  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#837A64]";
   const labelCls = "block text-sm font-medium text-[#2e2e2e] mb-1.5";
   const sectionCls = "space-y-5";
 
@@ -744,7 +733,7 @@ export default function ProductsPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
             <input
               type="text"
               placeholder={t("admin.searchByNameOrCode")}
@@ -763,11 +752,16 @@ export default function ProductsPage() {
           <div className={`${showFilters ? "flex" : "hidden"} sm:flex flex-col sm:flex-row gap-3`}>
             <select value={brandFilter} onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
               <option value="__all__">{t("admin.allBrands")}</option>
-              {brandNames.map((b) => <option key={b} value={b}>{b}</option>)}
+              {availableBrands.map((b) => <option key={b} value={b}>{b}</option>)}
             </select>
             <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
               <option value="__all__">{t("admin.allCategories")}</option>
               {allCategoryNames.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select value={userTypeFilter} onChange={(e) => { setUserTypeFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
+              <option value="__all__">Svi korisnici</option>
+              <option value="retail">B2C (maloprodaja)</option>
+              <option value="professional">B2B (profesionalci)</option>
             </select>
             <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
               <option value="__all__">{t("admin.allStatuses")}</option>
@@ -813,7 +807,7 @@ export default function ProductsPage() {
             <thead>
               <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
-                  <button onClick={selectAll} className="text-[#a59d85] hover:text-black">
+                  <button onClick={selectAll} className="text-[#837A64] hover:text-black">
                     {selectedIds.length === paginated.length && paginated.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
@@ -836,7 +830,7 @@ export default function ProductsPage() {
                       onClick={() => toggleSelect(product.id)}
                       aria-label={selectedIds.includes(product.id) ? t("admin.deselectRow") : t("admin.selectRow")}
                       aria-pressed={selectedIds.includes(product.id)}
-                      className="text-[#a59d85] hover:text-black"
+                      className="text-[#837A64] hover:text-black"
                     >
                       {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
                     </button>
@@ -844,7 +838,7 @@ export default function ProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-sm bg-stone-100 flex items-center justify-center flex-shrink-0">
-                        <Package size={18} className="text-[#a59d85]" />
+                        <Package size={18} className="text-[#837A64]" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -868,7 +862,7 @@ export default function ProductsPage() {
                     <div>
                       <span className="text-sm font-medium text-black">{product.priceB2C.toLocaleString()} RSD</span>
                       {product.oldPrice && (
-                        <span className="block text-xs text-[#a59d85] line-through">{product.oldPrice.toLocaleString()} RSD</span>
+                        <span className="block text-xs text-[#837A64] line-through">{product.oldPrice.toLocaleString()} RSD</span>
                       )}
                     </div>
                   </td>
@@ -894,7 +888,7 @@ export default function ProductsPage() {
                         onClick={() => openEditPanel(product)}
                         aria-label={`${t("admin.editProduct")}: ${product.name}`}
                         title={t("admin.editProduct")}
-                        className="p-1.5 text-[#a59d85] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
+                        className="p-1.5 text-[#837A64] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
                       >
                         <Edit3 size={15} />
                       </button>
@@ -902,7 +896,7 @@ export default function ProductsPage() {
                         onClick={() => handleDelete(product.id)}
                         aria-label={`${t("admin.deleteProduct")}: ${product.name}`}
                         title={t("admin.deleteProduct")}
-                        className="p-1.5 text-[#a59d85] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
+                        className="p-1.5 text-[#837A64] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -912,7 +906,7 @@ export default function ProductsPage() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#a59d85]">
+                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#837A64]">
                     {t("admin.noProductsMatch")}
                   </td>
                 </tr>
@@ -969,7 +963,7 @@ export default function ProductsPage() {
               <h2 className="text-lg font-serif font-bold text-black">
                 {editingProduct ? t("admin.editProduct") : t("admin.addProduct")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-2 text-[#a59d85] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
+              <button onClick={() => setShowPanel(false)} className="p-2 text-[#837A64] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -1018,7 +1012,7 @@ export default function ProductsPage() {
                   {/* ERP Info (read-only) */}
                   {(formData.erpId || formData.vatCode) && (
                     <div className="p-3 bg-stone-50 border border-stone-200 rounded-sm">
-                      <label className="text-[10px] uppercase tracking-wider text-[#a59d85] font-medium">ERP / Pantheon</label>
+                      <label className="text-[10px] uppercase tracking-wider text-[#837A64] font-medium">ERP / Pantheon</label>
                       <div className="flex gap-6 mt-1.5 text-sm text-[#837A64]">
                         {formData.erpId && <span>ERP ID: <strong className="text-black">{formData.erpId}</strong></span>}
                         <span>PDV kod: <strong className="text-black">{formData.vatCode || "R2"}</strong></span>
@@ -1409,9 +1403,19 @@ export default function ProductsPage() {
                     <textarea
                       value={formData.description}
                       onChange={(e) => updateForm("description", e.target.value)}
-                      rows={6}
+                      rows={4}
                       className={inputCls + " resize-y"}
                       placeholder={t("admin.detailedDescription")}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>{t("admin.benefits")}</label>
+                    <textarea
+                      value={formData.benefits || ""}
+                      onChange={(e) => updateForm("benefits", e.target.value)}
+                      rows={4}
+                      className={inputCls + " resize-y"}
+                      placeholder={t("admin.benefitsPlaceholder")}
                     />
                   </div>
                   <div>
@@ -1422,6 +1426,16 @@ export default function ProductsPage() {
                       rows={4}
                       className={inputCls + " resize-y"}
                       placeholder="Aqua, Sodium Laureth Sulfate..."
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>{t("admin.declaration")}</label>
+                    <textarea
+                      value={formData.declaration || ""}
+                      onChange={(e) => updateForm("declaration", e.target.value)}
+                      rows={4}
+                      className={inputCls + " resize-y"}
+                      placeholder={t("admin.declarationPlaceholder")}
                     />
                   </div>
                   <div>
@@ -1442,7 +1456,7 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div>
                     <label className={labelCls}>{t("admin.productImages")}</label>
-                    <p className="text-xs text-[#a59d85] mb-3">{t("admin.dragImages")}</p>
+                    <p className="text-xs text-[#837A64] mb-3">{t("admin.dragImages")}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
@@ -1451,7 +1465,7 @@ export default function ProductsPage() {
                           ) : (
                             <div className="text-center p-2">
                               <ImageIcon size={28} className="mx-auto text-[#D8CFBC] mb-1" />
-                              <p className="text-[10px] text-[#a59d85] truncate max-w-full">{img.url.split("/").pop()}</p>
+                              <p className="text-[10px] text-[#837A64] truncate max-w-full">{img.url.split("/").pop()}</p>
                             </div>
                           )}
                           {img.isPrimary && (
@@ -1511,7 +1525,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#a59d85] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#837A64] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {uploading ? (
                           <>
@@ -1535,7 +1549,7 @@ export default function ProductsPage() {
                       <div className="space-y-2">
                         {formData.images.map((img, idx) => (
                           <div key={img.id} className="flex items-center gap-2">
-                            <span className="text-xs text-[#a59d85] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
+                            <span className="text-xs text-[#837A64] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
                             <input
                               type="text"
                               value={img.alt}
@@ -1553,23 +1567,6 @@ export default function ProductsPage() {
                     </div>
                   )}
 
-                  {/* Video/GIF URLs — only show when editing existing product */}
-                  {editingProduct && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className={labelCls}>
-                          <span className="flex items-center gap-1.5"><Film size={14} /> {t("admin.videoUrl")}</span>
-                        </label>
-                        <input type="url" value={formData.videoUrl} onChange={(e) => updateForm("videoUrl", e.target.value)} className={inputCls} placeholder="https://youtube.com/..." />
-                      </div>
-                      <div>
-                        <label className={labelCls}>
-                          <span className="flex items-center gap-1.5"><FileImage size={14} /> {t("admin.gifUrl")}</span>
-                        </label>
-                        <input type="url" value={formData.gifUrl} onChange={(e) => updateForm("gifUrl", e.target.value)} className={inputCls} placeholder="https://..." />
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -1607,61 +1604,6 @@ export default function ProductsPage() {
                 </div>
               )}
 
-              {/* ── Tab: Atributi ── */}
-              {activeTab === "atributi" && (
-                <div className={sectionCls}>
-                  <div>
-                    <label className={labelCls}>{t("admin.productAttributes")}</label>
-                    <div className="space-y-3 mt-1">
-                      {([
-                        { key: "sulfateFree" as const, label: t("admin.sulfateFree") },
-                        { key: "parabenFree" as const, label: t("admin.parabenFree") },
-                        { key: "ammoniaFree" as const, label: t("admin.ammoniaFree") },
-                        { key: "vegan" as const, label: t("admin.vegan") },
-                      ]).map(({ key, label }) => (
-                        <div key={key} className="flex items-center justify-between py-2 border-b border-[#FFFFFF]">
-                          <span className="text-sm text-[#2e2e2e]">{label}</span>
-                          <button
-                            type="button"
-                            onClick={() => updateForm("attributes", { ...formData.attributes, [key]: !formData.attributes[key] })}
-                            className={`relative w-11 h-6 rounded-full transition-colors ${formData.attributes[key] ? "bg-black" : "bg-gray-300"}`}
-                          >
-                            <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.attributes[key] ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className={labelCls}>{t("admin.hairType")}</label>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {hairTypeOptions.map((ht) => {
-                        const selected = formData.attributes.hairTypes.includes(ht.value);
-                        return (
-                          <button
-                            key={ht.value}
-                            type="button"
-                            onClick={() => {
-                              const newTypes = selected
-                                ? formData.attributes.hairTypes.filter((t) => t !== ht.value)
-                                : [...formData.attributes.hairTypes, ht.value];
-                              updateForm("attributes", { ...formData.attributes, hairTypes: newTypes });
-                            }}
-                            className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                              selected
-                                ? "bg-black text-white border-black"
-                                : "bg-white text-[#837A64] border-stone-200 hover:border-black hover:text-secondary"
-                            }`}
-                          >
-                            {ht.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Panel Footer (fixed) */}
@@ -1717,7 +1659,7 @@ export default function ProductsPage() {
                 onClick={() => setValidationErrors([])}
                 className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
               >
-                {t("admin.understood") || "Razumem"}
+                {t("auth.understood")}
               </button>
             </div>
           </div>

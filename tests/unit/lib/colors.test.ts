@@ -43,12 +43,12 @@ describe('Colors — Centralized Color Palette', () => {
     expect(Object.keys(colors)).toHaveLength(16)
   })
 
-  it('accent colors form a light-to-dark hierarchy', () => {
-    // accentLight should be lighter (higher hex values) than accentDark
-    // We just verify they are distinct
-    expect(colors.accentLight).not.toBe(colors.accent)
+  it('accent hierarchy: accentDark is distinct from accent (hover/pressed variant)', () => {
+    // accentLight is intentionally unified with accent (#837A64) — the palette was
+    // consolidated to a single Soft Olive after earlier drift. accentDark remains
+    // a separate deeper tone for active/pressed states.
     expect(colors.accentDark).not.toBe(colors.accent)
-    expect(colors.accentLight).not.toBe(colors.accentDark)
+    expect(colors.accentDark).not.toBe(colors.accentLight)
   })
 
   it('status colors are all distinct', () => {
