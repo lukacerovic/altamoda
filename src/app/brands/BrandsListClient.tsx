@@ -31,7 +31,7 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
             >
               {t("nav.ourBrands")}
             </h1>
-            <p className="mt-3 text-[#a59d85] text-lg max-w-xl mx-auto">
+            <p className="mt-3 text-[#837A64] text-lg max-w-xl mx-auto">
               {t("brand.browseDescription")}
             </p>
           </div>
@@ -64,9 +64,9 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                 </div>
                 <h3 className="text-lg font-semibold text-[#2e2e2e] text-center">{brand.name}</h3>
                 {brand.description && (
-                  <p className="text-sm text-[#a59d85] text-center mt-2 line-clamp-2">{brand.description}</p>
+                  <p className="text-sm text-[#837A64] text-center mt-2 line-clamp-2">{brand.description}</p>
                 )}
-                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[#a59d85] group-hover:text-[#2e2e2e] transition-colors">
+                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[#837A64] group-hover:text-[#2e2e2e] transition-colors">
                   <span>{brand._count.products} {t("admin.productsCount")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>

@@ -272,7 +272,7 @@ export default function Header() {
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-sm border border-[#D8CFBC] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#a59d85] to-[#2e2e2e]" />
+                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#837A64] to-[#2e2e2e]" />
                         <div className="p-5">
                           <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-4">
                             {t("nav.ourBrands")}
@@ -288,7 +288,7 @@ export default function Header() {
                                   <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
                                 ) : (
                                   <div className="w-8 h-8 bg-[#FFFFFF] rounded-sm flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs font-bold text-[#a59d85]">{brand.name.charAt(0)}</span>
+                                    <span className="text-xs font-bold text-[#837A64]">{brand.name.charAt(0)}</span>
                                   </div>
                                 ); })()}
                                 <span className="text-sm text-[#837A64] group-hover:text-[#2e2e2e] transition-colors truncate">
@@ -313,7 +313,7 @@ export default function Header() {
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-sm border border-[#D8CFBC] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#a59d85] to-[#2e2e2e]" />
+                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#837A64] to-[#2e2e2e]" />
                         <div className="p-6 flex gap-8">
                           <div className="flex-1 flex gap-8">
                             {menuData.columns.map((col) => (
@@ -353,7 +353,7 @@ export default function Header() {
                                     <p className="text-white text-sm font-medium">
                                       {menuData.featured.title}
                                     </p>
-                                    <span className="text-[#a59d85] text-xs font-medium flex items-center gap-1 mt-1">
+                                    <span className="text-[#837A64] text-xs font-medium flex items-center gap-1 mt-1">
                                       {menuData.featured.cta}
                                       <ChevronRight className="w-3 h-3" />
                                     </span>
@@ -420,12 +420,12 @@ export default function Header() {
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   className="w-full border border-[#D8CFBC] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a59d85]" />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#837A64]" />
               </div>
               {searchResults.length > 0 && (
                 <div className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-[#D8CFBC] shadow-xl overflow-hidden">
                   <div className="p-3">
-                    <span className="text-[11px] text-[#a59d85] font-semibold tracking-widest uppercase">Proizvodi</span>
+                    <span className="text-[11px] text-[#837A64] font-semibold tracking-widest uppercase">Proizvodi</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
                         <Link
@@ -440,7 +440,7 @@ export default function Header() {
                             <p className="text-[11px] text-[#837A64] font-medium">{p.brand}</p>
                           </div>
                           <span className="text-sm font-bold text-[#2e2e2e]">
-                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#a59d85]">RSD</span>
+                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#837A64]">RSD</span>
                           </span>
                         </Link>
                       ))}
@@ -507,7 +507,7 @@ export default function Header() {
                               <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
                             ) : (
                               <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-[#a59d85]">{brand.name.charAt(0)}</span>
+                                <span className="text-[10px] font-bold text-[#837A64]">{brand.name.charAt(0)}</span>
                               </div>
                             ); })()}
                             {brand.name}

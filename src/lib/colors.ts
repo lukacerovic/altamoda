@@ -12,7 +12,7 @@
 export const colors = {
   // ── Brand Accent (Soft Olive) ──────────────────────────────
   accent:      '#837A64',  // Primary brand color — buttons, links, highlights
-  accentLight: '#a59d85',  // Hover states, subtle accents, scrollbar
+  accentLight: '#837A64',  // Hover states, subtle accents, scrollbar
   accentDark:  '#6a624f',  // Active/pressed states, deeper emphasis
 
   // ── Backgrounds (Floral White / Bone) ─────────────────────
@@ -43,7 +43,7 @@ export const colors = {
  * Tailwind class reference (available via @theme inline in globals.css):
  *
  *   bg-accent / text-accent / border-accent          → #837A64 (Soft Olive)
- *   bg-accent-light / text-accent-light               → #a59d85
+ *   bg-accent-light / text-accent-light               → #837A64
  *   bg-accent-dark / text-accent-dark                 → #6a624f
  *   bg-background                                     → #FFFFFF (Floral White)
  *   bg-surface                                        → #FFFFFF

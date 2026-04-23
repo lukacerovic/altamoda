@@ -106,7 +106,7 @@ export default function FAQPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 bg-white border border-[#D8CFBC] rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a59d85]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#837A64]" />
         </div>
 
         {/* FAQ Sections */}

@@ -708,7 +708,7 @@ export default function ProductsPage() {
   ];
 
   /* ── Common input class ── */
-  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#a59d85]";
+  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#837A64]";
   const labelCls = "block text-sm font-medium text-[#2e2e2e] mb-1.5";
   const sectionCls = "space-y-5";
 
@@ -744,7 +744,7 @@ export default function ProductsPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
             <input
               type="text"
               placeholder={t("admin.searchByNameOrCode")}
@@ -813,7 +813,7 @@ export default function ProductsPage() {
             <thead>
               <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
-                  <button onClick={selectAll} className="text-[#a59d85] hover:text-black">
+                  <button onClick={selectAll} className="text-[#837A64] hover:text-black">
                     {selectedIds.length === paginated.length && paginated.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
@@ -836,7 +836,7 @@ export default function ProductsPage() {
                       onClick={() => toggleSelect(product.id)}
                       aria-label={selectedIds.includes(product.id) ? t("admin.deselectRow") : t("admin.selectRow")}
                       aria-pressed={selectedIds.includes(product.id)}
-                      className="text-[#a59d85] hover:text-black"
+                      className="text-[#837A64] hover:text-black"
                     >
                       {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
                     </button>
@@ -844,7 +844,7 @@ export default function ProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-sm bg-stone-100 flex items-center justify-center flex-shrink-0">
-                        <Package size={18} className="text-[#a59d85]" />
+                        <Package size={18} className="text-[#837A64]" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -868,7 +868,7 @@ export default function ProductsPage() {
                     <div>
                       <span className="text-sm font-medium text-black">{product.priceB2C.toLocaleString()} RSD</span>
                       {product.oldPrice && (
-                        <span className="block text-xs text-[#a59d85] line-through">{product.oldPrice.toLocaleString()} RSD</span>
+                        <span className="block text-xs text-[#837A64] line-through">{product.oldPrice.toLocaleString()} RSD</span>
                       )}
                     </div>
                   </td>
@@ -894,7 +894,7 @@ export default function ProductsPage() {
                         onClick={() => openEditPanel(product)}
                         aria-label={`${t("admin.editProduct")}: ${product.name}`}
                         title={t("admin.editProduct")}
-                        className="p-1.5 text-[#a59d85] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
+                        className="p-1.5 text-[#837A64] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
                       >
                         <Edit3 size={15} />
                       </button>
@@ -902,7 +902,7 @@ export default function ProductsPage() {
                         onClick={() => handleDelete(product.id)}
                         aria-label={`${t("admin.deleteProduct")}: ${product.name}`}
                         title={t("admin.deleteProduct")}
-                        className="p-1.5 text-[#a59d85] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
+                        className="p-1.5 text-[#837A64] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -912,7 +912,7 @@ export default function ProductsPage() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#a59d85]">
+                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#837A64]">
                     {t("admin.noProductsMatch")}
                   </td>
                 </tr>
@@ -969,7 +969,7 @@ export default function ProductsPage() {
               <h2 className="text-lg font-serif font-bold text-black">
                 {editingProduct ? t("admin.editProduct") : t("admin.addProduct")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-2 text-[#a59d85] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
+              <button onClick={() => setShowPanel(false)} className="p-2 text-[#837A64] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -1018,7 +1018,7 @@ export default function ProductsPage() {
                   {/* ERP Info (read-only) */}
                   {(formData.erpId || formData.vatCode) && (
                     <div className="p-3 bg-stone-50 border border-stone-200 rounded-sm">
-                      <label className="text-[10px] uppercase tracking-wider text-[#a59d85] font-medium">ERP / Pantheon</label>
+                      <label className="text-[10px] uppercase tracking-wider text-[#837A64] font-medium">ERP / Pantheon</label>
                       <div className="flex gap-6 mt-1.5 text-sm text-[#837A64]">
                         {formData.erpId && <span>ERP ID: <strong className="text-black">{formData.erpId}</strong></span>}
                         <span>PDV kod: <strong className="text-black">{formData.vatCode || "R2"}</strong></span>
@@ -1442,7 +1442,7 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div>
                     <label className={labelCls}>{t("admin.productImages")}</label>
-                    <p className="text-xs text-[#a59d85] mb-3">{t("admin.dragImages")}</p>
+                    <p className="text-xs text-[#837A64] mb-3">{t("admin.dragImages")}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
@@ -1451,7 +1451,7 @@ export default function ProductsPage() {
                           ) : (
                             <div className="text-center p-2">
                               <ImageIcon size={28} className="mx-auto text-[#D8CFBC] mb-1" />
-                              <p className="text-[10px] text-[#a59d85] truncate max-w-full">{img.url.split("/").pop()}</p>
+                              <p className="text-[10px] text-[#837A64] truncate max-w-full">{img.url.split("/").pop()}</p>
                             </div>
                           )}
                           {img.isPrimary && (
@@ -1511,7 +1511,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#a59d85] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#837A64] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {uploading ? (
                           <>
@@ -1535,7 +1535,7 @@ export default function ProductsPage() {
                       <div className="space-y-2">
                         {formData.images.map((img, idx) => (
                           <div key={img.id} className="flex items-center gap-2">
-                            <span className="text-xs text-[#a59d85] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
+                            <span className="text-xs text-[#837A64] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
                             <input
                               type="text"
                               value={img.alt}

@@ -72,11 +72,12 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
   const newLabel = t("home.new");
   const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = product.promoBadge || badge || (product.isNew ? newLabel : discountBadge);
+  const isDiscountBadge = !!displayBadge && /^-\d+%$/.test(displayBadge);
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
       <div
-        className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-[#F2ECDE] mb-5 transition-all duration-300 ease-out group-hover:-translate-y-0.5 [box-shadow:0_0_0_1px_rgba(46,46,46,0.02),0_2px_6px_rgba(46,46,46,0.04),0_4px_8px_rgba(46,46,46,0.1)] group-hover:[box-shadow:0_0_0_1px_rgba(46,46,46,0.04),0_4px_12px_rgba(46,46,46,0.08),0_16px_32px_rgba(46,46,46,0.14)]"
+        className="relative aspect-[4/5] overflow-hidden rounded-[4px] bg-[#F2ECDE] mb-5 transition-all duration-300 ease-out group-hover:-translate-y-0.5 [box-shadow:0_0_0_1px_rgba(46,46,46,0.02),0_2px_6px_rgba(46,46,46,0.04),0_4px_8px_rgba(46,46,46,0.1)] group-hover:[box-shadow:0_0_0_1px_rgba(46,46,46,0.04),0_4px_12px_rgba(46,46,46,0.08),0_16px_32px_rgba(46,46,46,0.14)]"
       >
         <Image
           src={product.image || defaultImg}
@@ -86,7 +87,13 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           className="object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out"
         />
         {displayBadge && (
-          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#FFFFFF]/90 text-[#2e2e2e] backdrop-blur-sm rounded-full">
+          <span
+            className={`absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full ${
+              isDiscountBadge
+                ? "bg-[#B54B3A] text-[#FFFFFF]"
+                : "bg-[#FFFFFF]/90 text-[#2e2e2e]"
+            }`}
+          >
             {displayBadge}
           </span>
         )}
@@ -459,6 +466,36 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
+          1.5 CATEGORY PILL BAR — Airbnb-style horizontal scroll filter
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="bg-[#FFFFFF] border-y border-[rgba(46,46,46,0.08)]">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="overflow-x-auto hide-scrollbar">
+            <div className="flex gap-2 px-6 md:px-10 py-4 md:py-5 min-w-max">
+              {[
+                { label: "Nega kose", href: "/products?category=sampon" },
+                { label: "Styling", href: "/products?category=stajling" },
+                { label: "Boje za kosu", href: "/products?category=permanentne-boje" },
+                { label: "Alati & Pribor", href: "/products?category=frizerski-pribor" },
+                { label: "Oksidanti", href: "/products?category=oksidanti" },
+                { label: "Dekoloranti", href: "/products?category=dekoloranti" },
+                { label: "Muška kolekcija", href: "/products?search=Brews" },
+                { label: "Akcije", href: "/products?onSale=true" },
+              ].map((c) => (
+                <Link
+                  key={c.label}
+                  href={c.href}
+                  className="shrink-0 text-[11px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-[rgba(46,46,46,0.1)] hover:border-[#2e2e2e] text-[#2e2e2e]/70 hover:text-[#2e2e2e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]"
+                >
+                  {c.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
           2. BRAND MARQUEE — partner logos (slower scroll)
       ═══════════════════════════════════════════════════════════ */}
       <section className="border-y border-[rgba(46,46,46,0.08)] py-8 md:py-10 overflow-hidden bg-[#FFFFFF]">
@@ -543,11 +580,11 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           4. B2B PARTNERS — salons & wholesale partners (unchanged)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#EFE7D5]">
+      <section className="py-20 md:py-28 bg-[#837A64]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
             {/* Left — image (landscape) */}
-            <div className="relative aspect-[4/3] md:aspect-[5/4] bg-[#D8CFBC] overflow-hidden">
+            <div className="relative aspect-[4/3] md:aspect-[5/4] bg-[#6e6754] overflow-hidden rounded-[4px]">
               <Image
                 src="/b2bhero.png"
                 alt="altamoda saloni partneri"
@@ -559,37 +596,37 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
             {/* Right — text */}
             <div>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-6">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#FFFFFF]/70 font-medium block mb-6">
                 Za salone
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 Partneri koji
                 <br />
                 <em className="italic">grade</em> struku.
               </h2>
-              <p className="text-[14px] text-[#2e2e2e]/70 leading-[1.8] mb-5 max-w-lg">
+              <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-5 max-w-lg">
                 Alta Moda je već tri decenije sinonim za pouzdanu saradnju sa frizerskim salonima. Naši partneri dobijaju veleprodajne uslove, direktan pristup proizvodima svetskih brendova i tehničku podršku kada im zatreba.
               </p>
-              <p className="text-[14px] text-[#2e2e2e]/70 leading-[1.8] mb-10 max-w-lg">
+              <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-10 max-w-lg">
                 Od porodičnih salona do vodećih lanaca — gradimo zajednički uspeh, korak po korak.
               </p>
 
               {/* Stats row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center sm:justify-items-start border-t border-[#D8CFBC] pt-8 mb-10 max-w-lg">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center sm:justify-items-start border-t border-[#FFFFFF]/25 pt-8 mb-10 max-w-lg">
                 {[
                   { v: "Veleprodaja", l: "Salonske cene" },
                   { v: "48h", l: "Isporuka" },
                   { v: "1:1", l: "Podrška" },
                   { v: "0 din", l: "Članarina" },
                 ].map((s, i) => (
-                  <div key={i} className={`text-center sm:text-left ${i < 3 ? "sm:border-r sm:border-[#D8CFBC]" : ""} sm:pr-2`}>
-                    <div className="text-xl md:text-2xl font-light text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  <div key={i} className={`text-center sm:text-left ${i < 3 ? "sm:border-r sm:border-[#FFFFFF]/25" : ""} sm:pr-2`}>
+                    <div className="text-xl md:text-2xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                       {s.v}
                     </div>
-                    <div className="text-[9px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 mt-1.5">{s.l}</div>
+                    <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/70 mt-1.5">{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -597,7 +634,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/account/login"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#FFFFFF] bg-[#2e2e2e] px-8 py-4 rounded-full hover:bg-[#1f1f1f] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#EFE7D5]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#837A64]"
                 >
                   Prijavi se za veleprodaju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -618,7 +655,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               return (
                 <div
                   key={i}
-                  className="group bg-[#FFFFFF] border border-[#837A64]/30 rounded-[8px] p-5 md:p-10 text-center transition-all duration-300 hover:border-[#837A64] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
+                  className="group bg-[#FFFFFF] border border-[#837A64]/30 rounded-[4px] p-5 md:p-10 text-center transition-all duration-300 hover:border-[#837A64] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
                 >
                   <div className="w-9 h-9 md:w-12 md:h-12 mx-auto mb-3 md:mb-5 flex items-center justify-center text-[#837A64]">
                     <Icon strokeWidth={1.5} className="w-full h-full" />
@@ -706,7 +743,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </div>
 
             {/* Right — image */}
-            <div className="order-1 md:order-2 relative aspect-[5/6] md:aspect-[4/5] bg-[#1a1a1a] overflow-hidden">
+            <div className="order-1 md:order-2 relative aspect-[5/6] md:aspect-[4/5] bg-[#1a1a1a] overflow-hidden rounded-[4px]">
               <Image
                 src="/edukacija2.jpg"
                 alt="ID Hair Academy edukacija"

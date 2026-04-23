@@ -246,7 +246,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#F2ECDE] mb-4">
+      <div className="relative aspect-[4/5] overflow-hidden bg-[#F2ECDE] mb-4 rounded-[4px]">
         <Image src={imgSrc} alt={product.name} width={500} height={625} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (

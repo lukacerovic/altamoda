@@ -89,7 +89,7 @@ export default function EducationPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               <div className="order-2 lg:order-1">
                 <div className="relative">
-                  <div className="aspect-[3/4] relative overflow-hidden rounded-sm shadow-2xl bg-white flex items-center justify-center">
+                  <div className="aspect-[3/4] relative overflow-hidden rounded-[4px] shadow-2xl bg-white flex items-center justify-center">
                     <Image
                       src="/edukacijaImage.jpg"
                       alt="ID Hair Academy"
@@ -187,7 +187,7 @@ export default function EducationPage() {
                 </div>
               </div>
               <div>
-                <div className="aspect-[3/4] overflow-hidden rounded-sm shadow-2xl">
+                <div className="aspect-[3/4] overflow-hidden rounded-[4px] shadow-2xl">
                   <Image
                     src="/edukacija2.jpg"
                     alt="ID Hair Academy education"
