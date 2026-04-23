@@ -90,7 +90,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <nav className="flex items-center gap-2 text-sm text-[#a59d85] mb-6">
+        <nav className="flex items-center gap-2 text-sm text-[#837A64] mb-6">
           <Link href="/" className="hover:text-secondary">{t("cart.home")}</Link><ChevronRight className="w-3 h-3" /><span className="text-[#2e2e2e]">{t("cart.cart")}</span>
         </nav>
 
@@ -104,7 +104,7 @@ export default function CartPage() {
           <div className="text-center py-20">
             <ShoppingBag className="w-16 h-16 text-[#D8CFBC] mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-[#2e2e2e] mb-2">{t("cart.empty")}</h2>
-            <p className="text-[#a59d85] mb-6">{t("cart.emptyDesc")}</p>
+            <p className="text-[#837A64] mb-6">{t("cart.emptyDesc")}</p>
             <Link href="/products" className="inline-flex items-center gap-2 bg-black hover:bg-[#2e2e2e] text-white px-6 py-3 rounded font-medium transition-colors">{t("cart.continueShopping")}</Link>
           </div>
         ) : (
@@ -130,11 +130,11 @@ export default function CartPage() {
                         <h3 className="text-sm md:text-base font-medium text-[#2e2e2e] mt-1">{item.name}</h3>
                         {outOfStock && <p className="text-xs text-red-600 font-medium mt-1">{t("cart.outOfStockNotice")}</p>}
                       </div>
-                      <button onClick={() => removeItem(item.productId)} className="text-[#a59d85] hover:text-[#b5453a] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => removeItem(item.productId)} className="text-[#837A64] hover:text-[#b5453a] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       {outOfStock ? (
-                        <span className="text-xs text-[#a59d85] italic">{t("cart.unavailable")}</span>
+                        <span className="text-xs text-[#837A64] italic">{t("cart.unavailable")}</span>
                       ) : (
                         <div className="flex items-center border border-[#D8CFBC] rounded">
                           <button onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-[#FFFFFF]"><Minus className="w-3 h-3" /></button>
@@ -151,7 +151,7 @@ export default function CartPage() {
                           <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-[#FFFFFF]"><Plus className="w-3 h-3" /></button>
                         </div>
                       )}
-                      <span className={`font-bold ${outOfStock ? "text-[#a59d85] line-through" : "text-[#2e2e2e]"}`}>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                      <span className={`font-bold ${outOfStock ? "text-[#837A64] line-through" : "text-[#2e2e2e]"}`}>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
                     </div>
                   </div>
                 </div>
@@ -191,11 +191,11 @@ export default function CartPage() {
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-[#D8CFBC] text-secondary focus:ring-[#2e2e2e]" />
                       <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#a59d85]" />
+                        <FileText className="w-4 h-4 text-[#837A64]" />
                         <span className="text-sm text-[#2e2e2e]">{t("cart.invoicePayment")}</span>
                       </div>
                     </label>
-                    <div className="bg-[#FFFFFF] rounded p-3 text-xs text-[#a59d85] flex items-start gap-2">
+                    <div className="bg-[#FFFFFF] rounded p-3 text-xs text-[#837A64] flex items-start gap-2">
                       <Store className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                       <span>{t("cart.minB2bOrder")}: <strong className="text-[#2e2e2e]">{MIN_B2B_ORDER.toLocaleString("sr-RS")} RSD</strong></span>
                     </div>
@@ -210,8 +210,8 @@ export default function CartPage() {
                 <h3 className="text-lg font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.orderSummary")}</h3>
 
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between"><span className="text-[#a59d85]">{t("cart.subtotal")}</span><span className="font-medium">{subtotal.toLocaleString("sr-RS")} RSD</span></div>
-                  <div className="flex justify-between"><span className="text-[#a59d85]">{t("cart.delivery")} ({selectedDelivery.label.split("(")[0].trim()})</span><span className="font-medium">{shipping === 0 ? t("cart.free") : `${shipping} RSD`}</span></div>
+                  <div className="flex justify-between"><span className="text-[#837A64]">{t("cart.subtotal")}</span><span className="font-medium">{subtotal.toLocaleString("sr-RS")} RSD</span></div>
+                  <div className="flex justify-between"><span className="text-[#837A64]">{t("cart.delivery")} ({selectedDelivery.label.split("(")[0].trim()})</span><span className="font-medium">{shipping === 0 ? t("cart.free") : `${shipping} RSD`}</span></div>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-[#D8CFBC]">
@@ -231,14 +231,14 @@ export default function CartPage() {
                   {t("cart.proceedToCheckout")} <ChevronRight className="w-4 h-4" />
                 </button>
 
-                <div className="mt-4 space-y-2 text-xs text-[#a59d85]">
+                <div className="mt-4 space-y-2 text-xs text-[#837A64]">
                   <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> {t("cart.freeShippingOver")}</div>
                   <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-secondary" /> {t("cart.securePayment")}</div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#D8CFBC]">
                   {["Visa", "Mastercard", "PayPal", "Pouzece"].map((p) => (
-                    <span key={p} className="px-2 py-1 bg-[#FFFFFF] rounded text-[10px] text-[#a59d85] font-medium">{p}</span>
+                    <span key={p} className="px-2 py-1 bg-[#FFFFFF] rounded text-[10px] text-[#837A64] font-medium">{p}</span>
                   ))}
                 </div>
               </div>
@@ -251,7 +251,7 @@ export default function CartPage() {
           <h2 className="text-2xl font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.recommended")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {recommended.map((p) => (
-              <Link key={p.id} href={`/products/${p.id}`} className="product-card bg-white rounded-sm shadow-sm hover:shadow-md transition-all group overflow-hidden">
+              <Link key={p.id} href={`/products/${p.id}`} className="product-card bg-white rounded-[4px] shadow-sm hover:shadow-md transition-all group overflow-hidden">
                 <div className="aspect-square overflow-hidden"><Image src={p.image} alt={p.name} width={80} height={80} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /></div>
                 <div className="p-4">
                   <span className="text-xs text-secondary font-medium uppercase tracking-wider">{p.brand}</span>

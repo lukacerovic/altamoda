@@ -249,7 +249,7 @@ export default function OrdersPage() {
       case "otkazano":
         return <XCircle size={16} className="text-red-500" />;
       default:
-        return <Clock size={16} className="text-[#a59d85]" />;
+        return <Clock size={16} className="text-[#837A64]" />;
     }
   };
 
@@ -279,7 +279,7 @@ export default function OrdersPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
             <input
               type="text"
               placeholder={t("admin.searchOrders")}
@@ -325,7 +325,7 @@ export default function OrdersPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <Package size={40} className="mx-auto text-[#D8CFBC] mb-3" />
-            <p className="text-sm text-[#a59d85]">{t("admin.noProductsMatch")}</p>
+            <p className="text-sm text-[#837A64]">{t("admin.noProductsMatch")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -375,7 +375,7 @@ export default function OrdersPage() {
                             B2B
                           </span>
                         )}
-                        <p className="text-xs text-[#a59d85] md:hidden">{formatDate(order.createdAt)}</p>
+                        <p className="text-xs text-[#837A64] md:hidden">{formatDate(order.createdAt)}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-[#837A64] ">
                         {formatDate(order.createdAt)}
@@ -432,7 +432,7 @@ export default function OrdersPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-[#a59d85] hover:text-black transition-colors">
+                        <button className="text-[#837A64] hover:text-black transition-colors">
                           {expandedOrder === order.id ? (
                             <ChevronUp size={18} />
                           ) : (
@@ -488,12 +488,12 @@ export default function OrdersPage() {
                                                 />
                                               ) : (
                                                 <div className="w-8 h-8 rounded bg-stone-100 flex items-center justify-center flex-shrink-0">
-                                                  <Package size={14} className="text-[#a59d85]" />
+                                                  <Package size={14} className="text-[#837A64]" />
                                                 </div>
                                               )}
                                               <div>
                                                 <p className="text-sm text-[#2e2e2e]">{item.productName}</p>
-                                                <p className="text-[10px] text-[#a59d85]">{item.productSku}</p>
+                                                <p className="text-[10px] text-[#837A64]">{item.productSku}</p>
                                               </div>
                                             </div>
                                           </td>
@@ -550,12 +550,12 @@ export default function OrdersPage() {
                                   {orderDetail.user && (
                                     <>
                                       <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                        <Mail size={14} className="text-[#a59d85]" />{" "}
+                                        <Mail size={14} className="text-[#837A64]" />{" "}
                                         {orderDetail.user.email}
                                       </div>
                                       {orderDetail.user.name && (
                                         <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                          <Package size={14} className="text-[#a59d85]" />{" "}
+                                          <Package size={14} className="text-[#837A64]" />{" "}
                                           {orderDetail.user.name}
                                           {orderDetail.user.role === "b2b" && (
                                             <span className="text-[10px] font-semibold bg-stone-200 text-[#837A64] px-1.5 py-0.5 rounded ml-1">
@@ -568,7 +568,7 @@ export default function OrdersPage() {
                                   )}
                                   {orderDetail.shippingAddress && (
                                     <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                      <MapPin size={14} className="text-[#a59d85]" />{" "}
+                                      <MapPin size={14} className="text-[#837A64]" />{" "}
                                       {orderDetail.shippingAddress.street}
                                       {orderDetail.shippingAddress.city &&
                                         `, ${orderDetail.shippingAddress.city}`}
@@ -578,7 +578,7 @@ export default function OrdersPage() {
                                   )}
                                   {orderDetail.shippingMethod && (
                                     <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                      <Truck size={14} className="text-[#a59d85]" />{" "}
+                                      <Truck size={14} className="text-[#837A64]" />{" "}
                                       {orderDetail.shippingMethod === "express"
                                         ? "Express dostava"
                                         : orderDetail.shippingMethod === "pickup"
@@ -602,7 +602,7 @@ export default function OrdersPage() {
                                 </h3>
                                 <div className="bg-white rounded-sm border border-stone-200 p-4">
                                   {orderDetail.statusHistory.length === 0 ? (
-                                    <p className="text-sm text-[#a59d85] text-center py-4">
+                                    <p className="text-sm text-[#837A64] text-center py-4">
                                       Nema istorije statusa
                                     </p>
                                   ) : (
@@ -622,7 +622,7 @@ export default function OrdersPage() {
                                             {event.note && (
                                               <p className="text-xs text-[#837A64] mt-0.5">{event.note}</p>
                                             )}
-                                            <p className="text-xs text-[#a59d85] mt-0.5">
+                                            <p className="text-xs text-[#837A64] mt-0.5">
                                               {formatDateTime(event.createdAt)} · {event.changedBy}
                                             </p>
                                           </div>

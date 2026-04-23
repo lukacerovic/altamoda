@@ -330,7 +330,7 @@ export default function SettingsPage() {
                   <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
                     <Globe
                       size={14}
-                      className="inline mr-1.5 text-[#a59d85]"
+                      className="inline mr-1.5 text-[#837A64]"
                     />
                     {t("admin.storeName")}
                   </label>
@@ -345,7 +345,7 @@ export default function SettingsPage() {
                   <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
                     <Mail
                       size={14}
-                      className="inline mr-1.5 text-[#a59d85]"
+                      className="inline mr-1.5 text-[#837A64]"
                     />
                     {t("admin.emailAddress")}
                   </label>
@@ -360,7 +360,7 @@ export default function SettingsPage() {
                   <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
                     <Phone
                       size={14}
-                      className="inline mr-1.5 text-[#a59d85]"
+                      className="inline mr-1.5 text-[#837A64]"
                     />
                     {t("admin.phone")}
                   </label>
@@ -375,7 +375,7 @@ export default function SettingsPage() {
                   <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
                     <MapPin
                       size={14}
-                      className="inline mr-1.5 text-[#a59d85]"
+                      className="inline mr-1.5 text-[#837A64]"
                     />
                     {t("admin.address")}
                   </label>
@@ -393,7 +393,7 @@ export default function SettingsPage() {
                   <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
                     <Warehouse
                       size={14}
-                      className="inline mr-1.5 text-[#a59d85]"
+                      className="inline mr-1.5 text-[#837A64]"
                     />
                     {t("admin.warehouseAddress")}
                   </label>
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a59d85] hover:text-[#2e2e2e]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#837A64] hover:text-[#2e2e2e]"
                     >
                       {showNewPassword ? (
                         <EyeOff size={16} />

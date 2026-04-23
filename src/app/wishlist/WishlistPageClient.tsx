@@ -78,7 +78,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#a59d85] mb-6">
+        <div className="flex items-center gap-2 text-sm text-[#837A64] mb-6">
           <Link href="/" className="hover:text-secondary">{t("wishlist.home")}</Link>
           <span>/</span>
           <span className="text-[#2e2e2e]">{t("wishlist.title")}</span>
@@ -97,7 +97,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
               <div className="flex items-center gap-3">
                 <Heart className="w-6 h-6 text-secondary fill-[#837A64]" />
                 <h1 className="text-3xl font-bold text-[#2e2e2e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
-                <span className="text-sm text-[#a59d85]">({items.length} {t("wishlist.itemCount")})</span>
+                <span className="text-sm text-[#837A64]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
               <div className="flex items-center gap-3">
                 <button className="flex items-center gap-2 px-4 py-2 border border-[#D8CFBC] text-[#837A64] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
@@ -114,11 +114,11 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
               {items.map((item) => {
                 const badge = discountBadge(item);
                 return (
-                  <div key={item.productId} className="bg-white rounded-sm overflow-hidden shadow-sm border border-[#D8CFBC]/50 group hover:shadow-md transition-all">
+                  <div key={item.productId} className="bg-white rounded-[4px] overflow-hidden shadow-sm border border-[#D8CFBC]/50 group hover:shadow-md transition-all">
                     <div className="relative overflow-hidden aspect-square">
                       <Image src={item.image} alt={item.name} width={200} height={200} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {badge && (
-                        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#b5453a]">{badge}</span>
+                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-[0.2em] font-medium text-white bg-[#837A64] backdrop-blur-sm">{badge}</span>
                       )}
                       {!item.inStock && (
                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
@@ -144,7 +144,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         {item.oldPrice && item.oldPrice > item.price ? (
                           <>
                             <span className="text-base font-bold text-[#b5453a]">{item.price.toLocaleString()} RSD</span>
-                            <span className="text-xs text-[#a59d85] line-through">{item.oldPrice.toLocaleString()} RSD</span>
+                            <span className="text-xs text-[#837A64] line-through">{item.oldPrice.toLocaleString()} RSD</span>
                           </>
                         ) : (
                           <span className="text-base font-bold text-[#2e2e2e]">{item.price.toLocaleString()} RSD</span>
@@ -156,7 +156,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
                             ? "bg-black hover:bg-[#2e2e2e] text-white"
-                            : "bg-[#D8CFBC] text-[#a59d85] cursor-not-allowed"
+                            : "bg-[#D8CFBC] text-[#837A64] cursor-not-allowed"
                         }`}
                       >
                         {item.inStock ? t("wishlist.addToCart") : t("wishlist.unavailable")}

@@ -7,10 +7,10 @@ export default function ProductDetailLoading() {
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Image gallery skeleton */}
         <div className="space-y-4">
-          <div className="aspect-square rounded-xl bg-surface-container" />
+          <div className="aspect-square rounded-[4px] bg-surface-container" />
           <div className="flex gap-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-20 w-20 rounded-lg bg-surface-container" />
+              <div key={i} className="h-20 w-20 rounded-[4px] bg-surface-container" />
             ))}
           </div>
         </div>

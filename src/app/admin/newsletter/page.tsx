@@ -41,7 +41,7 @@ const TiptapEditor = dynamic(() => import("@/components/admin/TiptapEditor"), {
   ssr: false,
   loading: () => (
     <div className="border border-stone-200 rounded-lg p-16 flex items-center justify-center bg-white">
-      <Loader2 size={24} className="animate-spin text-[#a59d85]" />
+      <Loader2 size={24} className="animate-spin text-[#837A64]" />
     </div>
   ),
 });
@@ -578,7 +578,7 @@ export default function NewsletterPage() {
         {/* Subject & description row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
           <div>
-            <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
+            <label className="block text-xs font-medium text-[#837A64] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
             <input
               type="text"
               value={templateForm.subject}
@@ -588,7 +588,7 @@ export default function NewsletterPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Opis šablona (opciono)</label>
+            <label className="block text-xs font-medium text-[#837A64] uppercase tracking-wider mb-1">Opis šablona (opciono)</label>
             <input
               type="text"
               value={templateForm.description}
@@ -614,7 +614,7 @@ export default function NewsletterPage() {
             <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4 p-5 bg-white border border-stone-200 rounded-lg">
               {/* Header settings */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Zaglavlje (Header)</h4>
+                <h4 className="text-xs font-semibold text-[#837A64] uppercase tracking-wider">Zaglavlje (Header)</h4>
                 <div>
                   <label className="block text-xs text-[#837A64] mb-1">Naslov</label>
                   <input
@@ -712,7 +712,7 @@ export default function NewsletterPage() {
                       <button
                         type="button"
                         onClick={() => setEmailOptions({ ...emailOptions, bodyBgImage: "" })}
-                        className="text-xs text-[#a59d85] hover:text-red-600 underline"
+                        className="text-xs text-[#837A64] hover:text-red-600 underline"
                       >
                         Ukloni
                       </button>
@@ -723,7 +723,7 @@ export default function NewsletterPage() {
 
               {/* Footer settings */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Podnožje (Footer)</h4>
+                <h4 className="text-xs font-semibold text-[#837A64] uppercase tracking-wider">Podnožje (Footer)</h4>
                 <div>
                   <label className="block text-xs text-[#837A64] mb-1">Tekst podnožja</label>
                   <input
@@ -753,7 +753,7 @@ export default function NewsletterPage() {
         <div className="mb-6 p-4 bg-white border border-stone-200 rounded-lg">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
             <div className="lg:col-span-4">
-              <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
+              <label className="block text-xs font-medium text-[#837A64] uppercase tracking-wider mb-1">Predmet emaila (Subject)</label>
               <input
                 type="text"
                 value={sendSubject}
@@ -763,7 +763,7 @@ export default function NewsletterPage() {
               />
             </div>
             <div className="lg:col-span-3">
-              <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">Publika</label>
+              <label className="block text-xs font-medium text-[#837A64] uppercase tracking-wider mb-1">Publika</label>
               <select
                 value={sendSegment}
                 onChange={(e) => setSendSegment(e.target.value as "all" | "b2b" | "b2c")}
@@ -776,9 +776,9 @@ export default function NewsletterPage() {
             </div>
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-lg">
-                <Users size={16} className="text-[#a59d85]" />
+                <Users size={16} className="text-[#837A64]" />
                 <span className="text-sm font-semibold text-[#2e2e2e]">{sendRecipientCount}</span>
-                <span className="text-xs text-[#a59d85]">prim.</span>
+                <span className="text-xs text-[#837A64]">prim.</span>
               </div>
             </div>
             <div className="lg:col-span-3">
@@ -800,7 +800,7 @@ export default function NewsletterPage() {
 
           {/* Inline test send — sends current template content to a single address */}
           <div className="mt-3 pt-3 border-t border-stone-200">
-            <label className="block text-xs font-medium text-[#a59d85] uppercase tracking-wider mb-1">
+            <label className="block text-xs font-medium text-[#837A64] uppercase tracking-wider mb-1">
               Pošalji test verziju ovog šablona
             </label>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -821,7 +821,7 @@ export default function NewsletterPage() {
                 {inlineTestSending ? "Slanje..." : "Pošalji test"}
               </button>
             </div>
-            <p className="mt-1 text-[11px] text-[#a59d85]">
+            <p className="mt-1 text-[11px] text-[#837A64]">
               Šalje trenutni sadržaj šablona na navedenu adresu (sa prefiksom &quot;[TEST]&quot; u predmetu). Koristi se za proveru pre slanja svim pretplatnicima.
             </p>
             {inlineTestResult && (
@@ -869,8 +869,8 @@ export default function NewsletterPage() {
           {/* Left: WYSIWYG Editor */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Editor</h3>
-              <span className="text-[10px] text-[#a59d85]">Pišite tekst, dodajte slike i formatirajte sadržaj</span>
+              <h3 className="text-xs font-semibold text-[#837A64] uppercase tracking-wider">Editor</h3>
+              <span className="text-[10px] text-[#837A64]">Pišite tekst, dodajte slike i formatirajte sadržaj</span>
             </div>
             <TiptapEditor
               content={editorBodyContent}
@@ -881,7 +881,7 @@ export default function NewsletterPage() {
           {/* Right: Live Email Preview */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-[#a59d85] uppercase tracking-wider">Pregled emaila</h3>
+              <h3 className="text-xs font-semibold text-[#837A64] uppercase tracking-wider">Pregled emaila</h3>
               <span className="text-[10px] font-semibold text-[#837A64] bg-[#837A64]/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 Uživo
               </span>
@@ -945,12 +945,12 @@ export default function NewsletterPage() {
 
           {templatesLoading || seeding ? (
             <div className="bg-white rounded-sm border border-stone-200 p-12 flex flex-col items-center justify-center">
-              <Loader2 size={28} className="animate-spin text-[#a59d85] mb-3" />
-              <span className="text-[#a59d85] text-sm">{seeding ? "Kreiranje podrazumevanih šablona..." : "Učitavanje šablona..."}</span>
+              <Loader2 size={28} className="animate-spin text-[#837A64] mb-3" />
+              <span className="text-[#837A64] text-sm">{seeding ? "Kreiranje podrazumevanih šablona..." : "Učitavanje šablona..."}</span>
             </div>
           ) : templates.length === 0 ? (
             <div className="bg-white rounded-sm border border-stone-200 p-12 text-center">
-              <FileText size={40} className="mx-auto text-[#a59d85] mb-3" />
+              <FileText size={40} className="mx-auto text-[#837A64] mb-3" />
               <p className="text-[#837A64]">Nema šablona. Kliknite &quot;Novi šablon&quot; da kreirate prvi.</p>
             </div>
           ) : (
@@ -993,9 +993,9 @@ export default function NewsletterPage() {
                   <div className="p-4">
                     <h3 className="font-semibold text-black text-sm mb-0.5">{template.name}</h3>
                     {template.description && (
-                      <p className="text-xs text-[#a59d85] mb-2.5 line-clamp-2">{template.description}</p>
+                      <p className="text-xs text-[#837A64] mb-2.5 line-clamp-2">{template.description}</p>
                     )}
-                    <p className="text-xs text-[#a59d85] mb-3">
+                    <p className="text-xs text-[#837A64] mb-3">
                       Poslednja izmena: {new Date(template.updatedAt).toLocaleDateString("sr-RS")}
                     </p>
 
@@ -1052,9 +1052,9 @@ export default function NewsletterPage() {
                 </thead>
                 <tbody>
                   {campaignsLoading ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#a59d85]">Učitavanje...</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#837A64]">Učitavanje...</td></tr>
                   ) : campaigns.length === 0 ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#a59d85]">Još nema poslatih kampanja.</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[#837A64]">Još nema poslatih kampanja.</td></tr>
                   ) : (
                     campaigns.map((c) => {
                       const statusColor: Record<Campaign["status"], string> = {
@@ -1076,7 +1076,7 @@ export default function NewsletterPage() {
                           <td className="px-4 py-3 text-[#2e2e2e] font-medium">{c.title}</td>
                           <td className="px-4 py-3 text-[#837A64]">{c.subject}</td>
                           <td className="px-4 py-3">
-                            <span className="text-xs uppercase tracking-wider text-[#a59d85]">{c.segment}</span>
+                            <span className="text-xs uppercase tracking-wider text-[#837A64]">{c.segment}</span>
                           </td>
                           <td className="px-4 py-3">
                             <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor[c.status]}`}>
@@ -1108,7 +1108,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-sm border border-stone-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#a59d85] uppercase tracking-wider">{t("newsletter.totalActive")}</p>
+                  <p className="text-xs text-[#837A64] uppercase tracking-wider">{t("newsletter.totalActive")}</p>
                   <p className="text-2xl font-bold text-black mt-1">{stats.totalActive}</p>
                 </div>
                 <div className="w-10 h-10 rounded-sm bg-black/10 flex items-center justify-center">
@@ -1119,7 +1119,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-sm border border-stone-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#a59d85] uppercase tracking-wider">{t("newsletter.b2bSubscribers")}</p>
+                  <p className="text-xs text-[#837A64] uppercase tracking-wider">{t("newsletter.b2bSubscribers")}</p>
                   <p className="text-2xl font-bold text-blue-600 mt-1">{stats.b2bCount}</p>
                 </div>
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">B2B</span>
@@ -1128,7 +1128,7 @@ export default function NewsletterPage() {
             <div className="bg-white rounded-sm border border-stone-200 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#a59d85] uppercase tracking-wider">{t("newsletter.b2cSubscribers")}</p>
+                  <p className="text-xs text-[#837A64] uppercase tracking-wider">{t("newsletter.b2cSubscribers")}</p>
                   <p className="text-2xl font-bold text-green-600 mt-1">{stats.b2cCount}</p>
                 </div>
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">B2C</span>
@@ -1140,7 +1140,7 @@ export default function NewsletterPage() {
           <div className="bg-white rounded-sm border border-stone-200 p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
                 <input type="text" placeholder={t("newsletter.searchPlaceholder")} value={search} onChange={(e) => handleSearchChange(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none" />
               </div>
               <select value={segmentFilter} onChange={(e) => handleSegmentChange(e.target.value)} className="px-4 py-2 border border-stone-200 rounded-sm text-sm focus:border-black focus:outline-none">
@@ -1169,9 +1169,9 @@ export default function NewsletterPage() {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#a59d85]">{t("newsletter.loading")}</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#837A64]">{t("newsletter.loading")}</td></tr>
                   ) : subscribers.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#a59d85]">{t("newsletter.noSubscribers")}</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-[#837A64]">{t("newsletter.noSubscribers")}</td></tr>
                   ) : (
                     subscribers.map((sub) => (
                       <tr key={sub.id} className="border-b border-stone-100 hover:bg-stone-100 transition-colors">
@@ -1282,7 +1282,7 @@ export default function NewsletterPage() {
           <div className="bg-white rounded-sm max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-black">Pošalji test email</h3>
-              <button onClick={() => setShowTestModal(false)} className="text-[#a59d85] hover:text-black"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowTestModal(false)} className="text-[#837A64] hover:text-black"><X className="w-5 h-5" /></button>
             </div>
             <p className="text-sm text-[#837A64] mb-4">Unesite email adresu na koju želite da pošaljete probni newsletter email.</p>
             <input

@@ -118,7 +118,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
       <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-bold text-[#2e2e2e] mb-2">{t('checkout.emptyCart')}</h2>
-          <p className="text-[#a59d85] mb-4">{t('checkout.emptyCartDesc')}</p>
+          <p className="text-[#837A64] mb-4">{t('checkout.emptyCartDesc')}</p>
           <Link href="/products" className="px-6 py-3 bg-black text-white rounded font-medium hover:bg-[#2e2e2e]">
             {t('checkout.continueShopping')}
           </Link>
@@ -215,7 +215,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-[#a59d85] mb-6">
+        <nav className="flex items-center gap-2 text-sm text-[#837A64] mb-6">
           <Link href="/" className="hover:text-secondary">{t('checkout.breadcrumbHome')}</Link>
           <ChevronRight className="w-3 h-3" />
           <Link href="/cart" className="hover:text-secondary">{t('checkout.breadcrumbCart')}</Link>
@@ -250,7 +250,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
             {step === 'contact' && isGuest && (
               <div className="bg-white rounded-sm shadow-sm p-6">
                 <h2 className="text-lg font-bold text-[#2e2e2e] mb-4">{t('checkout.yourDetails')}</h2>
-                <p className="text-sm text-[#a59d85] mb-4">{t('checkout.enterContactDetails')}</p>
+                <p className="text-sm text-[#837A64] mb-4">{t('checkout.enterContactDetails')}</p>
 
                 <div className="space-y-3">
                   <div>
@@ -285,7 +285,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 bg-[#FFFFFF] rounded-sm text-sm text-[#a59d85]">
+                <div className="mt-4 p-3 bg-[#FFFFFF] rounded-sm text-sm text-[#837A64]">
                   {t('checkout.haveAccount')}{' '}
                   <Link href="/account/login?callbackUrl=/checkout" className="text-secondary font-medium hover:underline">
                     {t('checkout.loginLink')}
@@ -315,7 +315,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                         <input type="radio" name="address" checked={!useNewAddress && selectedAddressId === addr.id} onChange={() => { setSelectedAddressId(addr.id); setUseNewAddress(false) }} className="mt-1 text-secondary" />
                         <div>
                           <span className="font-medium text-sm">{addr.label}</span>
-                          <p className="text-sm text-[#a59d85]">{addr.street}, {addr.postalCode} {addr.city}, {addr.country}</p>
+                          <p className="text-sm text-[#837A64]">{addr.street}, {addr.postalCode} {addr.city}, {addr.country}</p>
                         </div>
                       </label>
                     ))}
@@ -338,7 +338,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
                 <div className="flex gap-3 mt-6">
                   {isGuest && (
-                    <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#a59d85] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
+                    <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#837A64] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
                       <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                     </button>
                   )}
@@ -371,7 +371,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   ))}
                 </div>
                 <div className="flex gap-3 mt-6">
-                  <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#a59d85] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
+                  <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#837A64] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={goNext} className="flex-1 bg-black hover:bg-[#2e2e2e] text-white py-3 rounded font-medium flex items-center justify-center gap-2">
@@ -400,7 +400,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
 
                 <div className="flex gap-3 mt-6">
-                  <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#a59d85] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
+                  <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#837A64] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={goNext} className="flex-1 bg-black hover:bg-[#2e2e2e] text-white py-3 rounded font-medium flex items-center justify-center gap-2">
@@ -423,8 +423,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                         <span className="text-sm font-semibold text-[#2e2e2e]">{t('checkout.contactDetails')}</span>
                         <button onClick={() => setStep('contact')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                       </div>
-                      <p className="text-sm text-[#a59d85]">{guestInfo.name}</p>
-                      <p className="text-sm text-[#a59d85]">{guestInfo.email} | {guestInfo.phone}</p>
+                      <p className="text-sm text-[#837A64]">{guestInfo.name}</p>
+                      <p className="text-sm text-[#837A64]">{guestInfo.email} | {guestInfo.phone}</p>
                     </div>
                   )}
 
@@ -434,7 +434,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       <span className="text-sm font-semibold text-[#2e2e2e]">{t('checkout.shippingAddress')}</span>
                       <button onClick={() => setStep('address')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                     </div>
-                    <p className="text-sm text-[#a59d85]">
+                    <p className="text-sm text-[#837A64]">
                       {shippingAddress?.street}, {shippingAddress?.postalCode} {shippingAddress?.city}
                     </p>
                   </div>
@@ -445,7 +445,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       <span className="text-sm font-semibold text-[#2e2e2e]">{t('checkout.step3')}</span>
                       <button onClick={() => setStep('shipping')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                     </div>
-                    <p className="text-sm text-[#a59d85]">
+                    <p className="text-sm text-[#837A64]">
                       {shippingMethod === 'standard' ? t('checkout.standardShort') : shippingMethod === 'express' ? t('checkout.expressShort') : t('checkout.pickupShort')}
                       {' — '}
                       {shippingCost === 0 ? t('checkout.free') : `${shippingCost} RSD`}
@@ -458,7 +458,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       <span className="text-sm font-semibold text-[#2e2e2e]">{t('checkout.step4')}</span>
                       <button onClick={() => setStep('payment')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
                     </div>
-                    <p className="text-sm text-[#a59d85]">
+                    <p className="text-sm text-[#837A64]">
                       {paymentOptions.find((o) => o.key === paymentMethod)?.label}
                     </p>
                   </div>
@@ -475,7 +475,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-[#2e2e2e] truncate">{item.name}</p>
-                          <p className="text-xs text-[#a59d85]">x{item.quantity}</p>
+                          <p className="text-xs text-[#837A64]">x{item.quantity}</p>
                         </div>
                         <span className="text-sm font-semibold">{(item.price * item.quantity).toLocaleString('sr-RS')} RSD</span>
                       </div>
@@ -509,7 +509,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 )}
 
                 <div className="flex gap-3">
-                  <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#a59d85] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
+                  <button onClick={goPrev} className="flex-1 border border-[#D8CFBC] py-3 rounded font-medium text-[#837A64] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-black hover:bg-[#2e2e2e] text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
@@ -526,11 +526,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
               <h3 className="text-lg font-bold text-[#2e2e2e] mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>{t('checkout.summary')}</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#a59d85]">{t('checkout.subtotal')} ({items.length} {t('checkout.itemsCount')})</span>
+                  <span className="text-[#837A64]">{t('checkout.subtotal')} ({items.length} {t('checkout.itemsCount')})</span>
                   <span className="font-medium">{subtotal.toLocaleString('sr-RS')} RSD</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#a59d85]">{t('checkout.step3')}</span>
+                  <span className="text-[#837A64]">{t('checkout.step3')}</span>
                   <span className="font-medium">{shippingCost === 0 ? t('checkout.free') : `${shippingCost} RSD`}</span>
                 </div>
                 <div className="pt-3 border-t border-[#D8CFBC] flex justify-between text-lg font-bold">
@@ -538,7 +538,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <span>{total.toLocaleString('sr-RS')} RSD</span>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-[#D8CFBC] space-y-2 text-xs text-[#a59d85]">
+              <div className="mt-4 pt-4 border-t border-[#D8CFBC] space-y-2 text-xs text-[#837A64]">
                 <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-secondary" /> {t('checkout.securePayment')}</div>
                 <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> {t('checkout.freeShippingOver')}</div>
               </div>

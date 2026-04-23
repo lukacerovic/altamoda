@@ -170,11 +170,11 @@ export default function ChatWidget() {
           ))}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white text-[#a59d85] px-4 py-3 rounded-sm rounded-bl-none border border-[#D8CFBC]">
+              <div className="bg-white text-[#837A64] px-4 py-3 rounded-sm rounded-bl-none border border-[#D8CFBC]">
                 <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-[#a59d85] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-1.5 h-1.5 bg-[#a59d85] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-1.5 h-1.5 bg-[#a59d85] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-1.5 h-1.5 bg-[#837A64] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-1.5 h-1.5 bg-[#837A64] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-1.5 h-1.5 bg-[#837A64] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function ChatWidget() {
                 <button
                   key={reply}
                   onClick={() => handleQuickReply(reply)}
-                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border border-[#D8CFBC] text-[#a59d85] rounded-sm hover:bg-black hover:text-white hover:border-black transition-colors"
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border border-[#D8CFBC] text-[#837A64] rounded-sm hover:bg-black hover:text-white hover:border-black transition-colors"
                 >
                   {reply}
                 </button>
@@ -206,7 +206,7 @@ export default function ChatWidget() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t("chat.inputPlaceholder")}
-            className="flex-1 bg-[#FFFFFF] border border-[#D8CFBC] rounded-sm px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#2e2e2e] focus:border-[#2e2e2e] placeholder-[#a59d85]"
+            className="flex-1 bg-[#FFFFFF] border border-[#D8CFBC] rounded-sm px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#2e2e2e] focus:border-[#2e2e2e] placeholder-[#837A64]"
           />
           <button
             type="submit"

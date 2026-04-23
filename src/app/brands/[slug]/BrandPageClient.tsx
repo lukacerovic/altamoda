@@ -63,11 +63,11 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
               </h1>
             )}
             {brand.description && (
-              <p className="mt-4 text-[#a59d85] text-lg max-w-2xl mx-auto leading-relaxed">
+              <p className="mt-4 text-[#837A64] text-lg max-w-2xl mx-auto leading-relaxed">
                 {brand.description}
               </p>
             )}
-            <div className="mt-3 flex items-center justify-center gap-6 text-sm text-[#a59d85]">
+            <div className="mt-3 flex items-center justify-center gap-6 text-sm text-[#837A64]">
               <span>{totalProducts} {t("brand.productsAvailable")}</span>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                 [&_p]:text-[#2e2e2e] [&_p]:leading-relaxed
                 [&_a]:text-[#837A64] [&_a]:underline
                 [&_hr]:border-[#D8CFBC]
-                [&_img]:rounded-lg [&_img]:mx-auto"
+                [&_img]:rounded-[4px] [&_img]:mx-auto"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(brand.content) }}
             />
           </section>
@@ -102,7 +102,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                   >
                     {t("brand.productsBy")} {brand.name}
                   </h2>
-                  <p className="text-[#a59d85] text-sm mt-1">
+                  <p className="text-[#837A64] text-sm mt-1">
                     {t("brand.showingProducts").replace("{count}", String(products.length)).replace("{total}", String(totalProducts))}
                   </p>
                 </div>
@@ -129,7 +129,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                     <Link
                       key={product.id}
                       href={`/products/${product.slug}`}
-                      className="group bg-white rounded-sm overflow-hidden border border-transparent hover:border-[#D8CFBC] hover:shadow-md transition-all"
+                      className="group bg-white rounded-[4px] overflow-hidden border border-transparent hover:border-[#D8CFBC] hover:shadow-md transition-all"
                     >
                       <div className="relative aspect-square bg-[#FFFFFF] overflow-hidden">
                         <img
@@ -138,18 +138,18 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {product.isNew && (
-                          <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-black text-white">
+                          <span className="absolute top-2 left-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#837A64] text-white backdrop-blur-sm">
                             NOVO
                           </span>
                         )}
                         {hasDiscount && (
-                          <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold rounded-sm bg-red-500 text-white">
+                          <span className="absolute top-2 right-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#837A64] text-white backdrop-blur-sm">
                             -{discountPct}%
                           </span>
                         )}
                       </div>
                       <div className="p-3">
-                        <p className="text-[11px] text-[#a59d85] uppercase tracking-wider mb-1">
+                        <p className="text-[11px] text-[#837A64] uppercase tracking-wider mb-1">
                           {product.brand?.name}
                         </p>
                         <h3 className="text-sm font-medium text-[#2e2e2e] line-clamp-2 leading-snug mb-2">
@@ -158,17 +158,17 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                         {product.rating > 0 && (
                           <div className="flex items-center gap-1 mb-2">
                             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs text-[#a59d85]">
+                            <span className="text-xs text-[#837A64]">
                               {product.rating.toFixed(1)} ({product.reviewCount})
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-[#2e2e2e]">
-                            {product.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#a59d85]">RSD</span>
+                            {product.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#837A64]">RSD</span>
                           </span>
                           {hasDiscount && (
-                            <span className="text-xs text-[#a59d85] line-through">
+                            <span className="text-xs text-[#837A64] line-through">
                               {product.oldPrice!.toLocaleString("sr-RS")}
                             </span>
                           )}

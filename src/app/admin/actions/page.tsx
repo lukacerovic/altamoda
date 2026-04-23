@@ -386,7 +386,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-secondary" /></div>
             <div>
-              <p className="text-xs text-[#a59d85]">{t("admin.totalActions")}</p>
+              <p className="text-xs text-[#837A64]">{t("admin.totalActions")}</p>
               <p className="text-xl font-bold text-black">{actions.length}</p>
             </div>
           </div>
@@ -395,7 +395,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-emerald-50 flex items-center justify-center"><Check size={20} className="text-emerald-600" /></div>
             <div>
-              <p className="text-xs text-[#a59d85]">{t("admin.activeActions")}</p>
+              <p className="text-xs text-[#837A64]">{t("admin.activeActions")}</p>
               <p className="text-xl font-bold text-black">{activeCount}</p>
             </div>
           </div>
@@ -404,7 +404,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-blue-50 flex items-center justify-center"><Calendar size={20} className="text-blue-600" /></div>
             <div>
-              <p className="text-xs text-[#a59d85]">{t("admin.scheduledActions")}</p>
+              <p className="text-xs text-[#837A64]">{t("admin.scheduledActions")}</p>
               <p className="text-xl font-bold text-black">{scheduledCount}</p>
             </div>
           </div>
@@ -413,7 +413,7 @@ export default function ActionsPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-purple-50 flex items-center justify-center"><Package size={20} className="text-purple-600" /></div>
             <div>
-              <p className="text-xs text-[#a59d85]">{t("admin.productsOnSale")}</p>
+              <p className="text-xs text-[#837A64]">{t("admin.productsOnSale")}</p>
               <p className="text-xl font-bold text-black">{totalProducts}</p>
             </div>
           </div>
@@ -424,7 +424,7 @@ export default function ActionsPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t("admin.searchActions")} className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm focus:bg-white focus:border-black" />
           </div>
           <div className="flex flex-wrap gap-2">
@@ -481,10 +481,10 @@ export default function ActionsPage() {
                   <button onClick={() => toggleActive(action.id)} className={`p-2 rounded-sm transition-colors ${action.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-50"}`} title={action.isActive ? t("admin.deactivate") : t("admin.activate")}>
                     {action.isActive ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
-                  <button onClick={() => openEdit(action)} className="p-2 text-[#a59d85] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
+                  <button onClick={() => openEdit(action)} className="p-2 text-[#837A64] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
                     <Edit3 size={18} />
                   </button>
-                  <button onClick={() => deleteAction(action.id)} className="p-2 text-[#a59d85] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
+                  <button onClick={() => deleteAction(action.id)} className="p-2 text-[#837A64] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -502,14 +502,14 @@ export default function ActionsPage() {
                             {p.image ? (
                               <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                             ) : (
-                              <Package size={14} className="text-[#a59d85]" />
+                              <Package size={14} className="text-[#837A64]" />
                             )}
                           </div>
                           <div>
                             <p className="text-xs font-medium text-black truncate max-w-[150px]">{p.name}</p>
                             <div className="flex items-center gap-1.5">
                               <span className="text-xs font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
-                              <span className="text-[10px] text-[#a59d85] line-through">{p.originalPrice.toLocaleString()} RSD</span>
+                              <span className="text-[10px] text-[#837A64] line-through">{p.originalPrice.toLocaleString()} RSD</span>
                             </div>
                           </div>
                         </div>
@@ -547,7 +547,7 @@ export default function ActionsPage() {
               <h2 className="text-lg font-serif font-bold text-black">
                 {editingAction ? t("admin.editAction") : t("admin.newAction")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-1 text-[#a59d85] hover:text-black"><X size={20} /></button>
+              <button onClick={() => setShowPanel(false)} className="p-1 text-[#837A64] hover:text-black"><X size={20} /></button>
             </div>
 
             {/* Body */}
@@ -650,7 +650,7 @@ export default function ActionsPage() {
                 {/* Search + Filters */}
                 <div className="space-y-2 mb-3">
                   <div className="relative">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
                     <input
                       type="text"
                       value={productSearch}
@@ -661,7 +661,7 @@ export default function ActionsPage() {
                   </div>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
                       <select
                         value={filterBrand}
                         onChange={e => setFilterBrand(e.target.value)}
@@ -672,7 +672,7 @@ export default function ActionsPage() {
                       </select>
                     </div>
                     <div className="relative flex-1">
-                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a59d85]" />
+                      <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
                       <select
                         value={filterCategory}
                         onChange={e => setFilterCategory(e.target.value)}
@@ -692,7 +692,7 @@ export default function ActionsPage() {
                 ) : (
                   <div className="max-h-64 overflow-y-auto border border-stone-200 rounded-sm divide-y divide-[#FFFFFF]">
                     {filteredProducts.length === 0 && (
-                      <div className="px-4 py-8 text-center text-sm text-[#a59d85]">Nema proizvoda</div>
+                      <div className="px-4 py-8 text-center text-sm text-[#837A64]">Nema proizvoda</div>
                     )}
                     {filteredProducts.map(p => {
                       const selected = form.selectedProductIds.includes(p.id);
@@ -708,18 +708,18 @@ export default function ActionsPage() {
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img src={p.image} alt="" aria-hidden="true" className="w-full h-full object-cover" />
                             ) : (
-                              <Package size={14} className="text-[#a59d85]" aria-hidden="true" />
+                              <Package size={14} className="text-[#837A64]" aria-hidden="true" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm text-black truncate">{p.name}</p>
-                            <p className="text-xs text-[#a59d85]">{p.brand?.name || "—"} · {p.category?.nameLat || "—"} · {p.sku}</p>
+                            <p className="text-xs text-[#837A64]">{p.brand?.name || "—"} · {p.category?.nameLat || "—"} · {p.sku}</p>
                           </div>
                           <div className="text-right flex-shrink-0">
                             {form.value && Number(form.value) > 0 ? (
                               <>
                                 <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
-                                <p className="text-[10px] text-[#a59d85] line-through">{p.priceB2c.toLocaleString()} RSD</p>
+                                <p className="text-[10px] text-[#837A64] line-through">{p.priceB2c.toLocaleString()} RSD</p>
                               </>
                             ) : (
                               <p className="text-sm text-black">{p.priceB2c.toLocaleString()} RSD</p>
@@ -755,7 +755,7 @@ export default function ActionsPage() {
                           <p className="text-xs text-black truncate">{p.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
                             <span className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
-                            <span className="text-[10px] text-[#a59d85] line-through">{p.priceB2c.toLocaleString()} RSD</span>
+                            <span className="text-[10px] text-[#837A64] line-through">{p.priceB2c.toLocaleString()} RSD</span>
                           </div>
                         </div>
                       );

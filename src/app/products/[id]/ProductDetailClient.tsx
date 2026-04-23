@@ -327,7 +327,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
         <div className="grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16">
           {/* IMAGE GALLERY */}
           <div>
-            <div className="aspect-square overflow-hidden mb-4 relative bg-[#F2ECDE]">
+            <div className="aspect-square overflow-hidden mb-4 relative bg-[#F2ECDE] rounded-[4px]">
               <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-cover" />
               {product.images[activeThumb]?.type === 'video' && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#2e2e2e]/30">
@@ -340,7 +340,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
                 {images.map((img, t) => (
-                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#F2ECDE] ${activeThumb === t ? "ring-1 ring-[#2e2e2e]" : "opacity-70 hover:opacity-100"}`}>
+                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#F2ECDE] rounded-[4px] ${activeThumb === t ? "ring-1 ring-[#2e2e2e]" : "opacity-70 hover:opacity-100"}`}>
                     <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-cover" />
                     {product.images[t]?.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-[#2e2e2e]/40"><Play className="w-5 h-5 text-[#FFFFFF]" /></div>
@@ -674,7 +674,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               {related.map((p) => (
                 <Link key={p.id} href={`/products/${p.slug}`} className="group block">
-                  <div className="aspect-[4/5] overflow-hidden bg-[#F2ECDE] mb-4">
+                  <div className="aspect-[4/5] overflow-hidden bg-[#F2ECDE] mb-4 rounded-[4px]">
                     <Image src={p.image || defaultImage} alt={p.name} width={500} height={625} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
                   </div>
                   <div>

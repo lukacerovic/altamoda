@@ -28,7 +28,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-6 relative">
-              <div className="aspect-[4/5] bg-[#FFFFFF] overflow-hidden rounded-lg shadow-2xl">
+              <div className="aspect-[4/5] bg-[#FFFFFF] overflow-hidden rounded-[4px] shadow-2xl">
                 <img
                   alt="Heritage"
                   className="w-full h-full object-cover mix-blend-multiply opacity-90"
@@ -69,7 +69,7 @@ export default function AboutPage() {
                       {t("about.genesisDescription")}
                     </p>
                   </div>
-                  <div className="aspect-square bg-white p-2 shadow-sm rounded-sm">
+                  <div className="aspect-square bg-white p-2 shadow-sm rounded-[4px]">
                     <img
                       alt="Archival photo"
                       className="w-full h-full object-cover"
