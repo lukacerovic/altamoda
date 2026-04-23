@@ -462,36 +462,6 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          1.5 CATEGORY PILL BAR — Airbnb-style horizontal scroll filter
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="bg-[#FFFFFF] border-y border-[rgba(46,46,46,0.08)]">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="overflow-x-auto hide-scrollbar">
-            <div className="flex gap-2 px-6 md:px-10 py-4 md:py-5 min-w-max">
-              {[
-                { label: "Nega kose", href: "/products?category=sampon" },
-                { label: "Styling", href: "/products?category=stajling" },
-                { label: "Boje za kosu", href: "/products?category=permanentne-boje" },
-                { label: "Alati & Pribor", href: "/products?category=frizerski-pribor" },
-                { label: "Oksidanti", href: "/products?category=oksidanti" },
-                { label: "Dekoloranti", href: "/products?category=dekoloranti" },
-                { label: "Muška kolekcija", href: "/products?search=Brews" },
-                { label: "Akcije", href: "/products?onSale=true" },
-              ].map((c) => (
-                <Link
-                  key={c.label}
-                  href={c.href}
-                  className="shrink-0 text-[11px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-[rgba(46,46,46,0.1)] hover:border-[#2e2e2e] text-[#2e2e2e]/70 hover:text-[#2e2e2e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]"
-                >
-                  {c.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
           2. BRAND MARQUEE — partner logos (slower scroll)
       ═══════════════════════════════════════════════════════════ */}
       <section className="border-y border-[rgba(46,46,46,0.08)] py-8 md:py-10 overflow-hidden bg-[#FFFFFF]">
