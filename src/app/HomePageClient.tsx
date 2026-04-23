@@ -72,7 +72,6 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
   const newLabel = t("home.new");
   const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = product.promoBadge || badge || (product.isNew ? newLabel : discountBadge);
-  const isDiscountBadge = !!displayBadge && /^-\d+%$/.test(displayBadge);
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
@@ -87,13 +86,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           className="object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out"
         />
         {displayBadge && (
-          <span
-            className={`absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full ${
-              isDiscountBadge
-                ? "bg-[#B54B3A] text-[#FFFFFF]"
-                : "bg-[#FFFFFF]/90 text-[#2e2e2e]"
-            }`}
-          >
+          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[#837A64] text-[#FFFFFF]">
             {displayBadge}
           </span>
         )}

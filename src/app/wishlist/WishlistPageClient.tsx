@@ -118,7 +118,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                     <div className="relative overflow-hidden aspect-square">
                       <Image src={item.image} alt={item.name} width={200} height={200} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {badge && (
-                        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#b5453a]">{badge}</span>
+                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-[0.2em] font-medium text-white bg-[#837A64] backdrop-blur-sm">{badge}</span>
                       )}
                       {!item.inStock && (
                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
