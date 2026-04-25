@@ -26,6 +26,10 @@ export const GET = withErrorHandler(async (req: Request) => {
   const onSale = searchParams.get('onSale')
   const isFeatured = searchParams.get('isFeatured')
   const isBestseller = searchParams.get('isBestseller')
+  // Hide stock=0 rows entirely. The storefront passes this; admin doesn't
+  // because admin needs to see the full catalog (including just-created
+  // products that default to 0 stock) to manage inventory.
+  const inStockOnly = searchParams.get('inStockOnly') === 'true'
   // Guest tab filter: 'all' | 'b2c' | 'b2b'
   const visibility = searchParams.get('visibility') || 'all'
 
@@ -98,6 +102,7 @@ export const GET = withErrorHandler(async (req: Request) => {
   if (isNew === 'true') where.isNew = true
   if (isFeatured === 'true') where.isFeatured = true
   if (isBestseller === 'true') where.isBestseller = true
+  if (inStockOnly) where.stockQuantity = { gt: 0 }
 
   // "On Sale" matches either (a) a static oldPrice on the product or (b) at
   // least one active promotion row eligible for this viewer's audience.

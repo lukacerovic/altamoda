@@ -498,6 +498,9 @@ export default function ProductsPageClient({
       params.set("visibility", visibility);
     }
 
+    // Storefront only ever shows in-stock products; admin uses a separate flow.
+    params.set("inStockOnly", "true");
+
     if (selectedCategory) {
       params.set("category", selectedCategory);
     }

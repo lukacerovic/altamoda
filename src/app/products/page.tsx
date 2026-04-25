@@ -73,7 +73,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   // No auth() call — page is fully cacheable. Role-based filtering happens client-side via API.
   const limit = 12;
-  const productWhere = { isActive: true };
+  // Storefront hides stock=0 entirely (admin grid shows everything via the API).
+  const productWhere = { isActive: true, stockQuantity: { gt: 0 } };
 
   const [
     [rawProducts, rawTotal, groupedDups],
@@ -110,10 +111,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       select: { id: true, name: true, slug: true },
       orderBy: { name: "asc" },
     }),
-    // Categories
+    // Categories — count only in-stock products to mirror what the storefront list returns.
     prisma.category.findMany({
       where: { isActive: true },
-      select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true } } } } },
+      select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true, stockQuantity: { gt: 0 } } } } } },
       orderBy: { sortOrder: "asc" },
     }),
     // Dynamic attributes

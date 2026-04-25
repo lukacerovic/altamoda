@@ -390,55 +390,73 @@ export default function ProductsPage() {
   const perPage = 8;
   const loadedRef = useRef(false);
 
-  const fetchProducts = useCallback(() => {
-    fetch("/api/products?limit=100")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.data.products) {
-          const mapped: Product[] = data.data.products.map((p: Record<string, unknown>) => ({
-            id: p.id as number,
-            name: (p.name || "") as string,
-            sku: (p.sku || "") as string,
-            brand: ((p.brand as Record<string, unknown>)?.name || "") as string,
-            productLine: "",
-            category: ((p.category as Record<string, unknown>)?.nameLat || "") as string,
-            subCategory: "",
-            priceB2C: (p.priceB2c || 0) as number,
-            priceB2B: (p.priceB2b || 0) as number,
-            oldPrice: (p.oldPrice || undefined) as number | undefined,
-            purchasePrice: 0,
-            stock: (p.stockQuantity || 0) as number,
-            lowStockThreshold: 5,
-            weight: 0,
-            volume: 0,
-            status: (p.stockQuantity as number) >= 0 ? "active" as const : "inactive" as const,
-            badges: {
-              isNew: (p.isNew || false) as boolean,
-              isFeatured: (p.isFeatured || false) as boolean,
-              isBestseller: (p.isBestseller || false) as boolean,
-              isProfessionalOnly: (p.isProfessional || false) as boolean,
-            },
-            description: "",
-            benefits: "",
-            ingredients: "",
-            declaration: "",
-            howToUse: "",
-            images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
-            seoTitle: "",
-            metaDescription: "",
-            slug: (p.slug || "") as string,
-            barcode: (p.barcode || "") as string,
-            vatRate: (p.vatRate ?? 20) as number,
-            vatCode: (p.vatCode || (p.vatRate === 10 ? "R1" : "R2")) as string,
-            erpId: (p.erpId || "") as string,
-          }));
-          setProducts(mapped);
-          setApiLoaded(true);
-        }
-      })
-      .catch(() => {
+  const fetchProducts = useCallback(async () => {
+    try {
+      // Page 1 first, then fan out for any remaining pages so the admin grid
+      // sees every product regardless of stock — the API sorts by stock-desc,
+      // so a single ?limit=N call would push freshly-created (stock=0) rows
+      // past the cutoff once the catalog grows.
+      const firstRes = await fetch("/api/products?limit=100&page=1");
+      const firstJson = await firstRes.json();
+      if (!firstJson?.success || !firstJson.data?.products) {
         setApiLoaded(true);
-      });
+        return;
+      }
+      const rawProducts: Record<string, unknown>[] = [...firstJson.data.products];
+      const totalPages: number = firstJson.data.pagination?.totalPages || 1;
+      if (totalPages > 1) {
+        const remaining = await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, i) =>
+            fetch(`/api/products?limit=100&page=${i + 2}`).then(r => r.json()).catch(() => null),
+          ),
+        );
+        for (const r of remaining) {
+          if (r?.success && r.data?.products) rawProducts.push(...r.data.products);
+        }
+      }
+      const mapped: Product[] = rawProducts.map((p) => ({
+        id: p.id as number,
+        name: (p.name || "") as string,
+        sku: (p.sku || "") as string,
+        brand: ((p.brand as Record<string, unknown>)?.name || "") as string,
+        productLine: "",
+        category: ((p.category as Record<string, unknown>)?.nameLat || "") as string,
+        subCategory: "",
+        priceB2C: (p.priceB2c || 0) as number,
+        priceB2B: (p.priceB2b || 0) as number,
+        oldPrice: (p.oldPrice || undefined) as number | undefined,
+        purchasePrice: 0,
+        stock: (p.stockQuantity || 0) as number,
+        lowStockThreshold: 5,
+        weight: 0,
+        volume: 0,
+        status: (p.stockQuantity as number) >= 0 ? ("active" as const) : ("inactive" as const),
+        badges: {
+          isNew: (p.isNew || false) as boolean,
+          isFeatured: (p.isFeatured || false) as boolean,
+          isBestseller: (p.isBestseller || false) as boolean,
+          isProfessionalOnly: (p.isProfessional || false) as boolean,
+        },
+        description: "",
+        benefits: "",
+        ingredients: "",
+        declaration: "",
+        howToUse: "",
+        images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
+        seoTitle: "",
+        metaDescription: "",
+        slug: (p.slug || "") as string,
+        barcode: (p.barcode || "") as string,
+        vatRate: (p.vatRate ?? 20) as number,
+        vatCode: (p.vatCode || ((p.vatRate as number) === 10 ? "R1" : "R2")) as string,
+        erpId: (p.erpId || "") as string,
+      }));
+      setProducts(mapped);
+      setApiLoaded(true);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      setApiLoaded(true);
+    }
   }, []);
 
   const fetchTaxonomy = useCallback(() => {
@@ -479,12 +497,6 @@ export default function ProductsPage() {
     fetchProducts();
     fetchTaxonomy();
   }, [fetchProducts, fetchTaxonomy]);
-
-  // Poll for product updates every 30s
-  useEffect(() => {
-    const interval = setInterval(fetchProducts, 30000);
-    return () => clearInterval(interval);
-  }, [fetchProducts]);
 
   /* ── Filtered / paginated ── */
   const filtered = useMemo(() => {
