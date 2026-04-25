@@ -391,72 +391,90 @@ export default function ProductsPage() {
   const loadedRef = useRef(false);
 
   const fetchProducts = useCallback(async () => {
+    // Map a raw API product to the local Product shape used by the grid.
+    const mapRaw = (p: Record<string, unknown>): Product => ({
+      id: p.id as number,
+      name: (p.name || "") as string,
+      sku: (p.sku || "") as string,
+      brand: ((p.brand as Record<string, unknown>)?.name || "") as string,
+      productLine: "",
+      category: ((p.category as Record<string, unknown>)?.nameLat || "") as string,
+      subCategory: "",
+      priceB2C: (p.priceB2c || 0) as number,
+      priceB2B: (p.priceB2b || 0) as number,
+      oldPrice: (p.oldPrice || undefined) as number | undefined,
+      purchasePrice: 0,
+      stock: (p.stockQuantity || 0) as number,
+      lowStockThreshold: 5,
+      weight: 0,
+      volume: 0,
+      status: (p.stockQuantity as number) >= 0 ? ("active" as const) : ("inactive" as const),
+      badges: {
+        isNew: (p.isNew || false) as boolean,
+        isFeatured: (p.isFeatured || false) as boolean,
+        isBestseller: (p.isBestseller || false) as boolean,
+        isProfessionalOnly: (p.isProfessional || false) as boolean,
+      },
+      description: "",
+      benefits: "",
+      ingredients: "",
+      declaration: "",
+      howToUse: "",
+      images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
+      seoTitle: "",
+      metaDescription: "",
+      slug: (p.slug || "") as string,
+      barcode: (p.barcode || "") as string,
+      vatRate: (p.vatRate ?? 20) as number,
+      vatCode: (p.vatCode || ((p.vatRate as number) === 10 ? "R1" : "R2")) as string,
+      erpId: (p.erpId || "") as string,
+    });
+
     try {
-      // Page 1 first, then fan out for any remaining pages so the admin grid
-      // sees every product regardless of stock — the API sorts by stock-desc,
-      // so a single ?limit=N call would push freshly-created (stock=0) rows
-      // past the cutoff once the catalog grows.
-      // cache: 'no-store' bypasses the browser HTTP cache so a refresh after
-      // a save always sees the freshly-created product. Without this, the
-      // browser can serve a stale JSON response and a newly-added product
-      // appears to vanish on reload.
+      // Step 1 — page 1, awaited. cache:no-store dodges browser cache so a
+      // fresh save is always reflected on refresh.
       const firstRes = await fetch("/api/products?limit=100&page=1", { cache: "no-store" });
       const firstJson = await firstRes.json();
       if (!firstJson?.success || !firstJson.data?.products) {
         setApiLoaded(true);
         return;
       }
+
+      // Set products from page 1 IMMEDIATELY — without this, the grid keeps
+      // showing the hardcoded `initialProducts` mock data while the fan-out
+      // for the remaining pages plays out. With ~28 pages and free-tier DB
+      // limits, that fan-out can take 10s+ and some pages 500. The user then
+      // searches and sees no results because the search runs over mock data,
+      // not the real catalog they just saved into.
       const rawProducts: Record<string, unknown>[] = [...firstJson.data.products];
+      setProducts(rawProducts.map(mapRaw));
+      setApiLoaded(true);
+
+      // Step 2 — fetch the rest in batches of 5 so we don't open 27+ parallel
+      // connections to the DB at once (Render free Postgres has a small pool;
+      // unbatched fan-out was returning intermittent 500s on later pages).
+      // After each batch the products state is updated incrementally so the
+      // grid grows as data arrives.
       const totalPages: number = firstJson.data.pagination?.totalPages || 1;
       if (totalPages > 1) {
-        const remaining = await Promise.all(
-          Array.from({ length: totalPages - 1 }, (_, i) =>
-            fetch(`/api/products?limit=100&page=${i + 2}`, { cache: "no-store" }).then(r => r.json()).catch(() => null),
-          ),
-        );
-        for (const r of remaining) {
-          if (r?.success && r.data?.products) rawProducts.push(...r.data.products);
+        const BATCH_SIZE = 5;
+        const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+        for (let i = 0; i < remainingPages.length; i += BATCH_SIZE) {
+          const batch = remainingPages.slice(i, i + BATCH_SIZE);
+          const results = await Promise.all(
+            batch.map(pg =>
+              fetch(`/api/products?limit=100&page=${pg}`, { cache: "no-store" })
+                .then(r => r.json())
+                .catch(() => null),
+            ),
+          );
+          for (const r of results) {
+            if (r?.success && r.data?.products) rawProducts.push(...r.data.products);
+          }
+          // Snapshot the array each time so React sees a new reference.
+          setProducts(rawProducts.map(mapRaw));
         }
       }
-      const mapped: Product[] = rawProducts.map((p) => ({
-        id: p.id as number,
-        name: (p.name || "") as string,
-        sku: (p.sku || "") as string,
-        brand: ((p.brand as Record<string, unknown>)?.name || "") as string,
-        productLine: "",
-        category: ((p.category as Record<string, unknown>)?.nameLat || "") as string,
-        subCategory: "",
-        priceB2C: (p.priceB2c || 0) as number,
-        priceB2B: (p.priceB2b || 0) as number,
-        oldPrice: (p.oldPrice || undefined) as number | undefined,
-        purchasePrice: 0,
-        stock: (p.stockQuantity || 0) as number,
-        lowStockThreshold: 5,
-        weight: 0,
-        volume: 0,
-        status: (p.stockQuantity as number) >= 0 ? ("active" as const) : ("inactive" as const),
-        badges: {
-          isNew: (p.isNew || false) as boolean,
-          isFeatured: (p.isFeatured || false) as boolean,
-          isBestseller: (p.isBestseller || false) as boolean,
-          isProfessionalOnly: (p.isProfessional || false) as boolean,
-        },
-        description: "",
-        benefits: "",
-        ingredients: "",
-        declaration: "",
-        howToUse: "",
-        images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
-        seoTitle: "",
-        metaDescription: "",
-        slug: (p.slug || "") as string,
-        barcode: (p.barcode || "") as string,
-        vatRate: (p.vatRate ?? 20) as number,
-        vatCode: (p.vatCode || ((p.vatRate as number) === 10 ? "R1" : "R2")) as string,
-        erpId: (p.erpId || "") as string,
-      }));
-      setProducts(mapped);
-      setApiLoaded(true);
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setApiLoaded(true);
