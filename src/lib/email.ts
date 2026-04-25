@@ -22,12 +22,16 @@ function getEmailFrom() {
 }
 
 function getSiteUrl() {
-  const value = process.env.SITE_URL
-  if (!value) {
-    if (IS_PROD) throw new Error('SITE_URL is required in production')
-    return 'http://localhost:3000'
-  }
-  return value
+  const explicit = process.env.SITE_URL
+  if (explicit) return explicit
+
+  // Vercel auto-sets VERCEL_URL (no scheme) on every deployment. Use it as a safety
+  // net so emails still render absolute links if SITE_URL was never configured.
+  const vercelHost = process.env.VERCEL_URL
+  if (vercelHost) return `https://${vercelHost}`
+
+  if (IS_PROD) throw new Error('SITE_URL is required in production')
+  return 'http://localhost:3000'
 }
 
 export interface SendEmailOptions {

@@ -41,6 +41,7 @@ vi.mock('@/lib/db', () => ({
       update: vi.fn(),
       count: vi.fn(),
     },
+    orderItem: { findFirst: vi.fn() },
     orderStatusHistory: { create: vi.fn() },
     $transaction: vi.fn(),
   },
@@ -217,6 +218,9 @@ describe('Reviews API Logic', () => {
   describe('POST /api/reviews', () => {
     it('rejects duplicate review (409)', async () => {
       mockPrisma.product.findFirst.mockResolvedValue({ id: 'prod-1' } as any)
+      // Verified-purchase gate — return a matching order item so we get past
+      // the gate and reach the duplicate-review check.
+      mockPrisma.orderItem.findFirst.mockResolvedValue({ id: 'oi-1' } as any)
       mockPrisma.review.findUnique.mockResolvedValue({ id: 'existing-review' } as any)
 
       const { POST } = await import('@/app/api/reviews/route')
@@ -232,6 +236,7 @@ describe('Reviews API Logic', () => {
 
     it('creates review for new user/product combination', async () => {
       mockPrisma.product.findFirst.mockResolvedValue({ id: 'prod-1', isActive: true } as any)
+      mockPrisma.orderItem.findFirst.mockResolvedValue({ id: 'oi-1' } as any)
       mockPrisma.review.findUnique.mockResolvedValue(null)
       mockPrisma.review.create.mockResolvedValue({ id: 'r-new', rating: 5 } as any)
 
@@ -244,6 +249,19 @@ describe('Reviews API Logic', () => {
       const data = await res.json()
       expect(res.status).toBe(201)
       expect(data.data.rating).toBe(5)
+    })
+
+    it('rejects review from user who never purchased the product (403)', async () => {
+      mockPrisma.product.findFirst.mockResolvedValue({ id: 'prod-1', isActive: true } as any)
+      mockPrisma.orderItem.findFirst.mockResolvedValue(null)
+
+      const { POST } = await import('@/app/api/reviews/route')
+      const req = new Request('http://localhost/api/reviews', {
+        method: 'POST',
+        body: JSON.stringify({ productId: 'prod-1', rating: 5 }),
+      })
+      const res = await POST(req)
+      expect(res.status).toBe(403)
     })
 
     it('rejects invalid rating (0)', async () => {

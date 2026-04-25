@@ -5,6 +5,7 @@ import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 import { findFuzzyProductIds } from '@/lib/fuzzy-search'
+import { resolveBrandId, resolveCategoryId, resolveProductLineId } from '@/lib/taxonomy'
 
 // GET /api/products — List with filters, pagination, B2B/B2C visibility
 export const GET = withErrorHandler(async (req: Request) => {
@@ -95,9 +96,38 @@ export const GET = withErrorHandler(async (req: Request) => {
 
   // Boolean filters
   if (isNew === 'true') where.isNew = true
-  if (onSale === 'true') where.oldPrice = { not: null }
   if (isFeatured === 'true') where.isFeatured = true
   if (isBestseller === 'true') where.isBestseller = true
+
+  // "On Sale" matches either (a) a static oldPrice on the product or (b) at
+  // least one active promotion row eligible for this viewer's audience.
+  // Without the promo branch, products discounted purely via the Promotions
+  // system never appear in the filter even though they show a sale price.
+  if (onSale === 'true') {
+    const now = new Date()
+    const audiences: ('all' | 'b2c' | 'b2b')[] =
+      role === 'b2c' ? ['all', 'b2c']
+      : role === 'b2b' ? ['all', 'b2b']
+      : role === 'admin' ? ['all', 'b2c', 'b2b']
+      : ['all', 'b2c', 'b2b']
+    where.OR = [
+      { oldPrice: { not: null } },
+      {
+        promotionProducts: {
+          some: {
+            promotion: {
+              isActive: true,
+              audience: { in: audiences },
+              AND: [
+                { OR: [{ startDate: null }, { startDate: { lte: now } }] },
+                { OR: [{ endDate: null }, { endDate: { gte: now } }] },
+              ],
+            },
+          },
+        },
+      },
+    ]
+  }
 
   // Fuzzy search via pg_trgm + diacritic-aware ILIKE. Returns candidate IDs ranked by similarity;
   // downstream filters (category/price/etc.) still apply through the normal where clause.
@@ -192,8 +222,11 @@ export const GET = withErrorHandler(async (req: Request) => {
     ? { ...where, NOT: { id: { in: Array.from(excludeIds) } } }
     : where
 
-  // Query
-  const [products, totalRaw] = await Promise.all([
+  // Query — count against finalWhere (same filter as the list) so totalPages never
+  // exceeds the number of pages that actually have products. Previously this counted
+  // against `where` and subtracted duplicates, which could drift and leave an empty
+  // trailing page in the paginator.
+  const [products, total] = await Promise.all([
     prisma.product.findMany({
       where: finalWhere,
       include: {
@@ -207,9 +240,9 @@ export const GET = withErrorHandler(async (req: Request) => {
       skip,
       take: limit,
     }),
-    prisma.product.count({ where }),
+    prisma.product.count({ where: finalWhere }),
   ])
-  const total = totalRaw - duplicateCount
+  void duplicateCount // kept computed for possible future telemetry
 
   // Calculate avg ratings + variant counts in parallel
   const productIds = products.map(p => p.id)
@@ -270,6 +303,11 @@ export const GET = withErrorHandler(async (req: Request) => {
       ? p.nameLat.replace(p.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
       : p.nameLat
 
+    // Professional (B2B-only) products: the admin form mirrors priceB2b into priceB2c
+    // to satisfy the NOT NULL constraint. That mirrored value must NEVER be shown to
+    // non-B2B viewers — they'd see a price they can't actually purchase at.
+    const isProOnlyHiddenPrice = p.isProfessional && role !== 'b2b' && role !== 'admin'
+
     let basePrice = role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c)
     let oldPrice = p.oldPrice ? Number(p.oldPrice) : null
 
@@ -307,10 +345,10 @@ export const GET = withErrorHandler(async (req: Request) => {
       slug: p.slug,
       brand: p.brand,
       category: p.category,
-      price: basePrice,
-      priceB2c: Number(p.priceB2c),
+      price: isProOnlyHiddenPrice ? null : basePrice,
+      priceB2c: isProOnlyHiddenPrice ? null : Number(p.priceB2c),
       priceB2b: (role === 'b2b' || role === 'admin') && p.priceB2b ? Number(p.priceB2b) : null,
-      oldPrice,
+      oldPrice: isProOnlyHiddenPrice ? null : oldPrice,
       image: p.images[0]?.url || null,
       isProfessional: p.isProfessional,
       isNew: p.isNew,
@@ -357,15 +395,21 @@ export const POST = withErrorHandler(async (req: Request) => {
   const existingSlug = await prisma.product.findUnique({ where: { slug } })
   const finalSlug = existingSlug ? `${slug}-${Date.now().toString(36)}` : slug
 
+  // Admin form sends category/brand as names; resolve (find-or-create) to FK ids
+  // so newly invented taxonomy entries persist and surface in storefront filters.
+  const brandId = body.brandId || (await resolveBrandId(body.brand))
+  const productLineId = body.productLineId || (await resolveProductLineId(brandId, body.productLine))
+  const categoryId = body.categoryId || (await resolveCategoryId(body.category, body.subCategory))
+
   const product = await prisma.product.create({
     data: {
       sku,
       nameLat: body.nameLat,
       nameCyr: body.nameCyr,
       slug: finalSlug,
-      brandId: body.brandId || null,
-      productLineId: body.productLineId || null,
-      categoryId: body.categoryId || null,
+      brandId,
+      productLineId,
+      categoryId,
       description: body.description,
       benefits: body.benefits,
       ingredients: body.ingredients,

@@ -46,8 +46,8 @@ interface Product {
   slug: string;
   brand: ProductBrand | null;
   category: ProductCategory | null;
-  price: number;
-  priceB2c: number;
+  price: number | null;
+  priceB2c: number | null;
   priceB2b: number | null;
   oldPrice: number | null;
   image: string | null;
@@ -96,7 +96,7 @@ interface SearchResult {
   name: string;
   slug: string;
   brand: string | null;
-  price: number;
+  price: number | null;
   image: string | null;
   isProfessional: boolean;
 }
@@ -181,7 +181,7 @@ function getBadge(product: Product): string | null {
   if (product.promoBadge) return product.promoBadge;
   if (product.isNew) return "NOVO";
   if (product.isFeatured) return "HIT";
-  if (product.oldPrice && product.oldPrice > product.price) {
+  if (product.price != null && product.oldPrice && product.oldPrice > product.price) {
     const pct = Math.round((1 - product.price / product.oldPrice) * 100);
     return `-${pct}%`;
   }
@@ -229,7 +229,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (outOfStock) return;
+    if (outOfStock || product.price == null) return;
     addItem({
       productId: product.id,
       name: product.name,
@@ -274,8 +274,14 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
         <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium block mb-1.5">{product.brand?.name ?? ""}</span>
         <h3 className="text-base text-[#2e2e2e] mb-1 font-normal line-clamp-2 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.name}</h3>
         <div className="flex items-center gap-2 text-sm text-[#2e2e2e] mt-1">
-          {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-          <span>{product.price.toLocaleString("sr-RS")} RSD</span>
+          {product.price == null ? (
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#837A64] font-medium">B2B samo · prijavi se za cenu</span>
+          ) : (
+            <>
+              {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+              <span>{product.price.toLocaleString("sr-RS")} RSD</span>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-0.5 mt-2">
           {[...Array(5)].map((_, i) => <Star key={i} className={`w-2.5 h-2.5 ${i < Math.round(product.rating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />)}
@@ -891,9 +897,9 @@ export default function ProductsPageClient({
               <span className="text-[13px] text-[#2e2e2e]/60 group-hover:text-[#2e2e2e] transition-colors">{f.label}</span>
               <button
                 onClick={(e) => { e.preventDefault(); toggleFilter(f.key); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#2e2e2e]" : "bg-[#D8CFBC]"}`}
+                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#837A64]" : "bg-[#D8CFBC]"}`}
               >
-                <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-transform duration-300 ${activeToggles.includes(f.key) ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
+                <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.18)] ring-1 ring-black/5 transition-transform duration-300 ${activeToggles.includes(f.key) ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
               </button>
             </label>
           ))}
@@ -1009,7 +1015,11 @@ export default function ProductsPageClient({
                             <p className="text-sm text-[#2e2e2e] truncate" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{p.name}</p>
                             <p className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]/60">{p.brand}</p>
                           </div>
-                          <span className="text-sm text-[#2e2e2e]">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] text-[#2e2e2e]/60">RSD</span></span>
+                          {p.price == null ? (
+                            <span className="text-[10px] uppercase tracking-[0.18em] text-[#837A64]">B2B</span>
+                          ) : (
+                            <span className="text-sm text-[#2e2e2e]">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] text-[#2e2e2e]/60">RSD</span></span>
+                          )}
                         </Link>
                       ))}
                     </div>
@@ -1161,8 +1171,14 @@ export default function ProductsPageClient({
                         {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < Math.round(p.rating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />)}
                       </div>
                       <div className="mt-2 flex items-baseline gap-2 text-[#2e2e2e]">
-                        {p.oldPrice && <span className="text-xs text-[#2e2e2e]/60 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-                        <span className="text-sm">{p.price.toLocaleString("sr-RS")} <span className="text-xs text-[#2e2e2e]/60">RSD</span></span>
+                        {p.price == null ? (
+                          <span className="text-[10px] uppercase tracking-[0.22em] text-[#837A64] font-medium">B2B samo</span>
+                        ) : (
+                          <>
+                            {p.oldPrice && <span className="text-xs text-[#2e2e2e]/60 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+                            <span className="text-sm">{p.price.toLocaleString("sr-RS")} <span className="text-xs text-[#2e2e2e]/60">RSD</span></span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </Link>

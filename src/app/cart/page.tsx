@@ -11,7 +11,7 @@ import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
   ShoppingBag, Trash2, Minus, Plus, ChevronRight,
   Truck, Shield, Star, AlertCircle,
-  CheckCircle, FileText, Store, Sparkles,
+  FileText, Store, Sparkles,
 } from "lucide-react";
 
 const recommended = [
@@ -26,7 +26,6 @@ export default function CartPage() {
   const { data: session } = useSession();
   const { t } = useLanguage();
   const { items, updateQuantity, removeItem, getTotal, setItems } = useCartStore();
-  const [deliveryMethod, setDeliveryMethod] = useState("standard");
   const [b2bNoOnlinePayment, setB2bNoOnlinePayment] = useState(false);
   const [b2bInvoice, setB2bInvoice] = useState(false);
 
@@ -72,15 +71,9 @@ export default function CartPage() {
   const hasOutOfStock = items.some((i) => i.stockQuantity <= 0);
   const subtotal = inStockItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const deliveryOptions = [
-    { key: "standard", label: t("cart.standardDelivery"), price: subtotal > FREE_SHIPPING_THRESHOLD ? 0 : 350, note: subtotal > FREE_SHIPPING_THRESHOLD ? t("cart.freeDeliveryForOrders") : "350 RSD" },
-    { key: "express", label: t("cart.expressDelivery"), price: 690, note: "690 RSD" },
-    { key: "pickup", label: t("cart.storePickup"), price: 0, note: t("cart.free") },
-  ];
-
-  const selectedDelivery = deliveryOptions.find((d) => d.key === deliveryMethod)!;
-  const shipping = selectedDelivery.price;
-  const total = subtotal + shipping;
+  // Delivery method is chosen in the checkout step, not in cart — keeping only
+  // a subtotal view here avoids duplicate UI and ambiguous totals.
+  const total = subtotal
 
 
   const handleCheckout = () => {
@@ -158,27 +151,6 @@ export default function CartPage() {
                 );
               })}
 
-              {/* Delivery Options */}
-              <div className="bg-white rounded-sm shadow-sm p-6">
-                <h3 className="text-sm font-semibold text-[#2e2e2e] mb-4 flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> {t("cart.deliveryMethod")}</h3>
-                <div className="space-y-3">
-                  {deliveryOptions.map((opt) => (
-                    <label key={opt.key} className={`flex items-center gap-3 p-3 rounded-sm border-2 cursor-pointer transition-colors ${deliveryMethod === opt.key ? "border-black bg-[#FFFFFF]" : "border-[#D8CFBC] hover:border-[#D8CFBC]"}`}>
-                      <input type="radio" name="delivery" checked={deliveryMethod === opt.key} onChange={() => setDeliveryMethod(opt.key)} className="w-4 h-4 text-secondary focus:ring-[#2e2e2e]" />
-                      <div className="flex-1">
-                        <span className="text-sm font-medium text-[#2e2e2e]">{opt.label}</span>
-                      </div>
-                      <span className={`text-sm font-semibold ${opt.price === 0 ? "text-green-600" : "text-[#2e2e2e]"}`}>
-                        {opt.price === 0 ? t("cart.free") : `${opt.price} RSD`}
-                      </span>
-                    </label>
-                  ))}
-                  {deliveryMethod === "standard" && subtotal > FREE_SHIPPING_THRESHOLD && (
-                    <p className="text-xs text-green-600 flex items-center gap-1 ml-7"><CheckCircle className="w-3 h-3" /> {t("cart.freeDeliveryForOrders")}</p>
-                  )}
-                </div>
-              </div>
-
               {/* B2B Options Box — only for B2B users */}
               {isB2b && (
                 <div className="bg-white rounded-sm shadow-sm p-6 border-2 border-black">
@@ -211,7 +183,7 @@ export default function CartPage() {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between"><span className="text-[#837A64]">{t("cart.subtotal")}</span><span className="font-medium">{subtotal.toLocaleString("sr-RS")} RSD</span></div>
-                  <div className="flex justify-between"><span className="text-[#837A64]">{t("cart.delivery")} ({selectedDelivery.label.split("(")[0].trim()})</span><span className="font-medium">{shipping === 0 ? t("cart.free") : `${shipping} RSD`}</span></div>
+                  <div className="flex justify-between"><span className="text-[#837A64]">{t("cart.delivery")}</span><span className="text-xs text-[#837A64]">{t("cart.selectAtCheckout") ?? "U sledećem koraku"}</span></div>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-[#D8CFBC]">

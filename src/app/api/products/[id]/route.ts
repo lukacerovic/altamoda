@@ -4,6 +4,7 @@ import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-util
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
 import { updateProductSchema } from '@/lib/validations/product'
+import { resolveBrandId, resolveCategoryId, resolveProductLineId } from '@/lib/taxonomy'
 
 // GET /api/products/[id] — Full product detail
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
@@ -38,8 +39,9 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
 
   if (!product) return errorResponse('Proizvod nije pronađen', 404)
 
-  // B2C visibility check
-  if (role === 'b2c' && product.isProfessional) {
+  // Professional products are only for B2B and admin — guests and B2C are blocked
+  // even via direct URL.
+  if (product.isProfessional && role !== 'b2b' && role !== 'admin') {
     return errorResponse('Proizvod nije dostupan', 403)
   }
 
@@ -223,14 +225,27 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   const raw = await req.json()
   const body = updateProductSchema.parse(raw)
 
+  // Same find-or-create as POST: only resolve from name when an explicit id
+  // wasn't passed, so admin edits that just rename a product don't accidentally
+  // re-attach taxonomy. `undefined` leaves the column untouched.
+  const brandId = body.brandId !== undefined
+    ? body.brandId
+    : body.brand !== undefined ? await resolveBrandId(body.brand) : undefined
+  const productLineId = body.productLineId !== undefined
+    ? body.productLineId
+    : body.productLine !== undefined ? await resolveProductLineId(brandId ?? null, body.productLine) : undefined
+  const categoryId = body.categoryId !== undefined
+    ? body.categoryId
+    : body.category !== undefined ? await resolveCategoryId(body.category, body.subCategory) : undefined
+
   const product = await prisma.product.update({
     where: { id },
     data: {
       nameLat: body.nameLat,
       nameCyr: body.nameCyr,
-      brandId: body.brandId,
-      productLineId: body.productLineId,
-      categoryId: body.categoryId,
+      brandId,
+      productLineId,
+      categoryId,
       description: body.description,
       benefits: body.benefits,
       ingredients: body.ingredients,
@@ -292,17 +307,38 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   return successResponse(product)
 })
 
-// DELETE /api/products/[id] — Soft delete (admin)
+// DELETE /api/products/[id] — Hard delete when safe, soft delete when blocked
+// by order history. Order rows reference Product without cascade so they pin
+// the row in place — losing them would orphan the order's line items.
 export const DELETE = withErrorHandler(async (_req: Request, context: unknown) => {
   await requireAdmin()
   const { id } = await getRouteParams<{ id: string }>(context)
 
-  await prisma.product.update({
-    where: { id },
-    data: { isActive: false },
-  })
+  const orderItemCount = await prisma.orderItem.count({ where: { productId: id } })
 
-  // Invalidate cached pages
+  if (orderItemCount > 0) {
+    await prisma.product.update({
+      where: { id },
+      data: { isActive: false },
+    })
+    revalidatePath('/')
+    revalidatePath('/products')
+    return successResponse({
+      deleted: true,
+      soft: true,
+      message: 'Proizvod je deo postojećih porudžbina pa je deaktiviran umesto trajno obrisan.',
+    })
+  }
+
+  // Cart and wishlist references aren't cascade-deleted in the schema; clear
+  // them first so the FK constraint doesn't reject the hard delete. Reviews,
+  // images, color, attributes, and promo links cascade automatically.
+  await prisma.$transaction([
+    prisma.cartItem.deleteMany({ where: { productId: id } }),
+    prisma.wishlist.deleteMany({ where: { productId: id } }),
+    prisma.product.delete({ where: { id } }),
+  ])
+
   revalidatePath('/')
   revalidatePath('/products')
 

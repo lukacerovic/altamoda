@@ -46,7 +46,22 @@ export const GET = withErrorHandler(async (req: Request) => {
   })
 })
 
-// POST /api/reviews — create or update a review (upsert)
+// Has this user ever ordered this product (any non-cancelled order)?
+async function hasPurchasedProduct(userId: string, productId: string): Promise<boolean> {
+  const match = await prisma.orderItem.findFirst({
+    where: {
+      productId,
+      order: {
+        userId,
+        status: { not: 'otkazano' },
+      },
+    },
+    select: { id: true },
+  })
+  return match !== null
+}
+
+// POST /api/reviews — create a review. Only allowed if the user has ordered the product.
 export const POST = withErrorHandler(async (req: Request) => {
   const user = await requireAuth()
   const body = await req.json()
@@ -58,6 +73,12 @@ export const POST = withErrorHandler(async (req: Request) => {
   })
   if (!product) {
     throw new ApiError(404, 'Proizvod nije pronađen')
+  }
+
+  // Verified-purchase gate: prevent spam / fake reviews from users who never bought.
+  const purchased = await hasPurchasedProduct(user.id, productId)
+  if (!purchased) {
+    throw new ApiError(403, 'Možete oceniti samo proizvode koje ste poručili')
   }
 
   // Check if user already reviewed — return error instead of upsert

@@ -9,7 +9,7 @@ import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
   ShoppingBag, Heart, Star, ChevronRight, Minus, Plus, Truck,
   RotateCcw, Shield, Sparkles,
-  Play, CheckCircle, X, Camera, Link2, AlertCircle,
+  Play, CheckCircle, X, Link2, AlertCircle,
 } from "lucide-react";
 import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
@@ -128,20 +128,29 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     colorSiblings.find(s => s.isActive) || null
   );
   const [reviewError, setReviewError] = useState("");
+  const [canReview, setCanReview] = useState(false);
 
   const { addItem } = useCartStore();
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
 
-  // Fetch user-specific data client-side (wishlist + existing review)
+  // Fetch user-specific data client-side (wishlist + review eligibility)
   useEffect(() => {
     if (!session?.user?.id) return;
-    // Check wishlist status
     fetch('/api/wishlist')
       .then(r => r.json())
       .then(data => {
         if (data.success && Array.isArray(data.data?.items)) {
           setLiked(data.data.items.some((w: { productId: string }) => w.productId === product.id));
         }
+      })
+      .catch(() => {});
+
+    // Only users who ordered the product can leave a review. The server enforces this;
+    // this fetch just drives the CTA visibility so unbuyers don't see a dead button.
+    fetch(`/api/reviews/eligibility?productId=${product.id}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) setCanReview(!!data.data?.canReview);
       })
       .catch(() => {});
   }, [session?.user?.id, product.id]);
@@ -462,29 +471,37 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             )}
 
             {/* Quantity + Add to cart */}
-            <div className="flex items-center gap-3 mb-5">
-              <div className="flex items-center border border-[#D8CFBC]">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Minus className="w-3.5 h-3.5 text-[#2e2e2e]" /></button>
-                <span className="w-10 text-center text-sm text-[#2e2e2e]">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Plus className="w-3.5 h-3.5 text-[#2e2e2e]" /></button>
-              </div>
-              <button
-                onClick={handleAddToCart}
-                disabled={outOfStock}
-                className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#FFFFFF]" : "bg-[#837A64] hover:bg-[#6a624f] text-[#FFFFFF]"}`}
-              >
-                {outOfStock ? (
-                  <>{t("products.outOfStock")}</>
-                ) : addedToCart ? (
-                  <><CheckCircle className="w-4 h-4" /> {t("productDetail.addedToCart")}</>
-                ) : (
-                  <><ShoppingBag className="w-4 h-4" /> {t("productDetail.addToCart")}</>
-                )}
-              </button>
-              <button onClick={handleToggleWishlist} className={`w-12 h-12 border flex items-center justify-center transition-colors ${liked ? "border-[#b5453a] bg-[#b5453a]/5" : "border-[#D8CFBC] hover:border-[#2e2e2e]"}`}>
-                <Heart className={`w-4 h-4 ${liked ? "fill-[#b5453a] text-[#b5453a]" : "text-[#2e2e2e]"}`} />
-              </button>
-            </div>
+            {(() => {
+              const professionalBlocked = product.isProfessional && role !== 'b2b' && role !== 'admin'
+              const disabled = outOfStock || professionalBlocked
+              return (
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex items-center border border-[#D8CFBC]">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Minus className="w-3.5 h-3.5 text-[#2e2e2e]" /></button>
+                    <span className="w-10 text-center text-sm text-[#2e2e2e]">{quantity}</span>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-11 h-12 flex items-center justify-center hover:bg-[#EFE7D5]/40 transition-colors"><Plus className="w-3.5 h-3.5 text-[#2e2e2e]" /></button>
+                  </div>
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={disabled}
+                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${disabled ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#FFFFFF]" : "bg-[#837A64] hover:bg-[#6a624f] text-[#FFFFFF]"}`}
+                  >
+                    {professionalBlocked ? (
+                      <>B2B - samo za salone</>
+                    ) : outOfStock ? (
+                      <>{t("products.outOfStock")}</>
+                    ) : addedToCart ? (
+                      <><CheckCircle className="w-4 h-4" /> {t("productDetail.addedToCart")}</>
+                    ) : (
+                      <><ShoppingBag className="w-4 h-4" /> {t("productDetail.addToCart")}</>
+                    )}
+                  </button>
+                  <button onClick={handleToggleWishlist} className={`w-12 h-12 border flex items-center justify-center transition-colors ${liked ? "border-[#b5453a] bg-[#b5453a]/5" : "border-[#D8CFBC] hover:border-[#2e2e2e]"}`}>
+                    <Heart className={`w-4 h-4 ${liked ? "fill-[#b5453a] text-[#b5453a]" : "text-[#2e2e2e]"}`} />
+                  </button>
+                </div>
+              )
+            })()}
 
             {/* Wishlist message */}
             {wishlistMessage && (
@@ -608,14 +625,14 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     {[1,2,3,4,5].map((s) => <Star key={s} className={`w-3.5 h-3.5 ${s <= currentUserRating! ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />)}
                   </div>
                 </div>
-              ) : (
+              ) : canReview ? (
                 <button
                   onClick={() => setShowReviewForm(true)}
                   className="px-5 md:px-6 py-3 bg-[#2e2e2e] hover:bg-[#2b2c24] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
                 >
                   <Star className="w-3.5 h-3.5" /> {t("productDetail.rateProduct")}
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -624,7 +641,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             <div className="text-center py-14 border-t border-[#D8CFBC]/60">
               <Star className="w-8 h-8 text-[#2e2e2e]/20 mx-auto mb-4" />
               <p className="text-[#2e2e2e]/60 text-[14px]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{t("productDetail.noReviews")}</p>
-              {!hasAlreadyReviewed && (
+              {!hasAlreadyReviewed && canReview && (
                 <button
                   onClick={() => setShowReviewForm(true)}
                   className="mt-6 px-6 py-3 bg-[#2e2e2e] hover:bg-[#2b2c24] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors inline-flex items-center gap-2"
@@ -719,13 +736,6 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                         </button>
                       ))}
                       {reviewRating > 0 && <span className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 ml-2">{reviewRating}/5</span>}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] mb-2">{t("productDetail.photoOptional")}</label>
-                    <div className="border border-dashed border-[#D8CFBC] p-6 text-center hover:border-[#2e2e2e] transition-colors cursor-pointer">
-                      <Camera className="w-7 h-7 text-[#2e2e2e]/40 mx-auto mb-2" />
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[#2e2e2e]/60">{t("productDetail.clickToAddPhoto")}</p>
                     </div>
                   </div>
                   {reviewError && (

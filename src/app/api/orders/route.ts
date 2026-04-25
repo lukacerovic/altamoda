@@ -5,6 +5,7 @@ import { createOrderSchema } from '@/lib/validations/order'
 import { generateOrderNumber } from '@/lib/utils'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
 import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
+import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -77,7 +78,16 @@ export const POST = withErrorHandler(async (req: Request) => {
 
     const productMap = new Map(products.map((p) => [p.id, p]))
 
-    // 2. Validate stock inside the transaction
+    // 2a. Defense-in-depth: reject any professional (B2B-only) items for non-B2B roles,
+    // in case the product ever reached the cart (stale session, admin role change, etc.).
+    if (user.role !== 'b2b' && user.role !== 'admin') {
+      const forbidden = products.find((p) => p.isProfessional)
+      if (forbidden) {
+        throw new ApiError(403, `Proizvod "${forbidden.nameLat}" je dostupan samo profesionalnim salonima`)
+      }
+    }
+
+    // 2b. Validate stock inside the transaction
     for (const item of input.items) {
       const product = productMap.get(item.productId)!
       if (product.stockQuantity < item.quantity) {
@@ -85,12 +95,14 @@ export const POST = withErrorHandler(async (req: Request) => {
       }
     }
 
-    // 3. Calculate prices from DB (never trust client-side prices)
+    // 3. Calculate prices from DB (never trust client-side prices). Apply any active
+    // promotion so the charged unit price matches what the customer saw in cart/list.
+    const promosByProduct = await getActivePromosByProductId(productIds)
     const orderItems = input.items.map((item) => {
       const product = productMap.get(item.productId)!
-      const unitPrice = isB2b && product.priceB2b
-        ? Number(product.priceB2b)
-        : Number(product.priceB2c)
+      const basePrice = isB2b && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
+      const applied = applyBestPromo(basePrice, null, promosByProduct.get(product.id) ?? [], user.role)
+      const unitPrice = applied.price
       return {
         productId: product.id,
         productName: product.nameLat,

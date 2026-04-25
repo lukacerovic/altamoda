@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
+import { revalidatePriceSurfaces } from '@/lib/pricing'
 
 // Helper: format a promotion with its products for the API response
 async function formatPromotion(promoId: string) {
@@ -105,6 +106,7 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   }
 
   const result = await formatPromotion(id)
+  await revalidatePriceSurfaces()
   return successResponse(result)
 })
 
@@ -119,6 +121,7 @@ export const DELETE = withErrorHandler(async (_req: Request, context: unknown) =
   // Cascade delete handles promotion_products via schema onDelete: Cascade
   await prisma.promotion.delete({ where: { id } })
 
+  await revalidatePriceSurfaces()
   return successResponse({ message: 'Akcija je obrisana' })
 })
 
@@ -135,5 +138,6 @@ export const PATCH = withErrorHandler(async (_req: Request, context: unknown) =>
     data: { isActive: !existing.isActive },
   })
 
+  await revalidatePriceSurfaces()
   return successResponse({ id, isActive: updated.isActive })
 })

@@ -23,7 +23,7 @@ export interface ProductData {
   name: string;
   slug: string;
   brand: string;
-  price: number;
+  price: number | null;
   oldPrice: number | null;
   rating: number;
   image: string | null;
@@ -70,7 +70,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
   const { t } = useLanguage();
   const [liked, setLiked] = useState(false);
   const newLabel = t("home.new");
-  const discountBadge = product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
+  const discountBadge = product.price != null && product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = product.promoBadge || badge || (product.isNew ? newLabel : discountBadge);
 
   return (
@@ -103,8 +103,14 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           {product.name}
         </h3>
         <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-          {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-          <span>{product.price.toLocaleString("sr-RS")} RSD</span>
+          {product.price == null ? (
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#837A64] font-medium">B2B samo</span>
+          ) : (
+            <>
+              {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+              <span>{product.price.toLocaleString("sr-RS")} RSD</span>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-0.5 mt-2">
           {[...Array(5)].map((_, i) => (

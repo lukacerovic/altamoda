@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Plus, X, Search, Edit3, Trash2, Zap, Tag, Calendar,
@@ -57,6 +57,79 @@ interface CategoryOption {
   nameLat: string;
   slug: string;
 }
+
+// ─── Memoized product row ───
+// Pulled out of the main component so typing in the name/date/badge fields
+// doesn't repaint every row. memo() short-circuits when only unrelated form
+// state (name, dates, audience…) changes.
+type DiscountType = "percentage" | "fixed" | "price";
+
+const ProductRow = memo(function ProductRow({
+  id,
+  name,
+  sku,
+  brandName,
+  categoryName,
+  image,
+  priceB2c,
+  selected,
+  formValue,
+  formType,
+  onToggle,
+}: {
+  id: string;
+  name: string;
+  sku: string;
+  brandName: string;
+  categoryName: string;
+  image: string | null;
+  priceB2c: number;
+  selected: boolean;
+  formValue: string;
+  formType: DiscountType;
+  onToggle: (id: string) => void;
+}) {
+  const numericValue = Number(formValue);
+  const showDiscount = formValue !== "" && numericValue > 0;
+  const discounted = !showDiscount
+    ? priceB2c
+    : formType === "percentage"
+      ? Math.round(priceB2c * (1 - numericValue / 100))
+      : formType === "fixed"
+        ? Math.max(0, priceB2c - numericValue)
+        : numericValue;
+
+  return (
+    <label className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-stone-100 transition-colors ${selected ? "bg-stone-50" : ""}`}>
+      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? "bg-black border-black" : "border-gray-300"}`}>
+        {selected && <Check size={12} className="text-white" />}
+      </div>
+      <input type="checkbox" checked={selected} onChange={() => onToggle(id)} className="sr-only" />
+      <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+        {image ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={image} alt="" aria-hidden="true" className="w-full h-full object-cover" />
+        ) : (
+          <Package size={14} className="text-[#837A64]" aria-hidden="true" />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-black truncate">{name}</p>
+        <p className="text-xs text-[#837A64]">{brandName} · {categoryName} · {sku}</p>
+      </div>
+      <div className="text-right flex-shrink-0">
+        {showDiscount ? (
+          <>
+            <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
+            <p className="text-[10px] text-[#837A64] line-through">{priceB2c.toLocaleString()} RSD</p>
+          </>
+        ) : (
+          <p className="text-sm text-black">{priceB2c.toLocaleString()} RSD</p>
+        )}
+      </div>
+    </label>
+  );
+});
 
 // ─── Component ───
 
@@ -338,26 +411,62 @@ export default function ActionsPage() {
     setForm(f => ({ ...f, target: target as typeof f.target, targetValue: value, selectedProductIds: ids }));
   };
 
-  // Filter products by search (name, brand, SKU) + brand/category dropdowns
-  const filteredProducts = allProducts.filter(p => {
+  // Memoize so filtering only re-runs when an input that actually affects it
+  // changes. Without this, every keystroke in the name/value fields re-filters
+  // the entire allProducts list.
+  const filteredProducts = useMemo(() => {
     const searchLower = productSearch.toLowerCase();
-    const matchSearch = !productSearch ||
-      p.name.toLowerCase().includes(searchLower) ||
-      p.sku.toLowerCase().includes(searchLower) ||
-      (p.brand?.name || "").toLowerCase().includes(searchLower);
-    const matchBrand = !filterBrand || p.brand?.id === filterBrand;
-    const matchCategory = !filterCategory || p.category?.id === filterCategory;
-    return matchSearch && matchBrand && matchCategory;
-  });
+    return allProducts.filter(p => {
+      const matchSearch = !productSearch ||
+        p.name.toLowerCase().includes(searchLower) ||
+        p.sku.toLowerCase().includes(searchLower) ||
+        (p.brand?.name || "").toLowerCase().includes(searchLower);
+      const matchBrand = !filterBrand || p.brand?.id === filterBrand;
+      const matchCategory = !filterCategory || p.category?.id === filterCategory;
+      return matchSearch && matchBrand && matchCategory;
+    });
+  }, [allProducts, productSearch, filterBrand, filterCategory]);
 
-  const toggleProduct = (id: string) => {
+  // O(1) selection lookup; rebuilding only when selection changes.
+  const selectedSet = useMemo(
+    () => new Set(form.selectedProductIds),
+    [form.selectedProductIds],
+  );
+
+  // Stable callback identity so memoized rows don't re-render on every
+  // unrelated form update.
+  const toggleProduct = useCallback((id: string) => {
     setForm(f => ({
       ...f,
       selectedProductIds: f.selectedProductIds.includes(id)
         ? f.selectedProductIds.filter(pid => pid !== id)
         : [...f.selectedProductIds, id],
     }));
-  };
+  }, []);
+
+  const allFilteredSelected =
+    filteredProducts.length > 0 && filteredProducts.every(p => selectedSet.has(p.id));
+
+  const toggleSelectAllFiltered = useCallback(() => {
+    setForm(f => {
+      const filteredIds = filteredProducts.map(p => p.id);
+      const filteredIdSet = new Set(filteredIds);
+      const everySelected = filteredIds.length > 0 && filteredIds.every(id => f.selectedProductIds.includes(id));
+      if (everySelected) {
+        // Deselect just the filtered subset; preserve selections outside the filter.
+        return { ...f, selectedProductIds: f.selectedProductIds.filter(id => !filteredIdSet.has(id)) };
+      }
+      const merged = new Set([...f.selectedProductIds, ...filteredIds]);
+      return { ...f, selectedProductIds: Array.from(merged) };
+    });
+  }, [filteredProducts]);
+
+  // Preview list: derived from selection, recomputed only when selection or
+  // product list changes — not on every keystroke in the name field.
+  const previewProducts = useMemo(() => {
+    if (!form.value || Number(form.value) <= 0 || form.selectedProductIds.length === 0) return [];
+    return allProducts.filter(p => selectedSet.has(p.id)).slice(0, 4);
+  }, [allProducts, selectedSet, form.value, form.selectedProductIds.length]);
 
   if (loading) {
     return (
@@ -638,13 +747,24 @@ export default function ActionsPage() {
 
               {/* Product Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
                   <label className="text-sm font-medium text-[#2e2e2e]">
                     {`${t("admin.productsSelected")} (${form.selectedProductIds.length})`}
                   </label>
-                  {form.target !== "product" && (
-                    <span className="text-xs text-secondary">{t("admin.autoSelectedByScope")}</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {form.target === "product" && filteredProducts.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={toggleSelectAllFiltered}
+                        className="text-xs px-2.5 py-1 rounded-sm bg-stone-100 hover:bg-stone-200 text-secondary font-medium transition-colors"
+                      >
+                        {allFilteredSelected ? "Poništi sve" : "Označi sve"} ({filteredProducts.length})
+                      </button>
+                    )}
+                    {form.target !== "product" && (
+                      <span className="text-xs text-secondary">{t("admin.autoSelectedByScope")}</span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Search + Filters */}
@@ -694,50 +814,32 @@ export default function ActionsPage() {
                     {filteredProducts.length === 0 && (
                       <div className="px-4 py-8 text-center text-sm text-[#837A64]">Nema proizvoda</div>
                     )}
-                    {filteredProducts.map(p => {
-                      const selected = form.selectedProductIds.includes(p.id);
-                      const discounted = calcDiscountedPrice(p.priceB2c);
-                      return (
-                        <label key={p.id} className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-stone-100 transition-colors ${selected ? "bg-stone-50" : ""}`}>
-                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? "bg-black border-black" : "border-gray-300"}`}>
-                            {selected && <Check size={12} className="text-white" />}
-                          </div>
-                          <input type="checkbox" checked={selected} onChange={() => toggleProduct(p.id)} className="sr-only" />
-                          <div className="w-8 h-8 bg-stone-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            {p.image ? (
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              <img src={p.image} alt="" aria-hidden="true" className="w-full h-full object-cover" />
-                            ) : (
-                              <Package size={14} className="text-[#837A64]" aria-hidden="true" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-black truncate">{p.name}</p>
-                            <p className="text-xs text-[#837A64]">{p.brand?.name || "—"} · {p.category?.nameLat || "—"} · {p.sku}</p>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            {form.value && Number(form.value) > 0 ? (
-                              <>
-                                <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
-                                <p className="text-[10px] text-[#837A64] line-through">{p.priceB2c.toLocaleString()} RSD</p>
-                              </>
-                            ) : (
-                              <p className="text-sm text-black">{p.priceB2c.toLocaleString()} RSD</p>
-                            )}
-                          </div>
-                        </label>
-                      );
-                    })}
+                    {filteredProducts.map(p => (
+                      <ProductRow
+                        key={p.id}
+                        id={p.id}
+                        name={p.name}
+                        sku={p.sku}
+                        brandName={p.brand?.name || "—"}
+                        categoryName={p.category?.nameLat || "—"}
+                        image={p.image}
+                        priceB2c={p.priceB2c}
+                        selected={selectedSet.has(p.id)}
+                        formValue={form.value}
+                        formType={form.type}
+                        onToggle={toggleProduct}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Preview */}
-              {form.value && Number(form.value) > 0 && form.selectedProductIds.length > 0 && (
+              {previewProducts.length > 0 && (
                 <div className="bg-stone-50 rounded-sm p-4">
                   <h4 className="text-sm font-semibold text-black mb-3 flex items-center gap-2"><Eye size={16} /> {t("admin.actionPreview")}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {allProducts.filter(p => form.selectedProductIds.includes(p.id)).slice(0, 4).map(p => {
+                    {previewProducts.map(p => {
                       const discounted = calcDiscountedPrice(p.priceB2c);
                       const pct = Math.round((1 - discounted / p.priceB2c) * 100);
                       return (

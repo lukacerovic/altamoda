@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
+import { revalidatePriceSurfaces } from '@/lib/pricing'
 
 // Helper: format a promotion with its products for the API response
 async function formatPromotion(promoId: string) {
@@ -134,5 +135,6 @@ export const POST = withErrorHandler(async (req: Request) => {
   })
 
   const result = await formatPromotion(promo.id)
+  await revalidatePriceSurfaces()
   return successResponse(result, 201)
 })

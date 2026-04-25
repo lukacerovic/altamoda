@@ -335,15 +335,46 @@ export default function ProductsPage() {
   const [showNewSubCategory, setShowNewSubCategory] = useState(false);
   const [newSubCategoryName, setNewSubCategoryName] = useState("");
 
-  // Category & filter helpers
-  const allCategoryNames = [...new Set([...Object.keys(categoryHierarchy), ...Object.keys(customCategories)])];
-  // Merge hardcoded brand list with brands actually present in the loaded products so
-  // admin-created brands show up in the dropdown without a hardcode update.
-  const availableBrands = [...new Set([...brandNames, ...products.map((p) => p.brand).filter(Boolean)])].sort();
-  const getAllSubcategories = (cat: string): string[] => [
-    ...(categoryHierarchy[cat] || []),
-    ...(customCategories[cat] || []),
-  ];
+  // Brands and categories pulled from the API so admin-created entries (from
+  // /admin/brands and /admin/categories) appear in the dropdowns alongside the
+  // hardcoded defaults — without needing a code change for every new entry.
+  const [dbBrands, setDbBrands] = useState<{ name: string; productLines: { name: string }[] }[]>([]);
+  const [dbCategoryTree, setDbCategoryTree] = useState<Record<string, string[]>>({});
+
+  // Dedupe case-insensitively (so "Redken" hardcoded and "redken" from DB
+  // collapse), preferring whichever casing the iteration sees first — DB
+  // values are passed in first below so they win over the hardcoded defaults.
+  const dedupeCI = (values: string[]): string[] => {
+    const seen = new Map<string, string>();
+    for (const v of values) {
+      if (!v) continue;
+      const key = v.trim().toLowerCase();
+      if (!seen.has(key)) seen.set(key, v.trim());
+    }
+    return [...seen.values()].sort((a, b) => a.localeCompare(b));
+  };
+
+  // Trust the DB as source of truth once it's loaded; the hardcoded list is
+  // just a bootstrap for an empty/loading DB so the dropdown isn't blank.
+  const availableBrands = dbBrands.length > 0
+    ? dedupeCI([...dbBrands.map(b => b.name), ...products.map((p) => p.brand).filter(Boolean)])
+    : dedupeCI([...brandNames, ...products.map((p) => p.brand).filter(Boolean)]);
+
+  const allCategoryNames = Object.keys(dbCategoryTree).length > 0
+    ? dedupeCI([...Object.keys(dbCategoryTree), ...Object.keys(customCategories)])
+    : dedupeCI([...Object.keys(categoryHierarchy), ...Object.keys(customCategories)]);
+
+  const getAllSubcategories = (cat: string): string[] => {
+    const dbSubs = dbCategoryTree[cat];
+    if (dbSubs) return dedupeCI([...dbSubs, ...(customCategories[cat] || [])]);
+    return dedupeCI([...(categoryHierarchy[cat] || []), ...(customCategories[cat] || [])]);
+  };
+
+  const getProductLinesForBrand = (brand: string): string[] => {
+    const dbMatch = dbBrands.find(b => b.name.trim().toLowerCase() === brand.trim().toLowerCase());
+    if (dbMatch) return dedupeCI(dbMatch.productLines.map(l => l.name));
+    return dedupeCI(brandProductLines[brand] || []);
+  };
 
   const colorUndertones = [
     { value: "N", label: "N - Neutralni" },
@@ -410,12 +441,44 @@ export default function ProductsPage() {
       });
   }, []);
 
+  const fetchTaxonomy = useCallback(() => {
+    // Brands include their product lines, so one round-trip covers both dropdowns.
+    fetch("/api/brands")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.success && Array.isArray(data.data)) {
+          setDbBrands(data.data.map((b: { name: string; productLines?: { name: string }[] }) => ({
+            name: b.name,
+            productLines: b.productLines || [],
+          })));
+        }
+      })
+      .catch(() => {});
+
+    // Categories come back as a tree of roots with `children`. Flatten into a
+    // { rootName: [subName, ...] } map matching the form's existing shape so
+    // the dropdown logic doesn't need to change.
+    fetch("/api/categories")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.success && Array.isArray(data.data)) {
+          const tree: Record<string, string[]> = {};
+          for (const root of data.data as { nameLat: string; children?: { nameLat: string }[] }[]) {
+            tree[root.nameLat] = (root.children || []).map(c => c.nameLat);
+          }
+          setDbCategoryTree(tree);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Load products from API on mount
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
     fetchProducts();
-  }, [fetchProducts]);
+    fetchTaxonomy();
+  }, [fetchProducts, fetchTaxonomy]);
 
   // Poll for product updates every 30s
   useEffect(() => {
@@ -520,6 +583,12 @@ export default function ProductsPage() {
     const apiBody = {
       nameLat: formData.name,
       sku: formData.sku,
+      // Send taxonomy as names; the API resolves (find-or-create) to FK ids so
+      // newly added categories/brands persist and show up in client filters.
+      brand: formData.brand || null,
+      productLine: formData.productLine || null,
+      category: formData.category || null,
+      subCategory: formData.subCategory || null,
       // B2B-only products still need a non-null priceB2c (schema constraint);
       // mirror priceB2b into priceB2c so the DB is satisfied and the public
       // storefront — which only ever reads priceB2c for unauth'd users — has a
@@ -610,12 +679,26 @@ export default function ProductsPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await fetch(`/api/products/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.success === false) {
+        setValidationErrors([data?.error || `Greška pri brisanju (${res.status})`]);
+        return;
+      }
+      // Soft-delete fallback (product had order history): show an info notice
+      // instead of silently leaving the row in place.
+      if (data?.data?.soft) {
+        setValidationErrors([data.data.message || "Proizvod je deaktiviran umesto trajno obrisan."]);
+      }
     } catch (err) {
       console.error("Delete failed:", err);
+      setValidationErrors([(err as Error).message || "Greška pri brisanju"]);
+      return;
     }
-    setProducts(products.filter((p) => p.id !== id));
     setSelectedIds(selectedIds.filter((sid) => sid !== id));
+    // Re-fetch so the list reflects whether the row was actually removed
+    // (hard delete) or just deactivated (soft delete fallback).
+    fetchProducts();
   };
 
   const toggleSelect = (id: number) => {
@@ -643,14 +726,17 @@ export default function ProductsPage() {
     });
     await Promise.all(promises);
 
-    if (action === "delete") {
-      setProducts(products.filter((p) => !selectedIds.includes(p.id)));
-    } else if (action === "activate") {
+    if (action === "activate") {
       setProducts(products.map((p) => (selectedIds.includes(p.id) ? { ...p, status: "active" as const } : p)));
     } else if (action === "deactivate") {
       setProducts(products.map((p) => (selectedIds.includes(p.id) ? { ...p, status: "inactive" as const } : p)));
     }
     setSelectedIds([]);
+    if (action === "delete") {
+      // Re-fetch — some rows may have soft-fallen-back to deactivated due to
+      // order history, so trust the server rather than guessing locally.
+      fetchProducts();
+    }
     setShowBulkMenu(false);
   };
 
@@ -1028,18 +1114,18 @@ export default function ProductsPage() {
                         onChange={(e) => {
                           const newBrand = e.target.value;
                           updateForm("brand", newBrand);
-                          const lines = brandProductLines[newBrand] || [];
+                          const lines = getProductLinesForBrand(newBrand);
                           updateForm("productLine", lines[0] || "");
                         }}
                         className={inputCls + " cursor-pointer"}
                       >
-                        {brandNames.map((b) => <option key={b}>{b}</option>)}
+                        {availableBrands.map((b) => <option key={b}>{b}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={labelCls}>{t("admin.productLine")}</label>
                       <select value={formData.productLine} onChange={(e) => updateForm("productLine", e.target.value)} className={inputCls + " cursor-pointer"}>
-                        {(brandProductLines[formData.brand] || []).map((l) => <option key={l}>{l}</option>)}
+                        {getProductLinesForBrand(formData.brand).map((l) => <option key={l}>{l}</option>)}
                       </select>
                     </div>
                   </div>
@@ -1058,7 +1144,7 @@ export default function ProductsPage() {
                           }}
                           className={inputCls + " cursor-pointer flex-1"}
                         >
-                          {allCategoryNames.map((c) => <option key={c}>{c}</option>)}
+                          {allCategoryNames.map((c) => <option key={c} value={c}>{c}</option>)}
                         </select>
                         <button
                           type="button"
@@ -1100,7 +1186,7 @@ export default function ProductsPage() {
                       <label className={labelCls}>{t("admin.subcategory")}</label>
                       <div className="flex gap-2">
                         <select value={formData.subCategory} onChange={(e) => updateForm("subCategory", e.target.value)} className={inputCls + " cursor-pointer flex-1"}>
-                          {getAllSubcategories(formData.category).map((s) => <option key={s}>{s}</option>)}
+                          {getAllSubcategories(formData.category).map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                         <button
                           type="button"

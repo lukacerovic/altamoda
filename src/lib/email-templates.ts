@@ -1,4 +1,4 @@
-import { getUnsubscribeUrl } from './email'
+import { getUnsubscribeUrl, getSiteUrl } from './email'
 
 const BRAND_BG = '#FFFFFF'
 const BRAND_PRIMARY = '#837A64'
@@ -108,7 +108,7 @@ export interface B2bSignupUser {
 }
 
 export function b2bSignupAdminTemplate(user: B2bSignupUser): string {
-  const adminUrl = `${process.env.SITE_URL || 'http://localhost:3000'}/admin/users`
+  const adminUrl = `${getSiteUrl()}/admin/users`
   const row = (label: string, value?: string | null) =>
     value
       ? `<tr><td style="padding: 8px 0; font-size: 14px; color: #8a8578; width: 140px;">${label}</td><td style="padding: 8px 0; font-size: 14px; color: ${BRAND_TEXT};"><strong>${value}</strong></td></tr>`
@@ -149,7 +149,7 @@ export interface B2bApprovedUser {
 }
 
 export function b2bApprovedUserTemplate(user: B2bApprovedUser): string {
-  const loginUrl = `${process.env.SITE_URL || 'http://localhost:3000'}/login`
+  const loginUrl = `${getSiteUrl()}/account/login`
   const greeting = user.salonName ? `${user.salonName}` : user.name
 
   const content = `
