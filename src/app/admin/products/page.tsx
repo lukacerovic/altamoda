@@ -396,7 +396,11 @@ export default function ProductsPage() {
       // sees every product regardless of stock — the API sorts by stock-desc,
       // so a single ?limit=N call would push freshly-created (stock=0) rows
       // past the cutoff once the catalog grows.
-      const firstRes = await fetch("/api/products?limit=100&page=1");
+      // cache: 'no-store' bypasses the browser HTTP cache so a refresh after
+      // a save always sees the freshly-created product. Without this, the
+      // browser can serve a stale JSON response and a newly-added product
+      // appears to vanish on reload.
+      const firstRes = await fetch("/api/products?limit=100&page=1", { cache: "no-store" });
       const firstJson = await firstRes.json();
       if (!firstJson?.success || !firstJson.data?.products) {
         setApiLoaded(true);
@@ -407,7 +411,7 @@ export default function ProductsPage() {
       if (totalPages > 1) {
         const remaining = await Promise.all(
           Array.from({ length: totalPages - 1 }, (_, i) =>
-            fetch(`/api/products?limit=100&page=${i + 2}`).then(r => r.json()).catch(() => null),
+            fetch(`/api/products?limit=100&page=${i + 2}`, { cache: "no-store" }).then(r => r.json()).catch(() => null),
           ),
         );
         for (const r of remaining) {

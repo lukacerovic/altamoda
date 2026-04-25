@@ -371,7 +371,10 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   })
 
-  return successResponse({
+  // No-store on the JSON response so browsers and any intermediate caches
+  // never serve a stale list — admins (and the storefront filter UI) must
+  // always see the just-saved row on the next request.
+  const res = successResponse({
     products: formatted,
     pagination: {
       page,
@@ -380,6 +383,8 @@ export const GET = withErrorHandler(async (req: Request) => {
       totalPages: Math.ceil(total / limit),
     },
   })
+  res.headers.set('Cache-Control', 'no-store, must-revalidate')
+  return res
 })
 
 // POST /api/products — Create product (admin)
