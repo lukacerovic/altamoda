@@ -1,3 +1,9 @@
+-- Defensive: column was originally added out-of-band via `db push` and
+-- never captured in an earlier migration, so a fresh shadow DB lacks it.
+-- IF NOT EXISTS makes this a no-op on any environment that already has the
+-- column (production + any dev DB where this migration has already run).
+ALTER TABLE "products" ADD COLUMN IF NOT EXISTS "group_slug" TEXT;
+
 -- CreateIndex: products table
 CREATE INDEX IF NOT EXISTS "products_is_active_is_professional_idx" ON "products"("is_active", "is_professional");
 CREATE INDEX IF NOT EXISTS "products_is_active_is_featured_idx" ON "products"("is_active", "is_featured");

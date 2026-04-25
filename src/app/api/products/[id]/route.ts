@@ -5,6 +5,7 @@ import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
 import { updateProductSchema } from '@/lib/validations/product'
 import { resolveBrandId, resolveCategoryId, resolveProductLineId } from '@/lib/taxonomy'
+import { maybeNotifyLowStock } from '@/lib/notifications'
 
 // GET /api/products/[id] — Full product detail
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
@@ -225,6 +226,15 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   const raw = await req.json()
   const body = updateProductSchema.parse(raw)
 
+  // Snapshot stock before the update so we can detect a low-stock threshold
+  // crossing afterwards. One indexed read on a single product — cheap enough
+  // for the admin edit path. `null` if the product doesn't exist; the update
+  // below will throw the canonical 404 in that case.
+  const stockBefore = await prisma.product.findUnique({
+    where: { id },
+    select: { id: true, sku: true, nameLat: true, stockQuantity: true, lowStockThreshold: true },
+  })
+
   // Same find-or-create as POST: only resolve from name when an explicit id
   // wasn't passed, so admin edits that just rename a product don't accidentally
   // re-attach taxonomy. `undefined` leaves the column untouched.
@@ -297,6 +307,12 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   } else if (body.removeColor === true) {
     // Allow explicit removal of color data
     await prisma.colorProduct.deleteMany({ where: { productId: id } })
+  }
+
+  // Low-stock notification — only fires when this update actually moved stock
+  // across the threshold (not on unrelated edits like price/name).
+  if (stockBefore && body.stockQuantity !== undefined && body.stockQuantity !== stockBefore.stockQuantity) {
+    await maybeNotifyLowStock(stockBefore, body.stockQuantity)
   }
 
   // Invalidate cached pages that display products

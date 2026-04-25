@@ -6,6 +6,7 @@ import { generateOrderNumber } from '@/lib/utils'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
 import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
+import { notifyAdmins, maybeNotifyLowStock } from '@/lib/notifications'
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -19,7 +20,14 @@ export const GET = withErrorHandler(async (req: Request) => {
     prisma.order.findMany({
       where,
       include: {
-        items: true,
+        // Include each line item with its linked product slug so the client
+        // can render "Review this product" links on the orders page without
+        // a second round trip per item.
+        items: {
+          include: {
+            product: { select: { slug: true } },
+          },
+        },
         user: { select: { id: true, name: true, email: true, role: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -40,6 +48,14 @@ export const GET = withErrorHandler(async (req: Request) => {
     paymentMethod: o.paymentMethod,
     paymentStatus: o.paymentStatus,
     itemCount: o.items.length,
+    items: o.items.map((it) => ({
+      productId: it.productId,
+      productName: it.productName,
+      productSku: it.productSku,
+      quantity: it.quantity,
+      // slug may be null if the product has been hard-deleted since order placement
+      slug: it.product?.slug ?? null,
+    })),
     createdAt: o.createdAt,
     user: o.user,
     erpId: o.erpId,
@@ -64,8 +80,17 @@ export const POST = withErrorHandler(async (req: Request) => {
   const productIds = input.items.map((i) => i.productId)
   const isB2b = user.role === 'b2b'
 
+  // Promo lookup BEFORE the transaction. It's a read-only query against the
+  // promotions tables and doesn't need transactional isolation with the order
+  // write. Keeping it inside the transaction was holding the transaction open
+  // for an extra round trip on a separate pool connection — under load this
+  // pushed past Prisma's 5s interactive-transaction timeout.
+  const promosByProduct = await getActivePromosByProductId(productIds)
+
   // All validation, stock checks, and order creation inside a single transaction
-  // to prevent TOCTOU race conditions on stock
+  // to prevent TOCTOU race conditions on stock. Bumped timeout to 15s — the
+  // default 5s is too tight on a slow dev/Render-free DB once we have any
+  // realistic order with multiple items.
   const order = await prisma.$transaction(async (tx) => {
     // 1. Fetch products with row-level lock (SELECT ... FOR UPDATE via raw query)
     const products = await tx.product.findMany({
@@ -97,7 +122,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
     // 3. Calculate prices from DB (never trust client-side prices). Apply any active
     // promotion so the charged unit price matches what the customer saw in cart/list.
-    const promosByProduct = await getActivePromosByProductId(productIds)
+    // promosByProduct is the snapshot fetched above; we use it inline here.
     const orderItems = input.items.map((item) => {
       const product = productMap.get(item.productId)!
       const basePrice = isB2b && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
@@ -126,7 +151,12 @@ export const POST = withErrorHandler(async (req: Request) => {
     const total = subtotal + shippingCost
     const paymentStatus = 'pending'
 
-    // 5. Decrement stock atomically with check to prevent negative inventory
+    // 5. Decrement stock atomically with check to prevent negative inventory.
+    // We compute the post-decrement stock locally (before - qty) instead of
+    // re-reading — saves N queries inside an already-hot transaction. The
+    // updateMany above is the source of truth for atomicity; the local math
+    // is only used to drive the low-stock threshold check.
+    const lowStockChecks: Array<{ before: typeof products[number]; after: number }> = []
     for (const item of input.items) {
       const updated = await tx.product.updateMany({
         where: {
@@ -138,6 +168,8 @@ export const POST = withErrorHandler(async (req: Request) => {
       if (updated.count === 0) {
         throw new ApiError(400, `Nedovoljno zaliha za proizvod. Pokušajte ponovo.`)
       }
+      const product = productMap.get(item.productId)!
+      lowStockChecks.push({ before: product, after: product.stockQuantity - item.quantity })
     }
 
     // 6. Create order
@@ -176,14 +208,40 @@ export const POST = withErrorHandler(async (req: Request) => {
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
     }
 
-    return createdOrder
+    // Return both the order and the snapshot the post-commit notification
+    // step needs. We deliberately do NOT write notifications inside the
+    // transaction — the extra round-trips were pushing past Prisma's 5s
+    // interactive-transaction timeout under realistic load. Notifications
+    // are best-effort side-effects (the helper swallows errors); accepting
+    // a microscopic window where the order commits but the notification
+    // doesn't is the right trade.
+    return { createdOrder, lowStockChecks, total }
+  }, { timeout: 15000 })
+
+  // Fire-and-await notifications AFTER the transaction commits. notifyAdmins
+  // and maybeNotifyLowStock both swallow + log errors internally so a
+  // notification failure cannot reach the response.
+  void notifyAdmins({
+    type: 'order_created',
+    title: `Nova porudžbina #${order.createdOrder.orderNumber}`,
+    body: `${user.name ?? user.email} — ${order.total.toLocaleString('sr-RS')} RSD`,
+    link: `/admin/orders/${order.createdOrder.id}`,
+    payload: {
+      orderId: order.createdOrder.id,
+      orderNumber: order.createdOrder.orderNumber,
+      customerName: user.name ?? user.email ?? '',
+      total: order.total,
+    },
   })
+  for (const check of order.lowStockChecks) {
+    void maybeNotifyLowStock(check.before, check.after)
+  }
 
   return successResponse({
-    id: order.id,
-    orderNumber: order.orderNumber,
-    total: Number(order.total),
-    status: order.status,
-    itemCount: order.items.length,
+    id: order.createdOrder.id,
+    orderNumber: order.createdOrder.orderNumber,
+    total: Number(order.createdOrder.total),
+    status: order.createdOrder.status,
+    itemCount: order.createdOrder.items.length,
   }, 201)
 })

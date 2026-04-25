@@ -50,6 +50,14 @@ const statusLabelMap: Record<string, string> = {
   otkazano: "account.cancelled",
 };
 
+interface OrderItem {
+  productId: string;
+  productName: string;
+  productSku: string;
+  quantity: number;
+  slug: string | null;
+}
+
 function OrdersSection() {
   const { t } = useLanguage();
   const [orders, setOrders] = useState<{
@@ -57,6 +65,7 @@ function OrdersSection() {
     orderNumber: string;
     createdAt: string;
     itemCount: number;
+    items: OrderItem[];
     total: number;
     status: string;
   }[]>([]);
@@ -151,11 +160,39 @@ function OrdersSection() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
-                  <tr key={order.orderNumber} className="border-t border-[#D8CFBC] hover:bg-[#FFFFFF]/50">
+                {orders.map((order) => {
+                  // Reviews are gated server-side to non-cancelled orders, so the
+                  // UI mirrors that here — hiding the link on cancelled orders
+                  // avoids a 403 click for the user.
+                  const canReview = order.status !== "otkazano";
+                  return (
+                  <tr key={order.orderNumber} className="border-t border-[#D8CFBC] hover:bg-[#FFFFFF]/50 align-top">
                     <td className="px-6 py-4 text-sm font-medium text-[#2e2e2e]">{order.orderNumber}</td>
                     <td className="px-6 py-4 text-sm text-[#837A64]">{formatDate(order.createdAt)}</td>
-                    <td className="px-6 py-4 text-sm text-[#837A64]">{order.itemCount} {t("account.itemsCount")}</td>
+                    <td className="px-6 py-4 text-sm text-[#837A64]">
+                      {order.items.length === 0 ? (
+                        <>{order.itemCount} {t("account.itemsCount")}</>
+                      ) : (
+                        <ul className="space-y-1.5 max-w-[260px]">
+                          {order.items.map((it) => (
+                            <li key={it.productId} className="flex items-start justify-between gap-2">
+                              <span className="text-[#2e2e2e]">
+                                {it.productName}
+                                {it.quantity > 1 && <span className="text-[#837A64]"> × {it.quantity}</span>}
+                              </span>
+                              {canReview && it.slug && (
+                                <Link
+                                  href={`/products/${it.slug}#reviews`}
+                                  className="inline-flex items-center px-2.5 py-1 rounded-sm bg-black text-white text-xs font-medium hover:bg-[#2e2e2e] transition-colors whitespace-nowrap"
+                                >
+                                  {t("account.reviewProduct")}
+                                </Link>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-sm font-semibold text-[#2e2e2e]">{order.total.toLocaleString("sr-RS")} RSD</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColorMap[order.status] || "bg-[#FFFFFF] text-[#2e2e2e]"}`}>
@@ -174,7 +211,8 @@ function OrdersSection() {
                       )}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

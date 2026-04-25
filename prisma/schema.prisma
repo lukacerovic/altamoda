@@ -106,6 +106,13 @@ enum CampaignStatus {
   failed
 }
 
+enum NotificationType {
+  order_created
+  order_cancelled_by_customer
+  low_stock
+  b2b_registration_pending
+}
+
 // ==================== USERS & AUTH ====================
 
 model User {
@@ -128,8 +135,26 @@ model User {
   carts         Cart[]
   statusChanges OrderStatusHistory[] @relation("ChangedByUser")
   approvedB2b   B2bProfile[]         @relation("ApprovedByUser")
+  notifications Notification[]
 
   @@map("users")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  payload   Json?
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt(sort: Desc)])
+  @@map("notifications")
 }
 
 model UserAddress {

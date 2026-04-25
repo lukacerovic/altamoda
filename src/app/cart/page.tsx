@@ -39,25 +39,44 @@ export default function CartPage() {
     if (productIds.length === 0) { setStockChecked(true); return; }
     const validateStock = async () => {
       try {
-        const res = await fetch("/api/cart/validate-stock", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productIds }),
-        });
-        const json = await res.json();
-        if (json.success) {
-          setStockMap(json.data);
-          // Update stockQuantity on items using latest store state
+        // Two parallel fetches:
+        //   1) /api/cart      → authoritative re-priced items (applies any
+        //                       active promos created since the user added).
+        //                       Without this the cart freezes the add-time
+        //                       price and ignores promotions added later.
+        //   2) /api/cart/validate-stock → fresh stockQuantity per id.
+        // /api/cart returns 401 for guests; we silently fall back to local
+        // store + stock-only sync in that case.
+        const [cartRes, stockRes] = await Promise.all([
+          fetch("/api/cart", { cache: "no-store" }),
+          fetch("/api/cart/validate-stock", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productIds }),
+          }),
+        ]);
+
+        const stockJson = await stockRes.json().catch(() => null);
+        const cartJson = cartRes.ok ? await cartRes.json().catch(() => null) : null;
+
+        if (stockJson?.success) setStockMap(stockJson.data);
+
+        if (cartJson?.success && Array.isArray(cartJson.data?.items)) {
+          // Authoritative reprice from the server — items array already includes
+          // promo-adjusted price + oldPrice + promoBadge.
+          setItems(cartJson.data.items);
+        } else if (stockJson?.success) {
+          // Guest fallback: only refresh stockQuantity, keep prices as-is.
           const currentItems = useCartStore.getState().items;
           const updated = currentItems.map((item) => ({
             ...item,
-            stockQuantity: json.data[item.productId] ?? item.stockQuantity,
+            stockQuantity: stockJson.data[item.productId] ?? item.stockQuantity,
           }));
           const changed = updated.some((u, i) => u.stockQuantity !== currentItems[i].stockQuantity);
           if (changed) setItems(updated);
         }
       } catch {
-        // Silently fail — use cached stockQuantity
+        // Silently fail — use cached state
       } finally {
         setStockChecked(true);
       }
@@ -144,7 +163,12 @@ export default function CartPage() {
                           <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-[#FFFFFF]"><Plus className="w-3 h-3" /></button>
                         </div>
                       )}
-                      <span className={`font-bold ${outOfStock ? "text-[#837A64] line-through" : "text-[#2e2e2e]"}`}>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                      <div className="flex flex-col items-end">
+                        <span className={`font-bold ${outOfStock ? "text-[#837A64] line-through" : "text-[#2e2e2e]"}`}>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                        {item.oldPrice && item.oldPrice > item.price && !outOfStock && (
+                          <span className="text-xs text-[#837A64] line-through">{(item.oldPrice * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

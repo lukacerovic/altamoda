@@ -7,6 +7,10 @@ export interface CartItem {
   name: string
   brand: string
   price: number
+  // Strikethrough "was" price when an active promotion has discounted `price`
+  // below `oldPrice`. Re-set on every cart re-fetch from /api/cart so it
+  // tracks the latest promo state.
+  oldPrice?: number | null
   quantity: number
   image: string
   sku: string

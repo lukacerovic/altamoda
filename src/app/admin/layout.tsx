@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -23,10 +23,23 @@ import {
 } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface NavSection {
   title?: string;
   items: { href: string; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[];
+}
+
+type NotificationType = "order_created" | "order_cancelled_by_customer" | "low_stock" | "b2b_registration_pending";
+
+interface AdminNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  body: string | null;
+  link: string | null;
+  readAt: string | null;
+  createdAt: string;
 }
 
 export default function AdminLayout({
@@ -35,12 +48,14 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const userName = session?.user?.name || "Admin";
   const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -64,17 +79,108 @@ export default function AdminLayout({
     {
       title: t("admin.system"),
       items: [
+        { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
         { href: "/admin/newsletter", label: t("admin.newsletter"), icon: Mail },
         { href: "/admin/settings", label: t("admin.settings"), icon: Settings },
       ],
     },
   ];
 
-  const notifications = [
-    { id: 1, text: "Nova porudžbina #1048", time: "Pre 5 min", unread: true },
-    { id: 2, text: "Nizak nivo zaliha: Kerastase Elixir", time: "Pre 1h", unread: true },
-    { id: 3, text: "Novi B2B korisnik čeka odobrenje", time: "Pre 3h", unread: false },
-  ];
+  // ─── Notifications ───
+  // List + count are fetched once on mount in a single round trip; the unread
+  // count is then refreshed by a 30s poll. The list itself is only refetched
+  // when the dropdown opens — no point shipping rows nobody is looking at.
+  const fetchList = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const res = await fetch("/api/notifications?limit=10", { cache: "no-store", signal });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.success) {
+        setNotifications(data.data.notifications);
+        setUnreadCount(data.data.unreadCount);
+      }
+    } catch {
+      // network error or aborted — silently skip; the next interaction retries
+    }
+  }, []);
+
+  // Initial fetch — only when the user is an authenticated admin. Skipping
+  // when unauthenticated avoids 401-spam from the layout mounting before
+  // session hydration completes.
+  useEffect(() => {
+    if (sessionStatus !== "authenticated" || session?.user?.role !== "admin") return;
+    const controller = new AbortController();
+    fetchList(controller.signal);
+    return () => controller.abort();
+  }, [sessionStatus, session?.user?.role, fetchList]);
+
+  // Poll unread count every 30s. Pauses when the tab is hidden so an admin
+  // leaving the tab open all night doesn't generate thousands of requests.
+  // Re-ticks immediately on tab focus so the badge feels live.
+  useEffect(() => {
+    if (sessionStatus !== "authenticated" || session?.user?.role !== "admin") return;
+    let cancelled = false;
+    const controller = new AbortController();
+    const tick = async () => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      try {
+        const res = await fetch("/api/notifications/unread-count", { cache: "no-store", signal: controller.signal });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (data?.success) setUnreadCount(data.data.count);
+      } catch {
+        // network error or aborted — silently skip
+      }
+    };
+    const interval = setInterval(tick, 30_000);
+    const onVisible = () => { if (typeof document !== "undefined" && !document.hidden) tick(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      controller.abort();
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [sessionStatus, session?.user?.role]);
+
+  // Refetch the list when the dropdown opens so it's fresh on each peek.
+  useEffect(() => {
+    if (!notificationsOpen) return;
+    if (sessionStatus !== "authenticated" || session?.user?.role !== "admin") return;
+    const controller = new AbortController();
+    fetchList(controller.signal);
+    return () => controller.abort();
+  }, [notificationsOpen, sessionStatus, session?.user?.role, fetchList]);
+
+  // Notifications are read-only info cards — clicking marks as read but does
+  // NOT navigate anywhere. Optimistic local update first, then PATCH; roll back
+  // on failure (rare). The next 30s tick reconciles regardless. The `link`
+  // field on the model is ignored here by design.
+  const handleNotificationClick = (n: AdminNotification) => {
+    if (n.readAt) return;
+    setNotifications((prev) =>
+      prev.map((p) => (p.id === n.id ? { ...p, readAt: new Date().toISOString() } : p)),
+    );
+    setUnreadCount((c) => Math.max(0, c - 1));
+    fetch(`/api/notifications/${n.id}/read`, { method: "PATCH", cache: "no-store" }).catch(() => {
+      // Roll back local state on failure
+      setNotifications((prev) =>
+        prev.map((p) => (p.id === n.id ? { ...p, readAt: null } : p)),
+      );
+      setUnreadCount((c) => c + 1);
+    });
+  };
+
+  const handleMarkAllRead = () => {
+    const previousUnread = unreadCount;
+    const previousList = notifications;
+    setNotifications((prev) => prev.map((p) => (p.readAt ? p : { ...p, readAt: new Date().toISOString() })));
+    setUnreadCount(0);
+    fetch("/api/notifications/mark-all-read", { method: "POST", cache: "no-store" }).catch(() => {
+      setNotifications(previousList);
+      setUnreadCount(previousUnread);
+    });
+  };
 
   const isActive = (href: string) => pathname.startsWith(href);
 
@@ -279,31 +385,58 @@ export default function AdminLayout({
                   setUserDropdownOpen(false);
                 }}
                 className="relative p-2 text-stone-500 hover:text-black hover:bg-stone-100 rounded-sm transition-colors"
+                aria-label={t("admin.notifications")}
               >
                 <Bell size={20} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden animate-slideDown">
-                  <div className="p-4 border-b border-stone-200">
+                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden animate-slideDown">
+                  <div className="p-4 border-b border-stone-200 flex items-center justify-between">
                     <h3 className="font-semibold text-sm text-black">{t("admin.notifications")}</h3>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllRead}
+                        className="text-xs text-secondary hover:text-black font-medium"
+                      >
+                        {t("admin.markAllRead")}
+                      </button>
+                    )}
                   </div>
-                  {notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      className={`p-4 border-b border-stone-100 hover:bg-stone-100 cursor-pointer transition-colors ${
-                        n.unread ? "bg-black/5" : ""
-                      }`}
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-sm text-stone-400">
+                        {t("admin.noNotifications")}
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <button
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={`w-full text-left p-4 border-b border-stone-100 hover:bg-stone-100 cursor-pointer transition-colors ${
+                            !n.readAt ? "bg-black/5" : ""
+                          }`}
+                        >
+                          <p className="text-sm text-stone-800 font-medium">{n.title}</p>
+                          {n.body && <p className="text-xs text-stone-500 mt-0.5">{n.body}</p>}
+                          <p className="text-xs text-stone-400 mt-1">{formatRelativeTime(n.createdAt)}</p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  <div className="p-3 text-center border-t border-stone-100">
+                    <Link
+                      href="/admin/notifications"
+                      onClick={() => setNotificationsOpen(false)}
+                      className="text-sm text-secondary hover:text-black font-medium"
                     >
-                      <p className="text-sm text-stone-800">{n.text}</p>
-                      <p className="text-xs text-stone-400 mt-1">{n.time}</p>
-                    </div>
-                  ))}
-                  <div className="p-3 text-center">
-                    <button className="text-sm text-secondary hover:text-black font-medium">
                       {t("admin.showAllNotifications")}
-                    </button>
+                    </Link>
                   </div>
                 </div>
               )}

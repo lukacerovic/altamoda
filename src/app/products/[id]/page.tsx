@@ -3,6 +3,7 @@ export const revalidate = 120
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { getProductBySlugOrId } from '@/lib/cached-queries'
+import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import ProductDetailClient from './ProductDetailClient'
 import type { Metadata } from 'next'
 
@@ -72,6 +73,21 @@ export default async function ProductDetailPage({ params }: PageProps) {
       : Promise.resolve([]),
   ])
 
+  // Active promos for the main product + every related product, fetched in
+  // one query. Without this, the detail page rendered the original priceB2c
+  // and the matching badge wasn't visible — the API endpoint applies promos
+  // but the SSR page bypassed it. SSR is anonymous so we apply 'all'/'b2c'
+  // audience promos here; per-role pricing is finalised client-side.
+  const allRelevantIds = [product.id, ...relatedProducts.map(r => r.id)]
+  const promoMap = await getActivePromosByProductId(allRelevantIds)
+  const mainBaseB2c = Number(product.priceB2c)
+  const mainApplied = applyBestPromo(
+    mainBaseB2c,
+    product.oldPrice ? Number(product.oldPrice) : null,
+    promoMap.get(product.id) ?? [],
+    null,
+  )
+
   const serialized = {
     id: product.id,
     sku: product.sku,
@@ -91,8 +107,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
     importerInfo: product.importerInfo,
     priceB2c: Number(product.priceB2c),
     priceB2b: product.priceB2b ? Number(product.priceB2b) : null,
-    oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
-    price: Number(product.priceB2c),
+    oldPrice: mainApplied.oldPrice,
+    price: mainApplied.price,
+    promoBadge: mainApplied.badge,
     stockQuantity: product.stockQuantity,
     isProfessional: product.isProfessional,
     isNew: product.isNew,
@@ -123,16 +140,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
     reviewCount: product._count.reviews,
   }
 
-  const related = relatedProducts.map(r => ({
-    id: r.id,
-    name: r.nameLat,
-    slug: r.slug,
-    brand: r.brand,
-    price: Number(r.priceB2c),
-    oldPrice: r.oldPrice ? Number(r.oldPrice) : null,
-    image: r.images[0]?.url || null,
-    isProfessional: r.isProfessional,
-  }))
+  const related = relatedProducts.map(r => {
+    const baseB2c = Number(r.priceB2c)
+    const applied = applyBestPromo(
+      baseB2c,
+      r.oldPrice ? Number(r.oldPrice) : null,
+      promoMap.get(r.id) ?? [],
+      null,
+    )
+    return {
+      id: r.id,
+      name: r.nameLat,
+      slug: r.slug,
+      brand: r.brand,
+      price: applied.price,
+      oldPrice: applied.oldPrice,
+      image: r.images[0]?.url || null,
+      isProfessional: r.isProfessional,
+    }
+  })
 
   const siblings = colorSiblings.map(s => ({
     id: s.id,

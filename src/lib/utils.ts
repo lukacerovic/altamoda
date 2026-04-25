@@ -71,3 +71,19 @@ export function normalizePostalCode(code: string | null | undefined): string {
   if (!code) return ''
   return code.replace(/^RS-/i, '')
 }
+
+// ─── Relative time formatter ───
+// Built-in Intl, no external date dep. Returns short Serbian strings like
+// "Pre 5 min", "Pre 2 h", "Pre 3 d". Used by the admin notifications UI.
+const _rtf = typeof Intl !== 'undefined' ? new Intl.RelativeTimeFormat('sr', { numeric: 'auto', style: 'short' }) : null
+
+export function formatRelativeTime(iso: string | Date): string {
+  if (!_rtf) return ''
+  const t = typeof iso === 'string' ? new Date(iso).getTime() : iso.getTime()
+  const diffSec = Math.round((t - Date.now()) / 1000)
+  const abs = Math.abs(diffSec)
+  if (abs < 60) return _rtf.format(diffSec, 'second')
+  if (abs < 3600) return _rtf.format(Math.round(diffSec / 60), 'minute')
+  if (abs < 86400) return _rtf.format(Math.round(diffSec / 3600), 'hour')
+  return _rtf.format(Math.round(diffSec / 86400), 'day')
+}

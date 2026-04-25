@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError } from '@/lib/api-utils'
 import { requireAuth } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
+import { notifyAdmins } from '@/lib/notifications'
 
 // Only these states allow self-cancel — once an order is in progress or delivered
 // it needs human follow-up (shipping, refund), not a click.
@@ -50,6 +51,20 @@ export const POST = withErrorHandler(async (_req: Request, context: unknown) => 
         data: { stockQuantity: { increment: it.quantity } },
       })
     }
+  })
+
+  // Notification fires after commit. Best-effort side-effect, swallowed by
+  // the helper on failure — must not extend the transaction window.
+  void notifyAdmins({
+    type: 'order_cancelled_by_customer',
+    title: `Otkazana porudžbina #${order.orderNumber}`,
+    body: user.name ?? user.email ?? '',
+    link: `/admin/orders/${order.id}`,
+    payload: {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      customerName: user.name ?? user.email ?? '',
+    },
   })
 
   return successResponse({ id, status: 'otkazano', orderNumber: order.orderNumber })
