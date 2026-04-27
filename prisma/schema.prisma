@@ -427,8 +427,35 @@ model Order {
   promoCode     PromoCode?         @relation(fields: [promoCodeId], references: [id])
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
+  payments      Payment[]
 
   @@map("orders")
+}
+
+model Payment {
+  id                  String   @id @default(cuid())
+  orderId             String   @map("order_id")
+  /// PSP identifier — "monri" for now, future-proof for additional providers.
+  provider            String
+  /// PSP-side payment id (Monri's payment.id from POST /v2/payment/new).
+  providerPaymentId   String?  @map("provider_payment_id")
+  /// Order number we sent to the PSP (mirrors Order.orderNumber).
+  providerOrderNumber String   @map("provider_order_number")
+  amount              Decimal  @db.Decimal(10, 2)
+  currency            String
+  /// Internal status: "created" | "pending" | "paid" | "failed" | "error".
+  status              String   @default("created")
+  rawRequest          Json?    @map("raw_request")
+  rawResponse         Json?    @map("raw_response")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([providerPaymentId])
+  @@index([providerOrderNumber])
+  @@map("payments")
 }
 
 model OrderItem {
