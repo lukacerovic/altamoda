@@ -10,10 +10,10 @@
  */
 
 export const colors = {
-  // ── Brand Accent (Soft Olive) ──────────────────────────────
-  accent:      '#837A64',  // Primary brand color — buttons, links, highlights
-  accentLight: '#837A64',  // Hover states, subtle accents, scrollbar
-  accentDark:  '#6a624f',  // Active/pressed states, deeper emphasis
+  // ── Brand Accent (Anthracite — RAL 7016) ───────────────────
+  accent:      '#293133',  // Primary brand color — buttons, links, highlights
+  accentLight: '#293133',  // Hover states, subtle accents, scrollbar
+  accentDark:  '#1a1d1f',  // Active/pressed states, deeper emphasis
 
   // ── Backgrounds (Floral White / Bone) ─────────────────────
   background:  '#FFFFFF',  // Page background, floral white
@@ -24,7 +24,7 @@ export const colors = {
   // ── Text (Smoky Black) ────────────────────────────────────
   foreground:  '#2e2e2e',  // Primary text
   text:        '#2e2e2e',  // Alias for foreground
-  textLight:   '#837A64',  // Secondary/muted text
+  textLight:   '#293133',  // Secondary/muted text
 
   // ── Dark tones (Smoky Black) ──────────────────────────────
   dark:        '#2e2e2e',  // Dark backgrounds, footer
@@ -42,15 +42,15 @@ export const colors = {
 /**
  * Tailwind class reference (available via @theme inline in globals.css):
  *
- *   bg-accent / text-accent / border-accent          → #837A64 (Soft Olive)
- *   bg-accent-light / text-accent-light               → #837A64
- *   bg-accent-dark / text-accent-dark                 → #6a624f
+ *   bg-accent / text-accent / border-accent          → #293133 (Soft Olive)
+ *   bg-accent-light / text-accent-light               → #293133
+ *   bg-accent-dark / text-accent-dark                 → #1a1d1f
  *   bg-background                                     → #FFFFFF (Floral White)
  *   bg-surface                                        → #FFFFFF
  *   bg-muted                                          → #f5efe5
  *   bg-light-accent                                   → #D8CFBC (Bone)
  *   text-foreground / text-text                       → #2e2e2e (Smoky Black)
- *   text-text-light                                   → #837A64
+ *   text-text-light                                   → #293133
  *   bg-dark / text-dark                               → #2e2e2e
  *   bg-dark-light                                     → #3d3e37
  *   border-border                                     → #D8CFBC

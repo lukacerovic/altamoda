@@ -250,13 +250,13 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
         <Image src={imgSrc} alt={product.name} width={500} height={625} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (
-            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[#837A64] text-[#FFFFFF]">{badge}</span>
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[#293133]/85 text-[#FFFFFF]">{badge}</span>
           )}
           {product.isProfessional && (
-            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#837A64] text-[#FFFFFF] backdrop-blur-sm rounded-full">{t("products.professional")}</span>
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#293133]/85 text-[#FFFFFF] backdrop-blur-sm rounded-full">{t("products.professional")}</span>
           )}
           {product.variantCount != null && product.variantCount > 1 && (
-            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#837A64] text-[#FFFFFF] backdrop-blur-sm rounded-full">
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#293133]/85 text-[#FFFFFF] backdrop-blur-sm rounded-full">
               {product.variantCount} boja
             </span>
           )}
@@ -265,7 +265,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#2e2e2e] text-[#2e2e2e]" : "text-[#2e2e2e]"}`} />
         </button>
         <div className="absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={handleAddToCart} disabled={outOfStock} className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#FFFFFF]" : "bg-[#837A64] text-[#FFFFFF] hover:bg-[#6a624f]"}`}>
+          <button onClick={handleAddToCart} disabled={outOfStock} className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#1a1d1f]/90 text-[#FFFFFF]" : "bg-[#293133]/85 text-[#FFFFFF] hover:bg-[#1a1d1f]/90"}`}>
             {outOfStock ? <>{t("products.outOfStock")}</> : addedToCart ? <><CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}</> : <><ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}</>}
           </button>
         </div>
@@ -1112,7 +1112,7 @@ export default function ProductsPageClient({
                   <button
                     key={tag.key}
                     onClick={() => removeTag(tag.key)}
-                    className="group flex items-center gap-1.5 bg-[#837A64] text-[#FFFFFF] pl-3 pr-2 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium border border-[#837A64] hover:bg-[#6a624f] hover:border-[#6a624f] transition-colors"
+                    className="group flex items-center gap-1.5 bg-[#293133]/85 text-[#FFFFFF] pl-3 pr-2 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium border border-[#293133]/25 hover:bg-[#1a1d1f]/90 hover:border-[#1a1d1f]/30 transition-colors"
                   >
                     {tag.label}
                     <X className="w-3 h-3 text-[#FFFFFF]/70 group-hover:text-[#FFFFFF] transition-colors" />
@@ -1151,7 +1151,7 @@ export default function ProductsPageClient({
                         <span className="absolute top-2 left-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[#2e2e2e]/90 text-[#FFFFFF] backdrop-blur-sm">{t("products.professional")}</span>
                       )}
                       {getBadge(p) && (
-                        <span className="absolute top-2 right-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[#837A64] text-[#FFFFFF] backdrop-blur-sm rounded-full">{getBadge(p)}</span>
+                        <span className="absolute top-2 right-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[#293133]/85 text-[#FFFFFF] backdrop-blur-sm rounded-full">{getBadge(p)}</span>
                       )}
                     </div>
                     <div className="p-5 flex-1 flex flex-col justify-center">

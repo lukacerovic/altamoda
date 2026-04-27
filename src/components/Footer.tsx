@@ -24,26 +24,26 @@ export default function Footer() {
           <a
             href="#"
             aria-label="Instagram"
-            className="w-8 h-8 rounded-full border border-[#837A64]/30 flex items-center justify-center text-[#837A64] hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#293133]/30 flex items-center justify-center text-[#293133]/65 hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
           >
             <Globe className="w-3.5 h-3.5" />
           </a>
           <a
             href="#"
             aria-label="Email"
-            className="w-8 h-8 rounded-full border border-[#837A64]/30 flex items-center justify-center text-[#837A64] hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#293133]/30 flex items-center justify-center text-[#293133]/65 hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
           >
             <AtSign className="w-3.5 h-3.5" />
           </a>
           <a
             href="#"
             aria-label="YouTube"
-            className="w-8 h-8 rounded-full border border-[#837A64]/30 flex items-center justify-center text-[#837A64] hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#293133]/30 flex items-center justify-center text-[#293133]/65 hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
           >
             <Play className="w-3.5 h-3.5" />
           </a>
         </div>
-        <p className="text-[10px] text-[#837A64]/60 uppercase tracking-widest mt-8">
+        <p className="text-[10px] text-[#293133]/60 uppercase tracking-widest mt-8">
           © 2026 ALTAMODA. All rights reserved.
         </p>
       </div>

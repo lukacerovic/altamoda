@@ -456,7 +456,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               <button
                 onClick={handleAddToCart}
                 disabled={outOfStock}
-                className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#FFFFFF]" : "bg-[#837A64] hover:bg-[#6a624f] text-[#FFFFFF]"}`}
+                className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#1a1d1f]/90 text-[#FFFFFF]" : "bg-[#293133]/85 hover:bg-[#1a1d1f]/90 text-[#FFFFFF]"}`}
               >
                 {outOfStock ? (
                   <>{t("products.outOfStock")}</>

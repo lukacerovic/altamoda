@@ -20,7 +20,7 @@ function ConfirmationContent() {
           <h1 className="text-2xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
             Porudžbina primljena!
           </h1>
-          <p className="text-[#837A64] mb-6">Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.</p>
+          <p className="text-[#293133]/65 mb-6">Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.</p>
 
           {orderNumber && (
             <div className="bg-[#FFFFFF] rounded-lg p-4 mb-6">
@@ -32,7 +32,7 @@ function ConfirmationContent() {
             </div>
           )}
 
-          <p className="text-sm text-[#837A64] mb-6">
+          <p className="text-sm text-[#293133]/65 mb-6">
             Poslali smo vam email sa potvrdom porudžbine i detaljima o dostavi.
           </p>
 
@@ -51,7 +51,7 @@ export default function ConfirmationPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
-        <div className="text-[#837A64]">Učitavanje...</div>
+        <div className="text-[#293133]/65">Učitavanje...</div>
       </div>
     }>
       <ConfirmationContent />

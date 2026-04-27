@@ -344,7 +344,7 @@ export default function HomepagePage() {
         <h1 className="text-2xl font-serif font-bold text-black">
           {t("admin.homepageManagement")}
         </h1>
-        <p className="text-sm text-[#837A64] mt-1">{t("admin.homepageDesc")}</p>
+        <p className="text-sm text-[#293133]/65 mt-1">{t("admin.homepageDesc")}</p>
       </div>
 
       {loading ? (
@@ -379,7 +379,7 @@ export default function HomepagePage() {
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-[#837A64] mb-5">
+              <p className="text-sm text-[#293133]/65 mb-5">
                 Uredite 3 kartice koje kupci vide na vrhu početne strane. Slika se automatski čuva posle uploada. Tekst i linkove sačuvajte dugmetom.
               </p>
 
@@ -438,8 +438,8 @@ export default function HomepagePage() {
                             ) : (
                               <>
                                 <Upload size={28} className="text-stone-400" />
-                                <span className="text-sm text-[#837A64]">Kartica {slotIndex + 1}</span>
-                                <span className="text-xs text-[#837A64]">Preporučeno: 800x1000px</span>
+                                <span className="text-sm text-[#293133]/65">Kartica {slotIndex + 1}</span>
+                                <span className="text-xs text-[#293133]/65">Preporučeno: 800x1000px</span>
                               </>
                             )}
                           </button>
@@ -450,7 +450,7 @@ export default function HomepagePage() {
                       {/* Text fields */}
                       <div className="space-y-2.5">
                         <div>
-                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#837A64] font-medium mb-1">Mala oznaka (kicker)</label>
+                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#293133]/65 font-medium mb-1">Mala oznaka (kicker)</label>
                           <input
                             type="text"
                             value={card.kicker}
@@ -460,7 +460,7 @@ export default function HomepagePage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#837A64] font-medium mb-1">Naslov</label>
+                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#293133]/65 font-medium mb-1">Naslov</label>
                           <input
                             type="text"
                             value={card.title}
@@ -470,7 +470,7 @@ export default function HomepagePage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#837A64] font-medium mb-1">Opis (paragraf)</label>
+                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#293133]/65 font-medium mb-1">Opis (paragraf)</label>
                           <textarea
                             value={card.paragraph}
                             onChange={(e) => updateCardField(slotIndex, "paragraph", e.target.value)}
@@ -480,7 +480,7 @@ export default function HomepagePage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#837A64] font-medium mb-1">Tekst linka (CTA)</label>
+                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#293133]/65 font-medium mb-1">Tekst linka (CTA)</label>
                           <input
                             type="text"
                             value={card.cta}
@@ -490,7 +490,7 @@ export default function HomepagePage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#837A64] font-medium mb-1">Putanja linka</label>
+                          <label className="block text-[10px] uppercase tracking-[0.18em] text-[#293133]/65 font-medium mb-1">Putanja linka</label>
                           <input
                             type="text"
                             value={card.href}
@@ -540,7 +540,7 @@ export default function HomepagePage() {
                 {/* Products Grid */}
                 <div className="p-6">
                   {products.length === 0 && (
-                    <p className="text-sm text-[#837A64] text-center py-4">
+                    <p className="text-sm text-[#293133]/65 text-center py-4">
                       {section.readOnly ? t("admin.saleNote") : t("admin.noProductsMatch")}
                     </p>
                   )}
@@ -561,14 +561,14 @@ export default function HomepagePage() {
                               className="w-10 h-10 rounded-lg object-cover"
                             />
                           ) : (
-                            <Package size={18} className="text-[#837A64]" />
+                            <Package size={18} className="text-[#293133]/65" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-black truncate">
                             {product.name}
                           </p>
-                          <p className="text-xs text-[#837A64]">
+                          <p className="text-xs text-[#293133]/65">
                             {product.brand?.name || ""}{" "}
                             {product.price > 0 && `· ${product.price.toLocaleString()} RSD`}
                           </p>
@@ -576,7 +576,7 @@ export default function HomepagePage() {
                         {!section.readOnly && (
                           <button
                             onClick={() => removeProduct(section.key, product.id, section.flagField)}
-                            className="p-1 text-[#837A64] hover:text-red-500 hover:bg-red-50 rounded sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
+                            className="p-1 text-[#293133]/65 hover:text-red-500 hover:bg-red-50 rounded sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
                             title={t("admin.removeFromSection")}
                           >
                             <X size={16} />
@@ -588,7 +588,7 @@ export default function HomepagePage() {
 
                   {/* Sale section note */}
                   {section.readOnly && products.length > 0 && (
-                    <p className="mt-4 text-xs text-[#837A64] italic">{t("admin.saleNote")}</p>
+                    <p className="mt-4 text-xs text-[#293133]/65 italic">{t("admin.saleNote")}</p>
                   )}
                 </div>
               </div>
@@ -605,13 +605,13 @@ export default function HomepagePage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
               <div>
                 <h3 className="text-lg font-serif font-bold text-black">{t("admin.addToSection")}</h3>
-                <p className="text-xs text-[#837A64] mt-0.5">
+                <p className="text-xs text-[#293133]/65 mt-0.5">
                   {selectedToAdd.size > 0
                     ? `${selectedToAdd.size} ${selectedToAdd.size === 1 ? "proizvod izabran" : "proizvoda izabrano"}`
                     : t("admin.searchToAdd")}
                 </p>
               </div>
-              <button onClick={() => setAddModal(null)} className="p-2 text-[#837A64] hover:text-black hover:bg-stone-100 rounded transition-colors">
+              <button onClick={() => setAddModal(null)} className="p-2 text-[#293133]/65 hover:text-black hover:bg-stone-100 rounded transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -619,7 +619,7 @@ export default function HomepagePage() {
             {/* Search */}
             <div className="px-6 py-3 border-b border-stone-100">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#293133]/65" />
                 <input
                   type="text"
                   value={modalSearch}
@@ -638,7 +638,7 @@ export default function HomepagePage() {
                   <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent" />
                 </div>
               ) : modalResults.length === 0 ? (
-                <p className="text-sm text-[#837A64] text-center py-12">{t("admin.noProductsMatch")}</p>
+                <p className="text-sm text-[#293133]/65 text-center py-12">{t("admin.noProductsMatch")}</p>
               ) : (
                 <div className="divide-y divide-stone-100">
                   {modalResults.map((product) => {
@@ -660,12 +660,12 @@ export default function HomepagePage() {
                           {product.image ? (
                             <Image src={product.image} alt={product.name} width={64} height={64} className="w-10 h-10 rounded-lg object-cover" />
                           ) : (
-                            <Package size={16} className="text-[#837A64]" />
+                            <Package size={16} className="text-[#293133]/65" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-black truncate">{product.name}</p>
-                          <p className="text-xs text-[#837A64]">
+                          <p className="text-xs text-[#293133]/65">
                             {product.brand?.name || ""} · {product.sku}
                             {product.price > 0 && ` · ${product.price.toLocaleString()} RSD`}
                           </p>
@@ -681,7 +681,7 @@ export default function HomepagePage() {
             <div className="flex items-center justify-between px-6 py-4 border-t border-stone-200 bg-white">
               <button
                 onClick={() => setAddModal(null)}
-                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#837A64] hover:bg-stone-100 transition-colors"
+                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#293133]/65 hover:bg-stone-100 transition-colors"
               >
                 {t("admin.cancel")}
               </button>

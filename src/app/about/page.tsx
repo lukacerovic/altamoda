@@ -16,7 +16,7 @@ export default function AboutPage() {
         <header className="relative px-8 pt-20 pb-32 max-w-screen-2xl mx-auto overflow-hidden">
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-12 md:col-span-7 lg:col-span-6 flex flex-col justify-center">
-              <span className="text-xs tracking-widest uppercase text-[#837A64] mb-6">
+              <span className="text-xs tracking-widest uppercase text-[#293133]/65 mb-6">
                 {t("about.heroTag")}
               </span>
               <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-8 tracking-tight">
@@ -35,7 +35,7 @@ export default function AboutPage() {
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXLvFysGyn1dS6cIm_EqFkS-guVBUCqtjAs_jiyslRMX-VNxRUAewIcNRMBxXzbXxBrrIEf2LxLuWHeBZFeH0PzIvsFCWt9NnhH_MTK2Ub991-rpDt4mIXadDYVVvFPDQZPqDnVEErUGfpCB8cClWBxKPfw9ISolRC1soFo4630OBQMSQ6ZvkclBSb4rZo79WLSrI1L29BilonLaq5xqAUHiqyKisCjIxELupcu2UnqbxDi8x5pj4s_X2yAd0YxFvIDeFz291-alr2"
                 />
               </div>
-              <div className="absolute -bottom-8 -left-8 md:-left-16 bg-[#837A64] p-8 md:p-12 text-white max-w-xs rounded-sm">
+              <div className="absolute -bottom-8 -left-8 md:-left-16 bg-[#293133]/85 p-8 md:p-12 text-white max-w-xs rounded-sm">
                 <p className="font-serif text-2xl italic mb-2">
                   {t("about.heroQuote")}
                 </p>
@@ -56,7 +56,7 @@ export default function AboutPage() {
                   {t("about.familyJourneyTitle1")} <br />
                   {t("about.familyJourneyTitle2")}
                 </h2>
-                <div className="w-12 h-px bg-[#6a624f] mb-6" />
+                <div className="w-12 h-px bg-[#1a1d1f]/90 mb-6" />
                 <p className="text-[#2e2e2e] leading-relaxed">
                   {t("about.familyJourneyDescription")}
                 </p>
@@ -77,7 +77,7 @@ export default function AboutPage() {
                     />
                   </div>
                 </div>
-                <div className="bg-white p-12 rounded-sm shadow-sm border-l-4 border-[#6a624f]">
+                <div className="bg-white p-12 rounded-sm shadow-sm border-l-4 border-[#1a1d1f]/30">
                   <h3 className="font-serif text-2xl mb-6">{t("about.reliabilityTitle")}</h3>
                   <p className="text-lg text-[#2e2e2e] font-light italic leading-relaxed">
                     {t("about.reliabilityQuote")}
@@ -92,14 +92,14 @@ export default function AboutPage() {
         <section className="py-32 bg-[#FFFFFF]">
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="text-center mb-24">
-              <span className="text-xs tracking-[0.2em] uppercase text-[#6a624f] mb-4 block">
+              <span className="text-xs tracking-[0.2em] uppercase text-[#1a1d1f] mb-4 block">
                 {t("about.milestonesTag")}
               </span>
               <h2 className="font-serif text-5xl">{t("about.milestonesTitle")}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px]">
               <div className="md:col-span-2 md:row-span-2 bg-[#D8CFBC] p-10 flex flex-col justify-end group cursor-default">
-                <span className="text-6xl font-serif text-[#6a624f] opacity-20 mb-4 group-hover:opacity-100 transition-opacity">
+                <span className="text-6xl font-serif text-[#1a1d1f] opacity-20 mb-4 group-hover:opacity-100 transition-opacity">
                   2005
                 </span>
                 <h4 className="font-serif text-2xl mb-2">{t("about.milestone2005Title")}</h4>
@@ -108,13 +108,13 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="md:col-span-2 bg-[#FFFFFF] p-10 flex flex-col justify-center">
-                <span className="text-4xl font-serif text-[#6a624f] mb-2">2012</span>
+                <span className="text-4xl font-serif text-[#1a1d1f] mb-2">2012</span>
                 <h4 className="font-serif text-xl">{t("about.milestone2012Title")}</h4>
                 <p className="text-[#2e2e2e] text-sm">
                   {t("about.milestone2012Description")}
                 </p>
               </div>
-              <div className="bg-[#837A64] text-white p-8 flex flex-col justify-between">
+              <div className="bg-[#293133]/85 text-white p-8 flex flex-col justify-between">
                 <span className="text-3xl font-serif italic">2018</span>
                 <div>
                   <h4 className="font-serif text-lg">{t("about.milestone2018Title")}</h4>
@@ -124,7 +124,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="bg-[#D8CFBC] p-8 flex flex-col justify-between border border-[#D8CFBC]/10">
-                <span className="text-3xl font-serif text-[#6a624f]">2024</span>
+                <span className="text-3xl font-serif text-[#1a1d1f]">2024</span>
                 <div>
                   <h4 className="font-serif text-lg">{t("about.milestone2024Title")}</h4>
                   <p className="text-xs text-[#2e2e2e]">
@@ -141,21 +141,21 @@ export default function AboutPage() {
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
               <div className="space-y-6">
-                <Award className="w-8 h-8 text-[#6a624f]" strokeWidth={1.5} />
+                <Award className="w-8 h-8 text-[#1a1d1f]" strokeWidth={1.5} />
                 <h3 className="font-serif text-2xl">{t("about.valueHeritageTitle")}</h3>
                 <p className="text-[#2e2e2e] font-light leading-relaxed">
                   {t("about.valueHeritageDescription")}
                 </p>
               </div>
               <div className="space-y-6">
-                <Users className="w-8 h-8 text-[#6a624f]" strokeWidth={1.5} />
+                <Users className="w-8 h-8 text-[#1a1d1f]" strokeWidth={1.5} />
                 <h3 className="font-serif text-2xl">{t("about.valueReliabilityTitle")}</h3>
                 <p className="text-[#2e2e2e] font-light leading-relaxed">
                   {t("about.valueReliabilityDescription")}
                 </p>
               </div>
               <div className="space-y-6">
-                <Sparkles className="w-8 h-8 text-[#6a624f]" strokeWidth={1.5} />
+                <Sparkles className="w-8 h-8 text-[#1a1d1f]" strokeWidth={1.5} />
                 <h3 className="font-serif text-2xl">{t("about.valueCurationTitle")}</h3>
                 <p className="text-[#2e2e2e] font-light leading-relaxed">
                   {t("about.valueCurationDescription")}

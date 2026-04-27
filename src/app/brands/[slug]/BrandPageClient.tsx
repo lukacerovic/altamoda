@@ -63,11 +63,11 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
               </h1>
             )}
             {brand.description && (
-              <p className="mt-4 text-[#837A64] text-lg max-w-2xl mx-auto leading-relaxed">
+              <p className="mt-4 text-[#293133]/65 text-lg max-w-2xl mx-auto leading-relaxed">
                 {brand.description}
               </p>
             )}
-            <div className="mt-3 flex items-center justify-center gap-6 text-sm text-[#837A64]">
+            <div className="mt-3 flex items-center justify-center gap-6 text-sm text-[#293133]/65">
               <span>{totalProducts} {t("brand.productsAvailable")}</span>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                 [&_h2]:text-[#2e2e2e] [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:tracking-wide
                 [&_h3]:text-[#2e2e2e] [&_h3]:font-serif
                 [&_p]:text-[#2e2e2e] [&_p]:leading-relaxed
-                [&_a]:text-[#837A64] [&_a]:underline
+                [&_a]:text-[#293133]/65 [&_a]:underline
                 [&_hr]:border-[#D8CFBC]
                 [&_img]:rounded-[4px] [&_img]:mx-auto"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(brand.content) }}
@@ -102,7 +102,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                   >
                     {t("brand.productsBy")} {brand.name}
                   </h2>
-                  <p className="text-[#837A64] text-sm mt-1">
+                  <p className="text-[#293133]/65 text-sm mt-1">
                     {t("brand.showingProducts").replace("{count}", String(products.length)).replace("{total}", String(totalProducts))}
                   </p>
                 </div>
@@ -138,18 +138,18 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {product.isNew && (
-                          <span className="absolute top-2 left-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#837A64] text-white backdrop-blur-sm">
+                          <span className="absolute top-2 left-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#293133]/85 text-white backdrop-blur-sm">
                             NOVO
                           </span>
                         )}
                         {hasDiscount && (
-                          <span className="absolute top-2 right-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#837A64] text-white backdrop-blur-sm">
+                          <span className="absolute top-2 right-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#293133]/85 text-white backdrop-blur-sm">
                             -{discountPct}%
                           </span>
                         )}
                       </div>
                       <div className="p-3">
-                        <p className="text-[11px] text-[#837A64] uppercase tracking-wider mb-1">
+                        <p className="text-[11px] text-[#293133]/65 uppercase tracking-wider mb-1">
                           {product.brand?.name}
                         </p>
                         <h3 className="text-sm font-medium text-[#2e2e2e] line-clamp-2 leading-snug mb-2">
@@ -158,17 +158,17 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                         {product.rating > 0 && (
                           <div className="flex items-center gap-1 mb-2">
                             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs text-[#837A64]">
+                            <span className="text-xs text-[#293133]/65">
                               {product.rating.toFixed(1)} ({product.reviewCount})
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-[#2e2e2e]">
-                            {product.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#837A64]">RSD</span>
+                            {product.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#293133]/65">RSD</span>
                           </span>
                           {hasDiscount && (
-                            <span className="text-xs text-[#837A64] line-through">
+                            <span className="text-xs text-[#293133]/65 line-through">
                               {product.oldPrice!.toLocaleString("sr-RS")}
                             </span>
                           )}

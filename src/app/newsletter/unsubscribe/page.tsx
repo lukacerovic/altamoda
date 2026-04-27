@@ -68,7 +68,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
         <div
           style={{
             padding: '32px 40px 24px',
-            backgroundColor: '#837A64',
+            backgroundColor: '#293133',
             textAlign: 'center',
           }}
         >
@@ -106,7 +106,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                 style={{
                   margin: '0 0 16px',
                   fontSize: '22px',
-                  color: '#837A64',
+                  color: '#293133',
                 }}
               >
                 Uspesno ste se odjavili
@@ -130,7 +130,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                 style={{
                   margin: '0 0 16px',
                   fontSize: '22px',
-                  color: '#837A64',
+                  color: '#293133',
                 }}
               >
                 Greska

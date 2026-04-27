@@ -55,7 +55,7 @@ export default function EducationPage() {
         </section>
 
         {/* Stats Bar */}
-        <section className="bg-[#837A64] text-white">
+        <section className="bg-[#293133]/85 text-white">
           <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/20">
               <div className="flex items-center gap-4 py-8 md:py-6 md:pr-8">
@@ -98,7 +98,7 @@ export default function EducationPage() {
                       className="w-[80%] h-auto object-contain"
                     />
                   </div>
-                  <div className="absolute -bottom-6 -right-6 bg-[#837A64] p-6 md:p-8 text-white max-w-[280px] rounded-sm shadow-xl">
+                  <div className="absolute -bottom-6 -right-6 bg-[#293133]/85 p-6 md:p-8 text-white max-w-[280px] rounded-sm shadow-xl">
                     <MapPin className="w-5 h-5 mb-2 opacity-80" />
                     <p className="font-serif text-lg leading-snug">Kneza Miloša 23</p>
                     <p className="text-sm opacity-80 mt-1">Beograd, Srbija</p>
@@ -109,11 +109,11 @@ export default function EducationPage() {
                 <h2 className="font-serif text-4xl md:text-5xl mb-8 leading-tight">
                   {t("education.heroTitle")}
                 </h2>
-                <div className="w-12 h-px bg-[#6a624f] mb-8" />
+                <div className="w-12 h-px bg-[#1a1d1f]/90 mb-8" />
                 <p className="text-lg text-[#2e2e2e] leading-relaxed mb-8">
                   {t("education.introText")}
                 </p>
-                <div className="flex items-center gap-3 text-[#837A64]">
+                <div className="flex items-center gap-3 text-[#293133]/65">
                   <Scissors className="w-5 h-5" />
                   <span className="text-sm font-medium tracking-wide uppercase">Kneza Miloša 23, Beograd</span>
                 </div>
@@ -126,18 +126,18 @@ export default function EducationPage() {
         <section className="py-24 md:py-32 bg-[#FFFFFF]">
           <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <GraduationCap className="w-10 h-10 text-[#837A64] mx-auto mb-6" />
+              <GraduationCap className="w-10 h-10 text-[#293133]/65 mx-auto mb-6" />
               <h2 className="font-serif text-4xl md:text-5xl mb-6">
                 {t("education.educationTitle")}
               </h2>
-              <div className="w-12 h-px bg-[#6a624f] mx-auto mb-8" />
+              <div className="w-12 h-px bg-[#1a1d1f]/90 mx-auto mb-8" />
               <p className="text-lg text-[#2e2e2e] leading-relaxed">
                 {t("education.educationText")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
-              <div className="bg-white p-10 md:p-12 rounded-sm shadow-sm border-l-4 border-[#6a624f]">
+              <div className="bg-white p-10 md:p-12 rounded-sm shadow-sm border-l-4 border-[#1a1d1f]/30">
                 <h3 className="font-serif text-2xl mb-6">{t("education.approachTitle")}</h3>
                 <p className="text-[#2e2e2e] font-light leading-relaxed text-lg">
                   {t("education.approachText")}
@@ -161,7 +161,7 @@ export default function EducationPage() {
                 <h2 className="font-serif text-4xl md:text-5xl mb-8 leading-tight">
                   {t("education.successTitle")}
                 </h2>
-                <div className="w-12 h-px bg-[#6a624f] mb-8" />
+                <div className="w-12 h-px bg-[#1a1d1f]/90 mb-8" />
                 <p className="text-lg text-[#2e2e2e] leading-relaxed mb-10">
                   {t("education.successText")}
                 </p>
@@ -171,15 +171,15 @@ export default function EducationPage() {
                   <h3 className="font-serif text-xl mb-4">{t("education.contactTitle")}</h3>
                   <p className="text-[#2e2e2e] text-sm mb-4">{t("education.contactText")}</p>
                   <div className="space-y-3">
-                    <a href="tel:+381113066333" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#837A64] transition-colors">
+                    <a href="tel:+381113066333" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#293133]/65 transition-colors">
                       <Phone className="w-4 h-4" />
                       <span className="text-sm">+381 11 306 6333</span>
                     </a>
-                    <a href="tel:+381646473142" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#837A64] transition-colors">
+                    <a href="tel:+381646473142" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#293133]/65 transition-colors">
                       <Phone className="w-4 h-4" />
                       <span className="text-sm">+381 64 647 3142</span>
                     </a>
-                    <a href="mailto:info@id-academy.com" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#837A64] transition-colors">
+                    <a href="mailto:info@id-academy.com" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#293133]/65 transition-colors">
                       <Mail className="w-4 h-4" />
                       <span className="text-sm">info@id-academy.com</span>
                     </a>
@@ -230,7 +230,7 @@ export default function EducationPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
                   href="mailto:info@id-academy.com"
-                  className="inline-flex items-center gap-2 bg-[#837A64] text-white px-8 py-4 text-sm font-medium tracking-wide hover:bg-[#6a624f] transition-colors"
+                  className="inline-flex items-center gap-2 bg-[#293133]/85 text-white px-8 py-4 text-sm font-medium tracking-wide hover:bg-[#1a1d1f]/90 transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                   info@id-academy.com

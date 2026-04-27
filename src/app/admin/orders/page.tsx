@@ -249,7 +249,7 @@ export default function OrdersPage() {
       case "otkazano":
         return <XCircle size={16} className="text-red-500" />;
       default:
-        return <Clock size={16} className="text-[#837A64]" />;
+        return <Clock size={16} className="text-[#293133]/65" />;
     }
   };
 
@@ -269,7 +269,7 @@ export default function OrdersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.orders")}</h1>
-          <p className="text-sm text-[#837A64] mt-1">
+          <p className="text-sm text-[#293133]/65 mt-1">
             {totalOrders} {t("admin.totalOrders")}
           </p>
         </div>
@@ -279,7 +279,7 @@ export default function OrdersPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#293133]/65" />
             <input
               type="text"
               placeholder={t("admin.searchOrders")}
@@ -290,7 +290,7 @@ export default function OrdersPage() {
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#837A64]"
+            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#293133]/65"
           >
             <Filter size={16} /> {t("admin.filters")}
           </button>
@@ -306,7 +306,7 @@ export default function OrdersPage() {
                 className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors ${
                   statusFilter === s.key
                     ? "bg-stone-900 text-white"
-                    : "bg-stone-100 text-[#837A64] hover:bg-[#D8CFBC]"
+                    : "bg-stone-100 text-[#293133]/65 hover:bg-[#D8CFBC]"
                 }`}
               >
                 {s.label}
@@ -325,35 +325,35 @@ export default function OrdersPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <Package size={40} className="mx-auto text-[#D8CFBC] mb-3" />
-            <p className="text-sm text-[#837A64]">{t("admin.noOrdersMatch")}</p>
+            <p className="text-sm text-[#293133]/65">{t("admin.noOrdersMatch")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="bg-stone-100 border-b border-stone-200">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.orderNo")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.customer")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.date")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.items")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.total")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.payment")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider">
                     {t("admin.status")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider"></th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#293133]/65 uppercase tracking-wider"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#FFFFFF]">
@@ -371,22 +371,22 @@ export default function OrdersPage() {
                           {order.user?.name || order.user?.email || "—"}
                         </p>
                         {order.user?.role === "b2b" && (
-                          <span className="text-[10px] font-semibold bg-stone-200 text-[#837A64] px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] font-semibold bg-stone-200 text-[#293133]/65 px-1.5 py-0.5 rounded">
                             B2B
                           </span>
                         )}
-                        <p className="text-xs text-[#837A64] md:hidden">{formatDate(order.createdAt)}</p>
+                        <p className="text-xs text-[#293133]/65 md:hidden">{formatDate(order.createdAt)}</p>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#837A64] ">
+                      <td className="px-6 py-4 text-sm text-[#293133]/65 ">
                         {formatDate(order.createdAt)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#837A64] ">
+                      <td className="px-6 py-4 text-sm text-[#293133]/65 ">
                         {order.itemCount} {t("admin.itemsCount")}
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-black">
                         {order.total.toLocaleString()} RSD
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#837A64] ">
+                      <td className="px-6 py-4 text-sm text-[#293133]/65 ">
                         {paymentMethodLabels[order.paymentMethod] || order.paymentMethod}
                       </td>
                       <td className="px-6 py-4">
@@ -432,7 +432,7 @@ export default function OrdersPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-[#837A64] hover:text-black transition-colors">
+                        <button className="text-[#293133]/65 hover:text-black transition-colors">
                           {expandedOrder === order.id ? (
                             <ChevronUp size={18} />
                           ) : (
@@ -461,16 +461,16 @@ export default function OrdersPage() {
                                   <table className="w-full">
                                     <thead>
                                       <tr className="bg-stone-100">
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#837A64]">
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#293133]/65">
                                           {t("admin.product")}
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#837A64]">
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#293133]/65">
                                           {t("admin.qty")}
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#837A64]">
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#293133]/65">
                                           {t("admin.price")}
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#837A64]">
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#293133]/65">
                                           {t("admin.total")}
                                         </th>
                                       </tr>
@@ -488,19 +488,19 @@ export default function OrdersPage() {
                                                 />
                                               ) : (
                                                 <div className="w-8 h-8 rounded bg-stone-100 flex items-center justify-center flex-shrink-0">
-                                                  <Package size={14} className="text-[#837A64]" />
+                                                  <Package size={14} className="text-[#293133]/65" />
                                                 </div>
                                               )}
                                               <div>
                                                 <p className="text-sm text-[#2e2e2e]">{item.productName}</p>
-                                                <p className="text-[10px] text-[#837A64]">{item.productSku}</p>
+                                                <p className="text-[10px] text-[#293133]/65">{item.productSku}</p>
                                               </div>
                                             </div>
                                           </td>
-                                          <td className="px-4 py-2.5 text-sm text-[#837A64]">
+                                          <td className="px-4 py-2.5 text-sm text-[#293133]/65">
                                             {item.quantity}
                                           </td>
-                                          <td className="px-4 py-2.5 text-sm text-[#837A64]">
+                                          <td className="px-4 py-2.5 text-sm text-[#293133]/65">
                                             {item.unitPrice.toLocaleString()} RSD
                                           </td>
                                           <td className="px-4 py-2.5 text-sm font-medium text-black">
@@ -512,7 +512,7 @@ export default function OrdersPage() {
                                     <tfoot>
                                       {orderDetail.discountAmount > 0 && (
                                         <tr className="border-t border-stone-200">
-                                          <td colSpan={3} className="px-4 py-2 text-sm text-[#837A64] text-right">
+                                          <td colSpan={3} className="px-4 py-2 text-sm text-[#293133]/65 text-right">
                                             Popust:
                                           </td>
                                           <td className="px-4 py-2 text-sm text-red-500">
@@ -522,10 +522,10 @@ export default function OrdersPage() {
                                       )}
                                       {orderDetail.shippingCost > 0 && (
                                         <tr>
-                                          <td colSpan={3} className="px-4 py-2 text-sm text-[#837A64] text-right">
+                                          <td colSpan={3} className="px-4 py-2 text-sm text-[#293133]/65 text-right">
                                             Dostava:
                                           </td>
-                                          <td className="px-4 py-2 text-sm text-[#837A64]">
+                                          <td className="px-4 py-2 text-sm text-[#293133]/65">
                                             {orderDetail.shippingCost.toLocaleString()} RSD
                                           </td>
                                         </tr>
@@ -550,15 +550,15 @@ export default function OrdersPage() {
                                   {orderDetail.user && (
                                     <>
                                       <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                        <Mail size={14} className="text-[#837A64]" />{" "}
+                                        <Mail size={14} className="text-[#293133]/65" />{" "}
                                         {orderDetail.user.email}
                                       </div>
                                       {orderDetail.user.name && (
                                         <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                          <Package size={14} className="text-[#837A64]" />{" "}
+                                          <Package size={14} className="text-[#293133]/65" />{" "}
                                           {orderDetail.user.name}
                                           {orderDetail.user.role === "b2b" && (
-                                            <span className="text-[10px] font-semibold bg-stone-200 text-[#837A64] px-1.5 py-0.5 rounded ml-1">
+                                            <span className="text-[10px] font-semibold bg-stone-200 text-[#293133]/65 px-1.5 py-0.5 rounded ml-1">
                                               B2B
                                             </span>
                                           )}
@@ -568,7 +568,7 @@ export default function OrdersPage() {
                                   )}
                                   {orderDetail.shippingAddress && (
                                     <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                      <MapPin size={14} className="text-[#837A64]" />{" "}
+                                      <MapPin size={14} className="text-[#293133]/65" />{" "}
                                       {orderDetail.shippingAddress.street}
                                       {orderDetail.shippingAddress.city &&
                                         `, ${orderDetail.shippingAddress.city}`}
@@ -578,7 +578,7 @@ export default function OrdersPage() {
                                   )}
                                   {orderDetail.shippingMethod && (
                                     <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
-                                      <Truck size={14} className="text-[#837A64]" />{" "}
+                                      <Truck size={14} className="text-[#293133]/65" />{" "}
                                       {orderDetail.shippingMethod === "express"
                                         ? "Express dostava"
                                         : orderDetail.shippingMethod === "pickup"
@@ -602,7 +602,7 @@ export default function OrdersPage() {
                                 </h3>
                                 <div className="bg-white rounded-sm border border-stone-200 p-4">
                                   {orderDetail.statusHistory.length === 0 ? (
-                                    <p className="text-sm text-[#837A64] text-center py-4">
+                                    <p className="text-sm text-[#293133]/65 text-center py-4">
                                       Nema istorije statusa
                                     </p>
                                   ) : (
@@ -620,9 +620,9 @@ export default function OrdersPage() {
                                               {statusLabel(event.status)}
                                             </p>
                                             {event.note && (
-                                              <p className="text-xs text-[#837A64] mt-0.5">{event.note}</p>
+                                              <p className="text-xs text-[#293133]/65 mt-0.5">{event.note}</p>
                                             )}
-                                            <p className="text-xs text-[#837A64] mt-0.5">
+                                            <p className="text-xs text-[#293133]/65 mt-0.5">
                                               {formatDateTime(event.createdAt)} · {event.changedBy}
                                             </p>
                                           </div>
@@ -674,13 +674,13 @@ export default function OrdersPage() {
                                 </h3>
                                 <div className="bg-white rounded-sm border border-stone-200 p-4 space-y-2">
                                   <div className="flex justify-between text-sm">
-                                    <span className="text-[#837A64]">Metod:</span>
+                                    <span className="text-[#293133]/65">Metod:</span>
                                     <span className="text-black font-medium">
                                       {paymentMethodLabels[orderDetail.paymentMethod] || orderDetail.paymentMethod}
                                     </span>
                                   </div>
                                   <div className="flex justify-between text-sm">
-                                    <span className="text-[#837A64]">Status:</span>
+                                    <span className="text-[#293133]/65">Status:</span>
                                     <span
                                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                                         orderDetail.paymentStatus === "paid"
@@ -718,7 +718,7 @@ export default function OrdersPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-4 sm:px-6 py-4 border-t border-stone-200 flex items-center justify-between gap-2">
-            <span className="text-xs sm:text-sm text-[#837A64] whitespace-nowrap">
+            <span className="text-xs sm:text-sm text-[#293133]/65 whitespace-nowrap">
               {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, totalOrders)} /{" "}
               {totalOrders}
             </span>
@@ -726,7 +726,7 @@ export default function OrdersPage() {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-sm text-[#837A64] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#293133]/65 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -737,7 +737,7 @@ export default function OrdersPage() {
                   className={`w-8 h-8 sm:w-9 sm:h-9 rounded-sm text-sm font-medium transition-colors ${
                     page === currentPage
                       ? "bg-black text-white"
-                      : "text-[#837A64] hover:bg-stone-100"
+                      : "text-[#293133]/65 hover:bg-stone-100"
                   }`}
                 >
                   {page}
@@ -746,7 +746,7 @@ export default function OrdersPage() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-sm text-[#837A64] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#293133]/65 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight size={18} />
               </button>

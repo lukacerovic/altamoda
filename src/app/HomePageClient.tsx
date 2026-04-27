@@ -86,7 +86,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           className="object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out"
         />
         {displayBadge && (
-          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[#837A64] text-[#FFFFFF]">
+          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[#293133]/85 text-[#FFFFFF]">
             {displayBadge}
           </span>
         )}
@@ -573,7 +573,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           4. B2B PARTNERS — salons & wholesale partners (unchanged)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#837A64]">
+      <section className="py-20 md:py-28 bg-[#293133]/85">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
             {/* Left — image (landscape) */}
@@ -627,7 +627,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/account/login"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#837A64]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#293133]"
                 >
                   Prijavi se za veleprodaju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -648,9 +648,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               return (
                 <div
                   key={i}
-                  className="group bg-[#FFFFFF] border border-[#837A64]/30 rounded-[4px] p-5 md:p-10 text-center transition-all duration-300 hover:border-[#837A64] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
+                  className="group bg-[#FFFFFF] border border-[#293133]/30 rounded-[4px] p-5 md:p-10 text-center transition-all duration-300 hover:border-[#293133]/25 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
                 >
-                  <div className="w-9 h-9 md:w-12 md:h-12 mx-auto mb-3 md:mb-5 flex items-center justify-center text-[#837A64]">
+                  <div className="w-9 h-9 md:w-12 md:h-12 mx-auto mb-3 md:mb-5 flex items-center justify-center text-[#293133]/65">
                     <Icon strokeWidth={1.5} className="w-full h-full" />
                   </div>
                   <h3
@@ -911,7 +911,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </h3>
               <p className="text-[#2e2e2e]/60 text-sm mb-8 leading-relaxed">{t("home.popupDesc")}</p>
               {popupStatus === "success" ? (
-                <p className="text-[#837A64] text-sm py-4">{popupMessage}</p>
+                <p className="text-[#293133]/65 text-sm py-4">{popupMessage}</p>
               ) : (
                 <form onSubmit={(e) => {
                   e.preventDefault();

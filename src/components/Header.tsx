@@ -272,7 +272,7 @@ export default function Header() {
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-sm border border-[#D8CFBC] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#837A64] to-[#2e2e2e]" />
+                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#293133]/85 to-[#2e2e2e]" />
                         <div className="p-5">
                           <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-4">
                             {t("nav.ourBrands")}
@@ -288,10 +288,10 @@ export default function Header() {
                                   <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
                                 ) : (
                                   <div className="w-8 h-8 bg-[#FFFFFF] rounded-sm flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs font-bold text-[#837A64]">{brand.name.charAt(0)}</span>
+                                    <span className="text-xs font-bold text-[#293133]/65">{brand.name.charAt(0)}</span>
                                   </div>
                                 ); })()}
-                                <span className="text-sm text-[#837A64] group-hover:text-[#2e2e2e] transition-colors truncate">
+                                <span className="text-sm text-[#293133]/65 group-hover:text-[#2e2e2e] transition-colors truncate">
                                   {brand.name}
                                 </span>
                               </Link>
@@ -313,7 +313,7 @@ export default function Header() {
                       onMouseLeave={handleMenuLeave}
                     >
                       <div className="bg-white rounded-sm border border-[#D8CFBC] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#837A64] to-[#2e2e2e]" />
+                        <div className="h-0.5 bg-gradient-to-r from-[#2e2e2e] via-[#293133]/85 to-[#2e2e2e]" />
                         <div className="p-6 flex gap-8">
                           <div className="flex-1 flex gap-8">
                             {menuData.columns.map((col) => (
@@ -326,7 +326,7 @@ export default function Header() {
                                     <li key={link.name}>
                                       <Link
                                         href={link.href}
-                                        className="text-sm text-[#837A64] hover:text-secondary transition-colors flex items-center gap-1 group"
+                                        className="text-sm text-[#293133]/65 hover:text-secondary transition-colors flex items-center gap-1 group"
                                       >
                                         <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
                                         {link.name}
@@ -353,7 +353,7 @@ export default function Header() {
                                     <p className="text-white text-sm font-medium">
                                       {menuData.featured.title}
                                     </p>
-                                    <span className="text-[#837A64] text-xs font-medium flex items-center gap-1 mt-1">
+                                    <span className="text-[#293133]/65 text-xs font-medium flex items-center gap-1 mt-1">
                                       {menuData.featured.cta}
                                       <ChevronRight className="w-3 h-3" />
                                     </span>
@@ -420,12 +420,12 @@ export default function Header() {
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   className="w-full border border-[#D8CFBC] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#837A64]" />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#293133]/65" />
               </div>
               {searchResults.length > 0 && (
                 <div className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-[#D8CFBC] shadow-xl overflow-hidden">
                   <div className="p-3">
-                    <span className="text-[11px] text-[#837A64] font-semibold tracking-widest uppercase">Proizvodi</span>
+                    <span className="text-[11px] text-[#293133]/65 font-semibold tracking-widest uppercase">Proizvodi</span>
                     <div className="mt-2 space-y-1">
                       {searchResults.map((p) => (
                         <Link
@@ -437,10 +437,10 @@ export default function Header() {
                           <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={200} height={200} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-[#2e2e2e] truncate">{p.name}</p>
-                            <p className="text-[11px] text-[#837A64] font-medium">{p.brand}</p>
+                            <p className="text-[11px] text-[#293133]/65 font-medium">{p.brand}</p>
                           </div>
                           <span className="text-sm font-bold text-[#2e2e2e]">
-                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#837A64]">RSD</span>
+                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#293133]/65">RSD</span>
                           </span>
                         </Link>
                       ))}
@@ -501,13 +501,13 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#837A64] hover:text-secondary transition-colors"
+                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#293133]/65 hover:text-secondary transition-colors"
                           >
                             {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                               <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
                             ) : (
                               <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-[#837A64]">{brand.name.charAt(0)}</span>
+                                <span className="text-[10px] font-bold text-[#293133]/65">{brand.name.charAt(0)}</span>
                               </div>
                             ); })()}
                             {brand.name}
@@ -528,7 +528,7 @@ export default function Header() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block py-2 px-2 text-sm text-[#837A64] hover:text-secondary transition-colors"
+                                className="block py-2 px-2 text-sm text-[#293133]/65 hover:text-secondary transition-colors"
                               >
                                 {link.name}
                               </Link>

@@ -208,7 +208,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
           "[&_h2]:text-[#2e2e2e] [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:tracking-wide",
           "[&_h3]:text-[#2e2e2e] [&_h3]:font-serif",
           "[&_p]:text-[#2e2e2e] [&_p]:leading-relaxed",
-          "[&_a]:text-[#837A64] [&_a]:underline",
+          "[&_a]:text-[#293133]/65 [&_a]:underline",
           "[&_hr]:border-[#D8CFBC]",
         ].join(" "),
       },

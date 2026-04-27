@@ -37,20 +37,20 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 text-center items-start">
               {/* Connect */}
               <div className="flex flex-col items-center">
-                <span className="text-xs tracking-[0.2em] text-[#6a624f] uppercase mb-10">
+                <span className="text-xs tracking-[0.2em] text-[#1a1d1f] uppercase mb-10">
                   {t("contact.connect")}
                 </span>
                 <div className="space-y-6">
-                  <a className="block font-serif text-2xl hover:text-[#6a624f] transition-colors duration-300 italic" href="#">
+                  <a className="block font-serif text-2xl hover:text-[#1a1d1f] transition-colors duration-300 italic" href="#">
                     Instagram
                   </a>
-                  <a className="block font-serif text-2xl hover:text-[#6a624f] transition-colors duration-300 italic" href="#">
+                  <a className="block font-serif text-2xl hover:text-[#1a1d1f] transition-colors duration-300 italic" href="#">
                     Pinterest
                   </a>
-                  <a className="block font-serif text-2xl hover:text-[#6a624f] transition-colors duration-300 italic" href="#">
+                  <a className="block font-serif text-2xl hover:text-[#1a1d1f] transition-colors duration-300 italic" href="#">
                     LinkedIn
                   </a>
-                  <a className="block font-serif text-2xl hover:text-[#6a624f] transition-colors duration-300 italic" href="#">
+                  <a className="block font-serif text-2xl hover:text-[#1a1d1f] transition-colors duration-300 italic" href="#">
                     Vogue Archive
                   </a>
                 </div>
@@ -58,27 +58,27 @@ export default function ContactPage() {
 
               {/* Inquire */}
               <div className="flex flex-col items-center">
-                <span className="text-xs tracking-[0.2em] text-[#6a624f] uppercase mb-10">
+                <span className="text-xs tracking-[0.2em] text-[#1a1d1f] uppercase mb-10">
                   {t("contact.inquire")}
                 </span>
                 <div className="space-y-6">
                   <div className="space-y-1">
-                    <p className="text-[10px] tracking-widest text-[#837A64] uppercase mb-2">
+                    <p className="text-[10px] tracking-widest text-[#293133]/65 uppercase mb-2">
                       {t("contact.emailLabel")}
                     </p>
                     <a
-                      className="block font-serif text-2xl hover:text-[#6a624f] transition-colors duration-300"
+                      className="block font-serif text-2xl hover:text-[#1a1d1f] transition-colors duration-300"
                       href="mailto:atelier@altamoda.com"
                     >
                       atelier@altamoda.com
                     </a>
                   </div>
                   <div className="pt-4 space-y-1">
-                    <p className="text-[10px] tracking-widest text-[#837A64] uppercase mb-2">
+                    <p className="text-[10px] tracking-widest text-[#293133]/65 uppercase mb-2">
                       {t("contact.phoneLabel")}
                     </p>
                     <a
-                      className="block font-serif text-2xl hover:text-[#6a624f] transition-colors duration-300"
+                      className="block font-serif text-2xl hover:text-[#1a1d1f] transition-colors duration-300"
                       href="tel:+39021234567"
                     >
                       +39 02 123 4567
@@ -89,7 +89,7 @@ export default function ContactPage() {
 
               {/* Visit */}
               <div className="flex flex-col items-center">
-                <span className="text-xs tracking-[0.2em] text-[#6a624f] uppercase mb-10">
+                <span className="text-xs tracking-[0.2em] text-[#1a1d1f] uppercase mb-10">
                   {t("contact.visit")}
                 </span>
                 <div className="space-y-6">
@@ -104,7 +104,7 @@ export default function ContactPage() {
                   </address>
                   <div className="pt-2">
                     <a
-                      className="inline-flex items-center gap-2 text-xs tracking-widest text-[#6a624f] uppercase hover:opacity-70 transition-opacity duration-300"
+                      className="inline-flex items-center gap-2 text-xs tracking-widest text-[#1a1d1f] uppercase hover:opacity-70 transition-opacity duration-300"
                       href="#"
                     >
                       {t("contact.viewOnMap")}
@@ -125,12 +125,12 @@ export default function ContactPage() {
             </p>
             <form className="flex flex-col md:flex-row gap-4">
               <input
-                className="flex-grow bg-transparent border-0 border-b border-[#837A64] focus:border-[#6a624f] focus:ring-0 py-3 text-[#2e2e2e] placeholder:text-[#837A64]/50 transition-colors duration-500"
+                className="flex-grow bg-transparent border-0 border-b border-[#293133]/25 focus:border-[#1a1d1f]/30 focus:ring-0 py-3 text-[#2e2e2e] placeholder:text-[#293133]/50 transition-colors duration-500"
                 placeholder={t("contact.emailPlaceholder")}
                 type="email"
               />
               <button
-                className="bg-[#837A64] text-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#6a624f] transition-colors duration-300"
+                className="bg-[#293133]/85 text-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#1a1d1f]/90 transition-colors duration-300"
                 type="submit"
               >
                 {t("contact.subscribe")}

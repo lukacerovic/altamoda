@@ -76,7 +76,7 @@ describe('Colors — Centralized Color Palette', () => {
     expect(colors.text).toBe(colors.foreground)
   })
 
-  it('accent is khaki olive (#837A64) used for CTAs like add-to-cart', () => {
-    expect(colors.accent).toBe('#837A64')
+  it('accent is anthracite (#293133) used for CTAs like add-to-cart', () => {
+    expect(colors.accent).toBe('#293133')
   })
 })

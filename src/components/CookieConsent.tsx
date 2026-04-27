@@ -56,9 +56,9 @@ export default function CookieConsent() {
             {/* Icon + Text */}
             <div className="flex items-start gap-3 flex-1">
               <div className="w-10 h-10 rounded-sm bg-[#FFFFFF] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Cookie className="w-5 h-5 text-[#837A64]" />
+                <Cookie className="w-5 h-5 text-[#293133]/65" />
               </div>
-              <p className="text-xs text-[#837A64] leading-relaxed tracking-wide">
+              <p className="text-xs text-[#293133]/65 leading-relaxed tracking-wide">
                 {t("cookie.text")}{" "}
                 <a href="#" className="text-[#2e2e2e] hover:underline font-medium">
                   {t("cookie.cookiePolicy")}
@@ -97,7 +97,7 @@ export default function CookieConsent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-sm font-bold text-[#2e2e2e]">{t("cookie.necessaryCookies")}</span>
-                    <p className="text-xs text-[#837A64] mt-0.5">
+                    <p className="text-xs text-[#293133]/65 mt-0.5">
                       {t("cookie.necessaryDesc")}
                     </p>
                   </div>
@@ -122,7 +122,7 @@ export default function CookieConsent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-sm font-bold text-[#2e2e2e]">{t("cookie.analyticsCookies")}</span>
-                    <p className="text-xs text-[#837A64] mt-0.5">
+                    <p className="text-xs text-[#293133]/65 mt-0.5">
                       {t("cookie.analyticsDesc")}
                     </p>
                   </div>
@@ -144,7 +144,7 @@ export default function CookieConsent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-sm font-bold text-[#2e2e2e]">{t("cookie.marketingCookies")}</span>
-                    <p className="text-xs text-[#837A64] mt-0.5">
+                    <p className="text-xs text-[#293133]/65 mt-0.5">
                       {t("cookie.marketingDesc")}
                     </p>
                   </div>

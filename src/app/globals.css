@@ -7,13 +7,13 @@
   --color-primary: #2e2e2e;
   --color-on-primary: #FFFFFF;
   --color-primary-container: #383838;
-  --color-on-primary-container: #837A64;
+  --color-on-primary-container: #293133;
 
   /* Secondary: Soft Olive – natural accent */
-  --color-secondary: #837A64;
+  --color-secondary: #293133;
   --color-on-secondary: #FFFFFF;
   --color-secondary-container: #D8CFBC;
-  --color-on-secondary-container: #6a624f;
+  --color-on-secondary-container: #1a1d1f;
 
   /* Surfaces – Floral White / Bone spectrum */
   --color-surface: #FFFFFF;
@@ -34,7 +34,7 @@
   --color-foreground: #2e2e2e;
 
   /* Outline */
-  --color-outline: #837A64;
+  --color-outline: #293133;
   --color-outline-variant: #D8CFBC;
 
   /* Error */
@@ -46,16 +46,16 @@
   /* Inverse */
   --color-inverse-surface: #2e2e2e;
   --color-inverse-on-surface: #FFFFFF;
-  --color-inverse-primary: #837A64;
+  --color-inverse-primary: #293133;
 
   /* Legacy aliases for gradual migration */
-  --color-accent: #837A64;
-  --color-accent-light: #837A64;
-  --color-accent-dark: #6a624f;
+  --color-accent: #293133;
+  --color-accent-light: #293133;
+  --color-accent-dark: #1a1d1f;
   --color-dark: #2e2e2e;
   --color-dark-light: #555555;
   --color-text: #2e2e2e;
-  --color-text-light: #837A64;
+  --color-text-light: #293133;
   --color-border: #D8CFBC;
   --color-success: #2d7a3a;
   --color-warning: #c4883a;
