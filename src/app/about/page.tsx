@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Award, Users, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { ArrowRight } from "lucide-react";
 
 export default function AboutPage() {
   const { t } = useLanguage();
@@ -12,155 +13,178 @@ export default function AboutPage() {
     <>
       <Header />
       <main className="bg-[#FFFFFF] text-[#2e2e2e]">
-        {/* Hero Section */}
-        <header className="relative px-8 pt-20 pb-32 max-w-screen-2xl mx-auto overflow-hidden">
-          <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-12 md:col-span-7 lg:col-span-6 flex flex-col justify-center">
-              <span className="text-xs tracking-widest uppercase text-[#837A64] mb-6">
-                {t("about.heroTag")}
+        {/* ════════════════════════════════════════════════════════════
+            1. HERO
+        ════════════════════════════════════════════════════════════ */}
+        <section className="bg-[#FFFFFF] pt-20 md:pt-28 pb-16 md:pb-20">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#837A64] font-medium block mb-6">
+              {t("about.heroTag")}
+            </span>
+            <h1
+              className="text-5xl md:text-6xl lg:text-7xl font-light text-[#2e2e2e] leading-[1.05] mb-8 max-w-4xl"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
+            >
+              {t("about.heroTitle")}
+            </h1>
+            <p className="text-lg md:text-xl text-[#2e2e2e]/75 leading-[1.6] max-w-3xl">
+              {t("about.heroLead")}
+            </p>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════════════
+            2. MAIN CONTENT — long-form intro paragraphs
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-16 md:py-24 bg-[#FFFFFF] border-t border-[rgba(46,46,46,0.08)]">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+              <div className="lg:col-span-4 lg:sticky lg:top-32 lg:self-start">
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+                  01
+                </span>
+                <h2
+                  className="text-3xl md:text-4xl font-light text-[#2e2e2e] leading-[1.1] mb-4"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+                >
+                  Alta Moda
+                </h2>
+                <div className="w-12 h-px bg-[#837A64] mb-6" />
+                <p className="text-sm text-[#2e2e2e]/60 leading-relaxed max-w-xs">
+                  {t("about.heroLead")}
+                </p>
+              </div>
+              <div className="lg:col-span-8 space-y-6">
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.introParagraph")}
+                </p>
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.foundedParagraph")}
+                </p>
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.distributionParagraph")}
+                </p>
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.portfolioParagraph")}
+                </p>
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.salonsParagraph")}
+                </p>
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.networkParagraph")}
+                </p>
+                {/* Academy paragraph with inline link to /education */}
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.academyBefore")}{" "}
+                  <Link
+                    href="/education"
+                    className="text-[#2e2e2e] underline decoration-[#837A64] decoration-1 underline-offset-4 hover:decoration-[#2e2e2e] transition-colors font-medium"
+                  >
+                    {t("about.academyName")}
+                  </Link>
+                  {t("about.academyAfter")}
+                </p>
+                <p className="text-[15px] md:text-base text-[#2e2e2e]/80 leading-[1.85]">
+                  {t("about.systemParagraph")}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════════════
+            3. STATS STRIP
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-16 md:py-20 bg-[#D8CFBC]/40 border-y border-[rgba(46,46,46,0.08)]">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[rgba(46,46,46,0.12)]">
+              <div className="py-8 md:py-4 md:pr-12">
+                <div
+                  className="text-5xl md:text-6xl font-light text-[#2e2e2e] mb-3"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
+                >
+                  {t("about.statYearsNumber")}
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium">
+                  {t("about.statYearsLabel")}
+                </div>
+              </div>
+              <div className="py-8 md:py-4 md:px-12">
+                <div
+                  className="text-5xl md:text-6xl font-light text-[#2e2e2e] mb-3"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
+                >
+                  {t("about.statSalonsNumber")}
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium">
+                  {t("about.statSalonsLabel")}
+                </div>
+              </div>
+              <div className="py-8 md:py-4 md:pl-12">
+                <div
+                  className="text-5xl md:text-6xl font-light text-[#2e2e2e] mb-3"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
+                >
+                  {t("about.statMarketsNumber")}
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium">
+                  {t("about.statMarketsLabel")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════════════
+            4. MISSION
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 bg-[#FFFFFF]">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <div className="max-w-3xl">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+                02
               </span>
-              <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-8 tracking-tight">
-                {t("about.heroTitle1")} <br />
-                <i className="font-normal">{t("about.heroTitle2")}</i>
-              </h1>
-              <p className="text-lg md:text-xl text-[#2e2e2e] max-w-lg leading-relaxed mb-10">
-                {t("about.heroDescription")}
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                {t("about.missionTitle")}
+              </h2>
+              <div className="w-12 h-px bg-[#837A64] mb-8" />
+              <p
+                className="text-2xl md:text-3xl font-light text-[#2e2e2e] leading-[1.4] italic"
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              >
+                {t("about.missionParagraph")}
               </p>
             </div>
-            <div className="col-span-12 md:col-span-5 lg:col-span-6 relative">
-              <div className="aspect-[4/5] bg-[#FFFFFF] overflow-hidden rounded-[4px] shadow-2xl">
-                <img
-                  alt="Heritage"
-                  className="w-full h-full object-cover mix-blend-multiply opacity-90"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXLvFysGyn1dS6cIm_EqFkS-guVBUCqtjAs_jiyslRMX-VNxRUAewIcNRMBxXzbXxBrrIEf2LxLuWHeBZFeH0PzIvsFCWt9NnhH_MTK2Ub991-rpDt4mIXadDYVVvFPDQZPqDnVEErUGfpCB8cClWBxKPfw9ISolRC1soFo4630OBQMSQ6ZvkclBSb4rZo79WLSrI1L29BilonLaq5xqAUHiqyKisCjIxELupcu2UnqbxDi8x5pj4s_X2yAd0YxFvIDeFz291-alr2"
-                />
-              </div>
-              <div className="absolute -bottom-8 -left-8 md:-left-16 bg-[#837A64] p-8 md:p-12 text-white max-w-xs rounded-sm">
-                <p className="font-serif text-2xl italic mb-2">
-                  {t("about.heroQuote")}
-                </p>
-                <p className="text-xs uppercase tracking-widest opacity-80">
-                  {t("about.heroQuoteAttribution")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* A Family Journey */}
-        <section className="bg-[#FFFFFF] py-32">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="flex flex-col md:flex-row gap-16 items-start">
-              <div className="w-full md:w-1/3 sticky top-32">
-                <h2 className="font-serif text-4xl mb-6">
-                  {t("about.familyJourneyTitle1")} <br />
-                  {t("about.familyJourneyTitle2")}
-                </h2>
-                <div className="w-12 h-px bg-[#6a624f] mb-6" />
-                <p className="text-[#2e2e2e] leading-relaxed">
-                  {t("about.familyJourneyDescription")}
-                </p>
-              </div>
-              <div className="w-full md:w-2/3 space-y-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h3 className="font-serif text-2xl">{t("about.genesisTitle")}</h3>
-                    <p className="text-[#2e2e2e] font-light leading-relaxed">
-                      {t("about.genesisDescription")}
-                    </p>
-                  </div>
-                  <div className="aspect-square bg-white p-2 shadow-sm rounded-[4px]">
-                    <img
-                      alt="Archival photo"
-                      className="w-full h-full object-cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkGHuNlnQGle2w7EqvNx6LYWdFAUHk4gQJFF500Yb5UXfpb8Utrb4_Mo6nGcX6AmXnbtEHod-VrIWkcIAHrffyESPuuPnaNJik7pJQjUBue74V3ucww-TOxAv9G83-WNtcoY9cZbsujEFztnUEvIc9ct_yjIr2Z-rZEP4-QMqnXsSyMXg2t00GoHiKcoc94PbyQuVLhImZTq5K0wbhIjcdSYech04i-xK06aV-l1a7XNjCkfMeBYuL6R8DQxe9OoLMBPRp1EpYySoS"
-                    />
-                  </div>
-                </div>
-                <div className="bg-white p-12 rounded-sm shadow-sm border-l-4 border-[#6a624f]">
-                  <h3 className="font-serif text-2xl mb-6">{t("about.reliabilityTitle")}</h3>
-                  <p className="text-lg text-[#2e2e2e] font-light italic leading-relaxed">
-                    {t("about.reliabilityQuote")}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* Milestones */}
-        <section className="py-32 bg-[#FFFFFF]">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="text-center mb-24">
-              <span className="text-xs tracking-[0.2em] uppercase text-[#6a624f] mb-4 block">
-                {t("about.milestonesTag")}
+        {/* ════════════════════════════════════════════════════════════
+            5. CTA — become a partner (dark)
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 bg-[#2e2e2e] text-white">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <div className="max-w-3xl">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#D8CFBC] font-medium block mb-5">
+                {t("about.ctaTag")}
               </span>
-              <h2 className="font-serif text-5xl">{t("about.milestonesTitle")}</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px]">
-              <div className="md:col-span-2 md:row-span-2 bg-[#D8CFBC] p-10 flex flex-col justify-end group cursor-default">
-                <span className="text-6xl font-serif text-[#6a624f] opacity-20 mb-4 group-hover:opacity-100 transition-opacity">
-                  2005
-                </span>
-                <h4 className="font-serif text-2xl mb-2">{t("about.milestone2005Title")}</h4>
-                <p className="text-[#2e2e2e] text-sm max-w-xs">
-                  {t("about.milestone2005Description")}
-                </p>
-              </div>
-              <div className="md:col-span-2 bg-[#FFFFFF] p-10 flex flex-col justify-center">
-                <span className="text-4xl font-serif text-[#6a624f] mb-2">2012</span>
-                <h4 className="font-serif text-xl">{t("about.milestone2012Title")}</h4>
-                <p className="text-[#2e2e2e] text-sm">
-                  {t("about.milestone2012Description")}
-                </p>
-              </div>
-              <div className="bg-[#837A64] text-white p-8 flex flex-col justify-between">
-                <span className="text-3xl font-serif italic">2018</span>
-                <div>
-                  <h4 className="font-serif text-lg">{t("about.milestone2018Title")}</h4>
-                  <p className="text-xs opacity-80">
-                    {t("about.milestone2018Description")}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-[#D8CFBC] p-8 flex flex-col justify-between border border-[#D8CFBC]/10">
-                <span className="text-3xl font-serif text-[#6a624f]">2024</span>
-                <div>
-                  <h4 className="font-serif text-lg">{t("about.milestone2024Title")}</h4>
-                  <p className="text-xs text-[#2e2e2e]">
-                    {t("about.milestone2024Description")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Values / Pillars */}
-        <section className="py-32 bg-[#D8CFBC]">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-              <div className="space-y-6">
-                <Award className="w-8 h-8 text-[#6a624f]" strokeWidth={1.5} />
-                <h3 className="font-serif text-2xl">{t("about.valueHeritageTitle")}</h3>
-                <p className="text-[#2e2e2e] font-light leading-relaxed">
-                  {t("about.valueHeritageDescription")}
-                </p>
-              </div>
-              <div className="space-y-6">
-                <Users className="w-8 h-8 text-[#6a624f]" strokeWidth={1.5} />
-                <h3 className="font-serif text-2xl">{t("about.valueReliabilityTitle")}</h3>
-                <p className="text-[#2e2e2e] font-light leading-relaxed">
-                  {t("about.valueReliabilityDescription")}
-                </p>
-              </div>
-              <div className="space-y-6">
-                <Sparkles className="w-8 h-8 text-[#6a624f]" strokeWidth={1.5} />
-                <h3 className="font-serif text-2xl">{t("about.valueCurationTitle")}</h3>
-                <p className="text-[#2e2e2e] font-light leading-relaxed">
-                  {t("about.valueCurationDescription")}
-                </p>
-              </div>
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                {t("about.ctaTitle")}
+              </h2>
+              <p className="text-[15px] md:text-base text-white/70 leading-[1.8] mb-10 max-w-2xl">
+                {t("about.ctaDescription")}
+              </p>
+              <Link
+                href="/account/login"
+                className="inline-flex items-center gap-2 bg-white text-[#2e2e2e] px-8 py-4 text-[11px] uppercase tracking-[0.22em] font-medium hover:bg-[#D8CFBC] transition-colors rounded-full"
+              >
+                {t("about.ctaButton")} <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
         </section>
