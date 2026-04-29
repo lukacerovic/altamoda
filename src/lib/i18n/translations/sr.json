@@ -353,7 +353,14 @@
     "pendingMessage": "Nakon pregleda dostavljenih podataka i provere njihove tačnosti, registracija će biti odobrena, o čemu ćete biti obavešteni putem e-maila.",
     "pendingNotify": "",
     "understood": "Razumem",
-    "errorTitle": "Greška"
+    "errorTitle": "Greška",
+    "continueWithGoogle": "Nastavi sa Google nalogom",
+    "orRegisterWithEmail": "ili se registruj putem e-maila",
+    "b2bMustUseEmail": "B2B nalozi se registruju putem e-maila i lozinke uz odobrenje administratora.",
+    "oauthB2bBlocked": "Ovaj e-mail je registrovan kao B2B nalog. Molimo prijavite se putem e-maila i lozinke.",
+    "oauthMissingEmail": "Vaš Google nalog nije vratio e-mail adresu. Molimo registrujte se putem e-maila.",
+    "oauthAccountNotLinked": "Nalog sa ovim e-mailom već postoji. Molimo prijavite se putem lozinke i povežite Google nalog iz profila.",
+    "oauthGenericError": "Prijava nije uspela. Molimo pokušajte ponovo."
   },
   "account": {
     "myOrders": "Moje Porudžbine",
