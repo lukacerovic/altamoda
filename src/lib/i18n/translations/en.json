@@ -1018,7 +1018,11 @@
     "catPayment": "Payment",
     "catB2B": "B2B Program",
     "catProducts": "Products",
-    "catReturns": "Returns & Claims"
+    "catReturns": "Returns & Claims",
+    "catShipping": "Shipping & Delivery",
+    "catComplaints": "Complaints & Returns",
+    "catPrivacy": "Privacy Policy",
+    "catTerms": "Terms of Use"
   },
   "colorPage": {
     "natural": "Natural",

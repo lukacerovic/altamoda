@@ -1018,7 +1018,11 @@
     "catPayment": "Plaćanje",
     "catB2B": "B2B Program",
     "catProducts": "Proizvodi",
-    "catReturns": "Povrat i Reklamacije"
+    "catReturns": "Povrat i Reklamacije",
+    "catShipping": "Dostava i isporuka",
+    "catComplaints": "Reklamacije i povraćaj",
+    "catPrivacy": "Politika privatnosti",
+    "catTerms": "Uslovi korišćenja"
   },
   "colorPage": {
     "natural": "Prirodna",
