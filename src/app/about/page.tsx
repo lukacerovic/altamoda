@@ -157,6 +157,12 @@ export default function AboutPage() {
               >
                 {t("about.missionParagraph")}
               </p>
+              <p
+                className="text-3xl md:text-4xl font-light text-[#837A64] leading-[1.2] mt-10"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                {t("about.welcome")}
+              </p>
             </div>
           </div>
         </section>

@@ -303,7 +303,7 @@
   "auth": {
     "login": "Prijava",
     "register": "Registracija",
-    "welcomeBack": "DOBRO DOŠLI",
+    "welcomeBack": "Dobro došli",
     "emailAddress": "Email adresa",
     "password": "Lozinka",
     "enterPassword": "Unesite lozinku",
@@ -342,7 +342,7 @@
     "processing": "Obrada...",
     "submitB2b": "Pošaljite zahtev za B2B nalog",
     "b2bNotice": "Nakon pregleda dostavljenih podataka i provere njihove tačnosti, registracija će biti odobrena, o čemu ćete biti obavešteni putem e-maila.",
-    "b2bRequestReceived": "Vaš B2B zahtev je primljen. Bićete obavešteni kada bude odobren.",
+    "b2bRequestReceived": "Nakon pregleda dostavljenih podataka i provere njihove tačnosti, registracija će biti odobrena, o čemu ćete biti obavešteni putem e-maila.",
     "passwordsDontMatch": "Lozinke se ne poklapaju",
     "mustAcceptTerms": "Morate prihvatiti uslove korišćenja",
     "registrationError": "Greška pri registraciji",
@@ -350,8 +350,8 @@
     "comingSoon": "Uskoro dostupno",
     "accountSuspended": "Vaš nalog je suspendovan. Kontaktirajte podršku za više informacija.",
     "pendingTitle": "Nalog na čekanju",
-    "pendingMessage": "Vaš poslovni nalog je uspešno kreiran i trenutno je u procesu verifikacije. Naš tim pregleda sve partnerske zahteve kako bi osigurao najbolju moguću uslugu.",
-    "pendingNotify": "Obavestićemo vas putem emaila čim vaš nalog bude odobren i verifikovan.",
+    "pendingMessage": "Nakon pregleda dostavljenih podataka i provere njihove tačnosti, registracija će biti odobrena, o čemu ćete biti obavešteni putem e-maila.",
+    "pendingNotify": "",
     "understood": "Razumem",
     "errorTitle": "Greška"
   },
