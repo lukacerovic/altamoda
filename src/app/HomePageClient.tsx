@@ -39,18 +39,18 @@ const defaultImg = "https://images.unsplash.com/photo-1526947425960-945c6e72858f
 
 /* Brand marquee — partner logos displayed on the home page */
 const brandLogos = [
-  { name: "Redken", logo: "/brands/redken.webp" },
-  { name: "Matrix", logo: "/brands/matrix.png" },
-  { name: "L'Oréal Professionnel", logo: "/brands/loreal.svg" },
-  { name: "Kérastase", logo: "/brands/kerastase.png" },
-  { name: "Biolage", logo: "/brands/biolage.webp" },
-  { name: "Olaplex", logo: "/brands/olaplex.svg" },
-  { name: "Framesi", logo: "/brands/framesi.webp" },
-  { name: "Elchim", logo: "/brands/elchim.png" },
-  { name: "L'image", logo: "/brands/limage.png" },
-  { name: "Mizutani", logo: "/brands/mizutani.png" },
-  { name: "Olivia Garden", logo: "/brands/olivia-garden.png" },
-  { name: "Redken Brews", logo: "/brands/redken-brews.png" },
+  { name: "Redken", logo: "/brands/redken.webp", slug: "redken" },
+  { name: "Matrix", logo: "/brands/matrix.png", slug: "matrix" },
+  { name: "L'Oréal Professionnel", logo: "/brands/loreal.svg", slug: "loreal" },
+  { name: "Kérastase", logo: "/brands/kerastase.png", slug: "kerastase" },
+  { name: "Biolage", logo: "/brands/biolage.webp", slug: "biolage" },
+  { name: "Olaplex", logo: "/brands/olaplex.svg", slug: "olaplex" },
+  { name: "Framesi", logo: "/brands/framesi.webp", slug: "framesi" },
+  { name: "Elchim", logo: "/brands/elchim.png", slug: "elchim" },
+  { name: "L'image", logo: "/brands/limage.png", slug: "limage" },
+  { name: "Mizutani", logo: "/brands/mizutani.png", slug: "mizutani" },
+  { name: "Olivia Garden", logo: "/brands/olivia-garden.png", slug: "olivia-garden" },
+  { name: "Redken Brews", logo: "/brands/redken-brews.png", slug: "redken-brews" },
 ];
 
 /* Social feed — mini editorial grid */
@@ -259,14 +259,16 @@ interface Props {
    Main editorial home page — inspired by botanical-press aesthetic
 ═══════════════════════════════════════════════════════════════════ */
 export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards, socialLinks }: Props) {
-  const instagramUrl = socialLinks?.instagram || "https://instagram.com";
-  const tiktokUrl = socialLinks?.tiktok || "https://tiktok.com";
+  const instagramUrl = socialLinks?.instagram || "https://www.instagram.com/altamoda_srbija";
+  const tiktokUrl = socialLinks?.tiktok || "https://www.tiktok.com/@idhairacademy?lang=de-DE";
+  const youtubeUrl = "https://www.youtube.com/@altamodabg";
   const { t } = useLanguage();
 
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [newsletterMessage, setNewsletterMessage] = useState("");
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [popupEmail, setPopupEmail] = useState("");
   const [popupStatus, setPopupStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [popupMessage, setPopupMessage] = useState("");
@@ -307,9 +309,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   type ProductTab = "bestsellers" | "new" | "sale";
   const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
   const tabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
-    { key: "bestsellers", label: "Bestseleri", products: bestsellerList, badge: (i: number) => (i === 2 ? "Novo" : "Bestseler"), viewAll: "/products" },
+    { key: "bestsellers", label: "Najprodavanije", products: bestsellerList, badge: (i: number) => (i === 2 ? "Novo" : "Bestseler"), viewAll: "/products" },
     { key: "sale", label: "Akcija", products: saleList, viewAll: "/products?onSale=true" },
-    { key: "new", label: "Izdvojena ponuda", products: newList, badge: "Novo", viewAll: "/products?sort=new" },
+    { key: "new", label: "Novo", products: newList, badge: "Novo", viewAll: "/products?sort=new" },
   ];
   const activeTabData = tabs.find((t) => t.key === activeTab) || tabs[0];
 
@@ -385,26 +387,19 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       ═══════════════════════════════════════════════════════════ */}
       <section className="bg-[#FFFFFF] pt-10 md:pt-16 pb-14 md:pb-20">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
-          {/* Top row — headline left, intro copy right */}
-          <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-10 md:gap-16 items-end pb-12 md:pb-16">
-            <div>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-6">
-                Od 1996. — Profesionalna kozmetika za kosu
-              </span>
-              <h1
-                className="text-5xl md:text-6xl lg:text-7xl font-light text-[#2e2e2e] leading-[1.02]"
-                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
-              >
-                Profesionalna nega,
-                <br />
-                <em className="italic">sa poverenjem</em>.
-              </h1>
-            </div>
-            <div className="md:pb-3">
-              <p className="text-[14px] md:text-[15px] text-[#2e2e2e]/70 leading-[1.8] max-w-md">
-                Generalni zastupnik vodećih svetskih brendova za kosu — Redken, Matrix, Biolage, Elchim, Mizutani, L&rsquo;image. Salonski kvalitet za profesionalce i ljubitelje lepe kose.
-              </p>
-            </div>
+          {/* Top row — headline only */}
+          <div className="pb-12 md:pb-16">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-6">
+              Od 1999. godine
+            </span>
+            <h1
+              className="text-5xl md:text-6xl lg:text-7xl font-light text-[#2e2e2e] leading-[1.02]"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
+            >
+              Profesionalna nega,
+              <br />
+              <em className="italic">sa poverenjem</em>.
+            </h1>
           </div>
 
           {/* Bottom row — three teaser cards (mobile: 1 big + 2 stacked; desktop: 3 equal) */}
@@ -475,17 +470,22 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           {[0, 1].map((setIndex) => (
             <div key={setIndex} className="flex animate-marquee flex-shrink-0">
               {brandLogos.map((brand) => (
-                <div key={`${brand.name}-${setIndex}`} className="flex-shrink-0 mx-8 md:mx-14 flex items-center">
+                <Link
+                  key={`${brand.name}-${setIndex}`}
+                  href={`/brands/${brand.slug}`}
+                  aria-label={brand.name}
+                  className="flex-shrink-0 mx-8 md:mx-14 flex items-center group"
+                >
                   <div className="relative h-10 md:h-12 w-32 md:w-44">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
                       fill
                       sizes="176px"
-                      className="object-contain opacity-85 hover:opacity-100 transition-opacity"
+                      className="object-contain opacity-70 group-hover:opacity-100 transition-opacity"
                     />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ))}
@@ -501,15 +501,15 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             <div className="flex items-end justify-between mb-10 md:mb-14 gap-8 flex-wrap">
               <div>
                 <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
-                  Omiljeni proizvodi
+                  Odabrani proizvodi
                 </span>
                 <h2
                   className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
                   style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
-                  Izabrani, <em className="italic">za vas</em>
+                  ZA KUĆNU,
                   <br />
-                  i profesionalce.
+                  <em className="italic">I SALONSKU UPOTREBU</em>
                 </h2>
               </div>
               <Link
@@ -575,24 +575,27 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                Partneri koji
+                PARTNERSTVO KOJE
                 <br />
-                <em className="italic">grade</em> struku.
+                GRADI <em className="italic">USPEH</em>
               </h2>
               <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-5 max-w-lg">
-                Alta Moda je već tri decenije sinonim za pouzdanu saradnju sa frizerskim salonima. Naši partneri dobijaju veleprodajne uslove, direktan pristup proizvodima svetskih brendova i tehničku podršku kada im zatreba.
+                Više od tri decenije gradimo mrežu partnera među frizerskim salonima, profesionalnim web shopovima i distributerima širom regiona.
+              </p>
+              <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-5 max-w-lg">
+                Alta Moda povezuje brendove i profesionalce kroz pouzdanu distribuciju, veleprodajne uslove, kao i tehničku i edukativnu podršku.
               </p>
               <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-10 max-w-lg">
-                Od porodičnih salona do vodećih lanaca — gradimo zajednički uspeh, korak po korak.
+                Od lokalnih salona i online shopova do velikih distributivnih sistema — naš cilj je isti: dugoročna saradnja i zajednički rast.
               </p>
 
               {/* Stats row */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center sm:justify-items-start border-t border-[#FFFFFF]/25 pt-8 mb-10 max-w-lg">
                 {[
-                  { v: "Veleprodaja", l: "Salonske cene" },
-                  { v: "48h", l: "Isporuka" },
-                  { v: "1:1", l: "Podrška" },
-                  { v: "0 din", l: "Članarina" },
+                  { v: "30+", l: "Godina iskustva" },
+                  { v: "1000+", l: "Profesionalnih partnera" },
+                  { v: "Veleprodajni", l: "Uslovi" },
+                  { v: "1:1", l: "Stručna podrška" },
                 ].map((s, i) => (
                   <div key={i} className={`text-center sm:text-left ${i < 3 ? "sm:border-r sm:border-[#FFFFFF]/25" : ""} sm:pr-2`}>
                     <div className="text-xl md:text-2xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
@@ -608,7 +611,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   href="/account/login"
                   className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#837A64]"
                 >
-                  Prijavi se za veleprodaju <ArrowRight className="w-3.5 h-3.5" />
+                  Postani naš partner <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -657,49 +660,44 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Left — text */}
             <div className="order-2 md:order-1">
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#FFFFFF]/60 font-medium block mb-6">
-                Edukacija
+                Edukativni centar
               </span>
               <h2
                 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                Id Hair Academy.
+                ID HAIR ACADEMY
                 <br />
-                Put ka <em className="italic">uspešnim</em>
-                <br />
-                profesionalcima.
+                Put ka <em className="italic">uspešnim</em> profesionalcima.
               </h2>
-              <p className="text-[14px] text-[#FFFFFF]/60 leading-[1.8] mb-5 max-w-lg">
-                Kroz Id Hair Academy — partnerski edukativni centar Alta Mode — nudimo obuke, seminare i radionice koje otvaraju vrata svetu profesionalne nege kose.
-              </p>
               <p className="text-[14px] text-[#FFFFFF]/60 leading-[1.8] mb-10 max-w-lg">
-                Od osnovnih tehnika šišanja i bojenja do naprednih salonskih veština — mentorstvo vrhunskih stručnjaka sa decenijama iskustva.
+                Mesto gde se frizersko znanje pretvara u vrhunski profesionalni rezultat.
               </p>
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-6 border-t border-[#FFFFFF]/15 pt-8 mb-10 max-w-md">
                 <div>
                   <div className="text-3xl md:text-4xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    6
+                    25<span className="text-xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/60 mt-1.5 leading-tight">
-                    Meseci<br />programa
+                    Godina<br />iskustva
                   </div>
                 </div>
                 <div>
                   <div className="text-3xl md:text-4xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    2008
+                    350<span className="text-xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/60 mt-1.5 leading-tight">
-                    Godina<br />osnivanja
+                    Stručnih seminara<br />i edukacija
                   </div>
                 </div>
                 <div>
                   <div className="text-3xl md:text-4xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    500<span className="text-xl">+</span>
+                    1500<span className="text-xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/60 mt-1.5 leading-tight">
-                    Polaznika<br />godišnje
+                    Edukovanih<br />frizera
                   </div>
                 </div>
               </div>
@@ -709,7 +707,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   href="/education"
                   className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#D8CFBC] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2e2e2e]"
                 >
-                  Istraži edukaciju <ArrowRight className="w-3.5 h-3.5" />
+                  Upoznaj akademiju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -742,7 +740,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                <em className="italic">@altamoda</em> na mreži.
+                <em className="italic">@altamoda_srbija</em> na mreži.
               </h2>
               <p className="text-[14px] text-[#2e2e2e]/60 leading-relaxed mt-5 max-w-md">
                 Najnoviji trendovi, saveti frizera i najave edukacija — pridruži se zajednici koja živi profesionalnu negu kose.
@@ -770,7 +768,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 <Music2 className="w-4 h-4" />
               </a>
               <a
-                href="https://youtube.com"
+                href={youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
@@ -835,7 +833,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </div>
             <div>
               <p className="text-[14px] text-[#FFFFFF]/60 leading-relaxed mb-6 max-w-md">
-                Pretplati se i prvi saznaj o novim linijama, akcijama i edukacijama Id Hair Academy.
+                Budi u toku sa novim proizvodima, edukacijama i ekskluzivnim ponudama iz sveta profesionalne frizerske industrije.
               </p>
               <form
                 onSubmit={(e) => { e.preventDefault(); handleNewsletterSubmit(newsletterEmail, setNewsletterStatus, setNewsletterMessage); }}
@@ -843,7 +841,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               >
                 <input
                   type="email"
-                  placeholder="Vaša email adresa"
+                  placeholder="Email adresa"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   className="flex-1 bg-transparent text-[#FFFFFF] placeholder-[#FFFFFF]/40 text-sm focus:outline-none"
@@ -863,8 +861,14 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 </p>
               )}
               <p className="text-[11px] text-[#FFFFFF]/40 mt-5 leading-relaxed">
-                Prijavom se slažete sa našom{" "}
-                <Link href="/privacy" className="underline hover:text-[#FFFFFF]/80">politikom privatnosti</Link>.
+                Prijavom prihvatate{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowPrivacyModal(true)}
+                  className="underline hover:text-[#FFFFFF]/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] rounded"
+                >
+                  politiku privatnosti
+                </button>.
               </p>
             </div>
           </div>
@@ -933,6 +937,48 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         >
           <Mail className="w-5 h-5" />
         </button>
+      )}
+
+      {/* PRIVACY POLICY MODAL — newsletter consent text */}
+      {showPrivacyModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowPrivacyModal(false)} />
+          <div className="bg-[#FFFFFF] max-w-xl w-full p-8 md:p-10 relative z-10 animate-scaleIn rounded-[4px] max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowPrivacyModal(false)}
+              aria-label="Zatvori"
+              className="absolute top-5 right-5 p-1"
+            >
+              <X className="w-4 h-4 text-[#2e2e2e]/60 hover:text-[#2e2e2e]" />
+            </button>
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+              Newsletter
+            </span>
+            <h3
+              className="text-3xl md:text-4xl font-light text-[#2e2e2e] mb-6 leading-[1.1]"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+            >
+              Politika privatnosti
+            </h3>
+            <div className="space-y-4 text-[14px] text-[#2e2e2e]/75 leading-[1.75]">
+              <p>
+                Prijavom na newsletter saglasni ste da Alta Moda doo koristi vašu email adresu za slanje informacija o novim proizvodima, edukacijama, akcijama i drugim sadržajima iz oblasti profesionalne frizerske industrije u okviru našeg poslovanja.
+              </p>
+              <p>
+                Vaši podaci se koriste isključivo za slanje newsletter komunikacije i neće biti korišćeni u druge svrhe niti prosleđeni trećim licima.
+              </p>
+              <p>
+                U svakom trenutku možete se odjaviti sa liste primalaca klikom na link za odjavu koji se nalazi u svakom emailu ili kontaktiranjem nas direktno.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowPrivacyModal(false)}
+              className="mt-8 w-full bg-[#2e2e2e] hover:bg-[#1f1f1f] text-[#FFFFFF] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors rounded-full"
+            >
+              Razumem
+            </button>
+          </div>
+        </div>
       )}
 
       <ChatWidget />

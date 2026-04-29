@@ -16,7 +16,7 @@ export default function Footer() {
   ].filter(Boolean) as Array<{ href: string; label: string; Icon: typeof Instagram }>;
 
   return (
-    <footer className="bg-[#2e2e2e] mt-auto grid grid-cols-1 md:grid-cols-4 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
+    <footer className="bg-[#2e2e2e] mt-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
       {/* Column 1: Brand */}
       <div className="md:col-span-1">
         <div
@@ -49,23 +49,7 @@ export default function Footer() {
         </p>
       </div>
 
-      {/* Column 2: Kupovina (Shopping) */}
-      <div className="flex flex-col gap-4">
-        <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
-          {t("footer.shopping")}
-        </h5>
-        <Link href="/products" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
-          {t("footer.allProducts")}
-        </Link>
-        <Link href="/colors" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
-          {t("footer.hairColors")}
-        </Link>
-        <Link href="/products" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
-          {t("footer.brands")}
-        </Link>
-      </div>
-
-      {/* Column 3: Podrska (Support) — deep-links into /faq */}
+      {/* Column 2: Podrska (Support) — deep-links into /faq */}
       <div className="flex flex-col gap-4">
         <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
           {t("footer.information")}
@@ -87,7 +71,7 @@ export default function Footer() {
         </Link>
       </div>
 
-      {/* Column 4: Kontakt */}
+      {/* Column 3: Kontakt */}
       <div className="flex flex-col gap-4">
         <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
           {t("footer.contactTitle")}
