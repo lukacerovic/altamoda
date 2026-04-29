@@ -4,7 +4,35 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { Phone, Mail, MapPin, Scissors, GraduationCap, Clock, Users, Star, ChevronRight } from "lucide-react";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Instagram,
+  Clock,
+  Users,
+  Star,
+  GraduationCap,
+  Sparkles,
+  ShoppingBag,
+  UserPlus,
+  ArrowRight,
+} from "lucide-react";
+
+/* Bento-grid placeholder shots — swap with real ID Hair Academy imagery
+   when CMS-editable image fields land. */
+const academyShots = [
+  "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=900&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&h=1200&fit=crop",
+  "https://images.unsplash.com/photo-1519735777090-ec97162dc266?w=600&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1580618864180-f6d7d39b8ff6?w=900&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1470259078422-826894b933aa?w=1200&h=600&fit=crop",
+];
+
+const INSTAGRAM_URL = "https://www.instagram.com/id_hairacademy";
 
 export default function EducationPage() {
   const { t } = useLanguage();
@@ -13,7 +41,9 @@ export default function EducationPage() {
     <>
       <Header />
       <main className="bg-[#FFFFFF] text-[#2e2e2e]">
-        {/* Hero Section */}
+        {/* ════════════════════════════════════════════════════════════
+            1. HERO
+        ════════════════════════════════════════════════════════════ */}
         <section className="relative overflow-hidden min-h-[70vh] flex items-center">
           <div className="absolute inset-0">
             <Image
@@ -28,54 +58,68 @@ export default function EducationPage() {
           </div>
           <div className="relative max-w-screen-2xl mx-auto px-6 md:px-8 py-24 md:py-40 w-full">
             <div className="max-w-3xl">
-              <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6 text-white tracking-tight">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D8CFBC] font-medium block mb-6">
+                {t("education.heroTag")}
+              </span>
+              <h1
+                className="text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6 text-white font-light"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
+              >
                 {t("education.heroTitle")}
               </h1>
-              <p className="text-xl md:text-2xl text-[#D8CFBC] font-light leading-relaxed max-w-xl">
+              <p className="text-xl md:text-2xl text-[#D8CFBC] font-light leading-relaxed max-w-2xl">
                 {t("education.heroSubtitle")}
               </p>
               <div className="flex items-center gap-4 mt-10">
                 <a
-                  href="tel:+381113066333"
-                  className="inline-flex items-center gap-2 bg-white text-[#2e2e2e] px-6 py-3 text-sm font-medium tracking-wide hover:bg-[#FFFFFF] transition-colors"
+                  href={`tel:${t("education.contactPhone1").replace(/\s/g, "")}`}
+                  className="inline-flex items-center gap-2 bg-white text-[#2e2e2e] px-6 py-3 text-sm font-medium tracking-wide hover:bg-[#D8CFBC] transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  +381 11 306 6333
+                  {t("education.contactPhone1")}
                 </a>
                 <a
-                  href="mailto:info@id-academy.com"
+                  href={`mailto:${t("education.contactEmail")}`}
                   className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-3 text-sm font-medium tracking-wide hover:bg-white/10 transition-colors"
                 >
                   <Mail className="w-4 h-4" />
-                  info@id-academy.com
+                  {t("education.contactEmail")}
                 </a>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Stats Bar */}
-        <section className="bg-[#837A64] text-white">
+        {/* ════════════════════════════════════════════════════════════
+            2. STATS BAR
+        ════════════════════════════════════════════════════════════ */}
+        <section className="bg-[#2e2e2e] text-white">
           <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/20">
+            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/15">
               <div className="flex items-center gap-4 py-8 md:py-6 md:pr-8">
-                <Clock className="w-8 h-8 opacity-80 flex-shrink-0" />
+                <Clock className="w-8 h-8 opacity-70 flex-shrink-0" />
                 <div>
-                  <p className="text-2xl font-serif">{t("education.programDuration")}</p>
+                  <p className="text-2xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    {t("education.programDuration")}
+                  </p>
                   <p className="text-sm opacity-70">{t("education.programDurationLabel")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 py-8 md:py-6 md:px-8">
-                <Star className="w-8 h-8 opacity-80 flex-shrink-0" />
+                <Star className="w-8 h-8 opacity-70 flex-shrink-0" />
                 <div>
-                  <p className="text-2xl font-serif">{t("education.since")}</p>
+                  <p className="text-2xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    {t("education.since")}
+                  </p>
                   <p className="text-sm opacity-70">{t("education.sinceLabel")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 py-8 md:py-6 md:pl-8">
-                <Users className="w-8 h-8 opacity-80 flex-shrink-0" />
+                <Users className="w-8 h-8 opacity-70 flex-shrink-0" />
                 <div>
-                  <p className="text-2xl font-serif">{t("education.liveModels")}</p>
+                  <p className="text-2xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    {t("education.liveModels")}
+                  </p>
                   <p className="text-sm opacity-70">{t("education.liveModelsLabel")}</p>
                 </div>
               </div>
@@ -83,167 +127,288 @@ export default function EducationPage() {
           </div>
         </section>
 
-        {/* Intro Section with Image */}
-        <section className="py-24 md:py-32">
+        {/* ════════════════════════════════════════════════════════════
+            3. SECTION 1 — EDUKATIVNI CENTAR
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-24 md:py-32 bg-[#FFFFFF]">
+          <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
+            <div className="max-w-3xl mb-16">
+              <GraduationCap className="w-8 h-8 text-[#2e2e2e] mb-6" strokeWidth={1.5} />
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+                01
+              </span>
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                {t("education.section1Title")}
+              </h2>
+              <div className="w-12 h-px bg-[#2e2e2e]/30 mb-8" />
+              <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8] mb-6">
+                {t("education.section1P1")}
+              </p>
+              <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8]">
+                {t("education.section1P2")}
+              </p>
+            </div>
+
+            {/* Four sub-pillar cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-12">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-[#FFFFFF] border border-[#2e2e2e]/10 rounded-[4px] p-8 hover:border-[#2e2e2e]/40 transition-colors"
+                >
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/50 font-medium block mb-3">
+                    0{i}
+                  </span>
+                  <h3
+                    className="text-2xl font-light text-[#2e2e2e] mb-3"
+                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  >
+                    {t(`education.section1Bullet${i}Title`)}
+                  </h3>
+                  <p className="text-[13px] text-[#2e2e2e]/65 leading-[1.65]">
+                    {t(`education.section1Bullet${i}Desc`)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════════════
+            4. SECTION 2 — PREMIUM SALON
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-24 md:py-32 bg-[#FFFFFF] border-t border-[#2e2e2e]/10">
           <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              <div className="order-2 lg:order-1">
-                <div className="relative">
-                  <div className="aspect-[3/4] relative overflow-hidden rounded-[4px] shadow-2xl bg-white flex items-center justify-center">
-                    <Image
-                      src="/edukacijaImage.jpg"
-                      alt="ID Hair Academy"
-                      width={500}
-                      height={140}
-                      className="w-[80%] h-auto object-contain"
-                    />
-                  </div>
-                  <div className="absolute -bottom-6 -right-6 bg-[#837A64] p-6 md:p-8 text-white max-w-[280px] rounded-sm shadow-xl">
-                    <MapPin className="w-5 h-5 mb-2 opacity-80" />
-                    <p className="font-serif text-lg leading-snug">Kneza Miloša 23</p>
-                    <p className="text-sm opacity-80 mt-1">Beograd, Srbija</p>
-                  </div>
+              <div className="relative order-2 lg:order-1">
+                <div className="aspect-[4/5] relative overflow-hidden rounded-[4px] shadow-2xl">
+                  <Image
+                    src="/edukacijaImage.jpg"
+                    alt="Premium salon"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="absolute -bottom-6 -right-6 bg-[#2e2e2e] text-white p-6 md:p-8 max-w-[280px] rounded-[4px] shadow-xl">
+                  <MapPin className="w-5 h-5 mb-2 opacity-80" />
+                  <p
+                    className="text-lg font-light leading-snug"
+                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  >
+                    Kneza Miloša 23
+                  </p>
+                  <p className="text-xs opacity-80 mt-1">Beograd, Srbija</p>
                 </div>
               </div>
               <div className="order-1 lg:order-2">
-                <h2 className="font-serif text-4xl md:text-5xl mb-8 leading-tight">
-                  {t("education.heroTitle")}
+                <Sparkles className="w-8 h-8 text-[#2e2e2e] mb-6" strokeWidth={1.5} />
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+                  02
+                </span>
+                <h2
+                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+                >
+                  {t("education.section2Title")}
                 </h2>
-                <div className="w-12 h-px bg-[#6a624f] mb-8" />
-                <p className="text-lg text-[#2e2e2e] leading-relaxed mb-8">
-                  {t("education.introText")}
+                <div className="w-12 h-px bg-[#2e2e2e]/30 mb-8" />
+                <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8] mb-6">
+                  {t("education.section2P1")}
                 </p>
-                <div className="flex items-center gap-3 text-[#837A64]">
-                  <Scissors className="w-5 h-5" />
-                  <span className="text-sm font-medium tracking-wide uppercase">Kneza Miloša 23, Beograd</span>
-                </div>
+                <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8]">
+                  {t("education.section2P2")}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Education Key to Success */}
-        <section className="py-24 md:py-32 bg-[#FFFFFF]">
+        {/* ════════════════════════════════════════════════════════════
+            5. SECTION 3 — PRODAJNO MESTO
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-24 md:py-32 bg-[#D8CFBC]/30 border-t border-[#2e2e2e]/10">
           <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <GraduationCap className="w-10 h-10 text-[#837A64] mx-auto mb-6" />
-              <h2 className="font-serif text-4xl md:text-5xl mb-6">
-                {t("education.educationTitle")}
+            <div className="max-w-3xl mx-auto text-center">
+              <ShoppingBag className="w-8 h-8 text-[#2e2e2e] mx-auto mb-6" strokeWidth={1.5} />
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+                03
+              </span>
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                {t("education.section3Title")}
               </h2>
-              <div className="w-12 h-px bg-[#6a624f] mx-auto mb-8" />
-              <p className="text-lg text-[#2e2e2e] leading-relaxed">
-                {t("education.educationText")}
+              <div className="w-12 h-px bg-[#2e2e2e]/30 mx-auto mb-8" />
+              <p className="text-[15px] md:text-base text-[#2e2e2e]/75 leading-[1.8]">
+                {t("education.section3P")}
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
-              <div className="bg-white p-10 md:p-12 rounded-sm shadow-sm border-l-4 border-[#6a624f]">
-                <h3 className="font-serif text-2xl mb-6">{t("education.approachTitle")}</h3>
-                <p className="text-[#2e2e2e] font-light leading-relaxed text-lg">
-                  {t("education.approachText")}
-                </p>
-              </div>
-              <div className="bg-white p-10 md:p-12 rounded-sm shadow-sm border-l-4 border-[#D8CFBC]">
-                <h3 className="font-serif text-2xl mb-6">{t("education.founderTitle")}</h3>
-                <p className="text-[#2e2e2e] font-light leading-relaxed text-lg">
-                  {t("education.founderText")}
-                </p>
-              </div>
             </div>
           </div>
         </section>
 
-        {/* Success Stories & Second Image */}
-        <section className="py-24 md:py-32">
+        {/* ════════════════════════════════════════════════════════════
+            6. SECTION 4 — POSTANI MODEL  (dark CTA section)
+        ════════════════════════════════════════════════════════════ */}
+        <section className="relative py-24 md:py-32 overflow-hidden bg-[#2e2e2e] text-white">
+          <div className="absolute inset-0 opacity-15">
+            <Image src="/edukacija2.jpg" alt="" fill className="object-cover" />
+          </div>
+          <div className="relative max-w-screen-2xl mx-auto px-6 md:px-8">
+            <div className="max-w-3xl">
+              <UserPlus className="w-8 h-8 text-[#D8CFBC] mb-6" strokeWidth={1.5} />
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#D8CFBC]/80 font-medium block mb-4">
+                04
+              </span>
+              <h2
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-white leading-[1.05] mb-8"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                {t("education.section4Title")}
+              </h2>
+              <div className="w-12 h-px bg-[#D8CFBC]/40 mb-8" />
+              <p className="text-[15px] md:text-base text-white/75 leading-[1.8] mb-10 max-w-2xl">
+                {t("education.section4P")}
+              </p>
+              <a
+                href={`mailto:${t("education.contactEmail")}`}
+                className="inline-flex items-center gap-2 bg-white text-[#2e2e2e] px-8 py-4 text-[11px] uppercase tracking-[0.22em] font-medium hover:bg-[#D8CFBC] transition-colors rounded-full"
+              >
+                {t("education.section4Cta")} <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════════════
+            7. CONTACT
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 bg-[#FFFFFF] border-t border-[#2e2e2e]/10">
           <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              <div>
-                <h2 className="font-serif text-4xl md:text-5xl mb-8 leading-tight">
-                  {t("education.successTitle")}
-                </h2>
-                <div className="w-12 h-px bg-[#6a624f] mb-8" />
-                <p className="text-lg text-[#2e2e2e] leading-relaxed mb-10">
-                  {t("education.successText")}
-                </p>
-
-                {/* Contact Info */}
-                <div className="bg-[#FFFFFF] p-8 rounded-sm">
-                  <h3 className="font-serif text-xl mb-4">{t("education.contactTitle")}</h3>
-                  <p className="text-[#2e2e2e] text-sm mb-4">{t("education.contactText")}</p>
-                  <div className="space-y-3">
-                    <a href="tel:+381113066333" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#837A64] transition-colors">
-                      <Phone className="w-4 h-4" />
-                      <span className="text-sm">+381 11 306 6333</span>
-                    </a>
-                    <a href="tel:+381646473142" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#837A64] transition-colors">
-                      <Phone className="w-4 h-4" />
-                      <span className="text-sm">+381 64 647 3142</span>
-                    </a>
-                    <a href="mailto:info@id-academy.com" className="flex items-center gap-3 text-[#2e2e2e] hover:text-[#837A64] transition-colors">
-                      <Mail className="w-4 h-4" />
-                      <span className="text-sm">info@id-academy.com</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="aspect-[3/4] overflow-hidden rounded-[4px] shadow-2xl">
-                  <Image
-                    src="/edukacija2.jpg"
-                    alt="ID Hair Academy education"
-                    width={800}
-                    height={1067}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+            <div className="max-w-2xl">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+                {t("education.contactTitle")}
+              </span>
+              <h3
+                className="text-3xl md:text-4xl font-light text-[#2e2e2e] leading-[1.1] mb-10"
+                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+              >
+                ID Hair Academy
+              </h3>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-4 text-[#2e2e2e]">
+                  <MapPin className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
+                  <span className="text-[14px]">{t("education.contactAddress")}</span>
+                </li>
+                <li>
+                  <a
+                    href={`tel:${t("education.contactPhone1").replace(/\s/g, "")}`}
+                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
+                  >
+                    <Phone className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
+                    <span className="text-[14px]">{t("education.contactPhone1")}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={`tel:${t("education.contactPhone2").replace(/\s/g, "")}`}
+                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
+                  >
+                    <Phone className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
+                    <span className="text-[14px]">{t("education.contactPhone2")}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={`mailto:${t("education.contactEmail")}`}
+                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
+                  >
+                    <Mail className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
+                    <span className="text-[14px]">{t("education.contactEmail")}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
+                  >
+                    <Instagram className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
+                    <span className="text-[14px]">{t("education.contactInstagram")}</span>
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </section>
 
-        {/* Welcome / CTA Section */}
-        <section className="relative py-24 md:py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#2e2e2e] via-[#2e2e2e] to-[#2e2e2e]" />
-          <div className="absolute inset-0 opacity-10">
-            <Image
-              src="/edukacija2.jpg"
-              alt=""
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="relative max-w-screen-2xl mx-auto px-6 md:px-8 text-center">
-            <h2 className="font-serif text-5xl md:text-7xl text-white mb-6">
-              {t("education.welcomeText")}
-            </h2>
-            <div className="w-16 h-px bg-[#D8CFBC] mx-auto mb-10" />
-            <div className="max-w-xl mx-auto">
-              <h3 className="font-serif text-2xl text-[#D8CFBC] mb-4">
-                {t("education.modelCallTitle")}
-              </h3>
-              <p className="text-[#D8CFBC] leading-relaxed mb-8">
-                {t("education.modelCallText")}
-              </p>
-              <p className="font-serif text-3xl text-white italic mb-10">
-                {t("education.seeYou")}
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a
-                  href="mailto:info@id-academy.com"
-                  className="inline-flex items-center gap-2 bg-[#837A64] text-white px-8 py-4 text-sm font-medium tracking-wide hover:bg-[#6a624f] transition-colors"
+        {/* ════════════════════════════════════════════════════════════
+            8. INSTAGRAM BENTO
+        ════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 bg-[#FFFFFF] border-t border-[#2e2e2e]/10">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+            <div className="flex items-end justify-between mb-12 md:mb-16 gap-8 flex-wrap">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+                  {t("education.socialKicker")}
+                </span>
+                <h2
+                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
-                  <Mail className="w-4 h-4" />
-                  info@id-academy.com
-                  <ChevronRight className="w-4 h-4" />
-                </a>
-                <a
-                  href="tel:+381113066333"
-                  className="inline-flex items-center gap-2 border border-white/30 text-white px-8 py-4 text-sm font-medium tracking-wide hover:bg-white/10 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  +381 11 306 6333
-                </a>
+                  <em className="italic">{t("education.contactInstagram")}</em> {t("education.socialTitle")}
+                </h2>
+                <p className="text-[14px] text-[#2e2e2e]/60 leading-relaxed mt-5 max-w-md">
+                  {t("education.socialDesc")}
+                </p>
               </div>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="w-11 h-11 rounded-full border border-[#D8CFBC] flex items-center justify-center text-[#2e2e2e] hover:bg-[#2e2e2e] hover:text-[#FFFFFF] hover:border-[#2e2e2e] transition-colors"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* Same bento pattern as homepage block 8 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[240px] gap-2 md:gap-3">
+              {[
+                { img: academyShots[0], cls: "col-span-2 row-span-1" },
+                { img: academyShots[1], cls: "col-span-1 row-span-1" },
+                { img: academyShots[2], cls: "col-span-1 row-span-2" },
+                { img: academyShots[3], cls: "col-span-1 row-span-1" },
+                { img: academyShots[4], cls: "col-span-2 row-span-1" },
+                { img: academyShots[5], cls: "col-span-2 row-span-1" },
+                { img: academyShots[6], cls: "col-span-1 row-span-1" },
+                { img: academyShots[7], cls: "col-span-1 row-span-1" },
+              ].map((cell, i) => (
+                <a
+                  key={i}
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${cell.cls} relative overflow-hidden bg-[#D8CFBC] group rounded-[4px]`}
+                >
+                  <Image
+                    src={cell.img}
+                    alt={`ID Hair Academy ${i + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-[#2e2e2e]/0 group-hover:bg-[#2e2e2e]/30 transition-colors flex items-center justify-center">
+                    <Instagram className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         </section>
