@@ -303,7 +303,7 @@
   "auth": {
     "login": "Log In",
     "register": "Register",
-    "welcomeBack": "WELCOME",
+    "welcomeBack": "Welcome",
     "emailAddress": "Email Address",
     "password": "Password",
     "enterPassword": "Enter your password",
@@ -342,7 +342,7 @@
     "processing": "Processing...",
     "submitB2b": "Submit B2B Account Request",
     "b2bNotice": "Once we review the submitted information and verify its accuracy, your registration will be approved and you'll be notified by email.",
-    "b2bRequestReceived": "Your B2B request has been received. You will be notified once it is approved.",
+    "b2bRequestReceived": "Once we review the submitted information and verify its accuracy, your registration will be approved and you'll be notified by email.",
     "passwordsDontMatch": "Passwords do not match",
     "mustAcceptTerms": "You must accept the terms of use",
     "registrationError": "Registration error",
@@ -350,8 +350,8 @@
     "comingSoon": "Coming Soon",
     "accountSuspended": "Your account has been suspended. Please contact support for more information.",
     "pendingTitle": "Account Under Review",
-    "pendingMessage": "Your business account has been successfully created and is currently being verified. Our team reviews all partner requests to ensure the best possible service.",
-    "pendingNotify": "We will notify you via email as soon as your account is approved and verified.",
+    "pendingMessage": "Once we review the submitted information and verify its accuracy, your registration will be approved and you'll be notified by email.",
+    "pendingNotify": "",
     "understood": "I Understand",
     "errorTitle": "Error"
   },

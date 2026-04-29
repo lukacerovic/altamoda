@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -70,6 +71,8 @@ function LoginContent() {
       } else {
         setError(t("auth.wrongCredentials"));
       }
+      setLoginEmail("");
+      setLoginPassword("");
       setLoading(false);
       return;
     }
@@ -90,6 +93,8 @@ function LoginContent() {
         }
         if (data.data?.status === "suspended") {
           setError(t("auth.accountSuspended"));
+          setLoginEmail("");
+          setLoginPassword("");
           setLoading(false);
           return;
         }
@@ -97,6 +102,8 @@ function LoginContent() {
         // Ignore check-status errors, fall through to generic message
       }
       setError(t("auth.wrongCredentials"));
+      setLoginEmail("");
+      setLoginPassword("");
       setLoading(false);
     } else {
       setLoading(false);
@@ -195,7 +202,9 @@ function LoginContent() {
             {activeTab === "login" ? (
               /* LOGIN FORM */
               <form onSubmit={handleLogin}>
-                <h2 className="text-2xl font-bold text-[#2e2e2e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.welcomeBack")}</h2>
+                <Link href="/" className="inline-block mb-6 hover:opacity-70 transition-opacity">
+                  <h2 className="text-2xl font-bold text-[#2e2e2e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.welcomeBack")}</h2>
+                </Link>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("auth.emailAddress")}</label>
@@ -385,11 +394,8 @@ function LoginContent() {
                 <h3 className="text-xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
                   {t("auth.pendingTitle")}
                 </h3>
-                <p className="text-sm text-[#837A64] leading-relaxed mb-2">
-                  {t("auth.pendingMessage")}
-                </p>
                 <p className="text-sm text-[#837A64] leading-relaxed">
-                  {t("auth.pendingNotify")}
+                  {t("auth.pendingMessage")}
                 </p>
               </div>
               <button
