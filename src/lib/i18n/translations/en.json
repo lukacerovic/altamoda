@@ -353,7 +353,14 @@
     "pendingMessage": "Once we review the submitted information and verify its accuracy, your registration will be approved and you'll be notified by email.",
     "pendingNotify": "",
     "understood": "I Understand",
-    "errorTitle": "Error"
+    "errorTitle": "Error",
+    "continueWithGoogle": "Continue with Google",
+    "orRegisterWithEmail": "or register with email",
+    "b2bMustUseEmail": "B2B accounts must register with email and password and await admin approval.",
+    "oauthB2bBlocked": "This email is registered as a B2B account. Please sign in with your email and password.",
+    "oauthMissingEmail": "Your Google account did not provide an email address. Please register with email.",
+    "oauthAccountNotLinked": "An account with this email already exists. Please sign in with your password and link your Google account from your profile.",
+    "oauthGenericError": "Sign-in failed. Please try again."
   },
   "account": {
     "myOrders": "My Orders",
