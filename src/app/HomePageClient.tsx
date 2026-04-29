@@ -507,9 +507,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
                   style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
-                  ZA KUĆNU,
+                  Za kućnu,
                   <br />
-                  <em className="italic">I SALONSKU UPOTREBU</em>
+                  i <em className="italic">salonsku</em> upotrebu.
                 </h2>
               </div>
               <Link
@@ -575,9 +575,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                PARTNERSTVO KOJE
+                Partnerstvo koje
                 <br />
-                GRADI <em className="italic">USPEH</em>
+                gradi <em className="italic">uspeh</em>.
               </h2>
               <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-5 max-w-lg">
                 Više od tri decenije gradimo mrežu partnera među frizerskim salonima, profesionalnim web shopovima i distributerima širom regiona.
@@ -666,7 +666,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                ID HAIR ACADEMY
+                ID Hair Academy.
                 <br />
                 Put ka <em className="italic">uspešnim</em> profesionalcima.
               </h2>
