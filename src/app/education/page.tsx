@@ -255,7 +255,7 @@ export default function EducationPage() {
                 num="Nº 03"
                 title={t("education.section3Title")}
                 kicker={t("education.section3Kicker")}
-                img="https://images.unsplash.com/photo-1522335789203-aaa7d7c0fbb1?w=900&q=80"
+                img="/prodajno-mesto.png"
                 credit={t("education.section3ImgCredit")}
               >
                 <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
