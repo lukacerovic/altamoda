@@ -1,23 +1,29 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import {
-  Phone,
-  Mail,
-  MapPin,
-  Instagram,
-  Clock,
-  Users,
-  Star,
-  GraduationCap,
-  Sparkles,
-  ShoppingBag,
-  UserPlus,
-  ArrowRight,
-} from "lucide-react";
+import { ArrowRight, Instagram } from "lucide-react";
+import type { ReactNode } from "react";
+
+/* Splits text on *…* markers and wraps the marked spans in italic accent colour. */
+function withEm(text: string, accent: "olive" | "gold" = "olive") {
+  const accentClass = accent === "gold" ? "text-[#B8975B]" : "text-[#8C8769]";
+  return text.split(/(\*[^*]+\*)/g).map((part, i) => {
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return (
+        <em key={i} className={`italic font-light ${accentClass}`}>
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
+const INSTAGRAM_URL = "https://www.instagram.com/id_hairacademy";
 
 /* Bento-grid placeholder shots — swap with real ID Hair Academy imagery
    when CMS-editable image fields land. */
@@ -32,7 +38,62 @@ const academyShots = [
   "https://images.unsplash.com/photo-1470259078422-826894b933aa?w=1200&h=600&fit=crop",
 ];
 
-const INSTAGRAM_URL = "https://www.instagram.com/id_hairacademy";
+/* Vertical card for the 3-up "spaces" grid (Nº 01 / 02 / 03) */
+function SpaceCard({
+  num,
+  title,
+  kicker,
+  img,
+  credit,
+  children,
+}: {
+  num: string;
+  title: string;
+  kicker: string;
+  img: string;
+  credit: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col">
+      <div className="aspect-[4/5] bg-[#1a1a1a] overflow-hidden relative mb-5">
+        <Image
+          src={img}
+          alt=""
+          fill
+          className="object-cover"
+          style={{ filter: "grayscale(1) contrast(1.05)" }}
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+        <span
+          className="absolute bottom-3 left-3.5 text-[11px] italic text-white/60"
+          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+        >
+          {credit}
+        </span>
+      </div>
+      <div
+        className="italic text-[12px] mb-2 text-[#8C8769]"
+        style={{ fontFamily: "'Cormorant Garamond', serif" }}
+      >
+        {num}
+      </div>
+      <h3
+        className="font-light text-[24px] leading-[1.1] mb-2.5 tracking-[-0.005em] text-[#1A1A1A]"
+        style={{ fontFamily: "'Cormorant Garamond', serif" }}
+      >
+        {withEm(title)}
+      </h3>
+      <div className="w-8 h-px mb-2.5 bg-[#1A1A1A]/40" />
+      <div className="text-[9.5px] uppercase tracking-[0.18em] leading-[1.6] text-[#6B6B6B] mb-4">
+        {kicker}
+      </div>
+      <div className="text-[13px] leading-[1.7] text-[#262521]">
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function EducationPage() {
   const { t } = useLanguage();
@@ -40,330 +101,331 @@ export default function EducationPage() {
   return (
     <>
       <Header />
-      <main className="bg-[#FFFFFF] text-[#2e2e2e]">
+      <main
+        className="bg-[#FAFAFA] text-[#1A1A1A]"
+        style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: "14.5px", lineHeight: 1.65 }}
+      >
         {/* ════════════════════════════════════════════════════════════
             1. HERO
         ════════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden min-h-[70vh] flex items-center">
-          <div className="absolute inset-0">
-            <Image
-              src="/edukacija2.jpg"
-              alt="ID Hair Academy team"
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#2e2e2e]/90 via-[#2e2e2e]/70 to-[#2e2e2e]/40" />
-          </div>
-          <div className="relative max-w-screen-2xl mx-auto px-6 md:px-8 py-24 md:py-40 w-full">
-            <div className="max-w-3xl">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#D8CFBC] font-medium block mb-6">
-                {t("education.heroTag")}
-              </span>
-              <h1
-                className="text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6 text-white font-light"
-                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
-              >
-                {t("education.heroTitle")}
-              </h1>
-              <p className="text-xl md:text-2xl text-[#D8CFBC] font-light leading-relaxed max-w-2xl">
-                {t("education.heroSubtitle")}
-              </p>
-              <div className="flex items-center gap-4 mt-10">
-                <a
-                  href={`tel:${t("education.contactPhone1").replace(/\s/g, "")}`}
-                  className="inline-flex items-center gap-2 bg-white text-[#2e2e2e] px-6 py-3 text-sm font-medium tracking-wide hover:bg-[#D8CFBC] transition-colors"
+        <section className="border-b border-[#E8E5DE]">
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14 py-20 md:py-24">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 items-end">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#6B6B6B] font-medium block mb-6">
+                  {t("education.heroTag")}
+                </span>
+                <h1
+                  className="font-light leading-[1.02] mb-7 tracking-[-0.01em]"
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "clamp(48px, 7vw, 96px)",
+                  }}
                 >
-                  <Phone className="w-4 h-4" />
-                  {t("education.contactPhone1")}
-                </a>
-                <a
-                  href={`mailto:${t("education.contactEmail")}`}
-                  className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-3 text-sm font-medium tracking-wide hover:bg-white/10 transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                  {t("education.contactEmail")}
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ════════════════════════════════════════════════════════════
-            2. STATS BAR
-        ════════════════════════════════════════════════════════════ */}
-        <section className="bg-[#2e2e2e] text-white">
-          <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/15">
-              <div className="flex items-center gap-4 py-8 md:py-6 md:pr-8">
-                <Clock className="w-8 h-8 opacity-70 flex-shrink-0" />
-                <div>
-                  <p className="text-2xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    {t("education.programDuration")}
-                  </p>
-                  <p className="text-sm opacity-70">{t("education.programDurationLabel")}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 py-8 md:py-6 md:px-8">
-                <Star className="w-8 h-8 opacity-70 flex-shrink-0" />
-                <div>
-                  <p className="text-2xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    {t("education.since")}
-                  </p>
-                  <p className="text-sm opacity-70">{t("education.sinceLabel")}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 py-8 md:py-6 md:pl-8">
-                <Users className="w-8 h-8 opacity-70 flex-shrink-0" />
-                <div>
-                  <p className="text-2xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    {t("education.liveModels")}
-                  </p>
-                  <p className="text-sm opacity-70">{t("education.liveModelsLabel")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ════════════════════════════════════════════════════════════
-            3. SECTION 1 — EDUKATIVNI CENTAR
-        ════════════════════════════════════════════════════════════ */}
-        <section className="py-24 md:py-32 bg-[#FFFFFF]">
-          <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="max-w-3xl mb-16">
-              <GraduationCap className="w-8 h-8 text-[#2e2e2e] mb-6" strokeWidth={1.5} />
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
-                01
-              </span>
-              <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
-                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
-              >
-                {t("education.section1Title")}
-              </h2>
-              <div className="w-12 h-px bg-[#2e2e2e]/30 mb-8" />
-              <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8] mb-6">
-                {t("education.section1P1")}
-              </p>
-              <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8]">
-                {t("education.section1P2")}
-              </p>
-            </div>
-
-            {/* Four sub-pillar cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-12">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="bg-[#FFFFFF] border border-[#2e2e2e]/10 rounded-[4px] p-8 hover:border-[#2e2e2e]/40 transition-colors"
-                >
-                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/50 font-medium block mb-3">
-                    0{i}
-                  </span>
-                  <h3
-                    className="text-2xl font-light text-[#2e2e2e] mb-3"
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  {withEm(t("education.heroTitle"))}
+                </h1>
+                <p className="text-[16px] text-[#6B6B6B] leading-[1.7] max-w-[480px] mb-8">
+                  {t("education.heroSubtitle")}
+                </p>
+                <div className="flex items-center gap-3.5 flex-wrap">
+                  <a
+                    href="#kontakt"
+                    className="inline-flex items-center gap-2.5 bg-[#1A1A1A] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-black hover:-translate-y-px transition-all"
                   >
-                    {t(`education.section1Bullet${i}Title`)}
-                  </h3>
-                  <p className="text-[13px] text-[#2e2e2e]/65 leading-[1.65]">
-                    {t(`education.section1Bullet${i}Desc`)}
-                  </p>
+                    {t("education.heroCtaPrimary")} <ArrowRight className="w-3 h-3" />
+                  </a>
+                  <a
+                    href="#kontakt"
+                    className="inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] font-medium border-b border-current pb-1 hover:text-[#8C8769] transition-colors"
+                  >
+                    {t("education.heroCtaSecondary")} <ArrowRight className="w-3 h-3" />
+                  </a>
                 </div>
-              ))}
+              </div>
+              <div className="aspect-[5/6] bg-[#1a1a1a] relative overflow-hidden">
+                <Image
+                  src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1400&q=80"
+                  alt="ID Hair Academy"
+                  fill
+                  className="object-cover"
+                  style={{ filter: "grayscale(1) contrast(1.05)" }}
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  priority
+                />
+                <span
+                  className="absolute bottom-3.5 left-4 text-[12px] italic text-white/55"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  {t("education.heroImageCredit")}
+                </span>
+              </div>
             </div>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════
-            4. SECTION 2 — PREMIUM SALON
+            2. ACADEMY INTRO — ink editorial
         ════════════════════════════════════════════════════════════ */}
-        <section className="py-24 md:py-32 bg-[#FFFFFF] border-t border-[#2e2e2e]/10">
-          <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              <div className="relative order-2 lg:order-1">
-                <div className="aspect-[4/5] relative overflow-hidden rounded-[4px] shadow-2xl">
-                  <Image
-                    src="/edukacijaImage.jpg"
-                    alt="Premium salon"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -right-6 bg-[#2e2e2e] text-white p-6 md:p-8 max-w-[280px] rounded-[4px] shadow-xl">
-                  <MapPin className="w-5 h-5 mb-2 opacity-80" />
-                  <p
-                    className="text-lg font-light leading-snug"
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                  >
-                    Kneza Miloša 23
-                  </p>
-                  <p className="text-xs opacity-80 mt-1">Beograd, Srbija</p>
-                </div>
-              </div>
-              <div className="order-1 lg:order-2">
-                <Sparkles className="w-8 h-8 text-[#2e2e2e] mb-6" strokeWidth={1.5} />
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
-                  02
+        <section className="bg-[#1A1A1A] text-white">
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14" style={{ paddingTop: "140px", paddingBottom: "140px" }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.28em] text-white/55 font-medium block mb-5">
+                  {t("education.academyEyebrow")}
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+                  className="font-light leading-[1.05] mb-7 tracking-[-0.005em]"
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "clamp(40px, 5vw, 64px)",
+                  }}
                 >
-                  {t("education.section2Title")}
+                  {withEm(t("education.academyTitle"), "gold")}
                 </h2>
-                <div className="w-12 h-px bg-[#2e2e2e]/30 mb-8" />
-                <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8] mb-6">
-                  {t("education.section2P1")}
-                </p>
-                <p className="text-[15px] text-[#2e2e2e]/75 leading-[1.8]">
-                  {t("education.section2P2")}
-                </p>
+                <div className="text-[16px] leading-[1.85] max-w-[520px] text-white/78">
+                  <p className="mb-4">{t("education.academyP1")}</p>
+                  <p>{t("education.academyP2")}</p>
+                </div>
+              </div>
+              <div className="aspect-[4/5] bg-[#0e0e0e] relative overflow-hidden">
+                <Image
+                  src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80"
+                  alt="Edukacija"
+                  fill
+                  className="object-cover"
+                  style={{ filter: "grayscale(1) brightness(0.85)" }}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
               </div>
             </div>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════
-            5. SECTION 3 — PRODAJNO MESTO
+            3. SECTIONS — Nº 01 / Nº 02 / Nº 03 / Nº 04
         ════════════════════════════════════════════════════════════ */}
-        <section className="py-24 md:py-32 bg-[#D8CFBC]/30 border-t border-[#2e2e2e]/10">
-          <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="max-w-3xl mx-auto text-center">
-              <ShoppingBag className="w-8 h-8 text-[#2e2e2e] mx-auto mb-6" strokeWidth={1.5} />
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
-                03
+        <section className="border-b border-[#E8E5DE] py-20 md:py-24">
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14 mb-12">
+            <div className="max-w-[720px]">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#6B6B6B] font-medium block mb-3.5">
+                {t("education.sectionsEyebrow")}
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
-                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+                className="font-light leading-[1.08] tracking-[-0.005em]"
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "clamp(28px, 3.4vw, 40px)",
+                }}
               >
-                {t("education.section3Title")}
+                {withEm(t("education.sectionsTitle"))}
               </h2>
-              <div className="w-12 h-px bg-[#2e2e2e]/30 mx-auto mb-8" />
-              <p className="text-[15px] md:text-base text-[#2e2e2e]/75 leading-[1.8]">
-                {t("education.section3P")}
-              </p>
+            </div>
+          </div>
+
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+              <SpaceCard
+                num="Nº 01"
+                title={t("education.section1Title")}
+                kicker={t("education.section1Kicker")}
+                img="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=80"
+                credit={t("education.section1ImgCredit")}
+              >
+                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  {withEm(t("education.section1P1"))}
+                </p>
+                <p>{t("education.section1P2")}</p>
+              </SpaceCard>
+
+              <SpaceCard
+                num="Nº 02"
+                title={t("education.section2Title")}
+                kicker={t("education.section2Kicker")}
+                img="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=900&q=80"
+                credit={t("education.section2ImgCredit")}
+              >
+                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  {withEm(t("education.section2P1"))}
+                </p>
+                <p className="mb-3">{t("education.section2P2")}</p>
+                <p>{t("education.section2P3")}</p>
+              </SpaceCard>
+
+              <SpaceCard
+                num="Nº 03"
+                title={t("education.section3Title")}
+                kicker={t("education.section3Kicker")}
+                img="https://images.unsplash.com/photo-1522335789203-aaa7d7c0fbb1?w=900&q=80"
+                credit={t("education.section3ImgCredit")}
+              >
+                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  {withEm(t("education.section3P1"))}
+                </p>
+                <p>{t("education.section3P2")}</p>
+              </SpaceCard>
             </div>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════
-            6. SECTION 4 — POSTANI MODEL  (dark CTA section)
+            4. COMBINED Nº 04 model + Nº 05 kontakt — single ink panel
         ════════════════════════════════════════════════════════════ */}
-        <section className="relative py-24 md:py-32 overflow-hidden bg-[#2e2e2e] text-white">
-          <div className="absolute inset-0 opacity-15">
-            <Image src="/edukacija2.jpg" alt="" fill className="object-cover" />
-          </div>
-          <div className="relative max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="max-w-3xl">
-              <UserPlus className="w-8 h-8 text-[#D8CFBC] mb-6" strokeWidth={1.5} />
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#D8CFBC]/80 font-medium block mb-4">
-                04
-              </span>
-              <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-white leading-[1.05] mb-8"
-                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
-              >
-                {t("education.section4Title")}
-              </h2>
-              <div className="w-12 h-px bg-[#D8CFBC]/40 mb-8" />
-              <p className="text-[15px] md:text-base text-white/75 leading-[1.8] mb-10 max-w-2xl">
-                {t("education.section4P")}
-              </p>
-              <a
-                href={`mailto:${t("education.contactEmail")}`}
-                className="inline-flex items-center gap-2 bg-white text-[#2e2e2e] px-8 py-4 text-[11px] uppercase tracking-[0.22em] font-medium hover:bg-[#D8CFBC] transition-colors rounded-full"
-              >
-                {t("education.section4Cta")} <ArrowRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ════════════════════════════════════════════════════════════
-            7. CONTACT
-        ════════════════════════════════════════════════════════════ */}
-        <section className="py-20 md:py-28 bg-[#FFFFFF] border-t border-[#2e2e2e]/10">
-          <div className="max-w-screen-2xl mx-auto px-6 md:px-8">
-            <div className="max-w-2xl">
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
-                {t("education.contactTitle")}
-              </span>
-              <h3
-                className="text-3xl md:text-4xl font-light text-[#2e2e2e] leading-[1.1] mb-10"
-                style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
-              >
-                ID Hair Academy
-              </h3>
-              <ul className="space-y-4">
-                <li className="flex items-center gap-4 text-[#2e2e2e]">
-                  <MapPin className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
-                  <span className="text-[14px]">{t("education.contactAddress")}</span>
-                </li>
-                <li>
-                  <a
-                    href={`tel:${t("education.contactPhone1").replace(/\s/g, "")}`}
-                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
-                  >
-                    <Phone className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
-                    <span className="text-[14px]">{t("education.contactPhone1")}</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={`tel:${t("education.contactPhone2").replace(/\s/g, "")}`}
-                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
-                  >
-                    <Phone className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
-                    <span className="text-[14px]">{t("education.contactPhone2")}</span>
-                  </a>
-                </li>
-                <li>
+        <section id="kontakt" className="bg-[#1A1A1A] text-white mt-12">
+          {/* Top — Nº 04 model row */}
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14 pt-14 md:pt-20 pb-12 md:pb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_0.85fr] gap-8 lg:gap-12 items-start">
+              <div>
+                <div
+                  className="italic text-[13px] text-[#B8975B] mb-2.5"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  Nº 04
+                </div>
+                <h3
+                  className="font-light text-[30px] leading-[1.1] mb-3.5 tracking-[-0.005em] text-white"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  {withEm(t("education.section4Title"), "gold")}
+                </h3>
+                <div className="w-10 h-px mb-3.5 bg-white/50" />
+                <div className="text-[10px] uppercase tracking-[0.18em] leading-[1.6] max-w-[220px] text-white/55">
+                  {t("education.section4Kicker")}
+                </div>
+              </div>
+              <div className="text-[14px] leading-[1.75] max-w-[520px] text-white/78">
+                <p
+                  className="mb-4 text-white"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "18px", lineHeight: 1.5, fontWeight: 300 }}
+                >
+                  {withEm(t("education.section4P1"), "gold")}
+                </p>
+                <p className="mb-3">{t("education.section4P2")}</p>
+                <div className="mt-6 flex gap-3.5 flex-wrap">
                   <a
                     href={`mailto:${t("education.contactEmail")}`}
-                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1A1A1A] transition-colors"
                   >
-                    <Mail className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
-                    <span className="text-[14px]">{t("education.contactEmail")}</span>
+                    {t("education.section4Cta")} <ArrowRight className="w-3 h-3" />
                   </a>
-                </li>
-                <li>
                   <a
                     href={INSTAGRAM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-4 text-[#2e2e2e] hover:opacity-60 transition-opacity"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1A1A1A] transition-colors"
                   >
-                    <Instagram className="w-4 h-4 text-[#2e2e2e]/60 flex-shrink-0" />
-                    <span className="text-[14px]">{t("education.contactInstagram")}</span>
+                    {t("education.contactInstagram")} <ArrowRight className="w-3 h-3" />
                   </a>
-                </li>
-              </ul>
+                </div>
+              </div>
+              <div className="pt-1">
+                <div className="aspect-[4/5] bg-[#0e0e0e] overflow-hidden relative">
+                  <Image
+                    src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=80"
+                    alt=""
+                    fill
+                    className="object-cover"
+                    style={{ filter: "grayscale(1) contrast(1.05)" }}
+                    sizes="(max-width: 1024px) 100vw, 30vw"
+                  />
+                  <span
+                    className="absolute bottom-3.5 left-4 text-[12px] italic text-white/70"
+                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  >
+                    {t("education.section4ImgCredit")}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Hairline separator */}
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14">
+            <div className="h-px bg-white/15" />
+          </div>
+
+          {/* Bottom — Nº 05 Kontakt hairline list (dark variant, compact) */}
+          <div className="max-w-[1240px] mx-auto px-6 md:px-14 pt-8 md:pt-10 pb-12 md:pb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 lg:gap-14 items-start">
+              <div>
+                <div
+                  className="italic text-[12px] text-[#B8975B] mb-2"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  Nº 05
+                </div>
+                <h3
+                  className="font-light text-[22px] leading-[1.1] mb-2.5 text-white"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  {t("education.contactTitle")}
+                </h3>
+                <div className="w-8 h-px bg-white/40 mb-3" />
+                <p className="text-[11.5px] text-white/55 leading-[1.6] max-w-[220px]">
+                  {t("education.contactKicker")}
+                </p>
+              </div>
+              <div className="border-t border-white/15">
+                {[
+                  { k: t("education.contactRowAddress"), v: t("education.contactStreet"), href: undefined, mono: false, external: false },
+                  { k: t("education.contactRowCity"), v: t("education.contactCity"), href: undefined, mono: false, external: false },
+                  { k: t("education.contactRowPhone"), v: t("education.contactPhone1"), href: `tel:${t("education.contactPhone1").replace(/\s/g, "")}`, mono: true, external: false },
+                  { k: t("education.contactRowMobile"), v: t("education.contactPhone2"), href: `tel:${t("education.contactPhone2").replace(/\s/g, "")}`, mono: true, external: false },
+                  { k: t("education.contactRowEmail"), v: t("education.contactEmail"), href: `mailto:${t("education.contactEmail")}`, mono: true, external: false },
+                  { k: t("education.contactRowInstagram"), v: t("education.contactInstagram"), href: INSTAGRAM_URL, mono: false, external: true },
+                ].map((row, i) => {
+                  const Comp: "a" | "div" = row.href ? "a" : "div";
+                  return (
+                    <Comp
+                      key={i}
+                      {...(row.href
+                        ? {
+                            href: row.href,
+                            ...(row.external ? { target: "_blank", rel: "noopener noreferrer" as const } : {}),
+                          }
+                        : {})}
+                      className="grid grid-cols-[90px_1fr_auto] md:grid-cols-[120px_1fr_auto] items-baseline py-2.5 border-b border-white/15 gap-3 md:gap-5 group transition-[padding] duration-200 hover:pl-1"
+                    >
+                      <span className="text-[9px] uppercase tracking-[0.22em] text-white/55">{row.k}</span>
+                      <span
+                        className={
+                          row.mono
+                            ? "text-[12.5px] tracking-[0.02em] text-white"
+                            : "italic text-[15px] text-white"
+                        }
+                        style={
+                          row.mono
+                            ? { fontFamily: "ui-monospace, Menlo, monospace" }
+                            : { fontFamily: "'Cormorant Garamond', serif" }
+                        }
+                      >
+                        {row.v}
+                      </span>
+                      <span className="text-[10px] text-white/50 group-hover:text-white group-hover:translate-x-[3px] transition-all">→</span>
+                    </Comp>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════
-            8. INSTAGRAM BENTO
+            5. INSTAGRAM BENTO — kept from previous design (per user request)
         ════════════════════════════════════════════════════════════ */}
-        <section className="py-20 md:py-28 bg-[#FFFFFF] border-t border-[#2e2e2e]/10">
+        <section className="py-20 md:py-28 bg-[#FAFAFA]">
           <div className="max-w-[1400px] mx-auto px-6 md:px-10">
             <div className="flex items-end justify-between mb-12 md:mb-16 gap-8 flex-wrap">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#1A1A1A]/60 font-medium block mb-5">
                   {t("education.socialKicker")}
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
+                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1A1A1A] leading-[1.05]"
                   style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
                   <em className="italic">{t("education.contactInstagram")}</em> {t("education.socialTitle")}
                 </h2>
-                <p className="text-[14px] text-[#2e2e2e]/60 leading-relaxed mt-5 max-w-md">
+                <p className="text-[14px] text-[#1A1A1A]/60 leading-relaxed mt-5 max-w-md">
                   {t("education.socialDesc")}
                 </p>
               </div>
@@ -372,13 +434,13 @@ export default function EducationPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="w-11 h-11 rounded-full border border-[#D8CFBC] flex items-center justify-center text-[#2e2e2e] hover:bg-[#2e2e2e] hover:text-[#FFFFFF] hover:border-[#2e2e2e] transition-colors"
+                className="w-11 h-11 rounded-full border border-[#E8E5DE] flex items-center justify-center text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white hover:border-[#1A1A1A] transition-colors"
               >
                 <Instagram className="w-4 h-4" />
               </a>
             </div>
 
-            {/* Same bento pattern as homepage block 8 */}
+            {/* Same bento pattern as before */}
             <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[240px] gap-2 md:gap-3">
               {[
                 { img: academyShots[0], cls: "col-span-2 row-span-1" },
@@ -395,7 +457,7 @@ export default function EducationPage() {
                   href={INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${cell.cls} relative overflow-hidden bg-[#D8CFBC] group rounded-[4px]`}
+                  className={`${cell.cls} relative overflow-hidden bg-[#EAE5DA] group`}
                 >
                   <Image
                     src={cell.img}
@@ -404,7 +466,7 @@ export default function EducationPage() {
                     sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-[#2e2e2e]/0 group-hover:bg-[#2e2e2e]/30 transition-colors flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#1A1A1A]/0 group-hover:bg-[#1A1A1A]/30 transition-colors flex items-center justify-center">
                     <Instagram className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </a>
