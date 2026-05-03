@@ -109,17 +109,19 @@ enum CampaignStatus {
 // ==================== USERS & AUTH ====================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  passwordHash  String    @map("password_hash")
+  id            String     @id @default(cuid())
+  email         String     @unique
+  passwordHash  String?    @map("password_hash")
+  emailVerified DateTime?  @map("email_verified")
   name          String
   phone         String?
-  role          UserRole  @default(b2c)
+  role          UserRole   @default(b2c)
   status        UserStatus @default(active)
-  avatarUrl     String?   @map("avatar_url")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  avatarUrl     String?    @map("avatar_url")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
 
+  accounts      Account[]
   addresses     UserAddress[]
   b2bProfile    B2bProfile?
   reviews       Review[]
@@ -130,6 +132,27 @@ model User {
   approvedB2b   B2bProfile[]         @relation("ApprovedByUser")
 
   @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
 }
 
 model UserAddress {

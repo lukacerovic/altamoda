@@ -16,7 +16,7 @@ export default function Footer() {
   ].filter(Boolean) as Array<{ href: string; label: string; Icon: typeof Instagram }>;
 
   return (
-    <footer className="bg-[#2e2e2e] mt-auto grid grid-cols-1 md:grid-cols-4 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
+    <footer className="bg-[#2e2e2e] mt-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
       {/* Column 1: Brand */}
       <div className="md:col-span-1">
         <div
@@ -49,51 +49,54 @@ export default function Footer() {
         </p>
       </div>
 
-      {/* Column 2: Kupovina (Shopping) */}
-      <div className="flex flex-col gap-4">
-        <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
-          {t("footer.shopping")}
-        </h5>
-        <Link href="/products" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
-          {t("footer.allProducts")}
-        </Link>
-        <Link href="/colors" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
-          {t("footer.hairColors")}
-        </Link>
-        <Link href="/products" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
-          {t("footer.brands")}
-        </Link>
-      </div>
-
-      {/* Column 3: Podrska (Support) */}
+      {/* Column 2: Podrska (Support) — deep-links into /faq */}
       <div className="flex flex-col gap-4">
         <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
           {t("footer.information")}
         </h5>
-        <Link href="/faq" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
+        <Link href="/faq" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
           {t("footer.faq")}
         </Link>
-        <a href="#" className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:text-[#FFFFFF] transition-colors">
+        <Link href="/faq#dostava" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
+          {t("footer.delivery")}
+        </Link>
+        <Link href="/faq#reklamacije" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
+          {t("footer.returns")}
+        </Link>
+        <Link href="/faq#privatnost" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
+          {t("footer.privacy")}
+        </Link>
+        <Link href="/faq#uslovi" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
           {t("footer.termsOfUse")}
-        </a>
+        </Link>
       </div>
 
-      {/* Column 4: Kontakt */}
+      {/* Column 3: Kontakt */}
       <div className="flex flex-col gap-4">
         <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
           {t("footer.contactTitle")}
         </h5>
         <p className="text-xs uppercase tracking-wider text-[#FFFFFF]">
           {t("footer.address")}
+          <br />
+          {t("footer.city")}
         </p>
-        <p className="text-xs uppercase tracking-wider text-[#FFFFFF]">
+        <a href={`tel:${t("footer.phone").replace(/\s|\(|\)/g, "")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
           {t("footer.phone")}
-        </p>
-        <p className="text-xs uppercase tracking-wider text-[#FFFFFF]">
+        </a>
+        <a href={`tel:${t("footer.phone2").replace(/\s|\(|\)/g, "")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
+          {t("footer.phone2")}
+        </a>
+        <a href={`mailto:${t("footer.email")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
           {t("footer.email")}
-        </p>
-        <p className="text-xs uppercase tracking-wider text-[#FFFFFF]">
+        </a>
+        <p className="text-xs uppercase tracking-wider text-[#FFFFFF]/80">
           {t("footer.workHours")}
+        </p>
+        <p className="text-[10px] uppercase tracking-wider text-[#FFFFFF]/60 mt-2">
+          {t("footer.pib")}
+          <br />
+          {t("footer.bankAccount")}
         </p>
       </div>
     </footer>

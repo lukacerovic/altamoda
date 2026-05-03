@@ -250,13 +250,13 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
         <Image src={imgSrc} alt={product.name} width={500} height={625} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && (
-            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[#837A64] text-[#FFFFFF]">{badge}</span>
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[rgba(41,49,51,0.5)] text-[#FFFFFF]">{badge}</span>
           )}
           {product.isProfessional && (
-            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#837A64] text-[#FFFFFF] backdrop-blur-sm rounded-full">{t("products.professional")}</span>
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[rgba(41,49,51,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">{t("products.professional")}</span>
           )}
           {product.variantCount != null && product.variantCount > 1 && (
-            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[#837A64] text-[#FFFFFF] backdrop-blur-sm rounded-full">
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[rgba(41,49,51,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">
               {product.variantCount} boja
             </span>
           )}
@@ -1164,7 +1164,7 @@ export default function ProductsPageClient({
                         <span className="absolute top-2 left-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[#2e2e2e]/90 text-[#FFFFFF] backdrop-blur-sm">{t("products.professional")}</span>
                       )}
                       {getBadge(p) && (
-                        <span className="absolute top-2 right-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[#837A64] text-[#FFFFFF] backdrop-blur-sm rounded-full">{getBadge(p)}</span>
+                        <span className="absolute top-2 right-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[rgba(41,49,51,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">{getBadge(p)}</span>
                       )}
                     </div>
                     <div className="p-5 flex-1 flex flex-col justify-center">

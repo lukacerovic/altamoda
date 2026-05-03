@@ -138,12 +138,12 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {product.isNew && (
-                          <span className="absolute top-2 left-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#837A64] text-white backdrop-blur-sm">
+                          <span className="absolute top-2 left-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[rgba(41,49,51,0.5)] text-white backdrop-blur-sm">
                             NOVO
                           </span>
                         )}
                         {hasDiscount && (
-                          <span className="absolute top-2 right-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[#837A64] text-white backdrop-blur-sm">
+                          <span className="absolute top-2 right-2 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] rounded-full bg-[rgba(41,49,51,0.5)] text-white backdrop-blur-sm">
                             -{discountPct}%
                           </span>
                         )}

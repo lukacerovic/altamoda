@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ChevronDown,
   Search,
@@ -10,8 +10,29 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const faqItemsData = [
+/**
+ * Each top-level section has a stable `slug` used as the in-page anchor id.
+ * Footer links such as `/faq#dostava` rely on these slugs being unique and
+ * URL-safe; do not rename them without updating the Footer too.
+ *
+ * `q` is the visible heading on the collapsed row, `a` is the body. `a`
+ * supports multi-paragraph content via `\n\n` separators and bullet lists
+ * via lines starting with `• `.
+ */
+interface FaqItem {
+  q: string;
+  a: string;
+}
+
+interface FaqSection {
+  slug: string;
+  titleKey: string;
+  items: FaqItem[];
+}
+
+const faqItemsData: FaqSection[] = [
   {
+    slug: "porudzbine",
     titleKey: "faq.catOrders",
     items: [
       { q: "Koliko traje dostava?", a: "Standardna dostava traje 1-3 radna dana za teritoriju Srbije. Za Beograd je moguća dostava narednog radnog dana za porudžbine primljene do 14h." },
@@ -22,6 +43,7 @@ const faqItemsData = [
     ],
   },
   {
+    slug: "placanje",
     titleKey: "faq.catPayment",
     items: [
       { q: "Koji načini plaćanja su dostupni?", a: "Prihvatamo platne kartice (Visa, Mastercard, Maestro, Dina), plaćanje pouzećem, kao i plaćanje putem fakture za B2B korisnike." },
@@ -31,6 +53,7 @@ const faqItemsData = [
     ],
   },
   {
+    slug: "b2b",
     titleKey: "faq.catB2B",
     items: [
       { q: "Kako se registrovati kao B2B korisnik?", a: "Kliknite na 'B2B Registracija' i popunite formular sa podacima o vašem salonu (PIB, matični broj, adresa). Naš tim će pregledati i odobriti vaš nalog u roku od 24h." },
@@ -40,6 +63,7 @@ const faqItemsData = [
     ],
   },
   {
+    slug: "proizvodi",
     titleKey: "faq.catProducts",
     items: [
       { q: "Da li su svi proizvodi originalni?", a: "Da, svi naši proizvodi su 100% originalni i nabavljeni direktno od ovlašćenih distributera. Garantujemo autentičnost svakog proizvoda." },
@@ -47,22 +71,159 @@ const faqItemsData = [
       { q: "Kako da odaberem pravi proizvod za svoj tip kose?", a: "Koristite naše filtere za tip kose pri pretrazi proizvoda. Takođe, naš blog sadrži vodiče za odabir proizvoda. Za personalizovane preporuke, kontaktirajte nas." },
     ],
   },
+  // ── Policy sections (footer deep-links) ──────────────────────────────
   {
-    titleKey: "faq.catReturns",
+    slug: "dostava",
+    titleKey: "faq.catShipping",
     items: [
-      { q: "Kakva je politika povrata?", a: "Imate pravo na povrat neotvorenog proizvoda u roku od 14 dana od prijema. Proizvod mora biti u originalnom pakovanju, neoštećen i nekorišćen." },
-      { q: "Kako pokrenuti povrat?", a: "Kontaktirajte nas putem emaila na reklamacije@altamoda.rs ili pozovite +381 11 123 4567. Naš tim će vam dati instrukcije za povrat." },
-      { q: "Koliko traje refundacija?", a: "Nakon prijema vraćenog proizvoda, refundacija se procesira u roku od 5-7 radnih dana na isti način plaćanja koji ste koristili pri kupovini." },
+      {
+        q: "Dostava i isporuka",
+        a: "Porudžbine se obrađuju u najkraćem mogućem roku nakon potvrde kupovine. Isporuka se vrši putem kurirske službe na adresu koju ste naveli prilikom poručivanja.",
+      },
+      {
+        q: "Rok isporuke",
+        a: "Rok isporuke je obično od 1 do 3 radna dana, u zavisnosti od lokacije i trenutnog opterećenja kurirske službe.",
+      },
+      {
+        q: "Troškovi dostave",
+        a: "Troškovi dostave prikazani su prilikom završetka kupovine.\n\nZa porudžbine iznad određenog iznosa, dostava može biti besplatna u skladu sa aktuelnim uslovima na sajtu.",
+      },
+      {
+        q: "Napomena",
+        a: "Alta Moda ulaže maksimalan napor da sve porudžbine budu isporučene u predviđenim rokovima.\n\nRokovi isporuke su okvirni i mogu varirati u zavisnosti od rada kurirske službe i okolnosti na koje ne možemo direktno uticati.\n\nU slučaju eventualnih kašnjenja, kupac će biti obavešten u najkraćem mogućem roku.",
+      },
+    ],
+  },
+  {
+    slug: "reklamacije",
+    titleKey: "faq.catComplaints",
+    items: [
+      {
+        q: "Pravo na reklamaciju",
+        a: "Kupac ima pravo na reklamaciju u skladu sa važećim zakonima Republike Srbije.\n\nU slučaju da proizvod ima nedostatak ili ne odgovara opisu, kupac ima pravo da podnese reklamaciju.",
+      },
+      {
+        q: "Način podnošenja reklamacije",
+        a: "Reklamacija se podnosi putem email adrese ili telefona uz dostavljanje:\n• broja porudžbine\n• opisa problema\n• fotografije proizvoda (po potrebi)",
+      },
+      {
+        q: "Rok za odgovor",
+        a: "Na reklamaciju odgovaramo u najkraćem mogućem roku, a najkasnije u zakonskom roku.",
+      },
+      {
+        q: "Povraćaj robe",
+        a: "Kupac ima pravo na odustanak od kupovine u roku od 14 dana od prijema proizvoda, bez navođenja razloga.\n\nProizvod mora biti:\n• nekorišćen\n• neoštećen\n• u originalnom pakovanju\n\nTroškove povraćaja snosi kupac, osim u slučaju opravdane reklamacije.",
+      },
+      {
+        q: "Povraćaj sredstava",
+        a: "U slučaju prihvaćenog povraćaja, sredstva se vraćaju kupcu u zakonskom roku, na isti način na koji je izvršeno plaćanje, osim ako nije drugačije dogovoreno.",
+      },
+    ],
+  },
+  {
+    slug: "privatnost",
+    titleKey: "faq.catPrivacy",
+    items: [
+      {
+        q: "Prikupljanje podataka",
+        a: "Alta Moda doo se obavezuje da štiti privatnost svih korisnika sajta.\n\nPrikupljamo samo neophodne podatke za obradu porudžbine i komunikaciju sa korisnicima, kao što su:\n• ime i prezime\n• email adresa\n• broj telefona\n• adresa za isporuku",
+      },
+      {
+        q: "Svrha obrade",
+        a: "Podaci se koriste isključivo za:\n• realizaciju porudžbine\n• komunikaciju sa korisnicima\n• slanje newsletter komunikacije (uz saglasnost)",
+      },
+      {
+        q: "Zaštita podataka",
+        a: "Vaši podaci su zaštićeni i čuvaju se u skladu sa važećim propisima.",
+      },
+      {
+        q: "Deljenje podataka",
+        a: "Podaci se ne prosleđuju trećim licima, osim u slučaju kada je to neophodno za realizaciju isporuke (kurirske službe).",
+      },
+      {
+        q: "Prava korisnika",
+        a: "Korisnik ima pravo da:\n• zatraži uvid u svoje podatke\n• zatraži ispravku ili brisanje podataka\n• povuče saglasnost za obradu podataka\n\nZa sva pitanja u vezi sa privatnošću, korisnik nas može kontaktirati putem dostupnih kontakt podataka.",
+      },
+    ],
+  },
+  {
+    slug: "uslovi",
+    titleKey: "faq.catTerms",
+    items: [
+      {
+        q: "Opšte odredbe",
+        a: "Korišćenjem ovog sajta prihvatate navedene uslove korišćenja.\n\nSajt altamoda.rs namenjen je kupovini proizvoda i informisanju o uslugama i edukacijama.",
+      },
+      {
+        q: "Tačnost informacija",
+        a: "Alta Moda nastoji da sve informacije na sajtu budu tačne i ažurne, ali ne može garantovati potpunu bezgrešnost sadržaja.",
+      },
+      {
+        q: "Cene i dostupnost",
+        a: "Sve cene prikazane su u dinarima i mogu biti podložne promenama bez prethodne najave.\n\nDostupnost proizvoda može varirati.",
+      },
+      {
+        q: "Odgovornost",
+        a: "Alta Moda ne snosi odgovornost za eventualne tehničke greške, prekide u radu sajta ili druge okolnosti van svoje kontrole.",
+      },
+      {
+        q: "Izmene uslova",
+        a: "Zadržavamo pravo izmene uslova korišćenja u bilo kom trenutku.",
+      },
     ],
   },
 ];
+
+/** Render a single answer block, splitting on `\n\n` for paragraphs and on
+ *  `\n• ` for bullet items. Keeps the structure simple so the answer string
+ *  remains a plain literal that translators can edit. */
+function renderAnswer(text: string) {
+  const blocks = text.split(/\n\n+/);
+  return (
+    <div className="space-y-3 text-sm text-[#837A64] leading-relaxed">
+      {blocks.map((block, i) => {
+        const lines = block.split("\n");
+        const bulletLines = lines.filter((l) => l.trim().startsWith("• "));
+        if (bulletLines.length > 0 && bulletLines.length === lines.filter((l) => l.trim()).length) {
+          // pure bullet list
+          return (
+            <ul key={i} className="list-disc pl-5 space-y-1">
+              {bulletLines.map((l, j) => (
+                <li key={j}>{l.replace(/^•\s*/, "")}</li>
+              ))}
+            </ul>
+          );
+        }
+        if (bulletLines.length > 0) {
+          // mixed: prose lines until first bullet, then list
+          const firstBulletIdx = lines.findIndex((l) => l.trim().startsWith("• "));
+          const intro = lines.slice(0, firstBulletIdx).join(" ").trim();
+          const bullets = lines.slice(firstBulletIdx).filter((l) => l.trim().startsWith("• "));
+          return (
+            <div key={i}>
+              {intro && <p className="mb-2">{intro}</p>}
+              <ul className="list-disc pl-5 space-y-1">
+                {bullets.map((l, j) => (
+                  <li key={j}>{l.replace(/^•\s*/, "")}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+        return <p key={i}>{block}</p>;
+      })}
+    </div>
+  );
+}
 
 export default function FAQPage() {
   const { t } = useLanguage();
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const faqSections = faqItemsData.map((section) => ({
+    slug: section.slug,
     title: t(section.titleKey),
     items: section.items,
   }));
@@ -74,15 +235,39 @@ export default function FAQPage() {
     setOpenItems(next);
   };
 
+  // Honour `#slug` deep-links from the footer: scroll into view, expand all
+  // items in that section, and clear the search.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const applyHash = () => {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (!hash) return;
+      const section = faqItemsData.find((s) => s.slug === hash);
+      if (!section) return;
+      setSearchQuery("");
+      setOpenItems(new Set(section.items.map((_, idx) => `${section.titleKey}-${idx}`)));
+      // Defer scroll until after expansion paints.
+      requestAnimationFrame(() => {
+        const el = sectionRefs.current[hash];
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
   const filteredSections = searchQuery
-    ? faqSections.map((section) => ({
-        ...section,
-        items: section.items.filter(
-          (item) =>
-            item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.a.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-      })).filter((section) => section.items.length > 0)
+    ? faqSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter(
+            (item) =>
+              item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              item.a.toLowerCase().includes(searchQuery.toLowerCase())
+          ),
+        }))
+        .filter((section) => section.items.length > 0)
     : faqSections;
 
   return (
@@ -110,9 +295,16 @@ export default function FAQPage() {
         </div>
 
         {/* FAQ Sections */}
-        <div className="space-y-8">
+        <div className="space-y-12">
           {filteredSections.map((section) => (
-            <div key={section.title}>
+            <div
+              key={section.title}
+              id={section.slug}
+              ref={(el) => {
+                sectionRefs.current[section.slug] = el;
+              }}
+              className="scroll-mt-24"
+            >
               <h2 className="text-lg font-semibold text-[#2e2e2e] mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-black rounded-full" />
                 {section.title}
@@ -132,7 +324,7 @@ export default function FAQPage() {
                       </button>
                       {isOpen && (
                         <div className="px-5 pb-4 animate-slideDown">
-                          <p className="text-sm text-[#837A64] leading-relaxed">{item.a}</p>
+                          {renderAnswer(item.a)}
                         </div>
                       )}
                     </div>
@@ -148,11 +340,11 @@ export default function FAQPage() {
           <h3 className="text-xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
           <p className="text-[#837A64] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+381111234567" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
-              <Phone className="w-4 h-4" /> +381 11 123 4567
+            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
+              <Phone className="w-4 h-4" /> +381 (0)11 3088388
             </a>
-            <a href="mailto:info@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
-              <Mail className="w-4 h-4" /> info@altamoda.rs
+            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
+              <Mail className="w-4 h-4" /> kontakt@altamoda.rs
             </a>
           </div>
         </div>
