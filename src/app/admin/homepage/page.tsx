@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, Star, ShoppingBag, Tag, Package, Plus, Check, Upload, ImageIcon, Trash2, Save } from "lucide-react";
+import { Search, X, Star, ShoppingBag, Package, Plus, Check, Upload, ImageIcon, Trash2, Save } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -66,7 +66,6 @@ export default function HomepagePage() {
   const sections: SectionConfig[] = [
     { key: "featured", label: t("admin.featuredSection"), filterParam: "isFeatured=true", flagField: "isFeatured", icon: <Star size={20} /> },
     { key: "newArrivals", label: t("admin.newArrivalsSection"), filterParam: "isNew=true", flagField: "isNew", icon: <ShoppingBag size={20} /> },
-    { key: "sale", label: t("admin.saleSection"), filterParam: "onSale=true", flagField: "onSale", icon: <Tag size={20} /> },
   ];
 
   const [sectionProducts, setSectionProducts] = useState<Record<string, SectionProduct[]>>({});

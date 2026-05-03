@@ -33,6 +33,11 @@ export default async function HomePage() {
     images: { where: { isPrimary: true }, take: 1 },
   }
 
+  // "On sale" = static oldPrice OR a currently-active promotion linked to the product.
+  // Audience limited to public-facing buckets so B2B-only promotions don't leak to the public homepage.
+  const now = new Date()
+  const saleAudiences = ['all', 'b2c'] as const
+
   // Fetch all product sets + hero settings + social links in parallel
   const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting, socialSettings] = await Promise.all([
     prisma.product.findMany({
@@ -54,7 +59,26 @@ export default async function HomePage() {
       orderBy: { createdAt: 'desc' },
     }),
     prisma.product.findMany({
-      where: { isActive: true, oldPrice: { not: null } },
+      where: {
+        isActive: true,
+        OR: [
+          { oldPrice: { not: null } },
+          {
+            promotionProducts: {
+              some: {
+                promotion: {
+                  isActive: true,
+                  audience: { in: [...saleAudiences] },
+                  AND: [
+                    { OR: [{ startDate: null }, { startDate: { lte: now } }] },
+                    { OR: [{ endDate: null }, { endDate: { gte: now } }] },
+                  ],
+                },
+              },
+            },
+          },
+        ],
+      },
       include: productInclude,
       take: 8,
       orderBy: { createdAt: 'desc' },

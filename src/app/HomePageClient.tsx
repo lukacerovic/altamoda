@@ -4,18 +4,16 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Heart, Star, ArrowRight, Music2, ChevronLeft, ChevronRight,
-  Leaf, ShieldCheck, Award, Truck,
+  Leaf, ShieldCheck, Award, Truck, ShoppingBag, CheckCircle,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Mail, X, Instagram, Youtube,
 } from "lucide-react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-
-const ChatWidget = dynamic(() => import("@/components/ChatWidget"), { ssr: false });
+import { useCartStore } from "@/lib/stores/cart-store";
 
 /* ─── Types ─── */
 export interface ProductData {
@@ -69,9 +67,31 @@ const socialImages = [
 function ProductCard({ product, badge }: { product: ProductData; badge?: string }) {
   const { t } = useLanguage();
   const [liked, setLiked] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addItem } = useCartStore();
   const newLabel = t("home.new");
   const discountBadge = product.price != null && product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = product.promoBadge || badge || (product.isNew ? newLabel : discountBadge);
+  const outOfStock = product.stockQuantity <= 0;
+  const b2bOnly = product.price == null;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (outOfStock || b2bOnly || product.price == null) return;
+    addItem({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand ?? "",
+      price: product.price,
+      quantity: 1,
+      image: product.image ?? "",
+      sku: product.sku,
+      stockQuantity: product.stockQuantity,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 1500);
+  };
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
@@ -96,6 +116,33 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
         >
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#2e2e2e] text-[#2e2e2e]" : "text-[#2e2e2e]"}`} />
         </button>
+        {!b2bOnly && (
+          <div className="absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+            <button
+              onClick={handleAddToCart}
+              disabled={outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${
+                outOfStock
+                  ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed"
+                  : addedToCart
+                  ? "bg-[#6a624f] text-[#FFFFFF]"
+                  : "bg-[#837A64] text-[#FFFFFF] hover:bg-[#6a624f]"
+              }`}
+            >
+              {outOfStock ? (
+                <>{t("products.outOfStock")}</>
+              ) : addedToCart ? (
+                <>
+                  <CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
       <div>
         <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium block mb-1.5">{product.brand}</span>
@@ -273,6 +320,19 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   const [popupStatus, setPopupStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [popupMessage, setPopupMessage] = useState("");
 
+  // Auto-open the newsletter popup on the user's first visit. Once shown,
+  // we mark localStorage so it never auto-opens again on this device — the
+  // floating Mail button remains the way to reopen it manually.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("altamoda-newsletter-seen")) return;
+    const timer = setTimeout(() => {
+      setShowNewsletter(true);
+      localStorage.setItem("altamoda-newsletter-seen", "1");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleNewsletterSubmit = async (email: string, setStatus: (s: "idle" | "loading" | "success" | "error") => void, setMessage: (m: string) => void, onSuccess?: () => void) => {
     if (!email) return;
     setStatus("loading");
@@ -305,15 +365,16 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   const newList = newArrivals.slice(0, 8);
   const saleList = saleProducts.slice(0, 8);
 
-  /* Tabbed products section */
+  /* Tabbed products section — each tab is only shown if it has products. */
   type ProductTab = "bestsellers" | "new" | "sale";
-  const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
-  const tabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
+  const allTabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
     { key: "bestsellers", label: "Najprodavanije", products: bestsellerList, badge: (i: number) => (i === 2 ? "Novo" : "Bestseler"), viewAll: "/products" },
     { key: "sale", label: "Akcija", products: saleList, viewAll: "/products?onSale=true" },
     { key: "new", label: "Novo", products: newList, badge: "Novo", viewAll: "/products?sort=new" },
   ];
-  const activeTabData = tabs.find((t) => t.key === activeTab) || tabs[0];
+  const visibleTabs = allTabs.filter((t) => t.products.length > 0);
+  const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
+  const activeTabData = visibleTabs.find((t) => t.key === activeTab) ?? visibleTabs[0];
 
   /* Hero teaser cards — shown below the headline; admin-editable via heroCards */
   const defaultHeroCards: HeroCard[] = [
@@ -494,8 +555,10 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
       {/* ═══════════════════════════════════════════════════════════
           3. PRODUCTS — merged tabbed section (Bestsellers / Sale / New)
+          Each tab is only rendered when its source has products; the whole
+          section is hidden if all three are empty.
       ═══════════════════════════════════════════════════════════ */}
-      {bestsellerList.length > 0 && (
+      {visibleTabs.length > 0 && activeTabData && (
         <section className="py-20 md:py-28 bg-[#FFFFFF]">
           <div className="max-w-[1400px] mx-auto px-6 md:px-10">
             <div className="flex items-end justify-between mb-10 md:mb-14 gap-8 flex-wrap">
@@ -520,31 +583,27 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </Link>
             </div>
 
-            {/* Tab switcher */}
-            <div className="flex items-center gap-8 md:gap-10 mb-10 md:mb-14 border-b border-[rgba(46,46,46,0.08)]">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`relative pb-4 text-[11px] md:text-[12px] uppercase tracking-[0.22em] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF] ${
-                    activeTab === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/40 hover:text-[#2e2e2e]/70"
-                  }`}
-                >
-                  {tab.label}
-                  {activeTab === tab.key && (
-                    <span className="absolute -bottom-px left-0 right-0 h-[2px] bg-[#2e2e2e]" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {activeTabData.products.length > 0 ? (
-              <ProductCarousel products={activeTabData.products} badge={activeTabData.badge} />
-            ) : (
-              <p className="text-[13px] text-[#2e2e2e]/60 py-10 text-center">
-                Uskoro nove ponude u ovoj kategoriji.
-              </p>
+            {/* Tab switcher — only tabs with products */}
+            {visibleTabs.length > 1 && (
+              <div className="flex items-center gap-8 md:gap-10 mb-10 md:mb-14 border-b border-[rgba(46,46,46,0.08)]">
+                {visibleTabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`relative pb-4 text-[11px] md:text-[12px] uppercase tracking-[0.22em] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF] ${
+                      activeTabData.key === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/40 hover:text-[#2e2e2e]/70"
+                    }`}
+                  >
+                    {tab.label}
+                    {activeTabData.key === tab.key && (
+                      <span className="absolute -bottom-px left-0 right-0 h-[2px] bg-[#2e2e2e]" />
+                    )}
+                  </button>
+                ))}
+              </div>
             )}
+
+            <ProductCarousel products={activeTabData.products} badge={activeTabData.badge} />
           </div>
         </section>
       )}
@@ -590,14 +649,14 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </p>
 
               {/* Stats row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center sm:justify-items-start border-t border-[#FFFFFF]/25 pt-8 mb-10 max-w-lg">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center border-t border-[#FFFFFF]/25 pt-8 mb-10 max-w-lg">
                 {[
-                  { v: "30+", l: "Godina iskustva" },
-                  { v: "1000+", l: "Profesionalnih partnera" },
-                  { v: "Veleprodajni", l: "Uslovi" },
-                  { v: "1:1", l: "Stručna podrška" },
+                  { v: "30+", l: "Godina" },
+                  { v: "1000+", l: "Partnera" },
+                  { v: "Usluge", l: "Veleprodaja" },
+                  { v: "1:1", l: "Podrška" },
                 ].map((s, i) => (
-                  <div key={i} className={`text-center sm:text-left ${i < 3 ? "sm:border-r sm:border-[#FFFFFF]/25" : ""} sm:pr-2`}>
+                  <div key={i} className={`text-center ${i < 3 ? "sm:border-r sm:border-[#FFFFFF]/25" : ""} sm:px-2`}>
                     <div className="text-xl md:text-2xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                       {s.v}
                     </div>
@@ -981,7 +1040,6 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         </div>
       )}
 
-      <ChatWidget />
       <CookieConsent />
     </div>
   );

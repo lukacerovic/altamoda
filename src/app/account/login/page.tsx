@@ -8,6 +8,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   User, Eye, EyeOff, Mail, Lock, Building2, Clock, X, AlertCircle,
 } from "lucide-react";
+import PhoneInput from "@/components/PhoneInput";
 
 export default function LoginPage() {
   return (
@@ -339,7 +340,7 @@ function LoginContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">{t("auth.phonePlaceholder")}</label>
-                    <input type="tel" value={regPhone} onChange={(e) => setRegPhone(e.target.value)} placeholder="+381 6x xxx xxxx" className="w-full border border-[#D8CFBC] rounded px-4 py-3 text-sm" />
+                    <PhoneInput value={regPhone} onChange={setRegPhone} placeholder="64 0123456" />
                   </div>
 
                   {registerType === "b2b" && (
