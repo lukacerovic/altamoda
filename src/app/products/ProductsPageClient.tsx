@@ -8,7 +8,7 @@ import Image from "next/image";
 import {
   Search, Heart, Star, SlidersHorizontal,
   ChevronDown, ChevronRight, Grid3X3, LayoutList,
-  X, ArrowUpDown, ShoppingBag, CheckCircle,
+  X, ArrowUpDown, ShoppingBag, CheckCircle, Palette,
 } from "lucide-react";
 import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
@@ -39,6 +39,20 @@ interface ColorProduct {
   shadeCode: string;
 }
 
+interface ColorSibling {
+  id: string;
+  slug: string;
+  name: string;
+  sku: string;
+  brand: string;
+  price: number;
+  image: string | null;
+  colorCode: string | null;
+  colorName: string | null;
+  hex: string | null;
+  stockQuantity: number;
+}
+
 interface Product {
   id: string;
   sku: string;
@@ -61,6 +75,7 @@ interface Product {
   variantCount?: number;
   groupSlug?: string | null;
   promoBadge?: string | null;
+  colorSiblings?: ColorSibling[];
 }
 
 interface BrandFilter {
@@ -197,6 +212,8 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
   const badge = getBadge(product);
   const imgSrc = product.image || PLACEHOLDER_IMG;
+  const hasColors = (product.colorSiblings?.length ?? 0) > 1;
+  const b2bOnly = product.price == null;
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -245,7 +262,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   };
 
   return (
-    <Link href={`/products/${product.slug}`} className="group block">
+    <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">
       <div className="relative aspect-[4/5] overflow-hidden bg-[#F2ECDE] mb-4 rounded-[4px]">
         <Image src={imgSrc} alt={product.name} width={500} height={625} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
@@ -264,18 +281,27 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
         <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10 opacity-0 group-hover:opacity-100">
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#2e2e2e] text-[#2e2e2e]" : "text-[#2e2e2e]"}`} />
         </button>
-        <div className="absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <button onClick={handleAddToCart} disabled={outOfStock} className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#FFFFFF]" : "bg-[#837A64] text-[#FFFFFF] hover:bg-[#6a624f]"}`}>
-            {outOfStock ? <>{t("products.outOfStock")}</> : addedToCart ? <><CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}</> : <><ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}</>}
-          </button>
-        </div>
+        {!b2bOnly && (
+          <div className="hidden md:block absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+            <button
+              onClick={hasColors ? undefined : handleAddToCart}
+              disabled={!hasColors && outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#2e2e2e]" : "bg-[#e1dbd0] text-[#2e2e2e] hover:bg-[#6a624f]"}`}
+            >
+              {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
+                : outOfStock ? <>{t("products.outOfStock")}</>
+                : addedToCart ? <><CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}</>
+                : <><ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}</>}
+            </button>
+          </div>
+        )}
       </div>
-      <div>
+      <div className="flex flex-col flex-1">
         <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium block mb-1.5">{product.brand?.name ?? ""}</span>
-        <h3 className="text-base text-[#2e2e2e] mb-1 font-normal line-clamp-2 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.name}</h3>
+        <h3 className="text-base text-[#2e2e2e] mb-1 font-normal line-clamp-2 leading-tight min-h-[2.6em]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.name}</h3>
         <div className="flex items-center gap-2 text-sm text-[#2e2e2e] mt-1">
           {product.price == null ? (
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#837A64] font-medium">B2B samo · prijavi se za cenu</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e] font-medium">B2B samo · prijavi se za cenu</span>
           ) : (
             <>
               {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
@@ -286,6 +312,23 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
         <div className="flex items-center gap-0.5 mt-2">
           {[...Array(5)].map((_, i) => <Star key={i} className={`w-2.5 h-2.5 ${i < Math.round(product.rating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />)}
         </div>
+
+        {/* Mobile-only persistent action area — pinned to bottom for cross-card alignment */}
+        {!b2bOnly && (
+          <div className="md:hidden mt-auto pt-3">
+            <button
+              onClick={hasColors ? undefined : handleAddToCart}
+              disabled={!hasColors && outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed" : addedToCart ? "bg-[#6a624f] text-[#2e2e2e]" : "bg-[#e1dbd0] text-[#2e2e2e] active:bg-[#6a624f]"}`}
+            >
+              {hasColors ? <><Palette className="w-3 h-3" /> Izaberi boju</>
+                : outOfStock ? <>{t("products.outOfStock")}</>
+                : addedToCart ? <><CheckCircle className="w-3 h-3" /> {t("products.addedToCart")}</>
+                : <><ShoppingBag className="w-3 h-3" /> {t("products.addToCart")}</>}
+            </button>
+          </div>
+        )}
+
       </div>
     </Link>
   );
@@ -900,7 +943,7 @@ export default function ProductsPageClient({
               <span className="text-[13px] text-[#2e2e2e]/60 group-hover:text-[#2e2e2e] transition-colors">{f.label}</span>
               <button
                 onClick={(e) => { e.preventDefault(); toggleFilter(f.key); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#837A64]" : "bg-[#D8CFBC]"}`}
+                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#e1dbd0]" : "bg-[#D8CFBC]"}`}
               >
                 <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.18)] ring-1 ring-black/5 transition-transform duration-300 ${activeToggles.includes(f.key) ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
               </button>
@@ -1019,7 +1062,7 @@ export default function ProductsPageClient({
                             <p className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]/60">{p.brand}</p>
                           </div>
                           {p.price == null ? (
-                            <span className="text-[10px] uppercase tracking-[0.18em] text-[#837A64]">B2B</span>
+                            <span className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]">B2B</span>
                           ) : (
                             <span className="text-sm text-[#2e2e2e]">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] text-[#2e2e2e]/60">RSD</span></span>
                           )}
@@ -1125,7 +1168,7 @@ export default function ProductsPageClient({
                   <button
                     key={tag.key}
                     onClick={() => removeTag(tag.key)}
-                    className="group flex items-center gap-1.5 bg-[#837A64] text-[#FFFFFF] pl-3 pr-2 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium border border-[#837A64] hover:bg-[#6a624f] hover:border-[#6a624f] transition-colors"
+                    className="group flex items-center gap-1.5 bg-[#e1dbd0] text-[#2e2e2e] pl-3 pr-2 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium border border-[#e1dbd0] hover:bg-[#6a624f] hover:border-[#6a624f] transition-colors"
                   >
                     {tag.label}
                     <X className="w-3 h-3 text-[#FFFFFF]/70 group-hover:text-[#FFFFFF] transition-colors" />
@@ -1175,7 +1218,7 @@ export default function ProductsPageClient({
                       </div>
                       <div className="mt-2 flex items-baseline gap-2 text-[#2e2e2e]">
                         {p.price == null ? (
-                          <span className="text-[10px] uppercase tracking-[0.22em] text-[#837A64] font-medium">B2B samo</span>
+                          <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e] font-medium">B2B samo</span>
                         ) : (
                           <>
                             {p.oldPrice && <span className="text-xs text-[#2e2e2e]/60 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}

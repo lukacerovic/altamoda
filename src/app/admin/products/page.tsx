@@ -817,7 +817,7 @@ export default function ProductsPage() {
   ];
 
   /* ── Common input class ── */
-  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#837A64]";
+  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#2e2e2e]";
   const labelCls = "block text-sm font-medium text-[#2e2e2e] mb-1.5";
   const sectionCls = "space-y-5";
 
@@ -829,7 +829,7 @@ export default function ProductsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.products")}</h1>
-          <p className="text-sm text-[#837A64] mt-1">{products.length} {t("admin.totalProducts")}</p>
+          <p className="text-sm text-[#2e2e2e] mt-1">{products.length} {t("admin.totalProducts")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -853,7 +853,7 @@ export default function ProductsPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#837A64]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2e2e2e]" />
             <input
               type="text"
               placeholder={t("admin.searchByNameOrCode")}
@@ -864,7 +864,7 @@ export default function ProductsPage() {
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#837A64]"
+            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#2e2e2e]"
           >
             <Filter size={16} />
             {t("admin.filters")}
@@ -894,7 +894,7 @@ export default function ProductsPage() {
         {/* Bulk Actions */}
         {selectedIds.length > 0 && (
           <div className="mt-3 pt-3 border-t border-[#FFFFFF] flex items-center gap-3">
-            <span className="text-sm text-[#837A64]">{selectedIds.length} {t("admin.selected")}</span>
+            <span className="text-sm text-[#2e2e2e]">{selectedIds.length} {t("admin.selected")}</span>
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
@@ -927,19 +927,19 @@ export default function ProductsPage() {
             <thead>
               <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
-                  <button onClick={selectAll} className="text-[#837A64] hover:text-black">
+                  <button onClick={selectAll} className="text-[#2e2e2e] hover:text-black">
                     {selectedIds.length === paginated.length && paginated.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.product")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.sku")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.brand")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.category")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.priceB2c")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.priceB2b")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.stock")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.status")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#837A64] uppercase tracking-wider">{t("admin.actions")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.product")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.sku")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.brand")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.category")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.priceB2c")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.priceB2b")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.stock")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.status")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#FFFFFF]">
@@ -950,7 +950,7 @@ export default function ProductsPage() {
                       onClick={() => toggleSelect(product.id)}
                       aria-label={selectedIds.includes(product.id) ? t("admin.deselectRow") : t("admin.selectRow")}
                       aria-pressed={selectedIds.includes(product.id)}
-                      className="text-[#837A64] hover:text-black"
+                      className="text-[#2e2e2e] hover:text-black"
                     >
                       {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
                     </button>
@@ -958,7 +958,7 @@ export default function ProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-sm bg-stone-100 flex items-center justify-center flex-shrink-0">
-                        <Package size={18} className="text-[#837A64]" />
+                        <Package size={18} className="text-[#2e2e2e]" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -975,14 +975,14 @@ export default function ProductsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs font-mono text-[#837A64]">{product.sku}</td>
+                  <td className="px-4 py-3 text-xs font-mono text-[#2e2e2e]">{product.sku}</td>
                   <td className="px-4 py-3 text-sm text-[#2e2e2e]">{product.brand}</td>
                   <td className="px-4 py-3 text-sm text-[#2e2e2e]">{product.category}</td>
                   <td className="px-4 py-3">
                     <div>
                       <span className="text-sm font-medium text-black">{product.priceB2C.toLocaleString()} RSD</span>
                       {product.oldPrice && (
-                        <span className="block text-xs text-[#837A64] line-through">{product.oldPrice.toLocaleString()} RSD</span>
+                        <span className="block text-xs text-[#2e2e2e] line-through">{product.oldPrice.toLocaleString()} RSD</span>
                       )}
                     </div>
                   </td>
@@ -1008,7 +1008,7 @@ export default function ProductsPage() {
                         onClick={() => openEditPanel(product)}
                         aria-label={`${t("admin.editProduct")}: ${product.name}`}
                         title={t("admin.editProduct")}
-                        className="p-1.5 text-[#837A64] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
+                        className="p-1.5 text-[#2e2e2e] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
                       >
                         <Edit3 size={15} />
                       </button>
@@ -1016,7 +1016,7 @@ export default function ProductsPage() {
                         onClick={() => handleDelete(product.id)}
                         aria-label={`${t("admin.deleteProduct")}: ${product.name}`}
                         title={t("admin.deleteProduct")}
-                        className="p-1.5 text-[#837A64] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
+                        className="p-1.5 text-[#2e2e2e] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -1026,7 +1026,7 @@ export default function ProductsPage() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#837A64]">
+                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#2e2e2e]">
                     {t("admin.noProductsMatch")}
                   </td>
                 </tr>
@@ -1038,14 +1038,14 @@ export default function ProductsPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
-            <span className="text-sm text-[#837A64]">
+            <span className="text-sm text-[#2e2e2e]">
               {t("admin.showing")} {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-sm text-[#837A64] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#2e2e2e] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -1053,7 +1053,7 @@ export default function ProductsPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#837A64] hover:bg-stone-100"}`}
+                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#2e2e2e] hover:bg-stone-100"}`}
                 >
                   {page}
                 </button>
@@ -1061,7 +1061,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-sm text-[#837A64] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#2e2e2e] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight size={18} />
               </button>
@@ -1083,7 +1083,7 @@ export default function ProductsPage() {
               <h2 className="text-lg font-serif font-bold text-black">
                 {editingProduct ? t("admin.editProduct") : t("admin.addProduct")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-2 text-[#837A64] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
+              <button onClick={() => setShowPanel(false)} className="p-2 text-[#2e2e2e] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -1098,7 +1098,7 @@ export default function ProductsPage() {
                     className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.key
                         ? "border-black text-secondary"
-                        : "border-transparent text-[#837A64] hover:text-black hover:border-[#D8CFBC]"
+                        : "border-transparent text-[#2e2e2e] hover:text-black hover:border-[#D8CFBC]"
                     }`}
                   >
                     {tab.icon}
@@ -1132,8 +1132,8 @@ export default function ProductsPage() {
                   {/* ERP Info (read-only) */}
                   {(formData.erpId || formData.vatCode) && (
                     <div className="p-3 bg-stone-50 border border-stone-200 rounded-sm">
-                      <label className="text-[10px] uppercase tracking-wider text-[#837A64] font-medium">ERP / Pantheon</label>
-                      <div className="flex gap-6 mt-1.5 text-sm text-[#837A64]">
+                      <label className="text-[10px] uppercase tracking-wider text-[#2e2e2e] font-medium">ERP / Pantheon</label>
+                      <div className="flex gap-6 mt-1.5 text-sm text-[#2e2e2e]">
                         {formData.erpId && <span>ERP ID: <strong className="text-black">{formData.erpId}</strong></span>}
                         <span>PDV kod: <strong className="text-black">{formData.vatCode || "R2"}</strong></span>
                       </div>
@@ -1274,7 +1274,7 @@ export default function ProductsPage() {
                       >
                         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.status === "active" ? "translate-x-[26px]" : "translate-x-[2px]"}`} />
                       </button>
-                      <span className="text-sm text-[#837A64]">{formData.status === "active" ? t("admin.active") : t("admin.inactive")}</span>
+                      <span className="text-sm text-[#2e2e2e]">{formData.status === "active" ? t("admin.active") : t("admin.inactive")}</span>
                     </div>
                   </div>
 
@@ -1293,7 +1293,7 @@ export default function ProductsPage() {
                             type="checkbox"
                             checked={formData.badges[key]}
                             onChange={(e) => updateForm("badges", { ...formData.badges, [key]: e.target.checked })}
-                            className="w-4 h-4 rounded border-stone-200 text-secondary accent-[#837A64]"
+                            className="w-4 h-4 rounded border-stone-200 text-secondary accent-[#e1dbd0]"
                           />
                           <span className="text-sm text-[#2e2e2e]">{label}</span>
                         </label>
@@ -1483,7 +1483,7 @@ export default function ProductsPage() {
 
                   {/* Margin info */}
                   {formData.purchasePrice > 0 && formData.priceB2C > 0 && (
-                    <div className="p-3 bg-stone-100 rounded-sm text-sm text-[#837A64]">
+                    <div className="p-3 bg-stone-100 rounded-sm text-sm text-[#2e2e2e]">
                       {t("admin.marginB2c")}: <strong className="text-black">{Math.round(((formData.priceB2C - formData.purchasePrice) / formData.priceB2C) * 100)}%</strong>
                       {formData.priceB2B > 0 && (
                         <span className="ml-4">{t("admin.marginB2b")}: <strong className="text-black">{Math.round(((formData.priceB2B - formData.purchasePrice) / formData.priceB2B) * 100)}%</strong></span>
@@ -1576,7 +1576,7 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div>
                     <label className={labelCls}>{t("admin.productImages")}</label>
-                    <p className="text-xs text-[#837A64] mb-3">{t("admin.dragImages")}</p>
+                    <p className="text-xs text-[#2e2e2e] mb-3">{t("admin.dragImages")}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
@@ -1585,7 +1585,7 @@ export default function ProductsPage() {
                           ) : (
                             <div className="text-center p-2">
                               <ImageIcon size={28} className="mx-auto text-[#D8CFBC] mb-1" />
-                              <p className="text-[10px] text-[#837A64] truncate max-w-full">{img.url.split("/").pop()}</p>
+                              <p className="text-[10px] text-[#2e2e2e] truncate max-w-full">{img.url.split("/").pop()}</p>
                             </div>
                           )}
                           {img.isPrimary && (
@@ -1645,7 +1645,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#837A64] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {uploading ? (
                           <>
@@ -1669,7 +1669,7 @@ export default function ProductsPage() {
                       <div className="space-y-2">
                         {formData.images.map((img, idx) => (
                           <div key={img.id} className="flex items-center gap-2">
-                            <span className="text-xs text-[#837A64] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
+                            <span className="text-xs text-[#2e2e2e] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
                             <input
                               type="text"
                               value={img.alt}
@@ -1730,7 +1730,7 @@ export default function ProductsPage() {
             <div className="flex-shrink-0 px-6 py-4 border-t border-stone-200 bg-white flex items-center justify-between">
               <button
                 onClick={() => setShowPanel(false)}
-                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#837A64] hover:bg-stone-100 transition-colors"
+                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#2e2e2e] hover:bg-stone-100 transition-colors"
               >
                 {t("admin.cancel")}
               </button>
@@ -1764,7 +1764,7 @@ export default function ProductsPage() {
               <h3 className="text-lg font-serif font-bold text-black">{t("admin.requiredFields") || "Obavezna polja"}</h3>
             </div>
             <div className="px-6 py-4">
-              <p className="text-sm text-[#837A64] mb-3">{t("admin.fillRequiredFields") || "Popunite sva obavezna polja pre nego što sačuvate proizvod:"}</p>
+              <p className="text-sm text-[#2e2e2e] mb-3">{t("admin.fillRequiredFields") || "Popunite sva obavezna polja pre nego što sačuvate proizvod:"}</p>
               <ul className="space-y-1.5">
                 {validationErrors.map((field) => (
                   <li key={field} className="flex items-center gap-2 text-sm text-red-600">

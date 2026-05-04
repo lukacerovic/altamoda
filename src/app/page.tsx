@@ -2,14 +2,15 @@ export const revalidate = 60
 
 import { prisma } from '@/lib/db'
 import HomePageClient from './HomePageClient'
-import type { ProductData } from './HomePageClient'
+import type { ProductData, ColorSiblingData } from './HomePageClient'
 
 function formatProduct(p: {
   id: string; nameLat: string; slug: string; sku: string; priceB2c: unknown; priceB2b: unknown; oldPrice: unknown;
   stockQuantity: number; isNew: boolean; isFeatured: boolean; isProfessional: boolean;
+  groupSlug: string | null;
   brand: { name: string } | null;
   images: { url: string }[];
-}, avgRating: number): ProductData {
+}, avgRating: number, siblings?: ColorSiblingData[]): ProductData {
   return {
     id: p.id,
     name: p.nameLat,
@@ -24,6 +25,8 @@ function formatProduct(p: {
     isProfessional: p.isProfessional,
     stockQuantity: p.stockQuantity,
     sku: p.sku,
+    groupSlug: p.groupSlug,
+    colorSiblings: siblings && siblings.length > 1 ? siblings : undefined,
   }
 }
 
@@ -104,12 +107,49 @@ export default async function HomePage() {
 
   const getRating = (id: string) => ratingMap.get(id) || 0
 
+  // Fetch all color siblings in one batch for products belonging to a color group.
+  const groupSlugs = [...new Set(allProducts.map(p => p.groupSlug).filter((g): g is string => !!g))]
+  const siblingRows = groupSlugs.length > 0
+    ? await prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugs }, isActive: true },
+        select: {
+          id: true, slug: true, nameLat: true, sku: true, priceB2c: true,
+          colorCode: true, colorName: true, groupSlug: true, stockQuantity: true,
+          brand: { select: { name: true } },
+          images: { where: { isPrimary: true }, take: 1 },
+          colorProduct: { select: { hexValue: true } },
+        },
+      })
+    : []
+
+  const siblingsByGroup = new Map<string, ColorSiblingData[]>()
+  for (const s of siblingRows) {
+    if (!s.groupSlug) continue
+    const arr = siblingsByGroup.get(s.groupSlug) || []
+    arr.push({
+      id: s.id,
+      slug: s.slug,
+      name: s.nameLat,
+      sku: s.sku,
+      brand: s.brand?.name || '',
+      price: Number(s.priceB2c),
+      image: s.images[0]?.url || null,
+      colorCode: s.colorCode,
+      colorName: s.colorName,
+      hex: s.colorProduct?.hexValue || null,
+      stockQuantity: s.stockQuantity,
+    })
+    siblingsByGroup.set(s.groupSlug, arr)
+  }
+
+  const getSiblings = (groupSlug: string | null) => groupSlug ? siblingsByGroup.get(groupSlug) : undefined
+
   return (
     <HomePageClient
-      featuredProducts={featured.map(p => formatProduct(p, getRating(p.id)))}
-      bestsellers={bestsellers.map(p => formatProduct(p, getRating(p.id)))}
-      newArrivals={newArrivals.map(p => formatProduct(p, getRating(p.id)))}
-      saleProducts={saleProducts.map(p => formatProduct(p, getRating(p.id)))}
+      featuredProducts={featured.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
+      bestsellers={bestsellers.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
+      newArrivals={newArrivals.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
+      saleProducts={saleProducts.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
       heroImages={heroSetting?.value ? (() => { try { return JSON.parse(heroSetting.value); } catch { return []; } })() : []}
       heroCards={heroCardsSetting?.value ? (() => { try { return JSON.parse(heroCardsSetting.value); } catch { return []; } })() : []}
       socialLinks={{

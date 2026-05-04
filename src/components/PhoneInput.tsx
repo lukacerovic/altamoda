@@ -129,7 +129,7 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
       >
         <span className="text-base leading-none">{country.flag}</span>
         <span className="text-[#2e2e2e] tabular-nums">{country.dial}</span>
-        <ChevronDown className={`w-3.5 h-3.5 text-[#837A64] transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-[#2e2e2e] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <input
         id={id}
@@ -149,7 +149,7 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
           className="absolute top-full left-0 z-20 mt-1 w-72 max-w-[calc(100vw-2rem)] bg-white border border-[#D8CFBC] rounded shadow-lg max-h-72 flex flex-col"
         >
           <div className="p-2 border-b border-[#D8CFBC] relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#837A64] pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#2e2e2e] pointer-events-none" />
             <input
               type="text"
               value={search}
@@ -161,7 +161,7 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
           </div>
           <div className="overflow-y-auto flex-1">
             {filtered.length === 0 ? (
-              <p className="text-xs text-[#837A64] text-center py-4">Nema rezultata</p>
+              <p className="text-xs text-[#2e2e2e] text-center py-4">Nema rezultata</p>
             ) : (
               filtered.map((c) => (
                 <button
@@ -174,7 +174,7 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
                 >
                   <span className="text-base leading-none">{c.flag}</span>
                   <span className="flex-1 truncate text-[#2e2e2e]">{c.name}</span>
-                  <span className="text-xs text-[#837A64] tabular-nums">{c.dial}</span>
+                  <span className="text-xs text-[#2e2e2e] tabular-nums">{c.dial}</span>
                 </button>
               ))
             )}

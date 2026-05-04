@@ -12,7 +12,6 @@ import {
   Settings,
   Menu,
   X,
-  Bell,
   ChevronDown,
   LogOut,
   User,
@@ -40,7 +39,6 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   const userName = session?.user?.name || "Admin";
   const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -68,12 +66,6 @@ export default function AdminLayout({
         { href: "/admin/settings", label: t("admin.settings"), icon: Settings },
       ],
     },
-  ];
-
-  const notifications = [
-    { id: 1, text: "Nova porudžbina #1048", time: "Pre 5 min", unread: true },
-    { id: 2, text: "Nizak nivo zaliha: Kerastase Elixir", time: "Pre 1h", unread: true },
-    { id: 3, text: "Novi B2B korisnik čeka odobrenje", time: "Pre 3h", unread: false },
   ];
 
   const isActive = (href: string) => pathname.startsWith(href);
@@ -271,51 +263,10 @@ export default function AdminLayout({
             {/* Language */}
             <LanguageToggle />
 
-            {/* Notifications */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setNotificationsOpen(!notificationsOpen);
-                  setUserDropdownOpen(false);
-                }}
-                className="relative p-2 text-stone-500 hover:text-black hover:bg-stone-100 rounded-sm transition-colors"
-              >
-                <Bell size={20} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
-
-              {notificationsOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden animate-slideDown">
-                  <div className="p-4 border-b border-stone-200">
-                    <h3 className="font-semibold text-sm text-black">{t("admin.notifications")}</h3>
-                  </div>
-                  {notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      className={`p-4 border-b border-stone-100 hover:bg-stone-100 cursor-pointer transition-colors ${
-                        n.unread ? "bg-black/5" : ""
-                      }`}
-                    >
-                      <p className="text-sm text-stone-800">{n.text}</p>
-                      <p className="text-xs text-stone-400 mt-1">{n.time}</p>
-                    </div>
-                  ))}
-                  <div className="p-3 text-center">
-                    <button className="text-sm text-secondary hover:text-black font-medium">
-                      {t("admin.showAllNotifications")}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* User dropdown */}
             <div className="relative">
               <button
-                onClick={() => {
-                  setUserDropdownOpen(!userDropdownOpen);
-                  setNotificationsOpen(false);
-                }}
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-2 p-2 hover:bg-stone-100 rounded-sm transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-semibold text-xs">

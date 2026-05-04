@@ -63,7 +63,7 @@ export default function ContactPage() {
                 </span>
                 <div className="space-y-6">
                   <div className="space-y-1">
-                    <p className="text-[10px] tracking-widest text-[#837A64] uppercase mb-2">
+                    <p className="text-[10px] tracking-widest text-[#2e2e2e] uppercase mb-2">
                       {t("contact.emailLabel")}
                     </p>
                     <a
@@ -74,7 +74,7 @@ export default function ContactPage() {
                     </a>
                   </div>
                   <div className="pt-4 space-y-1">
-                    <p className="text-[10px] tracking-widest text-[#837A64] uppercase mb-2">
+                    <p className="text-[10px] tracking-widest text-[#2e2e2e] uppercase mb-2">
                       {t("contact.phoneLabel")}
                     </p>
                     <a
@@ -125,12 +125,12 @@ export default function ContactPage() {
             </p>
             <form className="flex flex-col md:flex-row gap-4">
               <input
-                className="flex-grow bg-transparent border-0 border-b border-[#837A64] focus:border-[#6a624f] focus:ring-0 py-3 text-[#2e2e2e] placeholder:text-[#837A64]/50 transition-colors duration-500"
+                className="flex-grow bg-transparent border-0 border-b border-[#e1dbd0] focus:border-[#6a624f] focus:ring-0 py-3 text-[#2e2e2e] placeholder:text-[#2e2e2e]/50 transition-colors duration-500"
                 placeholder={t("contact.emailPlaceholder")}
                 type="email"
               />
               <button
-                className="bg-[#837A64] text-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#6a624f] transition-colors duration-300"
+                className="bg-[#e1dbd0] text-[#2e2e2e] px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#6a624f] transition-colors duration-300"
                 type="submit"
               >
                 {t("contact.subscribe")}

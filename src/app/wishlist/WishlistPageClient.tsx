@@ -78,7 +78,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-[#837A64] mb-6">
+        <div className="flex items-center gap-2 text-sm text-[#2e2e2e] mb-6">
           <Link href="/" className="hover:text-secondary">{t("wishlist.home")}</Link>
           <span>/</span>
           <span className="text-[#2e2e2e]">{t("wishlist.title")}</span>
@@ -95,12 +95,12 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             {/* Title + Actions */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-secondary fill-[#837A64]" />
+                <Heart className="w-6 h-6 text-secondary fill-[#e1dbd0]" />
                 <h1 className="text-3xl font-bold text-[#2e2e2e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
-                <span className="text-sm text-[#837A64]">({items.length} {t("wishlist.itemCount")})</span>
+                <span className="text-sm text-[#2e2e2e]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 border border-[#D8CFBC] text-[#837A64] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2 border border-[#D8CFBC] text-[#2e2e2e] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
                   <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
                 <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-black hover:bg-[#2e2e2e] text-white text-sm font-medium rounded-sm transition-colors">
@@ -137,14 +137,14 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       <h3 className="text-sm font-medium text-[#2e2e2e] mb-2 line-clamp-2 leading-snug">{item.name}</h3>
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#837A64] text-secondary" : "text-[#D8CFBC]"}`} />
+                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#e1dbd0] text-secondary" : "text-[#D8CFBC]"}`} />
                         ))}
                       </div>
                       <div className="flex items-center gap-2 mb-3">
                         {item.oldPrice && item.oldPrice > item.price ? (
                           <>
                             <span className="text-base font-bold text-[#b5453a]">{item.price.toLocaleString()} RSD</span>
-                            <span className="text-xs text-[#837A64] line-through">{item.oldPrice.toLocaleString()} RSD</span>
+                            <span className="text-xs text-[#2e2e2e] line-through">{item.oldPrice.toLocaleString()} RSD</span>
                           </>
                         ) : (
                           <span className="text-base font-bold text-[#2e2e2e]">{item.price.toLocaleString()} RSD</span>
@@ -155,8 +155,8 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         onClick={() => addToCart(item)}
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
-                            ? "bg-black hover:bg-[#2e2e2e] text-white"
-                            : "bg-[#D8CFBC] text-[#837A64] cursor-not-allowed"
+                            ? "bg-[#e1dbd0] hover:bg-[#6a624f] text-[#2e2e2e]"
+                            : "bg-[#D8CFBC] text-[#2e2e2e] cursor-not-allowed"
                         }`}
                       >
                         {item.inStock ? t("wishlist.addToCart") : t("wishlist.unavailable")}
@@ -172,7 +172,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-[#D8CFBC] mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.emptyTitle")}</h2>
-            <p className="text-[#837A64] mb-6">{t("wishlist.emptyDesc")}</p>
+            <p className="text-[#2e2e2e] mb-6">{t("wishlist.emptyDesc")}</p>
             <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-black hover:bg-[#2e2e2e] text-white font-medium rounded-sm transition-colors">
               {t("productDetail.products")}
             </Link>

@@ -1,7 +1,7 @@
 import { getUnsubscribeUrl, getSiteUrl } from './email'
 
 const BRAND_BG = '#FFFFFF'
-const BRAND_PRIMARY = '#837A64'
+const BRAND_PRIMARY = '#e1dbd0'
 const BRAND_TEXT = '#2e2e2e'
 
 interface BaseLayoutOptions {
