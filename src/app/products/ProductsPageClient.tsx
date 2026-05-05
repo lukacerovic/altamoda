@@ -589,7 +589,7 @@ export default function ProductsPageClient({
     if (filterUndertone) params.set("colorUndertone", filterUndertone);
 
     return params.toString();
-  }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
+  }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (page: number) => {
@@ -621,7 +621,7 @@ export default function ProductsPageClient({
     setCurrentPage(1);
     fetchProducts(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
+  }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
 
   // Re-fetch when page changes
   useEffect(() => {
