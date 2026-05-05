@@ -248,6 +248,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       where: finalWhere,
       include: {
         brand: { select: { id: true, name: true, slug: true } },
+        productLine: { select: { id: true, name: true, slug: true } },
         category: { select: { id: true, nameLat: true, slug: true } },
         images: { where: { isPrimary: true }, take: 1 },
         colorProduct: true,
