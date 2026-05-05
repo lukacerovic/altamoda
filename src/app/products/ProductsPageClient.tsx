@@ -129,11 +129,22 @@ interface ColorUndertoneFacet {
   hexSamples: string[];
 }
 
+interface ProductLineFilter {
+  id: string;
+  name: string;
+  slug: string;
+  brand: { id: string; name: string; slug: string };
+}
+
 interface ProductsPageClientProps {
   initialProducts: Product[];
   initialPagination: Pagination;
   brands: BrandFilter[];
   categories: CategoryNode[];
+  productLines: ProductLineFilter[];
+  productTypes: string[];
+  hairTypes: string[];
+  tags: string[];
   attributes: AttributeFilter[];
   userRole: string | null;
   wishlistedProductIds?: string[];
@@ -451,6 +462,10 @@ export default function ProductsPageClient({
   initialPagination,
   brands,
   categories,
+  productLines,
+  productTypes,
+  hairTypes,
+  tags,
   attributes,
   userRole: _serverRole,
   wishlistedProductIds: _serverWishlist = [],
@@ -466,6 +481,10 @@ export default function ProductsPageClient({
   const searchParam = searchParams.get("search");
   const genderParam = searchParams.get("gender");
   const brandParam = searchParams.get("brand");
+  const productLineParams = searchParams.getAll("productLine");
+  const productTypeParams = searchParams.getAll("productType");
+  const hairTypeParams = searchParams.getAll("hairType");
+  const tagParams = searchParams.getAll("tag");
 
   const [wishlistedProductIds, setWishlistedProductIds] = useState<string[]>(_serverWishlist);
   const wishlistedSet = new Set(wishlistedProductIds);
@@ -486,14 +505,23 @@ export default function ProductsPageClient({
   const [selectedBrands, setSelectedBrands] = useState<string[]>(brandParam ? [brandParam] : []);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
   const [selectedGender, setSelectedGender] = useState<string | null>(genderParam);
+  const [selectedProductLines, setSelectedProductLines] = useState<string[]>(productLineParams);
+  const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>(productTypeParams);
+  const [selectedHairTypes, setSelectedHairTypes] = useState<string[]>(hairTypeParams);
+  const [selectedTags, setSelectedTags] = useState<string[]>(tagParams);
 
-  // Sync category, gender, and brand from URL when navigating between menu links
+  // Sync category, gender, brand, lines, attribute filters from URL when navigating between menu links
   useEffect(() => {
     setSelectedCategory(categoryParam);
     setSelectedGender(genderParam);
     setSelectedBrands(brandParam ? [brandParam] : []);
+    setSelectedProductLines(productLineParams);
+    setSelectedProductTypes(productTypeParams);
+    setSelectedHairTypes(hairTypeParams);
+    setSelectedTags(tagParams);
     setCurrentPage(1);
-  }, [categoryParam, genderParam, brandParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryParam, genderParam, brandParam, productLineParams.join(","), productTypeParams.join(","), hairTypeParams.join(","), tagParams.join(",")]);
 
   // Sync search from URL (e.g. from header search) and auto-submit
   useEffect(() => {
@@ -553,6 +581,10 @@ export default function ProductsPageClient({
     }
 
     selectedBrands.forEach((b) => params.append("brand", b));
+    selectedProductLines.forEach((l) => params.append("productLine", l));
+    selectedProductTypes.forEach((t) => params.append("productType", t));
+    selectedHairTypes.forEach((t) => params.append("hairType", t));
+    selectedTags.forEach((t) => params.append("tag", t));
 
     if (priceMin) params.set("priceMin", priceMin);
     if (priceMax) params.set("priceMax", priceMax);
@@ -575,7 +607,7 @@ export default function ProductsPageClient({
     if (filterUndertone) params.set("colorUndertone", filterUndertone);
 
     return params.toString();
-  }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
+  }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (page: number) => {
@@ -607,7 +639,7 @@ export default function ProductsPageClient({
     setCurrentPage(1);
     fetchProducts(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
+  }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
 
   // Re-fetch when page changes
   useEffect(() => {
@@ -667,6 +699,19 @@ export default function ProductsPageClient({
     );
   };
 
+  const toggleProductLine = (slug: string) => {
+    setSelectedProductLines((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+    );
+  };
+
+  const toggleInList = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (value: string) => {
+    setter((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
+  };
+  const toggleProductType = toggleInList(setSelectedProductTypes);
+  const toggleHairType = toggleInList(setSelectedHairTypes);
+  const toggleTag = toggleInList(setSelectedTags);
+
   const toggleFilter = (key: string) => {
     setActiveToggles((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]);
   };
@@ -681,6 +726,13 @@ export default function ProductsPageClient({
     const b = brands.find((br) => br.slug === slug);
     if (b) activeTags.push({ key: `brand:${slug}`, label: b.name });
   });
+  selectedProductLines.forEach((slug) => {
+    const l = productLines.find((pl) => pl.slug === slug);
+    if (l) activeTags.push({ key: `productLine:${slug}`, label: l.name });
+  });
+  selectedProductTypes.forEach((v) => activeTags.push({ key: `productType:${v}`, label: v }));
+  selectedHairTypes.forEach((v) => activeTags.push({ key: `hairType:${v}`, label: v }));
+  selectedTags.forEach((v) => activeTags.push({ key: `tag:${v}`, label: v }));
   activeToggles.forEach((key) => {
     const attr = attributes.find((a) => a.slug === key);
     if (attr) activeTags.push({ key: `attr:${key}`, label: attr.nameLat });
@@ -709,6 +761,18 @@ export default function ProductsPageClient({
     if (tagKey.startsWith("brand:")) {
       const slug = tagKey.replace("brand:", "");
       setSelectedBrands((prev) => prev.filter((s) => s !== slug));
+    } else if (tagKey.startsWith("productLine:")) {
+      const slug = tagKey.replace("productLine:", "");
+      setSelectedProductLines((prev) => prev.filter((s) => s !== slug));
+    } else if (tagKey.startsWith("productType:")) {
+      const v = tagKey.replace("productType:", "");
+      setSelectedProductTypes((prev) => prev.filter((s) => s !== v));
+    } else if (tagKey.startsWith("hairType:")) {
+      const v = tagKey.replace("hairType:", "");
+      setSelectedHairTypes((prev) => prev.filter((s) => s !== v));
+    } else if (tagKey.startsWith("tag:")) {
+      const v = tagKey.replace("tag:", "");
+      setSelectedTags((prev) => prev.filter((s) => s !== v));
     } else if (tagKey.startsWith("attr:")) {
       const key = tagKey.replace("attr:", "");
       setActiveToggles((prev) => prev.filter((k) => k !== key));
@@ -724,6 +788,10 @@ export default function ProductsPageClient({
 
   const clearAllTags = () => {
     setSelectedBrands([]);
+    setSelectedProductLines([]);
+    setSelectedProductTypes([]);
+    setSelectedHairTypes([]);
+    setSelectedTags([]);
     setActiveToggles([]);
     setSelectedCategory(null);
     setSelectedGender(null);
@@ -783,6 +851,113 @@ export default function ProductsPageClient({
           ))}
         </div>
       </FilterSection>
+
+      {/* Product Lines — narrows to selected brand(s) when any are active */}
+      {(() => {
+        const visibleLines = selectedBrands.length > 0
+          ? productLines.filter((l) => selectedBrands.includes(l.brand.slug))
+          : productLines;
+        if (visibleLines.length === 0) return null;
+        return (
+          <FilterSection
+            title={t("products.productLines") || "Linije proizvoda"}
+            defaultOpen={false}
+            count={selectedProductLines.length}
+          >
+            <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
+              {visibleLines.map((l) => {
+                const isActive = selectedProductLines.includes(l.slug);
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => toggleProductLine(l.slug)}
+                    className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors flex items-baseline justify-between gap-2 ${
+                      isActive
+                        ? "bg-[#2e2e2e] text-white"
+                        : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                    }`}
+                  >
+                    <span className="truncate">{l.name}</span>
+                    {selectedBrands.length === 0 && (
+                      <span className={`text-[10px] uppercase tracking-[0.18em] flex-shrink-0 ${isActive ? "text-white/60" : "text-[#2e2e2e]/40"}`}>
+                        {l.brand.name}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </FilterSection>
+        );
+      })()}
+
+      {/* Tip proizvoda */}
+      {productTypes.length > 0 && (
+        <FilterSection title="Tip proizvoda" defaultOpen={false} count={selectedProductTypes.length}>
+          <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
+            {productTypes.map((v) => {
+              const isActive = selectedProductTypes.includes(v);
+              return (
+                <button
+                  key={v}
+                  onClick={() => toggleProductType(v)}
+                  className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors ${
+                    isActive ? "bg-[#2e2e2e] text-white" : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                  }`}
+                >
+                  {v}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+      )}
+
+      {/* Tip kose */}
+      {hairTypes.length > 0 && (
+        <FilterSection title="Tip kose" defaultOpen={false} count={selectedHairTypes.length}>
+          <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
+            {hairTypes.map((v) => {
+              const isActive = selectedHairTypes.includes(v);
+              return (
+                <button
+                  key={v}
+                  onClick={() => toggleHairType(v)}
+                  className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors ${
+                    isActive ? "bg-[#2e2e2e] text-white" : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                  }`}
+                >
+                  {v}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+      )}
+
+      {/* Funkcija / Tagovi */}
+      {tags.length > 0 && (
+        <FilterSection title="Funkcija" defaultOpen={false} count={selectedTags.length}>
+          <div className="flex flex-wrap gap-1.5 max-h-[260px] overflow-y-auto pr-1">
+            {tags.map((v) => {
+              const isActive = selectedTags.includes(v);
+              return (
+                <button
+                  key={v}
+                  onClick={() => toggleTag(v)}
+                  className={`px-3 py-1.5 rounded-full text-[11px] transition-colors ${
+                    isActive
+                      ? "bg-[#2e2e2e] text-white"
+                      : "bg-[#F2ECDE]/60 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                  }`}
+                >
+                  {v}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+      )}
 
       <FilterSection title={`${t("products.price")} (RSD)`} defaultOpen={false}>
         <div className="flex items-center gap-3">
@@ -1133,6 +1308,51 @@ export default function ProductsPageClient({
                 })}
               </div>
             )}
+
+            {/* Product line pills — visible whenever ≥1 brand is selected (or activeBrand from URL).
+                Multi-brand selection just merges all those brands' lines into one row. */}
+            {(() => {
+              const focusedBrandSlugs: string[] = activeBrand ? [activeBrand.slug] : selectedBrands;
+              if (focusedBrandSlugs.length === 0) return null;
+              const linesForBrands = productLines.filter((l) => focusedBrandSlugs.includes(l.brand.slug));
+              if (linesForBrands.length === 0) return null;
+              const showBrandSuffix = focusedBrandSlugs.length > 1;
+              return (
+                <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-10 pb-6 border-b border-[#D8CFBC]/60">
+                  <button
+                    onClick={() => setSelectedProductLines([])}
+                    className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
+                      selectedProductLines.length === 0
+                        ? "bg-[#2e2e2e] text-white shadow-sm"
+                        : "bg-[#F2ECDE]/50 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                    }`}
+                  >
+                    {t("products.allLines")}
+                  </button>
+                  {linesForBrands.map((l) => {
+                    const isActive = selectedProductLines.includes(l.slug);
+                    return (
+                      <button
+                        key={l.slug}
+                        onClick={() => toggleProductLine(l.slug)}
+                        className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
+                          isActive
+                            ? "bg-[#2e2e2e] text-white shadow-sm"
+                            : "bg-[#F2ECDE]/50 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                        }`}
+                      >
+                        {l.name}
+                        {showBrandSuffix && (
+                          <span className={`ml-1.5 text-[10px] uppercase tracking-[0.18em] ${isActive ? "text-white/60" : "text-[#2e2e2e]/40"}`}>
+                            {l.brand.name}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
 
             {/* Toolbar */}
             <div className="flex items-center justify-between mb-8 gap-4">

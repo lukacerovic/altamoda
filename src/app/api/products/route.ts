@@ -83,6 +83,45 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   }
 
+  // Product line filter (by slug, multi-select)
+  const productLineSlugs = searchParams.getAll('productLine')
+  if (productLineSlugs.length > 0) {
+    const lines = await prisma.productLine.findMany({
+      where: { slug: { in: productLineSlugs } },
+      select: { id: true },
+    })
+    if (lines.length > 0) {
+      where.productLineId = { in: lines.map(l => l.id) }
+    }
+  }
+
+  // Product type filter (exact value match, multi-select)
+  const productTypeValues = searchParams.getAll('productType')
+  if (productTypeValues.length > 0) {
+    where.productType = { in: productTypeValues }
+  }
+
+  // hairType / tag filters: stored as comma-separated strings, multi-select with OR
+  // (e.g. "Tanka kosa" + "Suva kosa" → products containing either)
+  const additionalAnd: Prisma.ProductWhereInput[] = []
+  const hairTypeValues = searchParams.getAll('hairType')
+  if (hairTypeValues.length > 0) {
+    additionalAnd.push({
+      OR: hairTypeValues.map(v => ({ hairTypes: { contains: v, mode: 'insensitive' as const } })),
+    })
+  }
+  const tagValues = searchParams.getAll('tag')
+  if (tagValues.length > 0) {
+    additionalAnd.push({
+      OR: tagValues.map(v => ({ tags: { contains: v, mode: 'insensitive' as const } })),
+    })
+  }
+  if (additionalAnd.length > 0) {
+    where.AND = where.AND
+      ? [...(Array.isArray(where.AND) ? where.AND : [where.AND]), ...additionalAnd]
+      : additionalAnd
+  }
+
   // Price range — filter by the price the user actually sees
   if (priceMin || priceMax) {
     const priceField = role === 'b2b' ? 'priceB2b' : 'priceB2c'
@@ -236,6 +275,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       where: finalWhere,
       include: {
         brand: { select: { id: true, name: true, slug: true } },
+        productLine: { select: { id: true, name: true, slug: true } },
         category: { select: { id: true, nameLat: true, slug: true } },
         images: { where: { isPrimary: true }, take: 1 },
         colorProduct: true,
@@ -469,6 +509,10 @@ export const POST = withErrorHandler(async (req: Request) => {
       ingredients: body.ingredients,
       declaration: body.declaration,
       usageInstructions: body.usageInstructions,
+      subcategory: body.subcategory,
+      productType: body.productType,
+      hairTypes: body.hairTypes,
+      tags: body.tags,
       priceB2c: body.priceB2c,
       priceB2b: body.priceB2b,
       oldPrice: body.oldPrice,

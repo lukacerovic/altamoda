@@ -65,6 +65,10 @@ interface Product {
   ingredients: string | null;
   declaration: string | null;
   usageInstructions: string | null;
+  productType: string | null;
+  hairTypes: string | null;
+  tags: string | null;
+  subcategory: string | null;
   warnings: string | null;
   shelfLife: string | null;
   importerInfo: string | null;
@@ -376,6 +380,42 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               <div className="flex items-center gap-2 mb-5">
                 <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60">{t("productDetail.productLine")}</span>
                 <Link href={`/products?line=${product.productLine.slug}`} className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e] hover:opacity-60 transition-opacity border-b border-[#2e2e2e] pb-0.5">{product.productLine.name}</Link>
+              </div>
+            )}
+
+            {/* Imported attributes — shown only when populated */}
+            {(hasText(product.productType) || hasText(product.hairTypes) || hasText(product.tags)) && (
+              <div className="space-y-2.5 mb-5">
+                {hasText(product.productType) && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 min-w-[110px]">Tip proizvoda</span>
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]">{product.productType}</span>
+                  </div>
+                )}
+                {hasText(product.hairTypes) && (
+                  <div className="flex flex-wrap items-start gap-x-3 gap-y-1.5">
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 min-w-[110px] pt-1">Tip kose</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.hairTypes!.split(",").map(s => s.trim()).filter(Boolean).map((v, i) => (
+                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]/80 bg-[#F2ECDE] px-2.5 py-1 rounded-sm">
+                          {v}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {hasText(product.tags) && (
+                  <div className="flex flex-wrap items-start gap-x-3 gap-y-1.5">
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 min-w-[110px] pt-1">Funkcija</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.tags!.split(",").map(s => s.trim()).filter(Boolean).map((v, i) => (
+                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]/80 bg-[#F2ECDE] px-2.5 py-1 rounded-sm">
+                          {v}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

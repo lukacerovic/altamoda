@@ -470,49 +470,64 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
     };
   });
 
-  /* Hair concern cards — below B2B */
+  /* Hair concern cards — below B2B.
+     Each href deep-links into /products with hairType/tag filters that match
+     the imported product attributes. Uses ILIKE-based contains semantics on
+     the API side, so substrings (e.g. "Frizz" with/without trailing space)
+     resolve consistently. */
+  function buildFilterHref(params: Record<string, string[]>): string {
+    const sp = new URLSearchParams();
+    for (const [key, values] of Object.entries(params)) {
+      for (const v of values) sp.append(key, v);
+    }
+    return `/products?${sp.toString()}`;
+  }
+
   const valueCards = [
     {
       icon: Droplet,
       title: "Suva i oštećena kosa",
       desc: "Kosa bez sjaja, sklona lomljenju i ispucalim krajevima.",
       solution: "Intenzivna hidratacija i obnova strukture kose",
-      href: "/products",
+      href: buildFilterHref({ hairType: ["Suva kosa", "Oštećena kosa"], tag: ["hidratacija", "obnova"] }),
     },
     {
       icon: AudioLines,
       title: "Tanka kosa bez volumena",
       desc: "Kosa koja brzo gubi oblik i nema punoću.",
       solution: "Lagana nega koja daje volumen od korena",
-      href: "/products",
+      href: buildFilterHref({ hairType: ["Tanka kosa"], tag: ["volumen"] }),
     },
     {
       icon: ShieldCheck,
       title: "Obojena kosa koja brzo bledi",
       desc: "Boja gubi intenzitet i sjaj već nakon nekoliko pranja.",
       solution: "Zaštita pigmenta, postojanost boje i sjaj",
-      href: "/products",
+      href: buildFilterHref({ hairType: ["Hemijski tretirana kosa"] }),
     },
     {
       icon: Waves,
       title: "Frizz i neposlušna kosa",
       desc: "Kosa koja reaguje na vlagu i teško se oblikuje.",
       solution: "Zaglađivanje i kontrola vlage bez otežavanja",
-      href: "/products",
+      href: buildFilterHref({ hairType: ["Frizz", "Neposlušna kosa"], tag: ["anti-frizz"] }),
     },
     {
       icon: Atom,
       title: "Oštećenja od dekoloranta, hemijskih tretmana i toplote",
       desc: "Slaba, lomljiva i bez elastičnosti.",
       solution: "Rekonstrukcija i jačanje unutrašnje strukture",
-      href: "/products",
+      href: buildFilterHref({
+        hairType: ["Oštećena kosa", "Hemijski tretirana kosa", "Zaštita od toplote"],
+        tag: ["zaštita od toplote", "obnova"],
+      }),
     },
     {
       icon: Sprout,
       title: "Masna kosa i osetljivo teme",
       desc: "Brzo mašćenje i disbalans vlasišta.",
       solution: "Balansirana nega za čisto i zdravo teme",
-      href: "/products",
+      href: buildFilterHref({ hairType: ["Masna kosa", "Osetljivo teme"], tag: ["balans vlasišta"] }),
     },
   ];
 

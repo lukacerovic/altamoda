@@ -162,8 +162,17 @@ export default function Header() {
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: session } = useSession();
-  const cartItemCount = useCartStore((s) => s.getItemCount());
-  const wishlistCount = useWishlistStore((s) => s.count);
+  const cartItemCountRaw = useCartStore((s) => s.getItemCount());
+  const wishlistCountRaw = useWishlistStore((s) => s.count);
+  // Cart/wishlist counts come from a Zustand store that persists to
+  // localStorage. On first render the server has no localStorage so it
+  // emits 0, but the client may hydrate with non-zero values — that
+  // mismatch triggers a hydration error. Defer the real values to after
+  // mount so SSR and the first client render agree on 0.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+  const cartItemCount = hydrated ? cartItemCountRaw : 0;
+  const wishlistCount = hydrated ? wishlistCountRaw : 0;
 
   useEffect(() => {
     const handleResize = () => {
