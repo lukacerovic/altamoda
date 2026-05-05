@@ -129,11 +129,19 @@ interface ColorUndertoneFacet {
   hexSamples: string[];
 }
 
+interface ProductLineFilter {
+  id: string;
+  name: string;
+  slug: string;
+  brand: { id: string; name: string; slug: string };
+}
+
 interface ProductsPageClientProps {
   initialProducts: Product[];
   initialPagination: Pagination;
   brands: BrandFilter[];
   categories: CategoryNode[];
+  productLines: ProductLineFilter[];
   attributes: AttributeFilter[];
   userRole: string | null;
   wishlistedProductIds?: string[];
@@ -451,6 +459,7 @@ export default function ProductsPageClient({
   initialPagination,
   brands,
   categories,
+  productLines,
   attributes,
   userRole: _serverRole,
   wishlistedProductIds: _serverWishlist = [],
@@ -466,6 +475,7 @@ export default function ProductsPageClient({
   const searchParam = searchParams.get("search");
   const genderParam = searchParams.get("gender");
   const brandParam = searchParams.get("brand");
+  const productLineParams = searchParams.getAll("productLine");
 
   const [wishlistedProductIds, setWishlistedProductIds] = useState<string[]>(_serverWishlist);
   const wishlistedSet = new Set(wishlistedProductIds);
@@ -486,14 +496,17 @@ export default function ProductsPageClient({
   const [selectedBrands, setSelectedBrands] = useState<string[]>(brandParam ? [brandParam] : []);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
   const [selectedGender, setSelectedGender] = useState<string | null>(genderParam);
+  const [selectedProductLines, setSelectedProductLines] = useState<string[]>(productLineParams);
 
-  // Sync category, gender, and brand from URL when navigating between menu links
+  // Sync category, gender, brand, and product lines from URL when navigating between menu links
   useEffect(() => {
     setSelectedCategory(categoryParam);
     setSelectedGender(genderParam);
     setSelectedBrands(brandParam ? [brandParam] : []);
+    setSelectedProductLines(productLineParams);
     setCurrentPage(1);
-  }, [categoryParam, genderParam, brandParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryParam, genderParam, brandParam, productLineParams.join(",")]);
 
   // Sync search from URL (e.g. from header search) and auto-submit
   useEffect(() => {
@@ -553,6 +566,7 @@ export default function ProductsPageClient({
     }
 
     selectedBrands.forEach((b) => params.append("brand", b));
+    selectedProductLines.forEach((l) => params.append("productLine", l));
 
     if (priceMin) params.set("priceMin", priceMin);
     if (priceMax) params.set("priceMax", priceMax);
@@ -667,6 +681,12 @@ export default function ProductsPageClient({
     );
   };
 
+  const toggleProductLine = (slug: string) => {
+    setSelectedProductLines((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+    );
+  };
+
   const toggleFilter = (key: string) => {
     setActiveToggles((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]);
   };
@@ -680,6 +700,10 @@ export default function ProductsPageClient({
   selectedBrands.forEach((slug) => {
     const b = brands.find((br) => br.slug === slug);
     if (b) activeTags.push({ key: `brand:${slug}`, label: b.name });
+  });
+  selectedProductLines.forEach((slug) => {
+    const l = productLines.find((pl) => pl.slug === slug);
+    if (l) activeTags.push({ key: `productLine:${slug}`, label: l.name });
   });
   activeToggles.forEach((key) => {
     const attr = attributes.find((a) => a.slug === key);
@@ -709,6 +733,9 @@ export default function ProductsPageClient({
     if (tagKey.startsWith("brand:")) {
       const slug = tagKey.replace("brand:", "");
       setSelectedBrands((prev) => prev.filter((s) => s !== slug));
+    } else if (tagKey.startsWith("productLine:")) {
+      const slug = tagKey.replace("productLine:", "");
+      setSelectedProductLines((prev) => prev.filter((s) => s !== slug));
     } else if (tagKey.startsWith("attr:")) {
       const key = tagKey.replace("attr:", "");
       setActiveToggles((prev) => prev.filter((k) => k !== key));
@@ -724,6 +751,7 @@ export default function ProductsPageClient({
 
   const clearAllTags = () => {
     setSelectedBrands([]);
+    setSelectedProductLines([]);
     setActiveToggles([]);
     setSelectedCategory(null);
     setSelectedGender(null);
@@ -783,6 +811,45 @@ export default function ProductsPageClient({
           ))}
         </div>
       </FilterSection>
+
+      {/* Product Lines — narrows to selected brand(s) when any are active */}
+      {(() => {
+        const visibleLines = selectedBrands.length > 0
+          ? productLines.filter((l) => selectedBrands.includes(l.brand.slug))
+          : productLines;
+        if (visibleLines.length === 0) return null;
+        return (
+          <FilterSection
+            title={t("products.productLines") || "Linije proizvoda"}
+            defaultOpen={false}
+            count={selectedProductLines.length}
+          >
+            <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
+              {visibleLines.map((l) => {
+                const isActive = selectedProductLines.includes(l.slug);
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => toggleProductLine(l.slug)}
+                    className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors flex items-baseline justify-between gap-2 ${
+                      isActive
+                        ? "bg-[#2e2e2e] text-white"
+                        : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                    }`}
+                  >
+                    <span className="truncate">{l.name}</span>
+                    {selectedBrands.length === 0 && (
+                      <span className={`text-[10px] uppercase tracking-[0.18em] flex-shrink-0 ${isActive ? "text-white/60" : "text-[#2e2e2e]/40"}`}>
+                        {l.brand.name}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </FilterSection>
+        );
+      })()}
 
       <FilterSection title={`${t("products.price")} (RSD)`} defaultOpen={false}>
         <div className="flex items-center gap-3">

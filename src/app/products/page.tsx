@@ -80,6 +80,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     [rawProducts, rawTotal, groupedDups],
     brandsData,
     flatCategories,
+    productLinesData,
     attributes,
     colorProducts,
     activeBrand,
@@ -116,6 +117,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       where: { isActive: true },
       select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true, stockQuantity: { gt: 0 } } } } } },
       orderBy: { sortOrder: "asc" },
+    }),
+    // Product lines — only those with at least one active, in-stock product.
+    prisma.productLine.findMany({
+      where: {
+        products: { some: { isActive: true, stockQuantity: { gt: 0 } } },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        brand: { select: { id: true, name: true, slug: true } },
+      },
+      orderBy: { name: "asc" },
     }),
     // Dynamic attributes
     prisma.dynamicAttribute.findMany({
@@ -244,6 +258,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       initialPagination={initialPagination}
       brands={brands}
       categories={categories}
+      productLines={productLinesData}
       attributes={attributes}
       userRole={null}
       wishlistedProductIds={[]}

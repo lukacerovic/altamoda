@@ -83,6 +83,18 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   }
 
+  // Product line filter (by slug, multi-select)
+  const productLineSlugs = searchParams.getAll('productLine')
+  if (productLineSlugs.length > 0) {
+    const lines = await prisma.productLine.findMany({
+      where: { slug: { in: productLineSlugs } },
+      select: { id: true },
+    })
+    if (lines.length > 0) {
+      where.productLineId = { in: lines.map(l => l.id) }
+    }
+  }
+
   // Price range — filter by the price the user actually sees
   if (priceMin || priceMax) {
     const priceField = role === 'b2b' ? 'priceB2b' : 'priceB2c'
