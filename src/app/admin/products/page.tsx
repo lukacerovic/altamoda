@@ -1171,8 +1171,10 @@ export default function ProductsPage() {
                         onChange={(e) => {
                           const newBrand = e.target.value;
                           updateForm("brand", newBrand);
-                          const lines = getProductLinesForBrand(newBrand);
-                          updateForm("productLine", lines[0] || "");
+                          // Don't auto-pick a line — that was assigning lines[0]
+                          // to products silently when the brand was changed.
+                          // User must consciously pick the line for this product.
+                          updateForm("productLine", "");
                         }}
                         className={inputCls + " cursor-pointer"}
                       >
@@ -1183,6 +1185,7 @@ export default function ProductsPage() {
                       <label className={labelCls}>{t("admin.productLine")}</label>
                       <div className="flex gap-2">
                         <select value={formData.productLine} onChange={(e) => updateForm("productLine", e.target.value)} className={inputCls + " cursor-pointer flex-1"}>
+                          <option value="">— Bez linije —</option>
                           {getProductLinesForBrand(formData.brand).map((l) => <option key={l}>{l}</option>)}
                         </select>
                         <button
