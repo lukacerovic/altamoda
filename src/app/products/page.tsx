@@ -81,6 +81,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     brandsData,
     flatCategories,
     productLinesData,
+    productTypeRows,
+    hairTypeRows,
+    tagRows,
     attributes,
     colorProducts,
     activeBrand,
@@ -131,6 +134,27 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       },
       orderBy: { name: "asc" },
     }),
+    // Distinct product types (single value per row)
+    prisma.$queryRaw<Array<{ value: string }>>`
+      SELECT DISTINCT TRIM(product_type) AS value FROM products
+      WHERE is_active = true AND stock_quantity > 0
+        AND product_type IS NOT NULL AND TRIM(product_type) != ''
+      ORDER BY value
+    `,
+    // Distinct hair types (comma-separated → unnest, dedupe)
+    prisma.$queryRaw<Array<{ value: string }>>`
+      SELECT DISTINCT TRIM(unnest(string_to_array(hair_types, ','))) AS value FROM products
+      WHERE is_active = true AND stock_quantity > 0
+        AND hair_types IS NOT NULL AND TRIM(hair_types) != ''
+      ORDER BY value
+    `,
+    // Distinct tags (comma-separated → unnest, dedupe)
+    prisma.$queryRaw<Array<{ value: string }>>`
+      SELECT DISTINCT TRIM(unnest(string_to_array(tags, ','))) AS value FROM products
+      WHERE is_active = true AND stock_quantity > 0
+        AND tags IS NOT NULL AND TRIM(tags) != ''
+      ORDER BY value
+    `,
     // Dynamic attributes
     prisma.dynamicAttribute.findMany({
       where: { showInFilters: true },
@@ -259,6 +283,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       brands={brands}
       categories={categories}
       productLines={productLinesData}
+      productTypes={productTypeRows.map(r => r.value).filter(Boolean)}
+      hairTypes={hairTypeRows.map(r => r.value).filter(Boolean)}
+      tags={tagRows.map(r => r.value).filter(Boolean)}
       attributes={attributes}
       userRole={null}
       wishlistedProductIds={[]}
