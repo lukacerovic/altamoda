@@ -171,20 +171,20 @@ model UserAddress {
 }
 
 model B2bProfile {
-  id           String   @id @default(cuid())
-  userId       String   @unique @map("user_id")
-  salonName    String   @map("salon_name")
+  id           String    @id @default(cuid())
+  userId       String    @unique @map("user_id")
+  salonName    String    @map("salon_name")
   pib          String?
-  maticniBroj  String?  @map("maticni_broj")
+  maticniBroj  String?   @map("maticni_broj")
   address      String?
-  discountTier Int      @default(0) @map("discount_tier")
-  creditLimit  Decimal? @map("credit_limit") @db.Decimal(12, 2)
-  paymentTerms Int?     @map("payment_terms")
+  discountTier Int       @default(0) @map("discount_tier")
+  creditLimit  Decimal?  @map("credit_limit") @db.Decimal(12, 2)
+  paymentTerms Int?      @map("payment_terms")
   approvedAt   DateTime? @map("approved_at")
-  approvedBy   String?  @map("approved_by")
-  erpSubjectId String?  @unique @map("erp_subject_id") // Pantheon acSubject
+  approvedBy   String?   @map("approved_by")
+  erpSubjectId String?   @unique @map("erp_subject_id") // Pantheon acSubject
 
-  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   approvedByUser User? @relation("ApprovedByUser", fields: [approvedBy], references: [id])
 
   @@map("b2b_profiles")
@@ -221,14 +221,14 @@ model ProductLine {
 }
 
 model Category {
-  id       String  @id @default(cuid())
-  parentId String? @map("parent_id")
-  nameLat  String  @map("name_lat")
-  nameCyr  String? @map("name_cyr")
-  slug     String  @unique
-  sortOrder Int    @default(0) @map("sort_order")
-  isActive Boolean @default(true) @map("is_active")
-  depth    Int     @default(0)
+  id        String  @id @default(cuid())
+  parentId  String? @map("parent_id")
+  nameLat   String  @map("name_lat")
+  nameCyr   String? @map("name_cyr")
+  slug      String  @unique
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
+  depth     Int     @default(0)
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children Category[] @relation("CategoryTree")
@@ -271,6 +271,10 @@ model Product {
   gender            String?
   erpId             String?  @map("erp_id")
   barcode           String?
+  subcategory       String?
+  productType       String?  @map("product_type")
+  hairTypes         String?  @map("hair_types")
+  tags              String?
   vatRate           Int      @default(20) @map("vat_rate")
   vatCode           String?  @map("vat_code")
   groupSlug         String?  @map("group_slug")
@@ -285,12 +289,12 @@ model Product {
   productLine ProductLine? @relation(fields: [productLineId], references: [id])
   category    Category?    @relation(fields: [categoryId], references: [id])
 
-  images           ProductImage[]
-  colorProduct     ColorProduct?
-  reviews          Review[]
-  cartItems        CartItem[]
-  wishlists        Wishlist[]
-  orderItems       OrderItem[]
+  images            ProductImage[]
+  colorProduct      ColorProduct?
+  reviews           Review[]
+  cartItems         CartItem[]
+  wishlists         Wishlist[]
+  orderItems        OrderItem[]
   productAttributes ProductAttribute[]
   promotionProducts PromotionProduct[]
 
@@ -446,8 +450,8 @@ model Order {
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
 
-  user          User               @relation(fields: [userId], references: [id])
-  promoCode     PromoCode?         @relation(fields: [promoCodeId], references: [id])
+  user          User                 @relation(fields: [userId], references: [id])
+  promoCode     PromoCode?           @relation(fields: [promoCodeId], references: [id])
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
 
@@ -478,7 +482,7 @@ model OrderStatusHistory {
   note      String?
   createdAt DateTime    @default(now()) @map("created_at")
 
-  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order         Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   changedByUser User? @relation("ChangedByUser", fields: [changedBy], references: [id])
 
   @@map("order_status_history")
@@ -536,19 +540,19 @@ model PromotionProduct {
 }
 
 model PromoCode {
-  id           String    @id @default(cuid())
-  code         String    @unique
-  type         PromoType
-  value        Decimal   @db.Decimal(10, 2)
-  minOrderValue Decimal? @map("min_order_value") @db.Decimal(10, 2)
-  maxUses      Int?      @map("max_uses")
-  currentUses  Int       @default(0) @map("current_uses")
-  perUserLimit Int       @default(1) @map("per_user_limit")
-  audience     Audience  @default(all)
-  validFrom    DateTime  @map("valid_from")
-  validUntil   DateTime  @map("valid_until")
-  isActive     Boolean   @default(true) @map("is_active")
-  createdAt    DateTime  @default(now()) @map("created_at")
+  id            String    @id @default(cuid())
+  code          String    @unique
+  type          PromoType
+  value         Decimal   @db.Decimal(10, 2)
+  minOrderValue Decimal?  @map("min_order_value") @db.Decimal(10, 2)
+  maxUses       Int?      @map("max_uses")
+  currentUses   Int       @default(0) @map("current_uses")
+  perUserLimit  Int       @default(1) @map("per_user_limit")
+  audience      Audience  @default(all)
+  validFrom     DateTime  @map("valid_from")
+  validUntil    DateTime  @map("valid_until")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
 
   orders Order[]
 
@@ -558,18 +562,18 @@ model PromoCode {
 // ==================== CONTENT ====================
 
 model Banner {
-  id             String  @id @default(cuid())
+  id             String    @id @default(cuid())
   title          String
   subtitle       String?
-  imageUrl       String  @map("image_url")
-  mobileImageUrl String? @map("mobile_image_url")
-  linkUrl        String? @map("link_url")
+  imageUrl       String    @map("image_url")
+  mobileImageUrl String?   @map("mobile_image_url")
+  linkUrl        String?   @map("link_url")
   position       String
-  sortOrder      Int     @default(0) @map("sort_order")
-  isActive       Boolean @default(true) @map("is_active")
+  sortOrder      Int       @default(0) @map("sort_order")
+  isActive       Boolean   @default(true) @map("is_active")
   startDate      DateTime? @map("start_date")
   endDate        DateTime? @map("end_date")
-  createdAt      DateTime @default(now()) @map("created_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
 
   @@map("banners")
 }
@@ -581,13 +585,13 @@ model NewsletterTemplate {
   name        String
   description String?
   subject     String
-  htmlContent String   @db.Text @map("html_content")
+  htmlContent String   @map("html_content") @db.Text
   thumbnail   String?
   isDefault   Boolean  @default(false) @map("is_default")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  campaigns   NewsletterCampaign[]
+  campaigns NewsletterCampaign[]
 
   @@map("newsletter_templates")
 }
@@ -604,23 +608,23 @@ model NewsletterSubscriber {
 }
 
 model NewsletterCampaign {
-  id          String            @id @default(cuid())
-  title       String
-  subject     String
-  content     String            @db.Text
-  segment     NewsletterSegment @default(b2c)
-  status      CampaignStatus    @default(draft)
-  sentAt      DateTime?         @map("sent_at")
-  sentCount   Int               @default(0) @map("sent_count")
-  openCount   Int               @default(0) @map("open_count")
-  clickCount  Int               @default(0) @map("click_count")
-  scheduledAt DateTime?         @map("scheduled_at")
-  templateId  String?           @map("template_id")
-  emailOptions Json?            @map("email_options")
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
+  id           String            @id @default(cuid())
+  title        String
+  subject      String
+  content      String            @db.Text
+  segment      NewsletterSegment @default(b2c)
+  status       CampaignStatus    @default(draft)
+  sentAt       DateTime?         @map("sent_at")
+  sentCount    Int               @default(0) @map("sent_count")
+  openCount    Int               @default(0) @map("open_count")
+  clickCount   Int               @default(0) @map("click_count")
+  scheduledAt  DateTime?         @map("scheduled_at")
+  templateId   String?           @map("template_id")
+  emailOptions Json?             @map("email_options")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
 
-  template    NewsletterTemplate? @relation(fields: [templateId], references: [id])
+  template NewsletterTemplate? @relation(fields: [templateId], references: [id])
 
   @@map("newsletter_campaigns")
 }
@@ -632,7 +636,7 @@ model NewsletterAutomation {
   trigger         String
   segment         NewsletterSegment @default(b2c)
   templateSubject String            @map("template_subject")
-  templateContent String            @db.Text @map("template_content")
+  templateContent String            @map("template_content") @db.Text
   enabled         Boolean           @default(false)
   lastTriggeredAt DateTime?         @map("last_triggered_at")
   createdAt       DateTime          @default(now()) @map("created_at")
@@ -684,11 +688,11 @@ model ErpSyncLog {
 
 model ErpSyncQueue {
   id          String        @id @default(cuid())
-  entityType  String        @map("entity_type")     // "order", "customer"
-  entityId    String        @map("entity_id")        // Order.id or User.id
+  entityType  String        @map("entity_type") // "order", "customer"
+  entityId    String        @map("entity_id") // Order.id or User.id
   direction   SyncDirection
-  payload     Json                                   // Serialized data to push
-  status      String        @default("pending")      // "pending", "retrying", "failed", "done"
+  payload     Json // Serialized data to push
+  status      String        @default("pending") // "pending", "retrying", "failed", "done"
   attempts    Int           @default(0)
   maxAttempts Int           @default(5) @map("max_attempts")
   lastError   String?       @map("last_error")
