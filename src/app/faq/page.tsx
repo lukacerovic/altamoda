@@ -180,7 +180,7 @@ const faqItemsData: FaqSection[] = [
 function renderAnswer(text: string) {
   const blocks = text.split(/\n\n+/);
   return (
-    <div className="space-y-3 text-sm text-[#837A64] leading-relaxed">
+    <div className="space-y-3 text-sm text-[#2e2e2e] leading-relaxed">
       {blocks.map((block, i) => {
         const lines = block.split("\n");
         const bulletLines = lines.filter((l) => l.trim().startsWith("• "));
@@ -279,7 +279,7 @@ export default function FAQPage() {
           <h1 className="text-3xl md:text-4xl font-bold text-[#2e2e2e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
             {t("faq.title")}
           </h1>
-          <p className="text-[#837A64]">{t("faq.subtitle")}</p>
+          <p className="text-[#2e2e2e]">{t("faq.subtitle")}</p>
         </div>
 
         {/* Search */}
@@ -291,7 +291,7 @@ export default function FAQPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 bg-white border border-[#D8CFBC] rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#837A64]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2e2e2e]" />
         </div>
 
         {/* FAQ Sections */}
@@ -338,7 +338,7 @@ export default function FAQPage() {
         {/* Contact Section */}
         <div className="mt-16 bg-white rounded-sm border border-[#D8CFBC] p-8 text-center">
           <h3 className="text-xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
-          <p className="text-[#837A64] mb-6">{t("faq.notFoundDesc")}</p>
+          <p className="text-[#2e2e2e] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
               <Phone className="w-4 h-4" /> +381 (0)11 3088388

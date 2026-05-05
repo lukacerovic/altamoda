@@ -4,20 +4,33 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Heart, Star, ArrowRight, Music2, ChevronLeft, ChevronRight,
-  Leaf, ShieldCheck, Award, Truck,
+  ShoppingBag, CheckCircle, Palette,
+  Droplet, AudioLines, ShieldCheck, Waves, Atom, Sprout,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Mail, X, Instagram, Youtube,
 } from "lucide-react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-
-const ChatWidget = dynamic(() => import("@/components/ChatWidget"), { ssr: false });
+import { useCartStore } from "@/lib/stores/cart-store";
 
 /* ─── Types ─── */
+export interface ColorSiblingData {
+  id: string;
+  slug: string;
+  name: string;
+  sku: string;
+  brand: string;
+  price: number;
+  image: string | null;
+  colorCode: string | null;
+  colorName: string | null;
+  hex: string | null;
+  stockQuantity: number;
+}
+
 export interface ProductData {
   id: string;
   name: string;
@@ -33,6 +46,8 @@ export interface ProductData {
   stockQuantity: number;
   sku: string;
   promoBadge?: string | null;
+  groupSlug?: string | null;
+  colorSiblings?: ColorSiblingData[];
 }
 
 const defaultImg = "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=800&h=800&fit=crop";
@@ -69,12 +84,35 @@ const socialImages = [
 function ProductCard({ product, badge }: { product: ProductData; badge?: string }) {
   const { t } = useLanguage();
   const [liked, setLiked] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addItem } = useCartStore();
   const newLabel = t("home.new");
   const discountBadge = product.price != null && product.oldPrice ? `-${Math.round((1 - product.price / product.oldPrice) * 100)}%` : null;
   const displayBadge = product.promoBadge || badge || (product.isNew ? newLabel : discountBadge);
+  const outOfStock = product.stockQuantity <= 0;
+  const b2bOnly = product.price == null;
+  const hasColors = (product.colorSiblings?.length ?? 0) > 1;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (outOfStock || b2bOnly || product.price == null) return;
+    addItem({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand ?? "",
+      price: product.price,
+      quantity: 1,
+      image: product.image ?? "",
+      sku: product.sku,
+      stockQuantity: product.stockQuantity,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 1500);
+  };
 
   return (
-    <Link href={`/products/${product.slug}`} className="group block">
+    <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">
       <div
         className="relative aspect-[4/5] overflow-hidden rounded-[4px] bg-[#F2ECDE] mb-5 transition-all duration-300 ease-out group-hover:-translate-y-0.5 [box-shadow:0_0_0_1px_rgba(46,46,46,0.02),0_2px_6px_rgba(46,46,46,0.04),0_4px_8px_rgba(46,46,46,0.1)] group-hover:[box-shadow:0_0_0_1px_rgba(46,46,46,0.04),0_4px_12px_rgba(46,46,46,0.08),0_16px_32px_rgba(46,46,46,0.14)]"
       >
@@ -96,15 +134,46 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
         >
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#2e2e2e] text-[#2e2e2e]" : "text-[#2e2e2e]"}`} />
         </button>
+        {!b2bOnly && (
+          <div className="hidden md:block absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+            <button
+              onClick={hasColors ? undefined : handleAddToCart}
+              disabled={!hasColors && outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${
+                !hasColors && outOfStock
+                  ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed"
+                  : addedToCart
+                  ? "bg-[#6a624f] text-[#2e2e2e]"
+                  : "bg-[#e1dbd0] text-[#2e2e2e] hover:bg-[#6a624f]"
+              }`}
+            >
+              {hasColors ? (
+                <>
+                  <Palette className="w-3.5 h-3.5" /> Izaberi boju
+                </>
+              ) : outOfStock ? (
+                <>{t("products.outOfStock")}</>
+              ) : addedToCart ? (
+                <>
+                  <CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
-      <div>
+      <div className="flex flex-col flex-1">
         <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium block mb-1.5">{product.brand}</span>
-        <h3 className="text-base text-[#2e2e2e] mb-1 font-normal" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+        <h3 className="text-base text-[#2e2e2e] mb-1 font-normal line-clamp-2 leading-tight min-h-[2.6em]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
           {product.name}
         </h3>
         <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
           {product.price == null ? (
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#837A64] font-medium">B2B samo</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e] font-medium">B2B samo</span>
           ) : (
             <>
               {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
@@ -117,6 +186,39 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
             <Star key={i} className={`w-2.5 h-2.5 ${i < Math.round(product.rating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />
           ))}
         </div>
+
+        {/* Mobile-only persistent action area — pinned to bottom for cross-card alignment */}
+        {!b2bOnly && (
+          <div className="md:hidden mt-auto pt-3">
+            <button
+              onClick={hasColors ? undefined : handleAddToCart}
+              disabled={!hasColors && outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${
+                !hasColors && outOfStock
+                  ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed"
+                  : addedToCart
+                  ? "bg-[#6a624f] text-[#2e2e2e]"
+                  : "bg-[#e1dbd0] text-[#2e2e2e] active:bg-[#6a624f]"
+              }`}
+            >
+              {hasColors ? (
+                <>
+                  <Palette className="w-3 h-3" /> Izaberi boju
+                </>
+              ) : outOfStock ? (
+                <>{t("products.outOfStock")}</>
+              ) : addedToCart ? (
+                <>
+                  <CheckCircle className="w-3 h-3" /> {t("products.addedToCart")}
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3 h-3" /> {t("products.addToCart")}
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </Link>
   );
@@ -273,6 +375,19 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   const [popupStatus, setPopupStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [popupMessage, setPopupMessage] = useState("");
 
+  // Auto-open the newsletter popup on the user's first visit. Once shown,
+  // we mark localStorage so it never auto-opens again on this device — the
+  // floating Mail button remains the way to reopen it manually.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("altamoda-newsletter-seen")) return;
+    const timer = setTimeout(() => {
+      setShowNewsletter(true);
+      localStorage.setItem("altamoda-newsletter-seen", "1");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleNewsletterSubmit = async (email: string, setStatus: (s: "idle" | "loading" | "success" | "error") => void, setMessage: (m: string) => void, onSuccess?: () => void) => {
     if (!email) return;
     setStatus("loading");
@@ -305,15 +420,16 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   const newList = newArrivals.slice(0, 8);
   const saleList = saleProducts.slice(0, 8);
 
-  /* Tabbed products section */
+  /* Tabbed products section — each tab is only shown if it has products. */
   type ProductTab = "bestsellers" | "new" | "sale";
-  const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
-  const tabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
+  const allTabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
     { key: "bestsellers", label: "Najprodavanije", products: bestsellerList, badge: (i: number) => (i === 2 ? "Novo" : "Bestseler"), viewAll: "/products" },
     { key: "sale", label: "Akcija", products: saleList, viewAll: "/products?onSale=true" },
     { key: "new", label: "Novo", products: newList, badge: "Novo", viewAll: "/products?sort=new" },
   ];
-  const activeTabData = tabs.find((t) => t.key === activeTab) || tabs[0];
+  const visibleTabs = allTabs.filter((t) => t.products.length > 0);
+  const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
+  const activeTabData = visibleTabs.find((t) => t.key === activeTab) ?? visibleTabs[0];
 
   /* Hero teaser cards — shown below the headline; admin-editable via heroCards */
   const defaultHeroCards: HeroCard[] = [
@@ -354,27 +470,49 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
     };
   });
 
-  /* New feature cards — below B2B */
+  /* Hair concern cards — below B2B */
   const valueCards = [
     {
-      icon: Leaf,
-      title: "Prirodna formula",
-      desc: "Nežna nega za vašu kosu sa premium sastojcima",
+      icon: Droplet,
+      title: "Suva i oštećena kosa",
+      desc: "Kosa bez sjaja, sklona lomljenju i ispucalim krajevima.",
+      solution: "Intenzivna hidratacija i obnova strukture kose",
+      href: "/products",
+    },
+    {
+      icon: AudioLines,
+      title: "Tanka kosa bez volumena",
+      desc: "Kosa koja brzo gubi oblik i nema punoću.",
+      solution: "Lagana nega koja daje volumen od korena",
+      href: "/products",
     },
     {
       icon: ShieldCheck,
-      title: "Bez okrutnosti",
-      desc: "Naši proizvodi nisu testirani na životinjama",
+      title: "Obojena kosa koja brzo bledi",
+      desc: "Boja gubi intenzitet i sjaj već nakon nekoliko pranja.",
+      solution: "Zaštita pigmenta, postojanost boje i sjaj",
+      href: "/products",
     },
     {
-      icon: Award,
-      title: "Stručno odobreno",
-      desc: "Testirano za sigurnost i vidljive rezultate",
+      icon: Waves,
+      title: "Frizz i neposlušna kosa",
+      desc: "Kosa koja reaguje na vlagu i teško se oblikuje.",
+      solution: "Zaglađivanje i kontrola vlage bez otežavanja",
+      href: "/products",
     },
     {
-      icon: Truck,
-      title: "Besplatna dostava",
-      desc: "Za porudžbine preko 5.000 RSD, bez dodatnih troškova",
+      icon: Atom,
+      title: "Oštećenja od dekoloranta, hemijskih tretmana i toplote",
+      desc: "Slaba, lomljiva i bez elastičnosti.",
+      solution: "Rekonstrukcija i jačanje unutrašnje strukture",
+      href: "/products",
+    },
+    {
+      icon: Sprout,
+      title: "Masna kosa i osetljivo teme",
+      desc: "Brzo mašćenje i disbalans vlasišta.",
+      solution: "Balansirana nega za čisto i zdravo teme",
+      href: "/products",
     },
   ];
 
@@ -494,8 +632,10 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
       {/* ═══════════════════════════════════════════════════════════
           3. PRODUCTS — merged tabbed section (Bestsellers / Sale / New)
+          Each tab is only rendered when its source has products; the whole
+          section is hidden if all three are empty.
       ═══════════════════════════════════════════════════════════ */}
-      {bestsellerList.length > 0 && (
+      {visibleTabs.length > 0 && activeTabData && (
         <section className="py-20 md:py-28 bg-[#FFFFFF]">
           <div className="max-w-[1400px] mx-auto px-6 md:px-10">
             <div className="flex items-end justify-between mb-10 md:mb-14 gap-8 flex-wrap">
@@ -520,31 +660,27 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </Link>
             </div>
 
-            {/* Tab switcher */}
-            <div className="flex items-center gap-8 md:gap-10 mb-10 md:mb-14 border-b border-[rgba(46,46,46,0.08)]">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`relative pb-4 text-[11px] md:text-[12px] uppercase tracking-[0.22em] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF] ${
-                    activeTab === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/40 hover:text-[#2e2e2e]/70"
-                  }`}
-                >
-                  {tab.label}
-                  {activeTab === tab.key && (
-                    <span className="absolute -bottom-px left-0 right-0 h-[2px] bg-[#2e2e2e]" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {activeTabData.products.length > 0 ? (
-              <ProductCarousel products={activeTabData.products} badge={activeTabData.badge} />
-            ) : (
-              <p className="text-[13px] text-[#2e2e2e]/60 py-10 text-center">
-                Uskoro nove ponude u ovoj kategoriji.
-              </p>
+            {/* Tab switcher — only tabs with products */}
+            {visibleTabs.length > 1 && (
+              <div className="flex items-center gap-8 md:gap-10 mb-10 md:mb-14 border-b border-[rgba(46,46,46,0.08)]">
+                {visibleTabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`relative pb-4 text-[11px] md:text-[12px] uppercase tracking-[0.22em] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF] ${
+                      activeTabData.key === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/40 hover:text-[#2e2e2e]/70"
+                    }`}
+                  >
+                    {tab.label}
+                    {activeTabData.key === tab.key && (
+                      <span className="absolute -bottom-px left-0 right-0 h-[2px] bg-[#2e2e2e]" />
+                    )}
+                  </button>
+                ))}
+              </div>
             )}
+
+            <ProductCarousel products={activeTabData.products} badge={activeTabData.badge} />
           </div>
         </section>
       )}
@@ -552,11 +688,11 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           4. B2B PARTNERS — salons & wholesale partners (unchanged)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#837A64]">
+      <section className="py-20 md:py-28 bg-[#e1dbd0]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-            {/* Left — image (landscape) */}
-            <div className="relative aspect-[4/3] md:aspect-[5/4] bg-[#6e6754] overflow-hidden rounded-[4px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-stretch">
+            {/* Left — image (portrait, matches right column height on desktop) */}
+            <div className="relative aspect-[3/4] md:aspect-auto md:h-full bg-[#6e6754] overflow-hidden rounded-[4px]">
               <Image
                 src="/b2bhero.png"
                 alt="altamoda saloni partneri"
@@ -568,40 +704,40 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
             {/* Right — text */}
             <div>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#FFFFFF]/70 font-medium block mb-6">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/70 font-medium block mb-6">
                 Za salone
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.05] mb-8"
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 Partnerstvo koje
                 <br />
                 gradi <em className="italic">uspeh</em>.
               </h2>
-              <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-5 max-w-lg">
+              <p className="text-[14px] text-[#2e2e2e]/80 leading-[1.8] mb-5 max-w-lg">
                 Više od tri decenije gradimo mrežu partnera među frizerskim salonima, profesionalnim web shopovima i distributerima širom regiona.
               </p>
-              <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-5 max-w-lg">
+              <p className="text-[14px] text-[#2e2e2e]/80 leading-[1.8] mb-5 max-w-lg">
                 Alta Moda povezuje brendove i profesionalce kroz pouzdanu distribuciju, veleprodajne uslove, kao i tehničku i edukativnu podršku.
               </p>
-              <p className="text-[14px] text-[#FFFFFF]/80 leading-[1.8] mb-10 max-w-lg">
+              <p className="text-[14px] text-[#2e2e2e]/80 leading-[1.8] mb-10 max-w-lg">
                 Od lokalnih salona i online shopova do velikih distributivnih sistema — naš cilj je isti: dugoročna saradnja i zajednički rast.
               </p>
 
               {/* Stats row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center sm:justify-items-start border-t border-[#FFFFFF]/25 pt-8 mb-10 max-w-lg">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center border-t border-[#2e2e2e]/25 pt-8 mb-10 max-w-lg">
                 {[
-                  { v: "30+", l: "Godina iskustva" },
-                  { v: "1000+", l: "Profesionalnih partnera" },
-                  { v: "Veleprodajni", l: "Uslovi" },
-                  { v: "1:1", l: "Stručna podrška" },
+                  { v: "30+", l: "Godina" },
+                  { v: "1000+", l: "Partnera" },
+                  { v: "Usluge", l: "Veleprodaja" },
+                  { v: "1:1", l: "Podrška" },
                 ].map((s, i) => (
-                  <div key={i} className={`text-center sm:text-left ${i < 3 ? "sm:border-r sm:border-[#FFFFFF]/25" : ""} sm:pr-2`}>
-                    <div className="text-xl md:text-2xl font-light text-[#FFFFFF]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  <div key={i} className={`text-center ${i < 3 ? "sm:border-r sm:border-[#2e2e2e]/25" : ""} sm:px-2`}>
+                    <div className="text-xl md:text-2xl font-light text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                       {s.v}
                     </div>
-                    <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/70 mt-1.5">{s.l}</div>
+                    <div className="text-[9px] uppercase tracking-[0.22em] text-[#2e2e2e]/70 mt-1.5">{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -609,7 +745,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/account/login"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#837A64]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e1dbd0]"
                 >
                   Postani naš partner <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -620,31 +756,59 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          5. VALUE CARDS — four-card feature strip (below B2B)
+          5. HAIR CONCERN CARDS — six-card solutions strip (below B2B)
       ═══════════════════════════════════════════════════════════ */}
       <section className="py-20 md:py-28 bg-transparent">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-7">
+          {/* Header — kicker / title / subtitle */}
+          <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+              Rešenja za vašu kosu
+            </span>
+            <h2
+              className="text-3xl md:text-4xl lg:text-5xl font-light text-[#2e2e2e] leading-[1.05] mb-6"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
+            >
+              Pronađite rutinu za <em className="italic">vidljive rezultate</em>.
+            </h2>
+            <p className="text-[13px] md:text-[15px] text-[#2e2e2e]/70 leading-[1.7] max-w-2xl mx-auto">
+              Od svakodnevne nege do savršenog stilizovanja — izaberite proizvode koji odgovaraju vašem tipu kose i njenim potrebama, kao i željenom izgledu. Hidratacija, obnova, volumen i zaštita boje — sve na jednom mestu.
+            </p>
+          </div>
+
+          {/* Six-card grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-7">
             {valueCards.map((card, i) => {
               const Icon = card.icon;
               return (
-                <div
+                <Link
                   key={i}
-                  className="group bg-[#FFFFFF] border border-[#837A64]/30 rounded-[4px] p-5 md:p-10 text-center transition-all duration-300 hover:border-[#837A64] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
+                  href={card.href}
+                  className="group flex flex-col items-center text-center bg-[#FFFFFF] border border-[#e1dbd0]/30 rounded-[4px] p-6 md:p-8 transition-all duration-300 hover:border-[#e1dbd0] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
                 >
-                  <div className="w-9 h-9 md:w-12 md:h-12 mx-auto mb-3 md:mb-5 flex items-center justify-center text-[#837A64]">
+                  <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-5 md:mb-6 flex items-center justify-center text-[#2e2e2e]">
                     <Icon strokeWidth={1.5} className="w-full h-full" />
                   </div>
                   <h3
-                    className="text-[14px] md:text-[18px] font-semibold text-[#2e2e2e] mb-2 md:mb-3"
+                    className="text-[16px] md:text-[19px] font-semibold text-[#2e2e2e] mb-2 md:mb-3 leading-[1.25]"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     {card.title}
                   </h3>
-                  <p className="text-[11px] md:text-[13px] text-[#2e2e2e]/65 leading-[1.55] md:leading-[1.7]">
+                  <p className="text-[12px] md:text-[13.5px] text-[#2e2e2e]/65 leading-[1.6] mb-4 md:mb-5">
                     {card.desc}
                   </p>
-                </div>
+                  <div className="mt-auto w-full pt-4 md:pt-5 border-t border-[#e1dbd0]/20 flex flex-col items-center">
+                    <p className="text-[12px] md:text-[13px] text-[#2e2e2e] leading-[1.6] mb-4">
+                      <span className="font-semibold">Rešenje: </span>
+                      {card.solution}
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] border-b border-[#e1dbd0]/40 pb-0.5 group-hover:border-[#e1dbd0] group-hover:gap-2.5 transition-all">
+                      Otkrij proizvode
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </Link>
               );
             })}
           </div>
@@ -894,7 +1058,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </h3>
               <p className="text-[#2e2e2e]/60 text-sm mb-8 leading-relaxed">{t("home.popupDesc")}</p>
               {popupStatus === "success" ? (
-                <p className="text-[#837A64] text-sm py-4">{popupMessage}</p>
+                <p className="text-[#2e2e2e] text-sm py-4">{popupMessage}</p>
               ) : (
                 <form onSubmit={(e) => {
                   e.preventDefault();
@@ -981,7 +1145,6 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         </div>
       )}
 
-      <ChatWidget />
       <CookieConsent />
     </div>
   );

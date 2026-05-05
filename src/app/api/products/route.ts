@@ -253,7 +253,7 @@ export const GET = withErrorHandler(async (req: Request) => {
   const productIds = products.map(p => p.id)
   const groupSlugs = [...new Set(products.map(p => p.groupSlug).filter(Boolean))] as string[]
 
-  const [ratings, variantCounts] = await Promise.all([
+  const [ratings, variantCounts, siblingRows] = await Promise.all([
     prisma.review.groupBy({
       by: ['productId'],
       where: { productId: { in: productIds } },
@@ -266,7 +266,50 @@ export const GET = withErrorHandler(async (req: Request) => {
           _count: true,
         })
       : Promise.resolve([]),
+    groupSlugs.length > 0
+      ? prisma.product.findMany({
+          where: { groupSlug: { in: groupSlugs }, isActive: true },
+          select: {
+            id: true, slug: true, nameLat: true, sku: true, priceB2c: true,
+            colorCode: true, colorName: true, groupSlug: true, stockQuantity: true,
+            brand: { select: { name: true } },
+            images: { where: { isPrimary: true }, take: 1 },
+            colorProduct: { select: { hexValue: true } },
+          },
+        })
+      : Promise.resolve([] as Array<{
+          id: string; slug: string; nameLat: string; sku: string; priceB2c: unknown;
+          colorCode: string | null; colorName: string | null; groupSlug: string | null; stockQuantity: number;
+          brand: { name: string } | null;
+          images: { url: string }[];
+          colorProduct: { hexValue: string } | null;
+        }>),
   ])
+
+  const siblingsByGroup = new Map<string, Array<{
+    id: string; slug: string; name: string; sku: string; brand: string;
+    price: number; image: string | null;
+    colorCode: string | null; colorName: string | null; hex: string | null;
+    stockQuantity: number;
+  }>>()
+  for (const s of siblingRows) {
+    if (!s.groupSlug) continue
+    const arr = siblingsByGroup.get(s.groupSlug) || []
+    arr.push({
+      id: s.id,
+      slug: s.slug,
+      name: s.nameLat,
+      sku: s.sku,
+      brand: s.brand?.name || '',
+      price: Number(s.priceB2c),
+      image: s.images[0]?.url || null,
+      colorCode: s.colorCode,
+      colorName: s.colorName,
+      hex: s.colorProduct?.hexValue || null,
+      stockQuantity: s.stockQuantity,
+    })
+    siblingsByGroup.set(s.groupSlug, arr)
+  }
 
   // Auto-delete expired promotions (fire-and-forget, don't block response)
   prisma.promotion.deleteMany({
@@ -368,6 +411,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       groupSlug: p.groupSlug,
       colorCode: p.colorCode,
       variantCount: p.groupSlug ? variantCountMap.get(p.groupSlug) || 0 : 0,
+      colorSiblings: p.groupSlug ? (siblingsByGroup.get(p.groupSlug) || undefined) : undefined,
     }
   })
 

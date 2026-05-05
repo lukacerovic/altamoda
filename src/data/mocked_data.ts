@@ -1378,10 +1378,10 @@ export const analyticsRevenueByMonth: AnalyticsRevenueByMonth[] = [
 ];
 
 export const analyticsCategoryData: AnalyticsCategoryData[] = [
-  { name: "Nega kose", value: 35, color: "#837A64" },
+  { name: "Nega kose", value: 35, color: "#e1dbd0" },
   { name: "Boje za kosu", value: 28, color: "#2e2e2e" },
   { name: "Styling", value: 18, color: "#6b6b6b" },
-  { name: "Ulja i serumi", value: 12, color: "#837A64" },
+  { name: "Ulja i serumi", value: 12, color: "#e1dbd0" },
   { name: "Oprema", value: 7, color: "#6a624f" },
 ];
 

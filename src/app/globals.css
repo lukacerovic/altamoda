@@ -7,10 +7,10 @@
   --color-primary: #2e2e2e;
   --color-on-primary: #FFFFFF;
   --color-primary-container: #383838;
-  --color-on-primary-container: #837A64;
+  --color-on-primary-container: #e1dbd0;
 
   /* Secondary: Soft Olive – natural accent */
-  --color-secondary: #837A64;
+  --color-secondary: #e1dbd0;
   --color-on-secondary: #FFFFFF;
   --color-secondary-container: #D8CFBC;
   --color-on-secondary-container: #6a624f;
@@ -34,7 +34,7 @@
   --color-foreground: #2e2e2e;
 
   /* Outline */
-  --color-outline: #837A64;
+  --color-outline: #e1dbd0;
   --color-outline-variant: #D8CFBC;
 
   /* Error */
@@ -46,16 +46,16 @@
   /* Inverse */
   --color-inverse-surface: #2e2e2e;
   --color-inverse-on-surface: #FFFFFF;
-  --color-inverse-primary: #837A64;
+  --color-inverse-primary: #e1dbd0;
 
   /* Legacy aliases for gradual migration */
-  --color-accent: #837A64;
-  --color-accent-light: #837A64;
+  --color-accent: #e1dbd0;
+  --color-accent-light: #e1dbd0;
   --color-accent-dark: #6a624f;
   --color-dark: #2e2e2e;
   --color-dark-light: #555555;
   --color-text: #2e2e2e;
-  --color-text-light: #837A64;
+  --color-text-light: #e1dbd0;
   --color-border: #D8CFBC;
   --color-success: #2d7a3a;
   --color-warning: #c4883a;

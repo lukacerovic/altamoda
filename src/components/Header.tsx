@@ -294,7 +294,7 @@ export default function Header() {
                                     <span className="text-xs font-bold text-[#a59d85]">{brand.name.charAt(0)}</span>
                                   </div>
                                 ); })()}
-                                <span className="text-sm text-[#837A64] group-hover:text-[#2e2e2e] transition-colors truncate">
+                                <span className="text-sm text-[#2e2e2e] group-hover:text-[#2e2e2e] transition-colors truncate">
                                   {brand.name}
                                 </span>
                               </Link>
@@ -329,7 +329,7 @@ export default function Header() {
                                     <li key={link.name}>
                                       <Link
                                         href={link.href}
-                                        className="text-sm text-[#837A64] hover:text-secondary transition-colors flex items-center gap-1 group"
+                                        className="text-sm text-[#2e2e2e] hover:text-secondary transition-colors flex items-center gap-1 group"
                                       >
                                         <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
                                         {link.name}
@@ -440,7 +440,7 @@ export default function Header() {
                           <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={200} height={200} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-[#2e2e2e] truncate">{p.name}</p>
-                            <p className="text-[11px] text-[#837A64] font-medium">{p.brand}</p>
+                            <p className="text-[11px] text-[#2e2e2e] font-medium">{p.brand}</p>
                           </div>
                           <span className="text-sm font-bold text-[#2e2e2e]">
                             {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#a59d85]">RSD</span>
@@ -504,7 +504,7 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#837A64] hover:text-secondary transition-colors"
+                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#2e2e2e] hover:text-secondary transition-colors"
                           >
                             {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                               <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
@@ -531,7 +531,7 @@ export default function Header() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block py-2 px-2 text-sm text-[#837A64] hover:text-secondary transition-colors"
+                                className="block py-2 px-2 text-sm text-[#2e2e2e] hover:text-secondary transition-colors"
                               >
                                 {link.name}
                               </Link>
@@ -545,7 +545,7 @@ export default function Header() {
               })}
 
               {/* Account & Wishlist in mobile menu */}
-              <div className="pt-4 border-t border-[#D8CFBC] mt-2 space-y-1">
+              <div className="pt-4 space-y-1">
                 <Link
                   href={session ? "/account" : "/account/login"}
                   onClick={() => setMobileMenu(false)}
