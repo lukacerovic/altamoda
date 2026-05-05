@@ -63,6 +63,9 @@ interface Product {
   ingredients: string;
   declaration?: string;
   howToUse: string;
+  productType?: string;
+  hairTypes?: string;
+  tags?: string;
   images: ProductImage[];
   colorLevel?: number;
   colorUndertone?: string;
@@ -279,6 +282,9 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   ingredients: "",
   declaration: "",
   howToUse: "",
+  productType: "",
+  hairTypes: "",
+  tags: "",
   images: [],
   seoTitle: "",
   metaDescription: "",
@@ -335,6 +341,13 @@ export default function ProductsPage() {
   const [showNewSubCategory, setShowNewSubCategory] = useState(false);
   const [newSubCategoryName, setNewSubCategoryName] = useState("");
 
+  // Custom product lines added inline from this form (keyed by brand).
+  // Persisted on save: the API resolves the line by name (find-or-create)
+  // via resolveProductLineId, so these don't need a separate POST.
+  const [customProductLines, setCustomProductLines] = useState<Record<string, string[]>>({});
+  const [showNewProductLine, setShowNewProductLine] = useState(false);
+  const [newProductLineName, setNewProductLineName] = useState("");
+
   // Brands and categories pulled from the API so admin-created entries (from
   // /admin/brands and /admin/categories) appear in the dropdowns alongside the
   // hardcoded defaults — without needing a code change for every new entry.
@@ -372,8 +385,9 @@ export default function ProductsPage() {
 
   const getProductLinesForBrand = (brand: string): string[] => {
     const dbMatch = dbBrands.find(b => b.name.trim().toLowerCase() === brand.trim().toLowerCase());
-    if (dbMatch) return dedupeCI(dbMatch.productLines.map(l => l.name));
-    return dedupeCI(brandProductLines[brand] || []);
+    const fromDb = dbMatch ? dbMatch.productLines.map(l => l.name) : (brandProductLines[brand] || []);
+    const customForBrand = customProductLines[brand] || [];
+    return dedupeCI([...fromDb, ...customForBrand]);
   };
 
   const colorUndertones = [
@@ -420,6 +434,9 @@ export default function ProductsPage() {
       ingredients: "",
       declaration: "",
       howToUse: "",
+      productType: "",
+      hairTypes: "",
+      tags: "",
       images: p.image ? [{ id: 1, url: p.image as string, alt: (p.name || "") as string, isPrimary: true }] : [],
       seoTitle: "",
       metaDescription: "",
@@ -575,6 +592,9 @@ export default function ProductsPage() {
           ingredients: p.ingredients || "",
           declaration: p.declaration || "",
           howToUse: p.usageInstructions || "",
+          productType: p.productType || "",
+          hairTypes: p.hairTypes || "",
+          tags: p.tags || "",
           weight: p.weightGrams || 0,
           volume: p.volumeMl || 0,
           lowStockThreshold: p.lowStockThreshold || 5,
@@ -642,6 +662,9 @@ export default function ProductsPage() {
       ingredients: formData.ingredients || null,
       declaration: formData.declaration || null,
       usageInstructions: formData.howToUse || null,
+      productType: formData.productType || null,
+      hairTypes: formData.hairTypes || null,
+      tags: formData.tags || null,
       isProfessional: formData.badges.isProfessionalOnly,
       isNew: formData.badges.isNew,
       isFeatured: formData.badges.isFeatured,
@@ -1158,9 +1181,48 @@ export default function ProductsPage() {
                     </div>
                     <div>
                       <label className={labelCls}>{t("admin.productLine")}</label>
-                      <select value={formData.productLine} onChange={(e) => updateForm("productLine", e.target.value)} className={inputCls + " cursor-pointer"}>
-                        {getProductLinesForBrand(formData.brand).map((l) => <option key={l}>{l}</option>)}
-                      </select>
+                      <div className="flex gap-2">
+                        <select value={formData.productLine} onChange={(e) => updateForm("productLine", e.target.value)} className={inputCls + " cursor-pointer flex-1"}>
+                          {getProductLinesForBrand(formData.brand).map((l) => <option key={l}>{l}</option>)}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setShowNewProductLine(!showNewProductLine)}
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-secondary hover:bg-stone-50 transition-colors whitespace-nowrap"
+                        >
+                          + Nova
+                        </button>
+                      </div>
+                      {showNewProductLine && (
+                        <div className="flex gap-2 mt-2">
+                          <input
+                            type="text"
+                            value={newProductLineName}
+                            onChange={(e) => setNewProductLineName(e.target.value)}
+                            placeholder="Naziv nove linije"
+                            className={inputCls + " flex-1"}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const name = newProductLineName.trim();
+                              const brand = formData.brand;
+                              if (name && brand) {
+                                setCustomProductLines((prev) => ({
+                                  ...prev,
+                                  [brand]: [...(prev[brand] || []), name],
+                                }));
+                                updateForm("productLine", name);
+                                setNewProductLineName("");
+                                setShowNewProductLine(false);
+                              }
+                            }}
+                            className="px-4 py-2 bg-black text-white rounded-sm text-xs font-medium hover:bg-stone-800 transition-colors"
+                          >
+                            Dodaj
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1567,6 +1629,40 @@ export default function ProductsPage() {
                       className={inputCls + " resize-y"}
                       placeholder="Nanesite na mokru kosu..."
                     />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Tip proizvoda</label>
+                      <input
+                        type="text"
+                        value={formData.productType || ""}
+                        onChange={(e) => updateForm("productType", e.target.value)}
+                        className={inputCls}
+                        placeholder="npr. Šampon, Teksturni sprej, Maska"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Tip kose</label>
+                      <input
+                        type="text"
+                        value={formData.hairTypes || ""}
+                        onChange={(e) => updateForm("hairTypes", e.target.value)}
+                        className={inputCls}
+                        placeholder="npr. Svi tipovi kose, Tanka kosa"
+                      />
+                      <p className="text-[11px] text-[#2e2e2e]/50 mt-1">Više tipova razdvojiti zarezom.</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className={labelCls}>Funkcija / Tagovi</label>
+                    <input
+                      type="text"
+                      value={formData.tags || ""}
+                      onChange={(e) => updateForm("tags", e.target.value)}
+                      className={inputCls}
+                      placeholder="npr. volumen, tekstura, kontrola"
+                    />
+                    <p className="text-[11px] text-[#2e2e2e]/50 mt-1">Tagove razdvojiti zarezom — koriste se za pretragu i filtriranje.</p>
                   </div>
                 </div>
               )}

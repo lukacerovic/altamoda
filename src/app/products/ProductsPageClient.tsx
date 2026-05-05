@@ -1201,6 +1201,51 @@ export default function ProductsPageClient({
               </div>
             )}
 
+            {/* Product line pills — visible whenever ≥1 brand is selected (or activeBrand from URL).
+                Multi-brand selection just merges all those brands' lines into one row. */}
+            {(() => {
+              const focusedBrandSlugs: string[] = activeBrand ? [activeBrand.slug] : selectedBrands;
+              if (focusedBrandSlugs.length === 0) return null;
+              const linesForBrands = productLines.filter((l) => focusedBrandSlugs.includes(l.brand.slug));
+              if (linesForBrands.length === 0) return null;
+              const showBrandSuffix = focusedBrandSlugs.length > 1;
+              return (
+                <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-10 pb-6 border-b border-[#D8CFBC]/60">
+                  <button
+                    onClick={() => setSelectedProductLines([])}
+                    className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
+                      selectedProductLines.length === 0
+                        ? "bg-[#2e2e2e] text-white shadow-sm"
+                        : "bg-[#F2ECDE]/50 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                    }`}
+                  >
+                    {t("products.allLines")}
+                  </button>
+                  {linesForBrands.map((l) => {
+                    const isActive = selectedProductLines.includes(l.slug);
+                    return (
+                      <button
+                        key={l.slug}
+                        onClick={() => toggleProductLine(l.slug)}
+                        className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
+                          isActive
+                            ? "bg-[#2e2e2e] text-white shadow-sm"
+                            : "bg-[#F2ECDE]/50 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                        }`}
+                      >
+                        {l.name}
+                        {showBrandSuffix && (
+                          <span className={`ml-1.5 text-[10px] uppercase tracking-[0.18em] ${isActive ? "text-white/60" : "text-[#2e2e2e]/40"}`}>
+                            {l.brand.name}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
             {/* Toolbar */}
             <div className="flex items-center justify-between mb-8 gap-4">
               <div className="flex items-center gap-3">
