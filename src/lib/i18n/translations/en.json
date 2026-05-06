@@ -448,20 +448,6 @@
     "marketingDesc": "Used to display relevant advertisements.",
     "saveSettings": "Save Settings"
   },
-  "chat": {
-    "assistantName": "Alta Moda Assistant",
-    "online": "Online",
-    "welcomeMessage": "Hello! 👋 How can I help you? Ask me about products, shipping, or anything else.",
-    "inputPlaceholder": "Type a message...",
-    "openChat": "Open chat",
-    "quickReply1": "Recommend a product",
-    "quickReply2": "Order status",
-    "quickReply3": "Shipping info",
-    "quickReply4": "Talk to an agent",
-    "response1": "Thank you for your question! Based on your needs, I recommend the L'Oreal Majirel hair color line. It delivers exceptional quality and long-lasting results. You can browse the full collection in the Hair Color section.",
-    "response2": "Your order is currently being processed. Estimated delivery is within 2-3 business days. For more details, you can check the status in the My Account section.",
-    "response3": "Shipping is free on all orders over 5,000 RSD. For orders below that amount, the shipping fee is 350 RSD. Delivery is handled by courier within 1-3 business days."
-  },
   "newsletter": {
     "subscribers": "Subscribers",
     "campaigns": "Campaigns",

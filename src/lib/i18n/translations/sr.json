@@ -448,20 +448,6 @@
     "marketingDesc": "Koriste se za prikazivanje relevantnih reklama.",
     "saveSettings": "Sačuvaj podešavanja"
   },
-  "chat": {
-    "assistantName": "Alta Moda Asistent",
-    "online": "Online",
-    "welcomeMessage": "Zdravo! 👋 Kako vam mogu pomoći? Pitajte me o proizvodima, dostavi, ili bilo čemu drugom.",
-    "inputPlaceholder": "Unesite poruku...",
-    "openChat": "Otvorite chat",
-    "quickReply1": "Preporuči proizvod",
-    "quickReply2": "Status porudžbine",
-    "quickReply3": "Dostava info",
-    "quickReply4": "Razgovor sa agentom",
-    "response1": "Hvala vam na pitanju! Na osnovu vaših potreba, preporučujem L'Oreal Majirel liniju boja za kosu. Izuzetno je kvalitetna i daje dugotrajne rezultate. Možete pogledati celu kolekciju u sekciji Boje za kosu.",
-    "response2": "Vaša porudžbina je trenutno u procesu obrade. Očekivana isporuka je u roku od 2-3 radna dana. Za detaljnije informacije, možete proveriti status u sekciji Moj Nalog.",
-    "response3": "Dostava je besplatna za sve porudžbine iznad 5.000 RSD. Za porudžbine ispod tog iznosa, cena dostave je 350 RSD. Isporuka se vrši putem kurirske službe u roku od 1-3 radna dana."
-  },
   "newsletter": {
     "subscribers": "Pretplatnici",
     "campaigns": "Kampanje",
