@@ -248,7 +248,7 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           {/* Mobile hamburger - left */}
-          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#1a1c1e] hover:text-secondary transition-colors">
+          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#1a1c1e] hover:text-[#c19742] transition-colors">
             <Menu className="w-6 h-6" />
           </button>
 
@@ -267,7 +267,7 @@ export default function Header() {
                 >
                   <Link
                     href={l.href}
-                    className="text-sm text-[#1a1c1e] hover:text-secondary transition-colors tracking-normal font-normal flex items-center gap-1"
+                    className="text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors tracking-normal font-normal flex items-center gap-1"
                   >
                     {l.name}
                     {hasMega && <ChevronDown className="w-3 h-3" />}
@@ -286,7 +286,7 @@ export default function Header() {
                       <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
                         <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
                         <div className="p-5">
-                          <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-4">
+                          <h4 className="text-xs font-medium uppercase tracking-wider text-[#c19742] mb-4">
                             {t("nav.ourBrands")}
                           </h4>
                           <div className="grid grid-cols-3 gap-2">
@@ -330,7 +330,7 @@ export default function Header() {
                           <div className="flex-1 flex gap-8">
                             {menuData.columns.map((col) => (
                               <div key={col.title} className="min-w-[140px]">
-                                <h4 className="text-xs font-medium uppercase tracking-wider text-secondary mb-3 min-h-[2.5rem] flex items-start">
+                                <h4 className="text-xs font-medium uppercase tracking-wider text-[#c19742] mb-3 min-h-[2.5rem] flex items-start">
                                   {col.title}
                                 </h4>
                                 <ul className="space-y-2">
@@ -338,7 +338,7 @@ export default function Header() {
                                     <li key={link.name}>
                                       <Link
                                         href={link.href}
-                                        className="text-sm text-[#1a1c1e] hover:text-secondary transition-colors flex items-center gap-1 group"
+                                        className="text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors flex items-center gap-1 group"
                                       >
                                         <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
                                         {link.name}
@@ -393,13 +393,13 @@ export default function Header() {
             <div className="hidden xl:block">
               <LanguageToggle />
             </div>
-            <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-secondary transition-colors">
+            <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#c19742] transition-colors">
               <User className="w-5 h-5 text-[#1a1c1e]" />
             </Link>
-            <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-secondary transition-colors">
+            <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#c19742] transition-colors">
               <Search className="w-5 h-5 text-[#1a1c1e]" />
             </button>
-            <Link href="/wishlist" className="relative hidden xl:block hover:text-secondary transition-colors">
+            <Link href="/wishlist" className="relative hidden xl:block hover:text-[#c19742] transition-colors">
               <Heart className="w-5 h-5 text-[#1a1c1e]" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c19742] text-white text-[10px] rounded-full flex items-center justify-center">
@@ -407,7 +407,7 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <Link href="/cart" className="relative hover:text-secondary transition-colors">
+            <Link href="/cart" className="relative hover:text-[#c19742] transition-colors">
               <ShoppingBag className="w-5 h-5 text-[#1a1c1e]" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c19742] text-white text-[10px] rounded-full flex items-center justify-center">
@@ -488,14 +488,14 @@ export default function Header() {
                       <Link
                         href={l.href}
                         onClick={() => setMobileMenu(false)}
-                        className="flex-1 py-3 px-2 text-[#1a1c1e] hover:text-secondary text-sm font-normal tracking-normal"
+                        className="flex-1 py-3 px-2 text-[#1a1c1e] hover:text-[#c19742] text-sm font-normal tracking-normal"
                       >
                         {l.name}
                       </Link>
                       {hasMega && (
                         <button
                           onClick={() => toggleMobileSubmenu(l.menuKey)}
-                          className="p-2 hover:text-secondary transition-colors"
+                          className="p-2 hover:text-[#c19742] transition-colors"
                         >
                           <ChevronDown
                             className={`w-4 h-4 transition-transform duration-200 ${
@@ -513,7 +513,7 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#1a1c1e] hover:text-secondary transition-colors"
+                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors"
                           >
                             {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                               <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
@@ -532,7 +532,7 @@ export default function Header() {
                       <div className="pl-4 pb-2 animate-slideDown">
                         {menuData.columns.map((col) => (
                           <div key={col.title} className="mb-3">
-                            <span className="text-xs font-medium uppercase tracking-wider text-secondary block py-1 px-2">
+                            <span className="text-xs font-medium uppercase tracking-wider text-[#c19742] block py-1 px-2">
                               {col.title}
                             </span>
                             {col.links.map((link) => (
@@ -540,7 +540,7 @@ export default function Header() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block py-2 px-2 text-sm text-[#1a1c1e] hover:text-secondary transition-colors"
+                                className="block py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors"
                               >
                                 {link.name}
                               </Link>
@@ -558,7 +558,7 @@ export default function Header() {
                 <Link
                   href={session ? "/account" : "/account/login"}
                   onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-secondary text-sm"
+                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#c19742] text-sm"
                 >
                   <User className="w-5 h-5" />
                   {session ? t("nav.account") || "Account" : t("nav.login") || "Login"}
@@ -566,7 +566,7 @@ export default function Header() {
                 <Link
                   href="/wishlist"
                   onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-secondary text-sm"
+                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#c19742] text-sm"
                 >
                   <Heart className="w-5 h-5" />
                   {t("nav.wishlist") || "Wishlist"}

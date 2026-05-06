@@ -218,7 +218,7 @@ export default function AdminColorsPage() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: t("admin.totalColors"), value: totalColors, icon: Palette, color: "text-secondary" },
+          { label: t("admin.totalColors"), value: totalColors, icon: Palette, color: "text-[#c19742]" },
           { label: t("admin.brandLines"), value: brandLines.length, icon: Package, color: "text-blue-600" },
           { label: t("admin.activeBrands"), value: activeBrands, icon: Grid3X3, color: "text-green-600" },
           { label: t("admin.lowStockColors"), value: lowStockColors, icon: AlertTriangle, color: "text-orange-500" },
@@ -298,7 +298,7 @@ export default function AdminColorsPage() {
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs text-secondary hover:text-black font-medium flex items-center gap-1 flex-shrink-0"
+              className="text-xs text-[#c19742] hover:text-black font-medium flex items-center gap-1 flex-shrink-0"
             >
               <X size={14} /> {t("admin.clearFilters")}
             </button>
@@ -492,7 +492,7 @@ export default function AdminColorsPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={(e) => { e.stopPropagation(); openEditModal(c); }}
-                      className="p-1.5 text-gray-400 hover:text-secondary hover:bg-stone-100 rounded transition-colors"
+                      className="p-1.5 text-gray-400 hover:text-[#c19742] hover:bg-stone-100 rounded transition-colors"
                     >
                       <Edit3 size={14} />
                     </button>
@@ -560,7 +560,7 @@ export default function AdminColorsPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => openEditModal(c)}
-                        className="p-1.5 text-gray-400 hover:text-secondary hover:bg-stone-100 rounded transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-[#c19742] hover:bg-stone-100 rounded transition-colors"
                         title={t("admin.edit")}
                       >
                         <Edit3 size={14} />
@@ -612,7 +612,7 @@ export default function AdminColorsPage() {
                 style={{ backgroundColor: selectedColor.hexValue }}
               />
               <div>
-                <p className="text-xs text-secondary font-semibold uppercase tracking-wider">
+                <p className="text-xs text-[#c19742] font-semibold uppercase tracking-wider">
                   {selectedColor.productLine?.name}
                 </p>
                 <h4 className="text-lg font-bold text-black">{selectedColor.shadeCode}</h4>

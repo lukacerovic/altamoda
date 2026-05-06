@@ -120,7 +120,7 @@ const ProductRow = memo(function ProductRow({
       <div className="text-right flex-shrink-0">
         {showDiscount ? (
           <>
-            <p className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</p>
+            <p className="text-sm font-bold text-[#c19742]">{discounted.toLocaleString()} RSD</p>
             <p className="text-[10px] text-[#1a1c1e] line-through">{priceB2c.toLocaleString()} RSD</p>
           </>
         ) : (
@@ -493,7 +493,7 @@ export default function ActionsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-secondary" /></div>
+            <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-[#c19742]" /></div>
             <div>
               <p className="text-xs text-[#1a1c1e]">{t("admin.totalActions")}</p>
               <p className="text-xl font-bold text-black">{actions.length}</p>
@@ -590,7 +590,7 @@ export default function ActionsPage() {
                   <button onClick={() => toggleActive(action.id)} className={`p-2 rounded-sm transition-colors ${action.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-50"}`} title={action.isActive ? t("admin.deactivate") : t("admin.activate")}>
                     {action.isActive ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
-                  <button onClick={() => openEdit(action)} className="p-2 text-[#1a1c1e] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors">
+                  <button onClick={() => openEdit(action)} className="p-2 text-[#1a1c1e] hover:text-[#c19742] hover:bg-black/10 rounded-sm transition-colors">
                     <Edit3 size={18} />
                   </button>
                   <button onClick={() => deleteAction(action.id)} className="p-2 text-[#1a1c1e] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
@@ -617,7 +617,7 @@ export default function ActionsPage() {
                           <div>
                             <p className="text-xs font-medium text-black truncate max-w-[150px]">{p.name}</p>
                             <div className="flex items-center gap-1.5">
-                              <span className="text-xs font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
+                              <span className="text-xs font-bold text-[#c19742]">{discounted.toLocaleString()} RSD</span>
                               <span className="text-[10px] text-[#1a1c1e] line-through">{p.originalPrice.toLocaleString()} RSD</span>
                             </div>
                           </div>
@@ -625,7 +625,7 @@ export default function ActionsPage() {
                       );
                     })}
                     {action.products.length > 5 && (
-                      <div className="flex items-center px-3 py-2 text-xs text-secondary font-medium">
+                      <div className="flex items-center px-3 py-2 text-xs text-[#c19742] font-medium">
                         +{action.products.length - 5} više
                       </div>
                     )}
@@ -756,13 +756,13 @@ export default function ActionsPage() {
                       <button
                         type="button"
                         onClick={toggleSelectAllFiltered}
-                        className="text-xs px-2.5 py-1 rounded-sm bg-stone-100 hover:bg-stone-200 text-secondary font-medium transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-sm bg-stone-100 hover:bg-stone-200 text-[#c19742] font-medium transition-colors"
                       >
                         {allFilteredSelected ? "Poništi sve" : "Označi sve"} ({filteredProducts.length})
                       </button>
                     )}
                     {form.target !== "product" && (
-                      <span className="text-xs text-secondary">{t("admin.autoSelectedByScope")}</span>
+                      <span className="text-xs text-[#c19742]">{t("admin.autoSelectedByScope")}</span>
                     )}
                   </div>
                 </div>
@@ -856,7 +856,7 @@ export default function ActionsPage() {
                           </div>
                           <p className="text-xs text-black truncate">{p.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-sm font-bold text-secondary">{discounted.toLocaleString()} RSD</span>
+                            <span className="text-sm font-bold text-[#c19742]">{discounted.toLocaleString()} RSD</span>
                             <span className="text-[10px] text-[#1a1c1e] line-through">{p.priceB2c.toLocaleString()} RSD</span>
                           </div>
                         </div>

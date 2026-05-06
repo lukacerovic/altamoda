@@ -216,9 +216,9 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
-          <Link href="/" className="hover:text-secondary">{t('checkout.breadcrumbHome')}</Link>
+          <Link href="/" className="hover:text-[#c19742]">{t('checkout.breadcrumbHome')}</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/cart" className="hover:text-secondary">{t('checkout.breadcrumbCart')}</Link>
+          <Link href="/cart" className="hover:text-[#c19742]">{t('checkout.breadcrumbCart')}</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-[#1a1c1e]">{t('checkout.breadcrumbCheckout')}</span>
         </nav>
@@ -229,8 +229,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         <div className="flex items-center justify-between mb-8">
           {STEPS.map((s, i) => (
             <div key={s.key} className="flex items-center flex-1">
-              <div className={`flex items-center gap-2 ${i <= stepIndex ? 'text-secondary' : 'text-[#dddbd9]'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i < stepIndex ? 'bg-[#c19742] text-white' : i === stepIndex ? 'border-2 border-black text-secondary' : 'border-2 border-[#dddbd9] text-[#dddbd9]'}`}>
+              <div className={`flex items-center gap-2 ${i <= stepIndex ? 'text-[#c19742]' : 'text-[#dddbd9]'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i < stepIndex ? 'bg-[#c19742] text-white' : i === stepIndex ? 'border-2 border-black text-[#c19742]' : 'border-2 border-[#dddbd9] text-[#dddbd9]'}`}>
                   {i < stepIndex ? <CheckCircle className="w-4 h-4" /> : i + 1}
                 </div>
                 <span className="text-sm font-medium hidden sm:inline">{s.label}</span>
@@ -287,7 +287,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
                 <div className="mt-4 p-3 bg-[#FFFFFF] rounded-sm text-sm text-[#1a1c1e]">
                   {t('checkout.haveAccount')}{' '}
-                  <Link href="/account/login?callbackUrl=/checkout" className="text-secondary font-medium hover:underline">
+                  <Link href="/account/login?callbackUrl=/checkout" className="text-[#c19742] font-medium hover:underline">
                     {t('checkout.loginLink')}
                   </Link>{' '}
                   {t('checkout.forFasterOrdering')}
@@ -312,7 +312,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <div className="space-y-3 mb-4">
                     {addresses.map((addr) => (
                       <label key={addr.id} className={`flex items-start gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${!useNewAddress && selectedAddressId === addr.id ? 'border-black bg-[#FFFFFF]' : 'border-[#dddbd9] hover:border-[#dddbd9]'}`}>
-                        <input type="radio" name="address" checked={!useNewAddress && selectedAddressId === addr.id} onChange={() => { setSelectedAddressId(addr.id); setUseNewAddress(false) }} className="mt-1 text-secondary" />
+                        <input type="radio" name="address" checked={!useNewAddress && selectedAddressId === addr.id} onChange={() => { setSelectedAddressId(addr.id); setUseNewAddress(false) }} className="mt-1 text-[#c19742]" />
                         <div>
                           <span className="font-medium text-sm">{addr.label}</span>
                           <p className="text-sm text-[#1a1c1e]">{addr.street}, {addr.postalCode} {addr.city}, {addr.country}</p>
@@ -320,7 +320,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       </label>
                     ))}
                     <label className={`flex items-center gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${useNewAddress ? 'border-black bg-[#FFFFFF]' : 'border-[#dddbd9] hover:border-[#dddbd9]'}`}>
-                      <input type="radio" name="address" checked={useNewAddress} onChange={() => setUseNewAddress(true)} className="text-secondary" />
+                      <input type="radio" name="address" checked={useNewAddress} onChange={() => setUseNewAddress(true)} className="text-[#c19742]" />
                       <span className="text-sm font-medium">{t('checkout.newAddress')}</span>
                     </label>
                   </div>
@@ -361,7 +361,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   ].map((opt) => (
                     <label key={opt.key} className={`flex items-center justify-between gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${shippingMethod === opt.key ? 'border-black bg-[#FFFFFF]' : 'border-[#dddbd9] hover:border-[#dddbd9]'}`}>
                       <div className="flex items-center gap-3">
-                        <input type="radio" name="shipping" checked={shippingMethod === opt.key} onChange={() => setShippingMethod(opt.key)} className="text-secondary" />
+                        <input type="radio" name="shipping" checked={shippingMethod === opt.key} onChange={() => setShippingMethod(opt.key)} className="text-[#c19742]" />
                         <span className="text-sm font-medium">{opt.label}</span>
                       </div>
                       <span className={`text-sm font-semibold ${opt.price === 0 ? 'text-green-600' : ''}`}>
@@ -388,7 +388,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 <div className="space-y-3">
                   {paymentOptions.map((opt) => (
                     <label key={opt.key} className={`flex items-center gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${paymentMethod === opt.key ? 'border-black bg-[#FFFFFF]' : 'border-[#dddbd9] hover:border-[#dddbd9]'}`}>
-                      <input type="radio" name="payment" checked={paymentMethod === opt.key} onChange={() => setPaymentMethod(opt.key)} className="text-secondary" />
+                      <input type="radio" name="payment" checked={paymentMethod === opt.key} onChange={() => setPaymentMethod(opt.key)} className="text-[#c19742]" />
                       <span className="text-sm font-medium">{opt.label}</span>
                     </label>
                   ))}
@@ -421,7 +421,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     <div className="mb-4 p-4 bg-[#FFFFFF] rounded-sm">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-semibold text-[#1a1c1e]">{t('checkout.contactDetails')}</span>
-                        <button onClick={() => setStep('contact')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
+                        <button onClick={() => setStep('contact')} className="text-xs text-[#c19742] hover:underline">{t('checkout.edit')}</button>
                       </div>
                       <p className="text-sm text-[#1a1c1e]">{guestInfo.name}</p>
                       <p className="text-sm text-[#1a1c1e]">{guestInfo.email} | {guestInfo.phone}</p>
@@ -432,7 +432,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <div className="mb-4 p-4 bg-[#FFFFFF] rounded-sm">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-semibold text-[#1a1c1e]">{t('checkout.shippingAddress')}</span>
-                      <button onClick={() => setStep('address')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
+                      <button onClick={() => setStep('address')} className="text-xs text-[#c19742] hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-[#1a1c1e]">
                       {shippingAddress?.street}, {shippingAddress?.postalCode} {shippingAddress?.city}
@@ -443,7 +443,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <div className="mb-4 p-4 bg-[#FFFFFF] rounded-sm">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-semibold text-[#1a1c1e]">{t('checkout.step3')}</span>
-                      <button onClick={() => setStep('shipping')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
+                      <button onClick={() => setStep('shipping')} className="text-xs text-[#c19742] hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-[#1a1c1e]">
                       {shippingMethod === 'standard' ? t('checkout.standardShort') : shippingMethod === 'express' ? t('checkout.expressShort') : t('checkout.pickupShort')}
@@ -456,7 +456,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   <div className="p-4 bg-[#FFFFFF] rounded-sm">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-semibold text-[#1a1c1e]">{t('checkout.step4')}</span>
-                      <button onClick={() => setStep('payment')} className="text-xs text-secondary hover:underline">{t('checkout.edit')}</button>
+                      <button onClick={() => setStep('payment')} className="text-xs text-[#c19742] hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-[#1a1c1e]">
                       {paymentOptions.find((o) => o.key === paymentMethod)?.label}
@@ -493,7 +493,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                         <Link href="/account/login?callbackUrl=/checkout" className="px-4 py-2 bg-[#c19742] text-white text-sm rounded font-medium hover:bg-[#413d3a]">
                           {t('checkout.loginLink')}
                         </Link>
-                        <Link href="/account/register?callbackUrl=/checkout" className="px-4 py-2 border border-black text-secondary text-sm rounded font-medium hover:bg-[#FFFFFF]">
+                        <Link href="/account/register?callbackUrl=/checkout" className="px-4 py-2 border border-black text-[#c19742] text-sm rounded font-medium hover:bg-[#FFFFFF]">
                           {t('checkout.createAccount')}
                         </Link>
                       </div>
@@ -539,8 +539,8 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-[#dddbd9] space-y-2 text-xs text-[#1a1c1e]">
-                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-secondary" /> {t('checkout.securePayment')}</div>
-                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-secondary" /> {t('checkout.freeShippingOver')}</div>
+                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#c19742]" /> {t('checkout.securePayment')}</div>
+                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#c19742]" /> {t('checkout.freeShippingOver')}</div>
               </div>
             </div>
           </div>

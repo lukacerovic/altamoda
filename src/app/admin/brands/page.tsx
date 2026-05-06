@@ -386,7 +386,7 @@ export default function AdminBrandsPage() {
                     </span>
                   ); })()}
                 </div>
-                <h3 className="text-sm font-semibold text-black group-hover:text-secondary transition-colors">
+                <h3 className="text-sm font-semibold text-black group-hover:text-[#c19742] transition-colors">
                   {brand.name}
                 </h3>
                 <p className="text-xs text-stone-400 mt-1">

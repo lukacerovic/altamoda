@@ -130,7 +130,7 @@ export default function ContactPage() {
                 type="email"
               />
               <button
-                className="bg-[#dddbd9] text-[#1a1c1e] px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#413d3a] transition-colors duration-300"
+                className="bg-[#dddbd9] text-[#1a1c1e] px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#413d3a] hover:text-white transition-colors duration-300"
                 type="submit"
               >
                 {t("contact.subscribe")}

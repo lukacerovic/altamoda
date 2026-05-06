@@ -252,7 +252,7 @@ export default function AdminLayout({
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-black hover:text-secondary transition-colors"
+            className="lg:hidden text-black hover:text-[#c19742] transition-colors"
           >
             <Menu size={24} />
           </button>

@@ -1388,7 +1388,7 @@ export default function ProductsPageClient({
                   <button
                     key={tag.key}
                     onClick={() => removeTag(tag.key)}
-                    className="group flex items-center gap-1.5 bg-[#dddbd9] text-[#1a1c1e] pl-3 pr-2 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium border border-[#dddbd9] hover:bg-[#413d3a] hover:border-[#413d3a] transition-colors"
+                    className="group flex items-center gap-1.5 bg-[#dddbd9] text-[#1a1c1e] pl-3 pr-2 py-1.5 text-[10px] uppercase tracking-[0.18em] font-medium border border-[#dddbd9] hover:bg-[#413d3a] hover:text-white hover:border-[#413d3a] transition-colors"
                   >
                     {tag.label}
                     <X className="w-3 h-3 text-[#FFFFFF]/70 group-hover:text-[#FFFFFF] transition-colors" />

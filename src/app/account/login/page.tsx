@@ -220,8 +220,8 @@ function LoginContent() {
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-[#dddbd9]">
-            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-secondary border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
-            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-secondary border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
+            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
+            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
           </div>
 
           <div className="p-6 md:p-8">
@@ -258,9 +258,9 @@ function LoginContent() {
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-sm text-[#1a1c1e] cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-[#dddbd9] text-secondary focus:ring-[#1a1c1e]" /> {t("auth.rememberMe")}
+                      <input type="checkbox" className="w-4 h-4 rounded border-[#dddbd9] text-[#c19742] focus:ring-[#1a1c1e]" /> {t("auth.rememberMe")}
                     </label>
-                    <button type="button" onClick={(e) => { e.preventDefault(); setForgotPasswordMsg(true); setTimeout(() => setForgotPasswordMsg(false), 3000); }} className="text-sm text-secondary hover:text-[#1a1c1e]">{t("auth.forgotPassword")}</button>
+                    <button type="button" onClick={(e) => { e.preventDefault(); setForgotPasswordMsg(true); setTimeout(() => setForgotPasswordMsg(false), 3000); }} className="text-sm text-[#c19742] hover:text-[#1a1c1e]">{t("auth.forgotPassword")}</button>
                   </div>
                   {forgotPasswordMsg && (
                     <div className="p-3 bg-[#FFFFFF] border border-[#dddbd9] text-[#1a1c1e] text-sm rounded">
@@ -346,7 +346,7 @@ function LoginContent() {
                   {registerType === "b2b" && (
                     <>
                       <div className="border-t border-[#dddbd9] pt-4">
-                        <h3 className="text-sm font-semibold text-[#1a1c1e] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-secondary" /> {t("auth.salonDetails")}</h3>
+                        <h3 className="text-sm font-semibold text-[#1a1c1e] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-[#c19742]" /> {t("auth.salonDetails")}</h3>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.salonName")}</label>
@@ -377,8 +377,8 @@ function LoginContent() {
                   </div>
 
                   <label className="flex items-start gap-2 text-sm text-[#1a1c1e] cursor-pointer">
-                    <input type="checkbox" checked={regTerms} onChange={(e) => setRegTerms(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-secondary focus:ring-[#1a1c1e] mt-0.5" />
-                    <span>{t("auth.agreeTerms")} <a href="#" className="text-secondary hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-secondary hover:underline">{t("auth.privacyPolicy")}</a></span>
+                    <input type="checkbox" checked={regTerms} onChange={(e) => setRegTerms(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#c19742] focus:ring-[#1a1c1e] mt-0.5" />
+                    <span>{t("auth.agreeTerms")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.privacyPolicy")}</a></span>
                   </label>
 
                   <button type="submit" disabled={loading} className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">

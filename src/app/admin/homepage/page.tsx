@@ -356,9 +356,9 @@ export default function HomepagePage() {
           <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFFFF]">
               <div className="flex items-center gap-3">
-                <div className="text-secondary"><ImageIcon size={20} /></div>
+                <div className="text-[#c19742]"><ImageIcon size={20} /></div>
                 <h2 className="text-lg font-serif font-bold text-black">Hero kartice</h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-secondary text-xs font-semibold">
+                <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#c19742] text-xs font-semibold">
                   {heroCards.filter((c) => c.image).length} / 3
                 </span>
               </div>
@@ -517,11 +517,11 @@ export default function HomepagePage() {
                 {/* Section Header */}
                 <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFFFF]">
                   <div className="flex items-center gap-3">
-                    <div className="text-secondary">{section.icon}</div>
+                    <div className="text-[#c19742]">{section.icon}</div>
                     <h2 className="text-lg font-serif font-bold text-black">
                       {section.label}
                     </h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-secondary text-xs font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#c19742] text-xs font-semibold">
                       {products.length}
                     </span>
                   </div>

@@ -79,7 +79,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
-          <Link href="/" className="hover:text-secondary">{t("wishlist.home")}</Link>
+          <Link href="/" className="hover:text-[#c19742]">{t("wishlist.home")}</Link>
           <span>/</span>
           <span className="text-[#1a1c1e]">{t("wishlist.title")}</span>
         </div>
@@ -95,7 +95,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             {/* Title + Actions */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-secondary fill-[#dddbd9]" />
+                <Heart className="w-6 h-6 text-[#c19742] fill-[#dddbd9]" />
                 <h1 className="text-3xl font-bold text-[#1a1c1e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
                 <span className="text-sm text-[#1a1c1e]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
@@ -133,11 +133,11 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       </button>
                     </div>
                     <div className="p-4">
-                      <p className="text-[10px] font-semibold tracking-widest uppercase text-secondary mb-1">{item.brand}</p>
+                      <p className="text-[10px] font-semibold tracking-widest uppercase text-[#c19742] mb-1">{item.brand}</p>
                       <h3 className="text-sm font-medium text-[#1a1c1e] mb-2 line-clamp-2 leading-snug">{item.name}</h3>
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#dddbd9] text-secondary" : "text-[#dddbd9]"}`} />
+                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#dddbd9] text-[#c19742]" : "text-[#dddbd9]"}`} />
                         ))}
                       </div>
                       <div className="flex items-center gap-2 mb-3">

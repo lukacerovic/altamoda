@@ -978,7 +978,7 @@ export default function ProductsPage() {
                       aria-pressed={selectedIds.includes(product.id)}
                       className="text-[#1a1c1e] hover:text-black"
                     >
-                      {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
+                      {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-[#c19742]" /> : <Square size={18} />}
                     </button>
                   </td>
                   <td className="px-4 py-3">
@@ -990,7 +990,7 @@ export default function ProductsPage() {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-black truncate max-w-[200px]">{product.name}</p>
                           {product.badges.isProfessionalOnly && (
-                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-black/10 text-secondary">
+                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-black/10 text-[#c19742]">
                               <ShieldCheck size={10} /> B2B
                             </span>
                           )}
@@ -1034,7 +1034,7 @@ export default function ProductsPage() {
                         onClick={() => openEditPanel(product)}
                         aria-label={`${t("admin.editProduct")}: ${product.name}`}
                         title={t("admin.editProduct")}
-                        className="p-1.5 text-[#1a1c1e] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
+                        className="p-1.5 text-[#1a1c1e] hover:text-[#c19742] hover:bg-black/10 rounded-sm transition-colors"
                       >
                         <Edit3 size={15} />
                       </button>
@@ -1123,7 +1123,7 @@ export default function ProductsPage() {
                     onClick={() => setActiveTab(tab.key)}
                     className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.key
-                        ? "border-black text-secondary"
+                        ? "border-black text-[#c19742]"
                         : "border-transparent text-[#1a1c1e] hover:text-black hover:border-[#dddbd9]"
                     }`}
                   >
@@ -1194,7 +1194,7 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewProductLine(!showNewProductLine)}
-                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-secondary hover:bg-stone-50 transition-colors whitespace-nowrap"
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#c19742] hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
                           + Nova
                         </button>
@@ -1251,7 +1251,7 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewCategory(!showNewCategory)}
-                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-secondary hover:bg-stone-50 transition-colors whitespace-nowrap"
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#c19742] hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
                           + Nova
                         </button>
@@ -1293,7 +1293,7 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewSubCategory(!showNewSubCategory)}
-                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-secondary hover:bg-stone-50 transition-colors whitespace-nowrap"
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#c19742] hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
                           + Nova
                         </button>
@@ -1361,7 +1361,7 @@ export default function ProductsPage() {
                             type="checkbox"
                             checked={formData.badges[key]}
                             onChange={(e) => updateForm("badges", { ...formData.badges, [key]: e.target.checked })}
-                            className="w-4 h-4 rounded border-stone-200 text-secondary accent-[#dddbd9]"
+                            className="w-4 h-4 rounded border-stone-200 text-[#c19742] accent-[#dddbd9]"
                           />
                           <span className="text-sm text-[#1a1c1e]">{label}</span>
                         </label>
@@ -1374,11 +1374,11 @@ export default function ProductsPage() {
                     <>
                       <div className="border-t border-stone-200 pt-5 mt-2">
                         <div className="flex items-center gap-2 mb-4">
-                          <Palette size={18} className="text-secondary" />
+                          <Palette size={18} className="text-[#c19742]" />
                           <h3 className="text-sm font-semibold text-black">Podaci o boji</h3>
                         </div>
                         <div className="p-3 bg-stone-100 rounded-sm text-xs text-stone-500 flex items-center gap-2 mb-5">
-                          <Palette size={16} className="text-secondary" />
+                          <Palette size={16} className="text-[#c19742]" />
                           Dodelite boju proizvodu — podaci se koriste za vizuelni prikaz i filtriranje na sajtu.
                         </div>
 
@@ -1576,7 +1576,7 @@ export default function ProductsPage() {
                         )}
                       </div>
                       {formData.badges.isProfessionalOnly && (
-                        <p className="text-xs text-secondary mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
+                        <p className="text-xs text-[#c19742] mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
                       )}
                     </div>
                   </div>
@@ -1747,7 +1747,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#1a1c1e] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#1a1c1e] hover:border-black hover:text-[#c19742] transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {uploading ? (
                           <>

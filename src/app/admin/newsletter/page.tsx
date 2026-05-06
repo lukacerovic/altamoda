@@ -1002,7 +1002,7 @@ export default function NewsletterPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openTemplateEditor(template)}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#dddbd9] text-[#1a1c1e] rounded-lg text-xs font-semibold hover:bg-[#413d3a] transition-colors"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#dddbd9] text-[#1a1c1e] rounded-lg text-xs font-semibold hover:bg-[#413d3a] hover:text-white transition-colors"
                       >
                         <Pencil size={13} /> Uredi
                       </button>
@@ -1112,7 +1112,7 @@ export default function NewsletterPage() {
                   <p className="text-2xl font-bold text-black mt-1">{stats.totalActive}</p>
                 </div>
                 <div className="w-10 h-10 rounded-sm bg-black/10 flex items-center justify-center">
-                  <Users size={20} className="text-secondary" />
+                  <Users size={20} className="text-[#c19742]" />
                 </div>
               </div>
             </div>
@@ -1177,7 +1177,7 @@ export default function NewsletterPage() {
                       <tr key={sub.id} className="border-b border-stone-100 hover:bg-stone-100 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <Mail size={14} className="text-secondary" />
+                            <Mail size={14} className="text-[#c19742]" />
                             <span className="text-[#1a1c1e]">{sub.email}</span>
                           </div>
                         </td>

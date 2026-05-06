@@ -275,7 +275,7 @@ export default function FAQPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Title */}
         <div className="text-center mb-10">
-          <HelpCircle className="w-12 h-12 text-secondary mx-auto mb-4" />
+          <HelpCircle className="w-12 h-12 text-[#c19742] mx-auto mb-4" />
           <h1 className="text-3xl md:text-4xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
             {t("faq.title")}
           </h1>
@@ -320,7 +320,7 @@ export default function FAQPage() {
                         className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FFFFFF] transition-colors"
                       >
                         <span className="text-sm font-medium text-[#1a1c1e] pr-4">{item.q}</span>
-                        <ChevronDown className={`w-5 h-5 text-secondary flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown className={`w-5 h-5 text-[#c19742] flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isOpen && (
                         <div className="px-5 pb-4 animate-slideDown">
@@ -340,10 +340,10 @@ export default function FAQPage() {
           <h3 className="text-xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
           <p className="text-[#1a1c1e] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-secondary transition-colors">
+            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#c19742] transition-colors">
               <Phone className="w-4 h-4" /> +381 (0)11 3088388
             </a>
-            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-secondary transition-colors">
+            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#c19742] transition-colors">
               <Mail className="w-4 h-4" /> kontakt@altamoda.rs
             </a>
           </div>

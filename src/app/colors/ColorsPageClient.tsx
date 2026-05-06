@@ -190,7 +190,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
-          <Link href="/" className="hover:text-secondary">{t("nav.home") || "Početna"}</Link>
+          <Link href="/" className="hover:text-[#c19742]">{t("nav.home") || "Početna"}</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-[#1a1c1e]">{t("colors.title")}</span>
         </nav>
@@ -319,7 +319,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             {hasActiveFilters && (
               <button
                 onClick={() => { setFilterLevel(null); setFilterUndertone(null); setSearchQuery(""); }}
-                className="text-xs text-secondary hover:text-[#1a1c1e] font-medium flex items-center gap-1"
+                className="text-xs text-[#c19742] hover:text-[#1a1c1e] font-medium flex items-center gap-1"
               >
                 <X size={14} /> {t("colors.clearFilters")}
               </button>
@@ -458,7 +458,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                                         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-2 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                                           {c.name}
                                           <br />
-                                          <span className="text-secondary">{c.price.toLocaleString("sr-RS")} RSD</span>
+                                          <span className="text-[#c19742]">{c.price.toLocaleString("sr-RS")} RSD</span>
                                           <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45 -mt-1" />
                                         </div>
                                       </button>
@@ -513,7 +513,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-2 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                           {color.name}
                           <br />
-                          <span className="text-secondary">{color.price.toLocaleString("sr-RS")} RSD</span>
+                          <span className="text-[#c19742]">{color.price.toLocaleString("sr-RS")} RSD</span>
                           <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45 -mt-1" />
                         </div>
                       </button>
@@ -538,7 +538,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 shadow-lg border-4 border-white" style={{ backgroundColor: selectedColor.hexValue }} />
 
                 <div className="text-center mb-4">
-                  <span className="text-xs text-secondary font-medium uppercase tracking-wider">
+                  <span className="text-xs text-[#c19742] font-medium uppercase tracking-wider">
                     {selectedColor.productLine?.name || selectedColor.brand?.name}
                   </span>
                   <h3 className="text-lg font-bold text-[#1a1c1e] mt-1">{selectedColor.shadeCode}</h3>
@@ -612,7 +612,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 rounded-full shadow-lg border-4 border-white flex-shrink-0" style={{ backgroundColor: selectedColor.hexValue }} />
               <div>
-                <span className="text-xs text-secondary font-medium uppercase">{selectedColor.productLine?.name}</span>
+                <span className="text-xs text-[#c19742] font-medium uppercase">{selectedColor.productLine?.name}</span>
                 <h3 className="text-lg font-bold text-[#1a1c1e]">{selectedColor.shadeCode}</h3>
                 <p className="text-sm text-[#1a1c1e]">{selectedColor.name}</p>
               </div>
