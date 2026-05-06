@@ -16,7 +16,7 @@ export default function Footer() {
   ].filter(Boolean) as Array<{ href: string; label: string; Icon: typeof Instagram }>;
 
   return (
-    <footer className="bg-[#2e2e2e] mt-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
+    <footer className="bg-[#1a1c1e] mt-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
       {/* Column 1: Brand */}
       <div className="md:col-span-1">
         <div
@@ -37,14 +37,14 @@ export default function Footer() {
                 aria-label={label}
                 target={href.startsWith("http") ? "_blank" : undefined}
                 rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="w-8 h-8 rounded-full border border-[#a59d85]/30 flex items-center justify-center text-[#a59d85] hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
+                className="w-8 h-8 rounded-full border border-[#dddbd9]/30 flex items-center justify-center text-[#dddbd9] hover:text-[#FFFFFF] hover:border-[#FFFFFF] transition-colors"
               >
                 <Icon className="w-3.5 h-3.5" />
               </a>
             ))}
           </div>
         )}
-        <p className="text-[10px] text-[#a59d85]/60 uppercase tracking-widest mt-8">
+        <p className="text-[10px] text-[#dddbd9]/60 uppercase tracking-widest mt-8">
           © 2026 ALTAMODA. All rights reserved.
         </p>
       </div>

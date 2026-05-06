@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 
 /* Splits text on *…* markers and wraps the marked spans in italic accent colour. */
 function withEm(text: string, accent: "olive" | "gold" = "olive") {
-  const accentClass = accent === "gold" ? "text-[#B8975B]" : "text-[#8C8769]";
+  const accentClass = accent === "gold" ? "text-[#c19742]" : "text-[#413d3a]";
   return text.split(/(\*[^*]+\*)/g).map((part, i) => {
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
@@ -56,7 +56,7 @@ function SpaceCard({
 }) {
   return (
     <div className="flex flex-col">
-      <div className="aspect-[4/5] bg-[#1a1a1a] overflow-hidden relative mb-5">
+      <div className="aspect-[4/5] bg-[#1a1c1e] overflow-hidden relative mb-5">
         <Image
           src={img}
           alt=""
@@ -73,22 +73,22 @@ function SpaceCard({
         </span>
       </div>
       <div
-        className="italic text-[12px] mb-2 text-[#8C8769]"
+        className="italic text-[12px] mb-2 text-[#413d3a]"
         style={{ fontFamily: "'Cormorant Garamond', serif" }}
       >
         {num}
       </div>
       <h3
-        className="font-light text-[24px] leading-[1.1] mb-2.5 tracking-[-0.005em] text-[#1A1A1A]"
+        className="font-light text-[24px] leading-[1.1] mb-2.5 tracking-[-0.005em] text-[#1a1c1e]"
         style={{ fontFamily: "'Cormorant Garamond', serif" }}
       >
         {withEm(title)}
       </h3>
-      <div className="w-8 h-px mb-2.5 bg-[#1A1A1A]/40" />
-      <div className="text-[9.5px] uppercase tracking-[0.18em] leading-[1.6] text-[#6B6B6B] mb-4">
+      <div className="w-8 h-px mb-2.5 bg-[#1a1c1e]/40" />
+      <div className="text-[9.5px] uppercase tracking-[0.18em] leading-[1.6] text-[#413d3a] mb-4">
         {kicker}
       </div>
-      <div className="text-[13px] leading-[1.7] text-[#262521]">
+      <div className="text-[13px] leading-[1.7] text-[#1a1c1e]">
         {children}
       </div>
     </div>
@@ -102,17 +102,17 @@ export default function EducationPage() {
     <>
       <Header />
       <main
-        className="bg-[#FAFAFA] text-[#1A1A1A]"
+        className="bg-[#dddbd9] text-[#1a1c1e]"
         style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: "14.5px", lineHeight: 1.65 }}
       >
         {/* ════════════════════════════════════════════════════════════
             1. HERO
         ════════════════════════════════════════════════════════════ */}
-        <section className="border-b border-[#E8E5DE]">
+        <section className="border-b border-[#dddbd9]">
           <div className="max-w-[1240px] mx-auto px-6 md:px-14 py-20 md:py-24">
             <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 items-end">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#6B6B6B] font-medium block mb-6">
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#413d3a] font-medium block mb-6">
                   {t("education.heroTag")}
                 </span>
                 <h1
@@ -124,25 +124,25 @@ export default function EducationPage() {
                 >
                   {withEm(t("education.heroTitle"))}
                 </h1>
-                <p className="text-[16px] text-[#6B6B6B] leading-[1.7] max-w-[480px] mb-8">
+                <p className="text-[16px] text-[#413d3a] leading-[1.7] max-w-[480px] mb-8">
                   {t("education.heroSubtitle")}
                 </p>
                 <div className="flex items-center gap-3.5 flex-wrap">
                   <a
                     href="#kontakt"
-                    className="inline-flex items-center gap-2.5 bg-[#1A1A1A] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-black hover:-translate-y-px transition-all"
+                    className="inline-flex items-center gap-2.5 bg-[#c19742] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-[#413d3a] hover:-translate-y-px transition-all"
                   >
                     {t("education.heroCtaPrimary")} <ArrowRight className="w-3 h-3" />
                   </a>
                   <a
                     href="#kontakt"
-                    className="inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] font-medium border-b border-current pb-1 hover:text-[#8C8769] transition-colors"
+                    className="inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] font-medium border-b border-current pb-1 hover:text-[#413d3a] transition-colors"
                   >
                     {t("education.heroCtaSecondary")} <ArrowRight className="w-3 h-3" />
                   </a>
                 </div>
               </div>
-              <div className="aspect-[5/6] bg-[#1a1a1a] relative overflow-hidden">
+              <div className="aspect-[5/6] bg-[#1a1c1e] relative overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1400&q=80"
                   alt="ID Hair Academy"
@@ -166,7 +166,7 @@ export default function EducationPage() {
         {/* ════════════════════════════════════════════════════════════
             2. ACADEMY INTRO — ink editorial
         ════════════════════════════════════════════════════════════ */}
-        <section className="bg-[#1A1A1A] text-white">
+        <section className="bg-[#1a1c1e] text-white">
           <div className="max-w-[1240px] mx-auto px-6 md:px-14" style={{ paddingTop: "140px", paddingBottom: "140px" }}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
               <div>
@@ -187,7 +187,7 @@ export default function EducationPage() {
                   <p>{t("education.academyP2")}</p>
                 </div>
               </div>
-              <div className="aspect-[4/5] bg-[#0e0e0e] relative overflow-hidden">
+              <div className="aspect-[4/5] bg-[#1a1c1e] relative overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80"
                   alt="Edukacija"
@@ -204,10 +204,10 @@ export default function EducationPage() {
         {/* ════════════════════════════════════════════════════════════
             3. SECTIONS — Nº 01 / Nº 02 / Nº 03 / Nº 04
         ════════════════════════════════════════════════════════════ */}
-        <section className="border-b border-[#E8E5DE] py-20 md:py-24">
+        <section className="border-b border-[#dddbd9] py-20 md:py-24">
           <div className="max-w-[1240px] mx-auto px-6 md:px-14 mb-12">
             <div className="max-w-[720px]">
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#6B6B6B] font-medium block mb-3.5">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#413d3a] font-medium block mb-3.5">
                 {t("education.sectionsEyebrow")}
               </span>
               <h2
@@ -231,7 +231,7 @@ export default function EducationPage() {
                 img="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=80"
                 credit={t("education.section1ImgCredit")}
               >
-                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                   {withEm(t("education.section1P1"))}
                 </p>
                 <p>{t("education.section1P2")}</p>
@@ -244,7 +244,7 @@ export default function EducationPage() {
                 img="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=900&q=80"
                 credit={t("education.section2ImgCredit")}
               >
-                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                   {withEm(t("education.section2P1"))}
                 </p>
                 <p className="mb-3">{t("education.section2P2")}</p>
@@ -258,7 +258,7 @@ export default function EducationPage() {
                 img="/prodajno-mesto.png"
                 credit={t("education.section3ImgCredit")}
               >
-                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                   {withEm(t("education.section3P1"))}
                 </p>
                 <p>{t("education.section3P2")}</p>
@@ -270,13 +270,13 @@ export default function EducationPage() {
         {/* ════════════════════════════════════════════════════════════
             4. COMBINED Nº 04 model + Nº 05 kontakt — single ink panel
         ════════════════════════════════════════════════════════════ */}
-        <section id="kontakt" className="bg-[#1A1A1A] text-white mt-12">
+        <section id="kontakt" className="bg-[#1a1c1e] text-white mt-12">
           {/* Top — Nº 04 model row */}
           <div className="max-w-[1240px] mx-auto px-6 md:px-14 pt-14 md:pt-20 pb-12 md:pb-16">
             <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_0.85fr] gap-8 lg:gap-12 items-start">
               <div>
                 <div
-                  className="italic text-[13px] text-[#B8975B] mb-2.5"
+                  className="italic text-[13px] text-[#c19742] mb-2.5"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   Nº 04
@@ -303,7 +303,7 @@ export default function EducationPage() {
                 <div className="mt-6 flex gap-3.5 flex-wrap">
                   <a
                     href={`mailto:${t("education.contactEmail")}`}
-                    className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1A1A1A] transition-colors"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1a1c1e] transition-colors"
                   >
                     {t("education.section4Cta")} <ArrowRight className="w-3 h-3" />
                   </a>
@@ -311,14 +311,14 @@ export default function EducationPage() {
                     href={INSTAGRAM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1A1A1A] transition-colors"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1a1c1e] transition-colors"
                   >
                     {t("education.contactInstagram")} <ArrowRight className="w-3 h-3" />
                   </a>
                 </div>
               </div>
               <div className="pt-1">
-                <div className="aspect-[4/5] bg-[#0e0e0e] overflow-hidden relative">
+                <div className="aspect-[4/5] bg-[#1a1c1e] overflow-hidden relative">
                   <Image
                     src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=80"
                     alt=""
@@ -348,7 +348,7 @@ export default function EducationPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 lg:gap-14 items-start">
               <div>
                 <div
-                  className="italic text-[12px] text-[#B8975B] mb-2"
+                  className="italic text-[12px] text-[#c19742] mb-2"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   Nº 05
@@ -412,20 +412,20 @@ export default function EducationPage() {
         {/* ════════════════════════════════════════════════════════════
             5. INSTAGRAM BENTO — kept from previous design (per user request)
         ════════════════════════════════════════════════════════════ */}
-        <section className="py-20 md:py-28 bg-[#FAFAFA]">
+        <section className="py-20 md:py-28 bg-[#dddbd9]">
           <div className="max-w-[1400px] mx-auto px-6 md:px-10">
             <div className="flex items-end justify-between mb-12 md:mb-16 gap-8 flex-wrap">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#1A1A1A]/60 font-medium block mb-5">
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
                   {t("education.socialKicker")}
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1A1A1A] leading-[1.05]"
+                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05]"
                   style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
                   <em className="italic">{t("education.contactInstagram")}</em> {t("education.socialTitle")}
                 </h2>
-                <p className="text-[14px] text-[#1A1A1A]/60 leading-relaxed mt-5 max-w-md">
+                <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-md">
                   {t("education.socialDesc")}
                 </p>
               </div>
@@ -434,7 +434,7 @@ export default function EducationPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="w-11 h-11 rounded-full border border-[#E8E5DE] flex items-center justify-center text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white hover:border-[#1A1A1A] transition-colors"
+                className="w-11 h-11 rounded-full border border-[#dddbd9] flex items-center justify-center text-[#1a1c1e] hover:bg-[#1a1c1e] hover:text-white hover:border-[#1a1c1e] transition-colors"
               >
                 <Instagram className="w-4 h-4" />
               </a>
@@ -457,7 +457,7 @@ export default function EducationPage() {
                   href={INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${cell.cls} relative overflow-hidden bg-[#EAE5DA] group`}
+                  className={`${cell.cls} relative overflow-hidden bg-[#dddbd9] group`}
                 >
                   <Image
                     src={cell.img}
@@ -466,7 +466,7 @@ export default function EducationPage() {
                     sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-[#1A1A1A]/0 group-hover:bg-[#1A1A1A]/30 transition-colors flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#1a1c1e]/0 group-hover:bg-[#1a1c1e]/30 transition-colors flex items-center justify-center">
                     <Instagram className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </a>

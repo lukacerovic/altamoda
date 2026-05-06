@@ -1,65 +1,69 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* ── The Modern Atelier – Design Tokens ── */
+  /* ── New Palette – Design Tokens ── */
 
-  /* Primary: Smoky Black – authoritative, elegant */
-  --color-primary: #2e2e2e;
-  --color-on-primary: #FFFFFF;
-  --color-primary-container: #383838;
-  --color-on-primary-container: #e1dbd0;
+  /* Primary: Near Black – authoritative, elegant */
+  --color-primary: #1a1c1e;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #413d3a;
+  --color-on-primary-container: #dddbd9;
 
-  /* Secondary: Soft Olive – natural accent */
-  --color-secondary: #e1dbd0;
-  --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #D8CFBC;
-  --color-on-secondary-container: #6a624f;
+  /* Secondary: Light Warm Gray – natural accent */
+  --color-secondary: #dddbd9;
+  --color-on-secondary: #1a1c1e;
+  --color-secondary-container: #413d3a;
+  --color-on-secondary-container: #dddbd9;
 
-  /* Surfaces – Floral White / Bone spectrum */
-  --color-surface: #FFFFFF;
-  --color-surface-dim: #D8CFBC;
-  --color-surface-bright: #FFFFFF;
+  /* Surfaces – White / Light Warm Gray spectrum */
+  --color-surface: #ffffff;
+  --color-surface-dim: #dddbd9;
+  --color-surface-bright: #ffffff;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #FFFFFF;
-  --color-surface-container: #f5efe5;
-  --color-surface-container-high: #ebe4d6;
-  --color-surface-container-highest: #e1d9ca;
-  --color-surface-variant: #D8CFBC;
+  --color-surface-container-low: #ffffff;
+  --color-surface-container: #dddbd9;
+  --color-surface-container-high: #dddbd9;
+  --color-surface-container-highest: #dddbd9;
+  --color-surface-variant: #dddbd9;
 
-  /* Text – Smoky Black tones */
-  --color-on-surface: #2e2e2e;
-  --color-on-surface-variant: #555555;
-  --color-on-background: #2e2e2e;
-  --color-background: #FFFFFF;
-  --color-foreground: #2e2e2e;
+  /* Text – Near Black tones */
+  --color-on-surface: #1a1c1e;
+  --color-on-surface-variant: #413d3a;
+  --color-on-background: #1a1c1e;
+  --color-background: #ffffff;
+  --color-foreground: #1a1c1e;
 
   /* Outline */
-  --color-outline: #e1dbd0;
-  --color-outline-variant: #D8CFBC;
+  --color-outline: #413d3a;
+  --color-outline-variant: #dddbd9;
 
-  /* Error */
+  /* Error — reserved for error messages only */
   --color-error: #ba1a1a;
-  --color-on-error: #FFFFFF;
+  --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
   /* Inverse */
-  --color-inverse-surface: #2e2e2e;
-  --color-inverse-on-surface: #FFFFFF;
-  --color-inverse-primary: #e1dbd0;
+  --color-inverse-surface: #1a1c1e;
+  --color-inverse-on-surface: #ffffff;
+  --color-inverse-primary: #dddbd9;
+
+  /* CTA / Button */
+  --color-cta: #c19742;
+  --color-on-cta: #ffffff;
 
   /* Legacy aliases for gradual migration */
-  --color-accent: #e1dbd0;
-  --color-accent-light: #e1dbd0;
-  --color-accent-dark: #6a624f;
-  --color-dark: #2e2e2e;
-  --color-dark-light: #555555;
-  --color-text: #2e2e2e;
-  --color-text-light: #e1dbd0;
-  --color-border: #D8CFBC;
+  --color-accent: #c19742;
+  --color-accent-light: #dddbd9;
+  --color-accent-dark: #413d3a;
+  --color-dark: #1a1c1e;
+  --color-dark-light: #413d3a;
+  --color-text: #1a1c1e;
+  --color-text-light: #dddbd9;
+  --color-border: #dddbd9;
   --color-success: #2d7a3a;
-  --color-warning: #c4883a;
-  --color-muted: #f5efe5;
+  --color-warning: #c19742;
+  --color-muted: #dddbd9;
 
   /* Typography */
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -158,14 +162,14 @@ body {
 
 /* Glass effect */
 .bg-glass {
-  background: rgba(255, 251, 244, 0.8);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 /* Gradient overlays */
 .gradient-overlay {
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(26,28,30, 0.5) 100%);
 }
 
 /* Product card */
@@ -232,7 +236,7 @@ body {
 
 /* Selection color */
 ::selection {
-  background-color: rgba(122, 127, 106, 0.2);
+  background-color: rgba(193, 151, 66, 0.2);
   color: var(--color-on-surface);
 }
 

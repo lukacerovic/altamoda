@@ -8,16 +8,16 @@
  */
 
 // ── Palette: warm neutral, unisex ──
-const PAGE_BG = '#f7f5f2'
-const HEADER_BG = '#2e2e2e'
+const PAGE_BG = '#dddbd9'
+const HEADER_BG = '#1a1c1e'
 const CONTENT_BG = '#ffffff'
-const FOOTER_BG = '#f0ece7'
+const FOOTER_BG = '#dddbd9'
 
-const TEXT_PRIMARY = '#2e2e2e'
-const TEXT_BODY = '#3d3833'
-const TEXT_MUTED = '#9e9389'
-const ACCENT = '#7c6f64'
-const DIVIDER = '#D8CFBC'
+const TEXT_PRIMARY = '#1a1c1e'
+const TEXT_BODY = '#413d3a'
+const TEXT_MUTED = '#dddbd9'
+const ACCENT = '#413d3a'
+const DIVIDER = '#dddbd9'
 
 const FONT = "font-family:'Georgia','Times New Roman',serif;"
 
@@ -291,7 +291,7 @@ function extractLegacyBody(html: string): string {
   }
 
   // Cut before the footer (beige/light background)
-  const footerPatterns = ['#FFFFFF', '#f0ece7']
+  const footerPatterns = ['#FFFFFF', '#dddbd9']
   for (const pattern of footerPatterns) {
     const idx = body.indexOf(pattern)
     if (idx > -1) {

@@ -180,7 +180,7 @@ const faqItemsData: FaqSection[] = [
 function renderAnswer(text: string) {
   const blocks = text.split(/\n\n+/);
   return (
-    <div className="space-y-3 text-sm text-[#2e2e2e] leading-relaxed">
+    <div className="space-y-3 text-sm text-[#1a1c1e] leading-relaxed">
       {blocks.map((block, i) => {
         const lines = block.split("\n");
         const bulletLines = lines.filter((l) => l.trim().startsWith("• "));
@@ -276,10 +276,10 @@ export default function FAQPage() {
         {/* Title */}
         <div className="text-center mb-10">
           <HelpCircle className="w-12 h-12 text-secondary mx-auto mb-4" />
-          <h1 className="text-3xl md:text-4xl font-bold text-[#2e2e2e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
             {t("faq.title")}
           </h1>
-          <p className="text-[#2e2e2e]">{t("faq.subtitle")}</p>
+          <p className="text-[#1a1c1e]">{t("faq.subtitle")}</p>
         </div>
 
         {/* Search */}
@@ -289,9 +289,9 @@ export default function FAQPage() {
             placeholder={t("faq.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white border border-[#D8CFBC] rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-white border border-[#dddbd9] rounded-sm text-sm shadow-sm focus:border-black focus:shadow-md transition-all"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#2e2e2e]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#1a1c1e]" />
         </div>
 
         {/* FAQ Sections */}
@@ -305,7 +305,7 @@ export default function FAQPage() {
               }}
               className="scroll-mt-24"
             >
-              <h2 className="text-lg font-semibold text-[#2e2e2e] mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-[#1a1c1e] mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-black rounded-full" />
                 {section.title}
               </h2>
@@ -314,12 +314,12 @@ export default function FAQPage() {
                   const key = `${section.title}-${idx}`;
                   const isOpen = openItems.has(key);
                   return (
-                    <div key={key} className="bg-white rounded-sm border border-[#D8CFBC]/50 overflow-hidden">
+                    <div key={key} className="bg-white rounded-sm border border-[#dddbd9]/50 overflow-hidden">
                       <button
                         onClick={() => toggleItem(key)}
                         className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FFFFFF] transition-colors"
                       >
-                        <span className="text-sm font-medium text-[#2e2e2e] pr-4">{item.q}</span>
+                        <span className="text-sm font-medium text-[#1a1c1e] pr-4">{item.q}</span>
                         <ChevronDown className={`w-5 h-5 text-secondary flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isOpen && (
@@ -336,14 +336,14 @@ export default function FAQPage() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-16 bg-white rounded-sm border border-[#D8CFBC] p-8 text-center">
-          <h3 className="text-xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
-          <p className="text-[#2e2e2e] mb-6">{t("faq.notFoundDesc")}</p>
+        <div className="mt-16 bg-white rounded-sm border border-[#dddbd9] p-8 text-center">
+          <h3 className="text-xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
+          <p className="text-[#1a1c1e] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
+            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-secondary transition-colors">
               <Phone className="w-4 h-4" /> +381 (0)11 3088388
             </a>
-            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#D8CFBC] rounded-sm text-sm font-medium text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors">
+            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-secondary transition-colors">
               <Mail className="w-4 h-4" /> kontakt@altamoda.rs
             </a>
           </div>

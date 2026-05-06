@@ -17,27 +17,27 @@ function ConfirmationContent() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
 
-          <h1 className="text-2xl font-bold text-[#2e2e2e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
+          <h1 className="text-2xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
             Porudžbina primljena!
           </h1>
-          <p className="text-[#2e2e2e] mb-6">Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.</p>
+          <p className="text-[#1a1c1e] mb-6">Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.</p>
 
           {orderNumber && (
             <div className="bg-[#FFFFFF] rounded-lg p-4 mb-6">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Package className="w-5 h-5 text-secondary" />
-                <span className="text-sm font-semibold text-[#2e2e2e]">Broj porudžbine</span>
+                <span className="text-sm font-semibold text-[#1a1c1e]">Broj porudžbine</span>
               </div>
               <span className="text-xl font-bold text-secondary">{orderNumber}</span>
             </div>
           )}
 
-          <p className="text-sm text-[#2e2e2e] mb-6">
+          <p className="text-sm text-[#1a1c1e] mb-6">
             Poslali smo vam email sa potvrdom porudžbine i detaljima o dostavi.
           </p>
 
           <div className="space-y-3">
-            <Link href="/products" className="w-full bg-black hover:bg-[#2e2e2e] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
+            <Link href="/products" className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2">
               Nastavi kupovinu <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -51,7 +51,7 @@ export default function ConfirmationPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
-        <div className="text-[#2e2e2e]">Učitavanje...</div>
+        <div className="text-[#1a1c1e]">Učitavanje...</div>
       </div>
     }>
       <ConfirmationContent />

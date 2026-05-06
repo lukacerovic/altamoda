@@ -60,7 +60,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
           width: '100%',
           backgroundColor: '#ffffff',
           borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+          boxShadow: '0 2px 8px rgba(26,28,30, 0.06)',
           overflow: 'hidden',
         }}
       >
@@ -68,7 +68,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
         <div
           style={{
             padding: '32px 40px 24px',
-            backgroundColor: '#e1dbd0',
+            backgroundColor: '#dddbd9',
             textAlign: 'center',
           }}
         >
@@ -106,7 +106,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                 style={{
                   margin: '0 0 16px',
                   fontSize: '22px',
-                  color: '#e1dbd0',
+                  color: '#dddbd9',
                 }}
               >
                 Uspesno ste se odjavili
@@ -116,7 +116,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                   margin: 0,
                   fontSize: '16px',
                   lineHeight: 1.6,
-                  color: '#2e2e2e',
+                  color: '#1a1c1e',
                 }}
               >
                 Vasa email adresa je uklonjena sa nase newsletter liste.
@@ -130,7 +130,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                 style={{
                   margin: '0 0 16px',
                   fontSize: '22px',
-                  color: '#e1dbd0',
+                  color: '#dddbd9',
                 }}
               >
                 Greska
@@ -140,7 +140,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
                   margin: 0,
                   fontSize: '16px',
                   lineHeight: 1.6,
-                  color: '#2e2e2e',
+                  color: '#1a1c1e',
                 }}
               >
                 {errorMessage}
@@ -154,11 +154,11 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
           style={{
             padding: '24px 40px',
             backgroundColor: '#FFFFFF',
-            borderTop: '1px solid #e8e0d4',
+            borderTop: '1px solid #dddbd9',
             textAlign: 'center',
           }}
         >
-          <p style={{ margin: 0, fontSize: '12px', color: '#8a8578' }}>
+          <p style={{ margin: 0, fontSize: '12px', color: '#413d3a' }}>
             &copy; {new Date().getFullYear()} Altamoda Heritage. Sva prava zadrzana.
           </p>
         </div>

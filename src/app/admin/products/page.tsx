@@ -176,7 +176,7 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Cetearyl Alcohol, Propylene Glycol...",
     howToUse: "Pome\u0161ajte 1:1 sa razvo\u010diva\u010dem. Nanesite i ostavite 30-45 min.",
     images: [{ id: 1, url: "/products/framesi-color1.jpg", alt: "Framesi Framcolor 7.0", isPrimary: true }],
-    colorLevel: 7, colorUndertone: "N", colorHex: "#8B6914", shadeCode: "7-0",
+    colorLevel: 7, colorUndertone: "N", colorHex: "#413d3a", shadeCode: "7-0",
     seoTitle: "Framesi Framcolor 7-0 | Alta Moda", metaDescription: "Framesi Framcolor 7-0 permanentna boja.", slug: "framesi-framcolor-7-0",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
   },
@@ -189,7 +189,7 @@ const initialProducts: Product[] = [
     ingredients: "Aqua, Cetearyl Alcohol, Hexylene Glycol...",
     howToUse: "Pome\u0161ajte sa oksidansom u srazmeri 1:1.5. Vreme delovanja 35 min.",
     images: [{ id: 1, url: "/products/matrix-socolor1.jpg", alt: "Matrix SoColor 6N", isPrimary: true }],
-    colorLevel: 6, colorUndertone: "N", colorHex: "#6B4226", shadeCode: "6N",
+    colorLevel: 6, colorUndertone: "N", colorHex: "#413d3a", shadeCode: "6N",
     seoTitle: "Matrix SoColor 6N | Alta Moda", metaDescription: "Matrix SoColor 6N permanentna boja.", slug: "matrix-socolor-6n",
     barcode: "", vatRate: 20, vatCode: "R2", erpId: "",
   },
@@ -659,7 +659,7 @@ export default function ProductsPage() {
         colorLevel: formData.colorLevel,
         undertoneCode: formData.colorUndertone || "N",
         undertoneName: colorUndertones.find(u => u.value === formData.colorUndertone)?.label.split(" - ")[1] || "Neutralni",
-        hexValue: formData.colorHex || "#000000",
+        hexValue: formData.colorHex || "#1a1c1e",
         shadeCode: formData.shadeCode || "",
       } : {
         ...(formData.removeColor ? { removeColor: true } : {}),
@@ -817,8 +817,8 @@ export default function ProductsPage() {
   ];
 
   /* ── Common input class ── */
-  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#2e2e2e]";
-  const labelCls = "block text-sm font-medium text-[#2e2e2e] mb-1.5";
+  const inputCls = "w-full px-4 py-2.5 border border-stone-200 rounded-sm text-sm focus:outline-none focus:border-black bg-white text-black placeholder:text-[#1a1c1e]";
+  const labelCls = "block text-sm font-medium text-[#1a1c1e] mb-1.5";
   const sectionCls = "space-y-5";
 
   /* ───────────────────── RENDER ───────────────────── */
@@ -829,19 +829,19 @@ export default function ProductsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.products")}</h1>
-          <p className="text-sm text-[#2e2e2e] mt-1">{products.length} {t("admin.totalProducts")}</p>
+          <p className="text-sm text-[#1a1c1e] mt-1">{products.length} {t("admin.totalProducts")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={openAddPanel}
-            className="px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-black text-white hover:bg-stone-800 transition-colors"
+            className="px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors"
           >
             <Plus size={18} />
             {t("admin.addProduct")}
           </button>
           <Link
             href="/admin/import"
-            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-black text-white hover:bg-stone-800 transition-colors"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors"
           >
             <Upload size={16} />
             {t("admin.importCsv")}
@@ -853,7 +853,7 @@ export default function ProductsPage() {
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2e2e2e]" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#1a1c1e]" />
             <input
               type="text"
               placeholder={t("admin.searchByNameOrCode")}
@@ -864,7 +864,7 @@ export default function ProductsPage() {
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#2e2e2e]"
+            className="sm:hidden flex items-center gap-2 px-4 py-2.5 bg-stone-100 rounded-sm text-sm text-[#1a1c1e]"
           >
             <Filter size={16} />
             {t("admin.filters")}
@@ -894,20 +894,20 @@ export default function ProductsPage() {
         {/* Bulk Actions */}
         {selectedIds.length > 0 && (
           <div className="mt-3 pt-3 border-t border-[#FFFFFF] flex items-center gap-3">
-            <span className="text-sm text-[#2e2e2e]">{selectedIds.length} {t("admin.selected")}</span>
+            <span className="text-sm text-[#1a1c1e]">{selectedIds.length} {t("admin.selected")}</span>
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
-                className="px-3 py-1.5 bg-black text-white rounded-sm text-sm flex items-center gap-1"
+                className="px-3 py-1.5 bg-[#c19742] text-white rounded-sm text-sm flex items-center gap-1"
               >
                 {t("admin.actions")} <MoreVertical size={14} />
               </button>
               {showBulkMenu && (
                 <div className="absolute top-full left-0 mt-1 w-40 bg-white rounded-sm shadow-xl border border-stone-200 overflow-hidden z-10">
-                  <button onClick={() => bulkAction("activate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#2e2e2e] hover:bg-stone-100">
+                  <button onClick={() => bulkAction("activate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#1a1c1e] hover:bg-stone-100">
                     <Eye size={14} /> {t("admin.activate")}
                   </button>
-                  <button onClick={() => bulkAction("deactivate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#2e2e2e] hover:bg-stone-100">
+                  <button onClick={() => bulkAction("deactivate")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#1a1c1e] hover:bg-stone-100">
                     <EyeOff size={14} /> {t("admin.deactivate")}
                   </button>
                   <button onClick={() => bulkAction("delete")} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
@@ -927,19 +927,19 @@ export default function ProductsPage() {
             <thead>
               <tr className="bg-stone-100 border-b border-stone-200">
                 <th className="px-4 py-3 text-left">
-                  <button onClick={selectAll} className="text-[#2e2e2e] hover:text-black">
+                  <button onClick={selectAll} className="text-[#1a1c1e] hover:text-black">
                     {selectedIds.length === paginated.length && paginated.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.product")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.sku")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.brand")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.category")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.priceB2c")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.priceB2b")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.stock")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.status")}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[#2e2e2e] uppercase tracking-wider">{t("admin.actions")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.product")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.sku")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.brand")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.category")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.priceB2c")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.priceB2b")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.stock")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.status")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">{t("admin.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#FFFFFF]">
@@ -950,7 +950,7 @@ export default function ProductsPage() {
                       onClick={() => toggleSelect(product.id)}
                       aria-label={selectedIds.includes(product.id) ? t("admin.deselectRow") : t("admin.selectRow")}
                       aria-pressed={selectedIds.includes(product.id)}
-                      className="text-[#2e2e2e] hover:text-black"
+                      className="text-[#1a1c1e] hover:text-black"
                     >
                       {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-secondary" /> : <Square size={18} />}
                     </button>
@@ -958,7 +958,7 @@ export default function ProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-sm bg-stone-100 flex items-center justify-center flex-shrink-0">
-                        <Package size={18} className="text-[#2e2e2e]" />
+                        <Package size={18} className="text-[#1a1c1e]" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -975,21 +975,21 @@ export default function ProductsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs font-mono text-[#2e2e2e]">{product.sku}</td>
-                  <td className="px-4 py-3 text-sm text-[#2e2e2e]">{product.brand}</td>
-                  <td className="px-4 py-3 text-sm text-[#2e2e2e]">{product.category}</td>
+                  <td className="px-4 py-3 text-xs font-mono text-[#1a1c1e]">{product.sku}</td>
+                  <td className="px-4 py-3 text-sm text-[#1a1c1e]">{product.brand}</td>
+                  <td className="px-4 py-3 text-sm text-[#1a1c1e]">{product.category}</td>
                   <td className="px-4 py-3">
                     <div>
                       <span className="text-sm font-medium text-black">{product.priceB2C.toLocaleString()} RSD</span>
                       {product.oldPrice && (
-                        <span className="block text-xs text-[#2e2e2e] line-through">{product.oldPrice.toLocaleString()} RSD</span>
+                        <span className="block text-xs text-[#1a1c1e] line-through">{product.oldPrice.toLocaleString()} RSD</span>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#2e2e2e]">{product.priceB2B.toLocaleString()} RSD</td>
+                  <td className="px-4 py-3 text-sm text-[#1a1c1e]">{product.priceB2B.toLocaleString()} RSD</td>
                   <td className="px-4 py-3 ">
                     <div className="flex items-center gap-1.5">
-                      <span className={`text-sm font-medium ${product.stock <= product.lowStockThreshold ? "text-red-500" : product.stock <= product.lowStockThreshold * 2 ? "text-orange-500" : "text-[#2e2e2e]"}`}>
+                      <span className={`text-sm font-medium ${product.stock <= product.lowStockThreshold ? "text-red-500" : product.stock <= product.lowStockThreshold * 2 ? "text-orange-500" : "text-[#1a1c1e]"}`}>
                         {product.stock}
                       </span>
                       {product.stock <= product.lowStockThreshold && (
@@ -1008,7 +1008,7 @@ export default function ProductsPage() {
                         onClick={() => openEditPanel(product)}
                         aria-label={`${t("admin.editProduct")}: ${product.name}`}
                         title={t("admin.editProduct")}
-                        className="p-1.5 text-[#2e2e2e] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
+                        className="p-1.5 text-[#1a1c1e] hover:text-secondary hover:bg-black/10 rounded-sm transition-colors"
                       >
                         <Edit3 size={15} />
                       </button>
@@ -1016,7 +1016,7 @@ export default function ProductsPage() {
                         onClick={() => handleDelete(product.id)}
                         aria-label={`${t("admin.deleteProduct")}: ${product.name}`}
                         title={t("admin.deleteProduct")}
-                        className="p-1.5 text-[#2e2e2e] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
+                        className="p-1.5 text-[#1a1c1e] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -1026,7 +1026,7 @@ export default function ProductsPage() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#2e2e2e]">
+                  <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#1a1c1e]">
                     {t("admin.noProductsMatch")}
                   </td>
                 </tr>
@@ -1038,14 +1038,14 @@ export default function ProductsPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
-            <span className="text-sm text-[#2e2e2e]">
+            <span className="text-sm text-[#1a1c1e]">
               {t("admin.showing")} {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-sm text-[#2e2e2e] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#1a1c1e] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -1053,7 +1053,7 @@ export default function ProductsPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-black text-white" : "text-[#2e2e2e] hover:bg-stone-100"}`}
+                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-[#c19742] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}
                 >
                   {page}
                 </button>
@@ -1061,7 +1061,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-sm text-[#2e2e2e] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 rounded-sm text-[#1a1c1e] hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight size={18} />
               </button>
@@ -1083,7 +1083,7 @@ export default function ProductsPage() {
               <h2 className="text-lg font-serif font-bold text-black">
                 {editingProduct ? t("admin.editProduct") : t("admin.addProduct")}
               </h2>
-              <button onClick={() => setShowPanel(false)} className="p-2 text-[#2e2e2e] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
+              <button onClick={() => setShowPanel(false)} className="p-2 text-[#1a1c1e] hover:text-black hover:bg-stone-100 rounded-sm transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -1098,7 +1098,7 @@ export default function ProductsPage() {
                     className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.key
                         ? "border-black text-secondary"
-                        : "border-transparent text-[#2e2e2e] hover:text-black hover:border-[#D8CFBC]"
+                        : "border-transparent text-[#1a1c1e] hover:text-black hover:border-[#dddbd9]"
                     }`}
                   >
                     {tab.icon}
@@ -1132,8 +1132,8 @@ export default function ProductsPage() {
                   {/* ERP Info (read-only) */}
                   {(formData.erpId || formData.vatCode) && (
                     <div className="p-3 bg-stone-50 border border-stone-200 rounded-sm">
-                      <label className="text-[10px] uppercase tracking-wider text-[#2e2e2e] font-medium">ERP / Pantheon</label>
-                      <div className="flex gap-6 mt-1.5 text-sm text-[#2e2e2e]">
+                      <label className="text-[10px] uppercase tracking-wider text-[#1a1c1e] font-medium">ERP / Pantheon</label>
+                      <div className="flex gap-6 mt-1.5 text-sm text-[#1a1c1e]">
                         {formData.erpId && <span>ERP ID: <strong className="text-black">{formData.erpId}</strong></span>}
                         <span>PDV kod: <strong className="text-black">{formData.vatCode || "R2"}</strong></span>
                       </div>
@@ -1209,7 +1209,7 @@ export default function ProductsPage() {
                                 setShowNewCategory(false);
                               }
                             }}
-                            className="px-4 py-2 bg-black text-white rounded-sm text-xs font-medium hover:bg-stone-800 transition-colors"
+                            className="px-4 py-2 bg-[#c19742] text-white rounded-sm text-xs font-medium hover:bg-[#413d3a] transition-colors"
                           >
                             Dodaj
                           </button>
@@ -1254,7 +1254,7 @@ export default function ProductsPage() {
                                 setShowNewSubCategory(false);
                               }
                             }}
-                            className="px-4 py-2 bg-black text-white rounded-sm text-xs font-medium hover:bg-stone-800 transition-colors"
+                            className="px-4 py-2 bg-[#c19742] text-white rounded-sm text-xs font-medium hover:bg-[#413d3a] transition-colors"
                           >
                             Dodaj
                           </button>
@@ -1274,7 +1274,7 @@ export default function ProductsPage() {
                       >
                         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.status === "active" ? "translate-x-[26px]" : "translate-x-[2px]"}`} />
                       </button>
-                      <span className="text-sm text-[#2e2e2e]">{formData.status === "active" ? t("admin.active") : t("admin.inactive")}</span>
+                      <span className="text-sm text-[#1a1c1e]">{formData.status === "active" ? t("admin.active") : t("admin.inactive")}</span>
                     </div>
                   </div>
 
@@ -1293,9 +1293,9 @@ export default function ProductsPage() {
                             type="checkbox"
                             checked={formData.badges[key]}
                             onChange={(e) => updateForm("badges", { ...formData.badges, [key]: e.target.checked })}
-                            className="w-4 h-4 rounded border-stone-200 text-secondary accent-[#e1dbd0]"
+                            className="w-4 h-4 rounded border-stone-200 text-secondary accent-[#dddbd9]"
                           />
-                          <span className="text-sm text-[#2e2e2e]">{label}</span>
+                          <span className="text-sm text-[#1a1c1e]">{label}</span>
                         </label>
                       ))}
                     </div>
@@ -1320,8 +1320,8 @@ export default function ProductsPage() {
                           <div className="flex gap-1.5">
                             {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
                               const levelHex = [
-                                "#1a1a1a", "#2d1f1a", "#3d2b1a", "#5a3825", "#6b4226",
-                                "#7a5533", "#8B6914", "#B8860B", "#D4A843", "#F5E6B8",
+                                "#1a1c1e", "#1a1c1e", "#413d3a", "#413d3a", "#413d3a",
+                                "#413d3a", "#413d3a", "#c19742", "#c19742", "#dddbd9",
                               ][n - 1];
                               return (
                                 <button
@@ -1333,7 +1333,7 @@ export default function ProductsPage() {
                                       ? "border-black ring-2 ring-black/20 scale-110"
                                       : "border-transparent hover:border-stone-400"
                                   }`}
-                                  style={{ backgroundColor: levelHex, color: n <= 5 ? "#fff" : "#000" }}
+                                  style={{ backgroundColor: levelHex, color: n <= 5 ? "#ffffff" : "#1a1c1e" }}
                                 >
                                   {n}
                                 </button>
@@ -1353,7 +1353,7 @@ export default function ProductsPage() {
                                 onClick={() => updateForm("colorUndertone", formData.colorUndertone === u.value ? undefined : u.value)}
                                 className={`px-3 py-1.5 text-xs font-medium border transition-all rounded-sm ${
                                   formData.colorUndertone === u.value
-                                    ? "bg-black text-white border-black"
+                                    ? "bg-[#c19742] text-white border-[#c19742]"
                                     : "bg-white text-stone-600 border-stone-200 hover:border-black"
                                 }`}
                               >
@@ -1373,7 +1373,7 @@ export default function ProductsPage() {
                             <div className="flex items-center gap-2">
                               <input
                                 type="color"
-                                value={formData.colorHex || "#000000"}
+                                value={formData.colorHex || "#1a1c1e"}
                                 onChange={(e) => updateForm("colorHex", e.target.value)}
                                 className="w-10 h-10 rounded-sm border border-stone-200 cursor-pointer p-0.5"
                               />
@@ -1382,7 +1382,7 @@ export default function ProductsPage() {
                                 value={formData.colorHex || ""}
                                 onChange={(e) => updateForm("colorHex", e.target.value)}
                                 className={inputCls}
-                                placeholder="#8B6914"
+                                placeholder="#413d3a"
                               />
                             </div>
                           </div>
@@ -1393,7 +1393,7 @@ export default function ProductsPage() {
                           <div className="flex items-center gap-4 p-4 bg-stone-50 rounded-sm border border-stone-200">
                             <div
                               className="w-14 h-14 rounded-full border-2 border-white shadow-md flex-shrink-0"
-                              style={{ backgroundColor: formData.colorHex || "#888" }}
+                              style={{ backgroundColor: formData.colorHex || "#413d3a" }}
                             />
                             <div>
                               <p className="text-sm font-bold text-black">
@@ -1483,7 +1483,7 @@ export default function ProductsPage() {
 
                   {/* Margin info */}
                   {formData.purchasePrice > 0 && formData.priceB2C > 0 && (
-                    <div className="p-3 bg-stone-100 rounded-sm text-sm text-[#2e2e2e]">
+                    <div className="p-3 bg-stone-100 rounded-sm text-sm text-[#1a1c1e]">
                       {t("admin.marginB2c")}: <strong className="text-black">{Math.round(((formData.priceB2C - formData.purchasePrice) / formData.priceB2C) * 100)}%</strong>
                       {formData.priceB2B > 0 && (
                         <span className="ml-4">{t("admin.marginB2b")}: <strong className="text-black">{Math.round(((formData.priceB2B - formData.purchasePrice) / formData.priceB2B) * 100)}%</strong></span>
@@ -1576,7 +1576,7 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div>
                     <label className={labelCls}>{t("admin.productImages")}</label>
-                    <p className="text-xs text-[#2e2e2e] mb-3">{t("admin.dragImages")}</p>
+                    <p className="text-xs text-[#1a1c1e] mb-3">{t("admin.dragImages")}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
@@ -1584,12 +1584,12 @@ export default function ProductsPage() {
                             <Image src={img.url} alt={img.alt} width={80} height={80} className="w-full h-full object-cover" />
                           ) : (
                             <div className="text-center p-2">
-                              <ImageIcon size={28} className="mx-auto text-[#D8CFBC] mb-1" />
-                              <p className="text-[10px] text-[#2e2e2e] truncate max-w-full">{img.url.split("/").pop()}</p>
+                              <ImageIcon size={28} className="mx-auto text-[#dddbd9] mb-1" />
+                              <p className="text-[10px] text-[#1a1c1e] truncate max-w-full">{img.url.split("/").pop()}</p>
                             </div>
                           )}
                           {img.isPrimary && (
-                            <div className="absolute top-1 left-1 bg-black text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
+                            <div className="absolute top-1 left-1 bg-[#c19742] text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
                               <Star size={10} /> {t("admin.mainImage")}
                             </div>
                           )}
@@ -1645,7 +1645,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#2e2e2e] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#1a1c1e] hover:border-black hover:text-secondary transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {uploading ? (
                           <>
@@ -1669,7 +1669,7 @@ export default function ProductsPage() {
                       <div className="space-y-2">
                         {formData.images.map((img, idx) => (
                           <div key={img.id} className="flex items-center gap-2">
-                            <span className="text-xs text-[#2e2e2e] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
+                            <span className="text-xs text-[#1a1c1e] w-20 flex-shrink-0 truncate">{img.url.split("/").pop()}</span>
                             <input
                               type="text"
                               value={img.alt}
@@ -1730,11 +1730,11 @@ export default function ProductsPage() {
             <div className="flex-shrink-0 px-6 py-4 border-t border-stone-200 bg-white flex items-center justify-between">
               <button
                 onClick={() => setShowPanel(false)}
-                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#2e2e2e] hover:bg-stone-100 transition-colors"
+                className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#1a1c1e] hover:bg-stone-100 transition-colors"
               >
                 {t("admin.cancel")}
               </button>
-              <button onClick={handleSave} disabled={saving} className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
+              <button onClick={handleSave} disabled={saving} className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
                 {saving ? t("admin.saving") : editingProduct ? t("admin.saveChanges") : t("admin.addProduct")}
               </button>
             </div>
@@ -1764,7 +1764,7 @@ export default function ProductsPage() {
               <h3 className="text-lg font-serif font-bold text-black">{t("admin.requiredFields") || "Obavezna polja"}</h3>
             </div>
             <div className="px-6 py-4">
-              <p className="text-sm text-[#2e2e2e] mb-3">{t("admin.fillRequiredFields") || "Popunite sva obavezna polja pre nego što sačuvate proizvod:"}</p>
+              <p className="text-sm text-[#1a1c1e] mb-3">{t("admin.fillRequiredFields") || "Popunite sva obavezna polja pre nego što sačuvate proizvod:"}</p>
               <ul className="space-y-1.5">
                 {validationErrors.map((field) => (
                   <li key={field} className="flex items-center gap-2 text-sm text-red-600">
@@ -1777,7 +1777,7 @@ export default function ProductsPage() {
             <div className="px-6 pb-6 pt-2 flex justify-end">
               <button
                 onClick={() => setValidationErrors([])}
-                className="bg-black text-white hover:bg-stone-800 transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
+                className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
               >
                 {t("auth.understood")}
               </button>

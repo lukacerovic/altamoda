@@ -1,8 +1,8 @@
 import { getUnsubscribeUrl, getSiteUrl } from './email'
 
 const BRAND_BG = '#FFFFFF'
-const BRAND_PRIMARY = '#e1dbd0'
-const BRAND_TEXT = '#2e2e2e'
+const BRAND_PRIMARY = '#dddbd9'
+const BRAND_TEXT = '#1a1c1e'
 
 interface BaseLayoutOptions {
   /** Recipient email — required when showUnsubscribe is true */
@@ -15,7 +15,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
   const { email, showUnsubscribe = false } = opts
   const footerUnsub =
     showUnsubscribe && email
-      ? `<p style="margin: 0; font-size: 12px; color: #8a8578; text-align: center;">
+      ? `<p style="margin: 0; font-size: 12px; color: #413d3a; text-align: center;">
                 <a href="${getUnsubscribeUrl(email)}" style="color: ${BRAND_PRIMARY}; text-decoration: underline;">Odjavi se</a> sa newsletter liste.
               </p>`
       : ''
@@ -31,7 +31,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND_BG};">
     <tr>
       <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(26,28,30, 0.06);">
           <tr>
             <td align="center" style="padding: 32px 40px 24px; background-color: ${BRAND_PRIMARY};">
               <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: 3px; text-transform: uppercase;">
@@ -46,8 +46,8 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
             <td style="padding: 0;">${content}</td>
           </tr>
           <tr>
-            <td style="padding: 24px 40px; background-color: #FFFFFF; border-top: 1px solid #e8e0d4;">
-              <p style="margin: 0 0 ${footerUnsub ? '8px' : '0'}; font-size: 12px; color: #8a8578; text-align: center;">
+            <td style="padding: 24px 40px; background-color: #FFFFFF; border-top: 1px solid #dddbd9;">
+              <p style="margin: 0 0 ${footerUnsub ? '8px' : '0'}; font-size: 12px; color: #413d3a; text-align: center;">
                 &copy; ${new Date().getFullYear()} Altamoda Heritage. Sva prava zadrzana.
               </p>
               ${footerUnsub}
@@ -80,7 +80,7 @@ export function welcomeTemplate(email: string): string {
         </td>
       </tr>
     </table>
-    <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.5; color: #8a8578;">
+    <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.5; color: #413d3a;">
       Kod vazi 30 dana od danas. Minimalna vrednost narudzbe: 3.000 RSD.
     </p>
     </div>
@@ -111,7 +111,7 @@ export function b2bSignupAdminTemplate(user: B2bSignupUser): string {
   const adminUrl = `${getSiteUrl()}/admin/users`
   const row = (label: string, value?: string | null) =>
     value
-      ? `<tr><td style="padding: 8px 0; font-size: 14px; color: #8a8578; width: 140px;">${label}</td><td style="padding: 8px 0; font-size: 14px; color: ${BRAND_TEXT};"><strong>${value}</strong></td></tr>`
+      ? `<tr><td style="padding: 8px 0; font-size: 14px; color: #413d3a; width: 140px;">${label}</td><td style="padding: 8px 0; font-size: 14px; color: ${BRAND_TEXT};"><strong>${value}</strong></td></tr>`
       : ''
 
   const content = `
@@ -120,7 +120,7 @@ export function b2bSignupAdminTemplate(user: B2bSignupUser): string {
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
         Novi B2B korisnik se registrovao i ceka odobrenje administratora.
       </p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px; border-top: 1px solid #e8e0d4;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px; border-top: 1px solid #dddbd9;">
         ${row('Salon', user.salonName)}
         ${row('Ime', user.name)}
         ${row('Email', user.email)}
@@ -170,7 +170,7 @@ export function b2bApprovedUserTemplate(user: B2bApprovedUser): string {
           </td>
         </tr>
       </table>
-      <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #8a8578;">
+      <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #413d3a;">
         Ako imate bilo kakva pitanja, slobodno nas kontaktirajte na info@altamoda.rs.
       </p>
     </div>

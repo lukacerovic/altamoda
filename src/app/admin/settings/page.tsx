@@ -253,7 +253,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-serif font-bold text-black">
             {t("admin.settings")}
           </h1>
-          <p className="text-sm text-[#2e2e2e] mt-1">{t("admin.settingsDesc")}</p>
+          <p className="text-sm text-[#1a1c1e] mt-1">{t("admin.settingsDesc")}</p>
         </div>
         {activeTab !== "credentials" && (
           <button
@@ -264,7 +264,7 @@ export default function SettingsPage() {
                 ? "bg-emerald-500 text-white"
                 : saving
                   ? "bg-stone-400 text-white cursor-not-allowed"
-                  : "bg-black text-white hover:bg-stone-800"
+                  : "bg-[#c19742] text-white hover:bg-[#413d3a]"
             }`}
           >
             {saved ? (
@@ -299,7 +299,7 @@ export default function SettingsPage() {
                     className={`flex items-center gap-3 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                       activeTab === tab.id
                         ? "bg-black/10 text-secondary border-b-2 lg:border-b-0 lg:border-l-2 border-black"
-                        : "text-[#2e2e2e] hover:text-black hover:bg-stone-100"
+                        : "text-[#1a1c1e] hover:text-black hover:bg-stone-100"
                     }`}
                   >
                     <Icon size={18} />
@@ -320,17 +320,17 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-semibold text-black mb-1">
                   {t("admin.contactInfo")}
                 </h2>
-                <p className="text-sm text-[#2e2e2e]">
+                <p className="text-sm text-[#1a1c1e]">
                   {t("admin.contactInfoDesc")}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     <Globe
                       size={14}
-                      className="inline mr-1.5 text-[#2e2e2e]"
+                      className="inline mr-1.5 text-[#1a1c1e]"
                     />
                     {t("admin.storeName")}
                   </label>
@@ -342,10 +342,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     <Mail
                       size={14}
-                      className="inline mr-1.5 text-[#2e2e2e]"
+                      className="inline mr-1.5 text-[#1a1c1e]"
                     />
                     {t("admin.emailAddress")}
                   </label>
@@ -357,10 +357,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     <Phone
                       size={14}
-                      className="inline mr-1.5 text-[#2e2e2e]"
+                      className="inline mr-1.5 text-[#1a1c1e]"
                     />
                     {t("admin.phone")}
                   </label>
@@ -372,10 +372,10 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     <MapPin
                       size={14}
-                      className="inline mr-1.5 text-[#2e2e2e]"
+                      className="inline mr-1.5 text-[#1a1c1e]"
                     />
                     {t("admin.address")}
                   </label>
@@ -390,10 +390,10 @@ export default function SettingsPage() {
 
               <div className="pt-4 border-t border-[#FFFFFF]">
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     <Warehouse
                       size={14}
-                      className="inline mr-1.5 text-[#2e2e2e]"
+                      className="inline mr-1.5 text-[#1a1c1e]"
                     />
                     {t("admin.warehouseAddress")}
                   </label>
@@ -413,7 +413,7 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-semibold text-black mb-1">Logo</h2>
-                <p className="text-sm text-[#2e2e2e]">
+                <p className="text-sm text-[#1a1c1e]">
                   Otpremi logo koji će se prikazivati u zaglavlju sajta. Ako nijedan logo nije otpremljen, koristi se podrazumevani ALTAMODA logo.
                 </p>
               </div>
@@ -441,7 +441,7 @@ export default function SettingsPage() {
                     <button
                       onClick={() => logoInputRef.current?.click()}
                       disabled={uploadingLogo}
-                      className="px-4 py-2 rounded-lg text-sm font-medium bg-black text-white hover:bg-stone-800 flex items-center gap-2 disabled:opacity-60"
+                      className="px-4 py-2 rounded-lg text-sm font-medium bg-[#c19742] text-white hover:bg-[#413d3a] flex items-center gap-2 disabled:opacity-60"
                     >
                       {uploadingLogo ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                       {uploadingLogo ? t("admin.saving") : (logoUrl ? "Zameni logo" : "Otpremi logo")}
@@ -449,14 +449,14 @@ export default function SettingsPage() {
                     {logoUrl && (
                       <button
                         onClick={handleResetLogo}
-                        className="px-4 py-2 rounded-lg text-sm font-medium border border-stone-200 text-[#2e2e2e] hover:bg-stone-100 flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg text-sm font-medium border border-stone-200 text-[#1a1c1e] hover:bg-stone-100 flex items-center gap-2"
                       >
                         <Trash2 size={16} />
                         Vrati podrazumevani
                       </button>
                     )}
                   </div>
-                  <p className="text-xs text-[#2e2e2e]">
+                  <p className="text-xs text-[#1a1c1e]">
                     PNG, JPG ili SVG, maks. 5MB. Preporučeno: transparentna pozadina, visina ~64px.
                   </p>
                   {logoError && <p className="text-sm text-red-600">{logoError}</p>}
@@ -472,14 +472,14 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-semibold text-black mb-1">
                   {t("admin.socialLinks")}
                 </h2>
-                <p className="text-sm text-[#2e2e2e]">
+                <p className="text-sm text-[#1a1c1e]">
                   {t("admin.socialLinksDesc")}
                 </p>
               </div>
 
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     {t("admin.instagram")}
                   </label>
                   <input
@@ -491,7 +491,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     {t("admin.facebook")}
                   </label>
                   <input
@@ -503,7 +503,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     {t("admin.tiktok")}
                   </label>
                   <input
@@ -525,14 +525,14 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-semibold text-black mb-1">
                   {t("admin.credentials")}
                 </h2>
-                <p className="text-sm text-[#2e2e2e]">
+                <p className="text-sm text-[#1a1c1e]">
                   {t("admin.credentialsDesc")}
                 </p>
               </div>
 
               <div className="max-w-md space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     {t("admin.newPassword")}
                   </label>
                   <div className="relative">
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2e2e2e] hover:text-[#2e2e2e]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a1c1e] hover:text-[#1a1c1e]"
                     >
                       {showNewPassword ? (
                         <EyeOff size={16} />
@@ -557,7 +557,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#2e2e2e] mb-1.5">
+                  <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">
                     {t("admin.confirmPassword")}
                   </label>
                   <input
@@ -591,7 +591,7 @@ export default function SettingsPage() {
                     !newPassword ||
                     !confirmPassword
                       ? "bg-stone-300 text-stone-500 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-stone-800"
+                      : "bg-[#c19742] text-white hover:bg-[#413d3a]"
                   }`}
                 >
                   {changingPassword ? (

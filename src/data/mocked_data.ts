@@ -711,16 +711,16 @@ export const productDetailRelated: RelatedProduct[] = [
 ];
 
 export const relatedShades: ColorShade[] = [
-  { shade: "5.0", name: "Svetlo Smedja", color: "#6B4226" },
-  { shade: "6.0", name: "Tamno Plava", color: "#8B6914" },
-  { shade: "7.0", name: "Srednje Plava", color: "#A0824A", active: true },
-  { shade: "7.1", name: "Pepeljasto Plava", color: "#9E8B6E" },
-  { shade: "7.3", name: "Zlatno Plava", color: "#C4A265" },
-  { shade: "7.4", name: "Bakarno Plava", color: "#B5651D" },
-  { shade: "8.0", name: "Svetlo Plava", color: "#C4A97D" },
-  { shade: "8.1", name: "Svetlo Pepeljasta", color: "#BEB09A" },
-  { shade: "9.0", name: "Veoma Svetla Plava", color: "#D4C5A9" },
-  { shade: "10.0", name: "Najsvetlija Plava", color: "#E8DCC8" },
+  { shade: "5.0", name: "Svetlo Smedja", color: "#413d3a" },
+  { shade: "6.0", name: "Tamno Plava", color: "#413d3a" },
+  { shade: "7.0", name: "Srednje Plava", color: "#dddbd9", active: true },
+  { shade: "7.1", name: "Pepeljasto Plava", color: "#dddbd9" },
+  { shade: "7.3", name: "Zlatno Plava", color: "#dddbd9" },
+  { shade: "7.4", name: "Bakarno Plava", color: "#c19742" },
+  { shade: "8.0", name: "Svetlo Plava", color: "#dddbd9" },
+  { shade: "8.1", name: "Svetlo Pepeljasta", color: "#dddbd9" },
+  { shade: "9.0", name: "Veoma Svetla Plava", color: "#dddbd9" },
+  { shade: "10.0", name: "Najsvetlija Plava", color: "#dddbd9" },
 ];
 
 
@@ -749,23 +749,23 @@ export const colorUndertones: Undertone[] = [
 ];
 
 export const colorHexMap: Record<string, Record<string, string>> = {
-  "1": { N: "#0a0a0a", A: "#1a1520", G: "#1a1510", C: "#1a1008", R: "#1a0808", V: "#150a1a", M: "#0f100a", B: "#1a1510" },
-  "2": { N: "#1a1510", A: "#201a25", G: "#201a10", C: "#201008", R: "#200808", V: "#1a0a20", M: "#15160a", B: "#201a10" },
-  "3": { N: "#3a2a1a", A: "#352a35", G: "#3a3018", C: "#3a2010", R: "#3a1510", V: "#2a1535", M: "#302a18", B: "#3a2a18" },
-  "4": { N: "#4a3a2a", A: "#453545", G: "#504020", C: "#4a2a15", R: "#4a1a15", V: "#3a1a45", M: "#403a20", B: "#4a3520" },
-  "5": { N: "#5a4a3a", A: "#554555", G: "#605028", C: "#5a3520", R: "#5a2520", V: "#4a2555", M: "#504a28", B: "#5a4528" },
-  "6": { N: "#6a5a4a", A: "#655565", G: "#706030", C: "#6a4525", R: "#6a3025", V: "#5a3065", M: "#605a30", B: "#6a5530" },
-  "7": { N: "#8a7a6a", A: "#857585", G: "#907838", C: "#8a5a30", R: "#8a4030", V: "#7a4085", M: "#7a7a38", B: "#8a7038" },
-  "8": { N: "#a89878", A: "#a59598", G: "#b09548", C: "#a86a38", R: "#a85038", V: "#985098", M: "#989848", B: "#a88848" },
-  "9": { N: "#c8b898", A: "#c0b0b8", G: "#d0b558", C: "#c88048", R: "#c86048", V: "#b868b0", M: "#b8b858", B: "#c8a058" },
-  "10": { N: "#e8d8b8", A: "#d8c8d8", G: "#e8d068", C: "#e89858", R: "#e87858", V: "#d080c8", M: "#d0d068", B: "#e0b868" },
+  "1": { N: "#1a1c1e", A: "#1a1c1e", G: "#1a1c1e", C: "#1a1c1e", R: "#1a1c1e", V: "#1a1c1e", M: "#1a1c1e", B: "#1a1c1e" },
+  "2": { N: "#1a1c1e", A: "#1a1c1e", G: "#1a1c1e", C: "#1a1c1e", R: "#1a1c1e", V: "#1a1c1e", M: "#1a1c1e", B: "#1a1c1e" },
+  "3": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#1a1c1e", M: "#413d3a", B: "#413d3a" },
+  "4": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
+  "5": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
+  "6": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
+  "7": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
+  "8": { N: "#dddbd9", A: "#dddbd9", G: "#c19742", C: "#dddbd9", R: "#dddbd9", V: "#dddbd9", M: "#dddbd9", B: "#dddbd9" },
+  "9": { N: "#dddbd9", A: "#dddbd9", G: "#c19742", C: "#c19742", R: "#c19742", V: "#c19742", M: "#c19742", B: "#c19742" },
+  "10": { N: "#dddbd9", A: "#dddbd9", G: "#c19742", C: "#c19742", R: "#c19742", V: "#dddbd9", M: "#c19742", B: "#c19742" },
 };
 
 export function generateColors(): ColorItem[] {
   const colors: ColorItem[] = [];
   colorLevels.forEach((level) => {
     colorUndertones.forEach((ut) => {
-      const hex = colorHexMap[level]?.[ut.key] || "#888888";
+      const hex = colorHexMap[level]?.[ut.key] || "#413d3a";
       colors.push({
         code: `${level}.${ut.key === "N" ? "0" : ut.key === "A" ? "1" : ut.key === "G" ? "3" : ut.key === "C" ? "4" : ut.key === "R" ? "6" : ut.key === "V" ? "2" : ut.key === "M" ? "7" : "8"}`,
         hex,
@@ -1378,11 +1378,11 @@ export const analyticsRevenueByMonth: AnalyticsRevenueByMonth[] = [
 ];
 
 export const analyticsCategoryData: AnalyticsCategoryData[] = [
-  { name: "Nega kose", value: 35, color: "#e1dbd0" },
-  { name: "Boje za kosu", value: 28, color: "#2e2e2e" },
-  { name: "Styling", value: 18, color: "#6b6b6b" },
-  { name: "Ulja i serumi", value: 12, color: "#e1dbd0" },
-  { name: "Oprema", value: 7, color: "#6a624f" },
+  { name: "Nega kose", value: 35, color: "#dddbd9" },
+  { name: "Boje za kosu", value: 28, color: "#1a1c1e" },
+  { name: "Styling", value: 18, color: "#413d3a" },
+  { name: "Ulja i serumi", value: 12, color: "#dddbd9" },
+  { name: "Oprema", value: 7, color: "#413d3a" },
 ];
 
 export const analyticsBrandPerformance: AnalyticsBrandPerformance[] = [
