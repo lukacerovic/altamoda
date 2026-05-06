@@ -125,11 +125,11 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center gap-1.5 border border-[#D8CFBC] rounded px-3 py-3 text-sm hover:bg-[#FFFFFF] transition-colors shrink-0"
+        className="flex items-center gap-1.5 border border-[#dddbd9] rounded px-3 py-3 text-sm hover:bg-[#FFFFFF] transition-colors shrink-0"
       >
         <span className="text-base leading-none">{country.flag}</span>
-        <span className="text-[#2e2e2e] tabular-nums">{country.dial}</span>
-        <ChevronDown className={`w-3.5 h-3.5 text-[#2e2e2e] transition-transform ${open ? "rotate-180" : ""}`} />
+        <span className="text-[#1a1c1e] tabular-nums">{country.dial}</span>
+        <ChevronDown className={`w-3.5 h-3.5 text-[#1a1c1e] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <input
         id={id}
@@ -140,28 +140,28 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
         onChange={(e) => handleLocalChange(e.target.value)}
         placeholder={placeholder || "64 0123456"}
         required={required}
-        className="flex-1 min-w-0 border border-[#D8CFBC] rounded px-4 py-3 text-sm"
+        className="flex-1 min-w-0 border border-[#dddbd9] rounded px-4 py-3 text-sm"
       />
 
       {open && (
         <div
           role="listbox"
-          className="absolute top-full left-0 z-20 mt-1 w-72 max-w-[calc(100vw-2rem)] bg-white border border-[#D8CFBC] rounded shadow-lg max-h-72 flex flex-col"
+          className="absolute top-full left-0 z-20 mt-1 w-72 max-w-[calc(100vw-2rem)] bg-white border border-[#dddbd9] rounded shadow-lg max-h-72 flex flex-col"
         >
-          <div className="p-2 border-b border-[#D8CFBC] relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#2e2e2e] pointer-events-none" />
+          <div className="p-2 border-b border-[#dddbd9] relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#1a1c1e] pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Pretraži državu…"
-              className="w-full pl-8 pr-2 py-1.5 text-sm border border-[#D8CFBC] rounded focus:border-black focus:outline-none"
+              className="w-full pl-8 pr-2 py-1.5 text-sm border border-[#dddbd9] rounded focus:border-black focus:outline-none"
               autoFocus
             />
           </div>
           <div className="overflow-y-auto flex-1">
             {filtered.length === 0 ? (
-              <p className="text-xs text-[#2e2e2e] text-center py-4">Nema rezultata</p>
+              <p className="text-xs text-[#1a1c1e] text-center py-4">Nema rezultata</p>
             ) : (
               filtered.map((c) => (
                 <button
@@ -173,8 +173,8 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
                   }`}
                 >
                   <span className="text-base leading-none">{c.flag}</span>
-                  <span className="flex-1 truncate text-[#2e2e2e]">{c.name}</span>
-                  <span className="text-xs text-[#2e2e2e] tabular-nums">{c.dial}</span>
+                  <span className="flex-1 truncate text-[#1a1c1e]">{c.name}</span>
+                  <span className="text-xs text-[#1a1c1e] tabular-nums">{c.dial}</span>
                 </button>
               ))
             )}

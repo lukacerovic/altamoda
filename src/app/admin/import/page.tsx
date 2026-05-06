@@ -107,11 +107,11 @@ export default function ImportPage() {
       <div className="border-b border-stone-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
           <Link href="/admin/products" className="p-2 hover:bg-stone-100 rounded-sm transition-colors">
-            <ArrowLeft size={18} className="text-[#2e2e2e]" />
+            <ArrowLeft size={18} className="text-[#1a1c1e]" />
           </Link>
           <div>
             <h1 className="text-lg font-semibold text-black">Uvoz proizvoda</h1>
-            <p className="text-sm text-[#2e2e2e]">Uvezite proizvode, kategorije i barkodove iz jednog ili više fajlova</p>
+            <p className="text-sm text-[#1a1c1e]">Uvezite proizvode, kategorije i barkodove iz jednog ili više fajlova</p>
           </div>
         </div>
       </div>
@@ -149,24 +149,24 @@ export default function ImportPage() {
                 onChange={(e) => { if (e.target.files) addFiles(e.target.files); e.target.value = ''; }}
                 className="hidden"
               />
-              <Upload size={40} className="mx-auto text-[#D8CFBC] mb-3" />
-              <p className="text-sm text-[#2e2e2e]">Prevucite fajlove ovde ili <span className="text-black font-medium underline">izaberite fajlove</span></p>
-              <p className="text-xs text-[#2e2e2e] mt-1">CSV, XLSX ili XLS • Više fajlova odjednom • Maksimalno 10MB po fajlu</p>
+              <Upload size={40} className="mx-auto text-[#dddbd9] mb-3" />
+              <p className="text-sm text-[#1a1c1e]">Prevucite fajlove ovde ili <span className="text-black font-medium underline">izaberite fajlove</span></p>
+              <p className="text-xs text-[#1a1c1e] mt-1">CSV, XLSX ili XLS • Više fajlova odjednom • Maksimalno 10MB po fajlu</p>
             </div>
 
             {/* Selected files list */}
             {files.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-[#2e2e2e] font-medium uppercase tracking-wider">{files.length} {files.length === 1 ? 'fajl izabran' : 'fajlova izabrano'}</p>
+                <p className="text-xs text-[#1a1c1e] font-medium uppercase tracking-wider">{files.length} {files.length === 1 ? 'fajl izabran' : 'fajlova izabrano'}</p>
                 {files.map((f, i) => (
                   <div key={f.name} className="flex items-center gap-3 bg-white border border-stone-200 rounded-sm px-4 py-2.5">
                     <FileSpreadsheet size={20} className="text-green-600 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-black truncate">{f.name}</p>
-                      <p className="text-xs text-[#2e2e2e]">{formatSize(f.size)}</p>
+                      <p className="text-xs text-[#1a1c1e]">{formatSize(f.size)}</p>
                     </div>
                     <button onClick={() => removeFile(i)} className="p-1 hover:bg-stone-100 rounded-sm">
-                      <X size={16} className="text-[#2e2e2e]" />
+                      <X size={16} className="text-[#1a1c1e]" />
                     </button>
                   </div>
                 ))}
@@ -178,7 +178,7 @@ export default function ImportPage() {
               <button
                 onClick={handleImport}
                 disabled={uploading}
-                className="w-full py-3 bg-black text-white rounded-sm font-medium hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#c19742] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {uploading ? (
                   <><Loader2 size={18} className="animate-spin" /> Uvoz u toku — obrađujem {files.length} {files.length === 1 ? 'fajl' : 'fajlova'}...</>
@@ -223,19 +223,19 @@ export default function ImportPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
                 <p className="text-2xl font-bold text-green-600">{result.totals.created}</p>
-                <p className="text-xs text-[#2e2e2e] mt-1">Kreirano</p>
+                <p className="text-xs text-[#1a1c1e] mt-1">Kreirano</p>
               </div>
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
                 <p className="text-2xl font-bold text-blue-600">{result.totals.updated}</p>
-                <p className="text-xs text-[#2e2e2e] mt-1">Ažurirano</p>
+                <p className="text-xs text-[#1a1c1e] mt-1">Ažurirano</p>
               </div>
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className="text-2xl font-bold text-[#2e2e2e]">{result.totals.skipped}</p>
-                <p className="text-xs text-[#2e2e2e] mt-1">Preskočeno</p>
+                <p className="text-2xl font-bold text-[#1a1c1e]">{result.totals.skipped}</p>
+                <p className="text-xs text-[#1a1c1e] mt-1">Preskočeno</p>
               </div>
               <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className={`text-2xl font-bold ${result.totals.errors > 0 ? "text-red-500" : "text-[#2e2e2e]"}`}>{result.totals.errors}</p>
-                <p className="text-xs text-[#2e2e2e] mt-1">Grešaka</p>
+                <p className={`text-2xl font-bold ${result.totals.errors > 0 ? "text-red-500" : "text-[#1a1c1e]"}`}>{result.totals.errors}</p>
+                <p className="text-xs text-[#1a1c1e] mt-1">Grešaka</p>
               </div>
             </div>
 
@@ -256,15 +256,15 @@ export default function ImportPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-black truncate">{fr.fileName}</p>
-                      <p className="text-xs text-[#2e2e2e]">{fr.fileLabel} • {fr.rows} redova</p>
+                      <p className="text-xs text-[#1a1c1e]">{fr.fileLabel} • {fr.rows} redova</p>
                     </div>
                     <div className="flex items-center gap-3 text-xs">
                       {fr.created > 0 && <span className="text-green-600 font-medium">+{fr.created}</span>}
                       {fr.updated > 0 && <span className="text-blue-600 font-medium">~{fr.updated}</span>}
-                      {fr.skipped > 0 && <span className="text-[#2e2e2e]">-{fr.skipped}</span>}
+                      {fr.skipped > 0 && <span className="text-[#1a1c1e]">-{fr.skipped}</span>}
                       {fr.errors.length > 0 && <span className="text-red-500 font-medium">{fr.errors.length} gr.</span>}
                     </div>
-                    {isExpanded ? <ChevronUp size={16} className="text-[#2e2e2e]" /> : <ChevronDown size={16} className="text-[#2e2e2e]" />}
+                    {isExpanded ? <ChevronUp size={16} className="text-[#1a1c1e]" /> : <ChevronDown size={16} className="text-[#1a1c1e]" />}
                   </button>
 
                   {isExpanded && (
@@ -286,7 +286,7 @@ export default function ImportPage() {
                         <div className="max-h-48 overflow-y-auto">
                           {fr.errors.map((err, i) => (
                             <div key={i} className="py-1.5 border-b border-stone-100 last:border-0 text-xs">
-                              <span className="text-[#2e2e2e] mr-1">Red {err.row}</span>
+                              <span className="text-[#1a1c1e] mr-1">Red {err.row}</span>
                               {err.name && <span className="text-black font-medium mr-1">{err.name}</span>}
                               <span className="text-red-600">{err.error}</span>
                             </div>
@@ -307,7 +307,7 @@ export default function ImportPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setFiles([]); setResult(null); setError(null); }}
-                className="flex-1 py-2.5 bg-black text-white rounded-sm font-medium hover:bg-black/90 transition-colors text-sm"
+                className="flex-1 py-2.5 bg-[#c19742] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors text-sm"
               >
                 Uvezi još fajlova
               </button>

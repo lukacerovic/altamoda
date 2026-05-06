@@ -10,14 +10,14 @@
 
 // ── 1. AKCIJE — Bold promotional template (visual sale style) ──
 const akcijeBody = `<div style="padding: 20px 40px 40px;">
-<h1 style="text-align: center; font-size: 64px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: 400; line-height: 1.1; margin: 40px 0 0; color: #2e2e2e;">Velika Akcija!</h1>
-<hr style="border: none; border-top: 2px solid #2e2e2e; width: 80px; margin: 24px auto;">
-<h2 style="text-align: center; font-size: 72px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: 400; line-height: 1; margin: 0; color: #2e2e2e;">DO -50%</h2>
-<p style="text-align: center; font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #2e2e2e; margin: 24px 0 8px;">Na odabrane proizvode</p>
-<p style="text-align: center; font-size: 16px; line-height: 1.6; color: #6b6b6b; margin: 16px auto 32px; max-width: 420px;">Iskoristite ekskluzivne popuste na premium proizvode za negu kose i lepotu. Ponuda je vremenski ogranicena i vazi do isteka zaliha.</p>
-<p style="text-align: center;"><a href="#" style="display: inline-block; padding: 16px 40px; background-color: #2e2e2e; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 30px; letter-spacing: 2px; text-transform: uppercase;">Pogledaj Ponudu &rarr;</a></p>
-<hr style="border: none; border-top: 1px solid #e8e0d4; margin: 40px 0 16px;">
-<p style="text-align: center; font-size: 13px; color: #999;"><em>Ponuda vazi do isteka zaliha. Pozurite i iskoristite popust pre nego sto bude kasno!</em></p>
+<h1 style="text-align: center; font-size: 64px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: 400; line-height: 1.1; margin: 40px 0 0; color: #1a1c1e;">Velika Akcija!</h1>
+<hr style="border: none; border-top: 2px solid #1a1c1e; width: 80px; margin: 24px auto;">
+<h2 style="text-align: center; font-size: 72px; font-family: 'Georgia', 'Times New Roman', serif; font-weight: 400; line-height: 1; margin: 0; color: #1a1c1e;">DO -50%</h2>
+<p style="text-align: center; font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #1a1c1e; margin: 24px 0 8px;">Na odabrane proizvode</p>
+<p style="text-align: center; font-size: 16px; line-height: 1.6; color: #413d3a; margin: 16px auto 32px; max-width: 420px;">Iskoristite ekskluzivne popuste na premium proizvode za negu kose i lepotu. Ponuda je vremenski ogranicena i vazi do isteka zaliha.</p>
+<p style="text-align: center;"><a href="#" style="display: inline-block; padding: 16px 40px; background-color: #1a1c1e; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 30px; letter-spacing: 2px; text-transform: uppercase;">Pogledaj Ponudu &rarr;</a></p>
+<hr style="border: none; border-top: 1px solid #dddbd9; margin: 40px 0 16px;">
+<p style="text-align: center; font-size: 13px; color: #dddbd9;"><em>Ponuda vazi do isteka zaliha. Pozurite i iskoristite popust pre nego sto bude kasno!</em></p>
 </div>`
 
 // ── 2. NOVO — Elegant product showcase ──
@@ -40,7 +40,7 @@ const novoBody = `<div style="padding: 40px;"><h1 style="text-align: center">Nov
 
 // ── 3. INFO — Editorial with background image ──
 const infoBody = `<div style="background-image: url('/newsletter-info-bg.png'); background-size: cover; background-position: center; position: relative;">
-<div style="background-color: rgba(29,28,23,0.7); padding: 48px 40px;">
+<div style="background-color: rgba(26,28,30,0.7); padding: 48px 40px;">
 <h1 style="color: #ffffff; text-align: center; font-family: 'Georgia', 'Times New Roman', serif; font-size: 36px; font-weight: 400; letter-spacing: 2px; margin: 0 0 8px;">Altamoda Vesti</h1>
 <p style="color: rgba(255,255,255,0.7); text-align: center; font-size: 14px; letter-spacing: 1px; margin: 0 0 32px;"><em>Mesecni pregled novosti, saveta i inspiracije iz sveta lepote</em></p>
 <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 0 0 32px;">
@@ -54,7 +54,7 @@ const infoBody = `<div style="background-image: url('/newsletter-info-bg.png'); 
 </ul>
 <h2 style="color: #ffffff; font-family: 'Georgia', 'Times New Roman', serif; font-size: 22px; font-weight: 400; margin: 0 0 12px;">Aktuelno u prodavnici</h2>
 <p style="color: rgba(255,255,255,0.85); font-size: 15px; line-height: 1.7; margin: 0 0 28px;">Posetite nas i uzivo — u nasem salonu mozete dobiti besplatnu konsultaciju sa nasim strucnjacima. Zakazite termin vec danas.</p>
-<p style="text-align: center;"><a href="#" style="display: inline-block; padding: 14px 36px; background-color: #ffffff; color: #2e2e2e; font-size: 13px; font-weight: 700; text-decoration: none; border-radius: 30px; letter-spacing: 2px; text-transform: uppercase;">Saznaj Vise &rarr;</a></p>
+<p style="text-align: center;"><a href="#" style="display: inline-block; padding: 14px 36px; background-color: #ffffff; color: #1a1c1e; font-size: 13px; font-weight: 700; text-decoration: none; border-radius: 30px; letter-spacing: 2px; text-transform: uppercase;">Saznaj Vise &rarr;</a></p>
 <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 32px 0 16px;">
 <p style="text-align: center; color: rgba(255,255,255,0.5); font-size: 13px; margin: 0;"><em>Pratite nas za jos saveta i inspiracije. Do sledeceg puta!</em></p>
 </div>

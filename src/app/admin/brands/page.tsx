@@ -346,7 +346,7 @@ export default function AdminBrandsPage() {
           </div>
           <button
             onClick={startCreateBrand}
-            className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-stone-800 transition-colors"
+            className="flex items-center gap-2 bg-[#c19742] text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-[#413d3a] transition-colors"
           >
             <Plus className="w-4 h-4" />
             Dodaj brend
@@ -429,7 +429,7 @@ export default function AdminBrandsPage() {
         <button
           onClick={isCreating ? handleCreate : handleSave}
           disabled={saving || (isCreating && !editName.trim())}
-          className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-stone-800 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 bg-[#c19742] text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-[#413d3a] transition-colors disabled:opacity-50"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : isCreating ? <Plus className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           {isCreating ? "Kreiraj brend" : t("admin.save")}
@@ -510,7 +510,7 @@ export default function AdminBrandsPage() {
               </div>
               <button
                 onClick={openPicker}
-                className="flex items-center gap-2 border border-black text-black px-4 py-2 rounded-sm text-sm font-medium hover:bg-black hover:text-white transition-colors"
+                className="flex items-center gap-2 border border-[#c19742] text-[#1a1c1e] px-4 py-2 rounded-sm text-sm font-medium hover:bg-[#c19742] hover:text-white transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Dodaj proizvode
@@ -705,7 +705,7 @@ export default function AdminBrandsPage() {
                 <button
                   onClick={attachSelected}
                   disabled={attaching || pickerSelection.size === 0}
-                  className="flex items-center gap-2 bg-black text-white px-5 py-2 rounded-sm text-sm font-medium hover:bg-stone-800 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 bg-[#c19742] text-white px-5 py-2 rounded-sm text-sm font-medium hover:bg-[#413d3a] transition-colors disabled:opacity-50"
                 >
                   {attaching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   {attaching ? "Dodavanje..." : `Dodaj ${pickerSelection.size > 0 ? `(${pickerSelection.size})` : ""}`}

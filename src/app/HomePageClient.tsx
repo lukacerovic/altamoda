@@ -114,7 +114,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
   return (
     <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">
       <div
-        className="relative aspect-[4/5] overflow-hidden rounded-[4px] bg-[#F2ECDE] mb-5 transition-all duration-300 ease-out group-hover:-translate-y-0.5 [box-shadow:0_0_0_1px_rgba(46,46,46,0.02),0_2px_6px_rgba(46,46,46,0.04),0_4px_8px_rgba(46,46,46,0.1)] group-hover:[box-shadow:0_0_0_1px_rgba(46,46,46,0.04),0_4px_12px_rgba(46,46,46,0.08),0_16px_32px_rgba(46,46,46,0.14)]"
+        className="relative aspect-[4/5] overflow-hidden rounded-[4px] bg-[#dddbd9] mb-5 transition-all duration-300 ease-out group-hover:-translate-y-0.5 [box-shadow:0_0_0_1px_rgba(26,28,30,0.02),0_2px_6px_rgba(26,28,30,0.04),0_4px_8px_rgba(26,28,30,0.1)] group-hover:[box-shadow:0_0_0_1px_rgba(26,28,30,0.04),0_4px_12px_rgba(26,28,30,0.08),0_16px_32px_rgba(26,28,30,0.14)]"
       >
         <Image
           src={product.image || defaultImg}
@@ -124,7 +124,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           className="object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out"
         />
         {displayBadge && (
-          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[rgba(41,49,51,0.5)] text-[#FFFFFF]">
+          <span className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[rgba(26,28,30,0.5)] text-[#FFFFFF]">
             {displayBadge}
           </span>
         )}
@@ -132,7 +132,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           onClick={(e) => { e.preventDefault(); setLiked(!liked); }}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#FFFFFF]/70 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors opacity-0 group-hover:opacity-100"
         >
-          <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#2e2e2e] text-[#2e2e2e]" : "text-[#2e2e2e]"}`} />
+          <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
         </button>
         {!b2bOnly && (
           <div className="hidden md:block absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -141,10 +141,10 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
               disabled={!hasColors && outOfStock}
               className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${
                 !hasColors && outOfStock
-                  ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed"
+                  ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                   : addedToCart
-                  ? "bg-[#6a624f] text-[#2e2e2e]"
-                  : "bg-[#e1dbd0] text-[#2e2e2e] hover:bg-[#6a624f]"
+                  ? "bg-[#413d3a] text-[#ffffff]"
+                  : "bg-[#c19742] text-[#ffffff] hover:bg-[#413d3a]"
               }`}
             >
               {hasColors ? (
@@ -167,23 +167,23 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
         )}
       </div>
       <div className="flex flex-col flex-1">
-        <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 font-medium block mb-1.5">{product.brand}</span>
-        <h3 className="text-base text-[#2e2e2e] mb-1 font-normal line-clamp-2 leading-tight min-h-[2.6em]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+        <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium block mb-1.5">{product.brand}</span>
+        <h3 className="text-base text-[#1a1c1e] mb-1 font-normal line-clamp-2 leading-tight min-h-[2.6em]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
           {product.name}
         </h3>
-        <div className="flex items-center gap-2 text-sm text-[#2e2e2e]">
+        <div className="flex items-center gap-2 text-sm text-[#1a1c1e]">
           {product.price == null ? (
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e] font-medium">B2B samo</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">B2B samo</span>
           ) : (
             <>
-              {product.oldPrice && <span className="text-[#2e2e2e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+              {product.oldPrice && <span className="text-[#1a1c1e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
               <span>{product.price.toLocaleString("sr-RS")} RSD</span>
             </>
           )}
         </div>
         <div className="flex items-center gap-0.5 mt-2">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} className={`w-2.5 h-2.5 ${i < Math.round(product.rating) ? "fill-[#2e2e2e] text-[#2e2e2e]" : "fill-[#2e2e2e]/15 text-[#2e2e2e]/25"}`} />
+            <Star key={i} className={`w-2.5 h-2.5 ${i < Math.round(product.rating) ? "fill-[#1a1c1e] text-[#1a1c1e]" : "fill-[#1a1c1e]/15 text-[#1a1c1e]/25"}`} />
           ))}
         </div>
 
@@ -195,10 +195,10 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
               disabled={!hasColors && outOfStock}
               className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${
                 !hasColors && outOfStock
-                  ? "bg-[#D8CFBC] text-[#2e2e2e]/60 cursor-not-allowed"
+                  ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                   : addedToCart
-                  ? "bg-[#6a624f] text-[#2e2e2e]"
-                  : "bg-[#e1dbd0] text-[#2e2e2e] active:bg-[#6a624f]"
+                  ? "bg-[#413d3a] text-[#ffffff]"
+                  : "bg-[#c19742] text-[#ffffff] active:bg-[#413d3a]"
               }`}
             >
               {hasColors ? (
@@ -321,16 +321,16 @@ function ProductCarousel({
       <button
         onClick={goPrev}
         aria-label="Previous"
-        className="absolute -left-3 md:-left-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFFFF] border border-[#D8CFBC] flex items-center justify-center hover:border-[#2e2e2e] hover:scale-[1.08] active:scale-[0.92] transition-all duration-200 z-10 shadow-sm hover:[box-shadow:0_4px_12px_rgba(46,46,46,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]"
+        className="absolute -left-3 md:-left-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFFFF] border border-[#dddbd9] flex items-center justify-center hover:border-[#1a1c1e] hover:scale-[1.08] active:scale-[0.92] transition-all duration-200 z-10 shadow-sm hover:[box-shadow:0_4px_12px_rgba(26,28,30,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a1c1e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]"
       >
-        <ChevronLeft className="w-4 h-4 text-[#2e2e2e]" />
+        <ChevronLeft className="w-4 h-4 text-[#1a1c1e]" />
       </button>
       <button
         onClick={goNext}
         aria-label="Next"
-        className="absolute -right-3 md:-right-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFFFF] border border-[#D8CFBC] flex items-center justify-center hover:border-[#2e2e2e] hover:scale-[1.08] active:scale-[0.92] transition-all duration-200 z-10 shadow-sm hover:[box-shadow:0_4px_12px_rgba(46,46,46,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]"
+        className="absolute -right-3 md:-right-5 top-[35%] w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#FFFFFF] border border-[#dddbd9] flex items-center justify-center hover:border-[#1a1c1e] hover:scale-[1.08] active:scale-[0.92] transition-all duration-200 z-10 shadow-sm hover:[box-shadow:0_4px_12px_rgba(26,28,30,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a1c1e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF]"
       >
-        <ChevronRight className="w-4 h-4 text-[#2e2e2e]" />
+        <ChevronRight className="w-4 h-4 text-[#1a1c1e]" />
       </button>
     </div>
   );
@@ -542,11 +542,11 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           {/* Top row — headline only */}
           <div className="pb-12 md:pb-16">
-            <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-6">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-6">
               Od 1999. godine
             </span>
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-light text-[#2e2e2e] leading-[1.02]"
+              className="text-5xl md:text-6xl lg:text-7xl font-light text-[#1a1c1e] leading-[1.02]"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
             >
               Profesionalna nega,
@@ -561,7 +561,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <Link
                 key={i}
                 href={card.href}
-                className={`group relative block overflow-hidden rounded-[4px] bg-[#F2ECDE] md:aspect-[4/5] ${
+                className={`group relative block overflow-hidden rounded-[4px] bg-[#dddbd9] md:aspect-[4/5] ${
                   i === 0 ? "row-span-2 md:row-span-1" : ""
                 }`}
               >
@@ -574,7 +574,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   fetchPriority={i === 0 ? "high" : "auto"}
                 />
                 {/* Gradient overlay for readability (stronger on mobile) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-[#2e2e2e]/55 to-[#2e2e2e]/10 md:from-[#1a1a1a]/85 md:via-[#2e2e2e]/25 md:to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c1e]/95 via-[#1a1c1e]/55 to-[#1a1c1e]/10 md:from-[#1a1c1e]/85 md:via-[#1a1c1e]/25 md:to-transparent" />
 
                 {/* Top kicker */}
                 <div className="absolute top-2.5 left-2.5 right-2.5 md:top-5 md:left-5 md:right-5 flex items-center justify-between">
@@ -618,7 +618,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           2. BRAND MARQUEE — partner logos (slower scroll)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="border-y border-[rgba(46,46,46,0.08)] py-8 md:py-10 overflow-hidden bg-[#FFFFFF]">
+      <section className="border-y border-[rgba(26,28,30,0.08)] py-8 md:py-10 overflow-hidden bg-[#FFFFFF]">
         <div className="relative flex">
           {[0, 1].map((setIndex) => (
             <div key={setIndex} className="flex animate-marquee flex-shrink-0">
@@ -655,11 +655,11 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="max-w-[1400px] mx-auto px-6 md:px-10">
             <div className="flex items-end justify-between mb-10 md:mb-14 gap-8 flex-wrap">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
                   Odabrani proizvodi
                 </span>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
+                  className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05]"
                   style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
                   Za kućnu,
@@ -669,7 +669,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </div>
               <Link
                 href={activeTabData.viewAll}
-                className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] hover:opacity-60 transition-opacity flex items-center gap-1.5 pb-1 border-b border-[#2e2e2e]"
+                className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] hover:opacity-60 transition-opacity flex items-center gap-1.5 pb-1 border-b border-[#1a1c1e]"
               >
                 Pogledaj sve <ArrowRight className="w-3 h-3" />
               </Link>
@@ -677,18 +677,18 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
             {/* Tab switcher — only tabs with products */}
             {visibleTabs.length > 1 && (
-              <div className="flex items-center gap-8 md:gap-10 mb-10 md:mb-14 border-b border-[rgba(46,46,46,0.08)]">
+              <div className="flex items-center gap-8 md:gap-10 mb-10 md:mb-14 border-b border-[rgba(26,28,30,0.08)]">
                 {visibleTabs.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`relative pb-4 text-[11px] md:text-[12px] uppercase tracking-[0.22em] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF] ${
-                      activeTabData.key === tab.key ? "text-[#2e2e2e]" : "text-[#2e2e2e]/40 hover:text-[#2e2e2e]/70"
+                    className={`relative pb-4 text-[11px] md:text-[12px] uppercase tracking-[0.22em] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a1c1e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFFFF] ${
+                      activeTabData.key === tab.key ? "text-[#1a1c1e]" : "text-[#1a1c1e]/40 hover:text-[#1a1c1e]/70"
                     }`}
                   >
                     {tab.label}
                     {activeTabData.key === tab.key && (
-                      <span className="absolute -bottom-px left-0 right-0 h-[2px] bg-[#2e2e2e]" />
+                      <span className="absolute -bottom-px left-0 right-0 h-[2px] bg-[#1a1c1e]" />
                     )}
                   </button>
                 ))}
@@ -703,11 +703,11 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           4. B2B PARTNERS — salons & wholesale partners (unchanged)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#e1dbd0]">
+      <section className="py-20 md:py-28 bg-[#dddbd9]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-stretch">
             {/* Left — image (portrait, matches right column height on desktop) */}
-            <div className="relative aspect-[3/4] md:aspect-auto md:h-full bg-[#6e6754] overflow-hidden rounded-[4px]">
+            <div className="relative aspect-[3/4] md:aspect-auto md:h-full bg-[#413d3a] overflow-hidden rounded-[4px]">
               <Image
                 src="/b2bhero.png"
                 alt="altamoda saloni partneri"
@@ -719,40 +719,40 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
             {/* Right — text */}
             <div>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/70 font-medium block mb-6">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/70 font-medium block mb-6">
                 Za salone
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05] mb-8"
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 Partnerstvo koje
                 <br />
                 gradi <em className="italic">uspeh</em>.
               </h2>
-              <p className="text-[14px] text-[#2e2e2e]/80 leading-[1.8] mb-5 max-w-lg">
+              <p className="text-[14px] text-[#1a1c1e]/80 leading-[1.8] mb-5 max-w-lg">
                 Više od tri decenije gradimo mrežu partnera među frizerskim salonima, profesionalnim web shopovima i distributerima širom regiona.
               </p>
-              <p className="text-[14px] text-[#2e2e2e]/80 leading-[1.8] mb-5 max-w-lg">
+              <p className="text-[14px] text-[#1a1c1e]/80 leading-[1.8] mb-5 max-w-lg">
                 Alta Moda povezuje brendove i profesionalce kroz pouzdanu distribuciju, veleprodajne uslove, kao i tehničku i edukativnu podršku.
               </p>
-              <p className="text-[14px] text-[#2e2e2e]/80 leading-[1.8] mb-10 max-w-lg">
+              <p className="text-[14px] text-[#1a1c1e]/80 leading-[1.8] mb-10 max-w-lg">
                 Od lokalnih salona i online shopova do velikih distributivnih sistema — naš cilj je isti: dugoročna saradnja i zajednički rast.
               </p>
 
               {/* Stats row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center border-t border-[#2e2e2e]/25 pt-8 mb-10 max-w-lg">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center border-t border-[#1a1c1e]/25 pt-8 mb-10 max-w-lg">
                 {[
                   { v: "30+", l: "Godina" },
                   { v: "1000+", l: "Partnera" },
                   { v: "Usluge", l: "Veleprodaja" },
                   { v: "1:1", l: "Podrška" },
                 ].map((s, i) => (
-                  <div key={i} className={`text-center ${i < 3 ? "sm:border-r sm:border-[#2e2e2e]/25" : ""} sm:px-2`}>
-                    <div className="text-xl md:text-2xl font-light text-[#2e2e2e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  <div key={i} className={`text-center ${i < 3 ? "sm:border-r sm:border-[#1a1c1e]/25" : ""} sm:px-2`}>
+                    <div className="text-xl md:text-2xl font-light text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                       {s.v}
                     </div>
-                    <div className="text-[9px] uppercase tracking-[0.22em] text-[#2e2e2e]/70 mt-1.5">{s.l}</div>
+                    <div className="text-[9px] uppercase tracking-[0.22em] text-[#1a1c1e]/70 mt-1.5">{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -760,7 +760,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/account/login"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#F5F0E6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e1dbd0]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#c19742] px-8 py-4 rounded-full hover:bg-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19742] focus-visible:ring-offset-2 focus-visible:ring-offset-[#dddbd9]"
                 >
                   Postani naš partner <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -777,16 +777,16 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           {/* Header — kicker / title / subtitle */}
           <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-            <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
               Rešenja za vašu kosu
             </span>
             <h2
-              className="text-3xl md:text-4xl lg:text-5xl font-light text-[#2e2e2e] leading-[1.05] mb-6"
+              className="text-3xl md:text-4xl lg:text-5xl font-light text-[#1a1c1e] leading-[1.05] mb-6"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
             >
               Pronađite rutinu za <em className="italic">vidljive rezultate</em>.
             </h2>
-            <p className="text-[13px] md:text-[15px] text-[#2e2e2e]/70 leading-[1.7] max-w-2xl mx-auto">
+            <p className="text-[13px] md:text-[15px] text-[#1a1c1e]/70 leading-[1.7] max-w-2xl mx-auto">
               Od svakodnevne nege do savršenog stilizovanja — izaberite proizvode koji odgovaraju vašem tipu kose i njenim potrebama, kao i željenom izgledu. Hidratacija, obnova, volumen i zaštita boje — sve na jednom mestu.
             </p>
           </div>
@@ -799,26 +799,26 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 <Link
                   key={i}
                   href={card.href}
-                  className="group flex flex-col items-center text-center bg-[#FFFFFF] border border-[#e1dbd0]/30 rounded-[4px] p-6 md:p-8 transition-all duration-300 hover:border-[#e1dbd0] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(131,122,100,0.12)]"
+                  className="group flex flex-col items-center text-center bg-[#FFFFFF] border border-[#dddbd9]/30 rounded-[4px] p-6 md:p-8 transition-all duration-300 hover:border-[#dddbd9] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(65,61,58,0.12)]"
                 >
-                  <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-5 md:mb-6 flex items-center justify-center text-[#2e2e2e]">
+                  <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-5 md:mb-6 flex items-center justify-center text-[#1a1c1e]">
                     <Icon strokeWidth={1.5} className="w-full h-full" />
                   </div>
                   <h3
-                    className="text-[16px] md:text-[19px] font-semibold text-[#2e2e2e] mb-2 md:mb-3 leading-[1.25]"
+                    className="text-[16px] md:text-[19px] font-semibold text-[#1a1c1e] mb-2 md:mb-3 leading-[1.25]"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     {card.title}
                   </h3>
-                  <p className="text-[12px] md:text-[13.5px] text-[#2e2e2e]/65 leading-[1.6] mb-4 md:mb-5">
+                  <p className="text-[12px] md:text-[13.5px] text-[#1a1c1e]/65 leading-[1.6] mb-4 md:mb-5">
                     {card.desc}
                   </p>
-                  <div className="mt-auto w-full pt-4 md:pt-5 border-t border-[#e1dbd0]/20 flex flex-col items-center">
-                    <p className="text-[12px] md:text-[13px] text-[#2e2e2e] leading-[1.6] mb-4">
+                  <div className="mt-auto w-full pt-4 md:pt-5 border-t border-[#dddbd9]/20 flex flex-col items-center">
+                    <p className="text-[12px] md:text-[13px] text-[#1a1c1e] leading-[1.6] mb-4">
                       <span className="font-semibold">Rešenje: </span>
                       {card.solution}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] border-b border-[#e1dbd0]/40 pb-0.5 group-hover:border-[#e1dbd0] group-hover:gap-2.5 transition-all">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#dddbd9]/40 pb-0.5 group-hover:border-[#dddbd9] group-hover:gap-2.5 transition-all">
                       Otkrij proizvode
                       <ArrowRight className="w-3 h-3" />
                     </span>
@@ -831,9 +831,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          6. EDUCATION CENTER — text left, image right, #2e2e2e bg
+          6. EDUCATION CENTER — text left, image right, #1a1c1e bg
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-32 bg-[#2e2e2e] text-[#FFFFFF]">
+      <section className="py-20 md:py-32 bg-[#1a1c1e] text-[#FFFFFF]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-12 md:gap-20 items-center">
             {/* Left — text */}
@@ -884,7 +884,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/education"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#2e2e2e] bg-[#FFFFFF] px-8 py-4 rounded-full hover:bg-[#D8CFBC] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2e2e2e]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#c19742] px-8 py-4 rounded-full hover:bg-[#ffffff] hover:text-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19742] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1c1e]"
                 >
                   Upoznaj akademiju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -892,7 +892,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </div>
 
             {/* Right — image */}
-            <div className="order-1 md:order-2 relative aspect-[5/6] md:aspect-[4/5] bg-[#1a1a1a] overflow-hidden rounded-[4px]">
+            <div className="order-1 md:order-2 relative aspect-[5/6] md:aspect-[4/5] bg-[#1a1c1e] overflow-hidden rounded-[4px]">
               <Image
                 src="/edukacija2.jpg"
                 alt="ID Hair Academy edukacija"
@@ -908,20 +908,20 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           7. SOCIAL — bento-style instagram grid
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#FFFFFF] border-t border-[rgba(46,46,46,0.08)]">
+      <section className="py-20 md:py-28 bg-[#FFFFFF] border-t border-[rgba(26,28,30,0.08)]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="flex items-end justify-between mb-12 md:mb-16 gap-8 flex-wrap">
             <div>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-5">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
                 Prati nas
               </span>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#2e2e2e] leading-[1.05]"
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05]"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
                 <em className="italic">@altamoda_srbija</em> na mreži.
               </h2>
-              <p className="text-[14px] text-[#2e2e2e]/60 leading-relaxed mt-5 max-w-md">
+              <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-md">
                 Najnoviji trendovi, saveti frizera i najave edukacija — pridruži se zajednici koja živi profesionalnu negu kose.
               </p>
             </div>
@@ -933,7 +933,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="w-11 h-11 rounded-full border border-[#D8CFBC] flex items-center justify-center text-[#2e2e2e] hover:bg-[#2e2e2e] hover:text-[#FFFFFF] hover:border-[#2e2e2e] transition-colors"
+                className="w-11 h-11 rounded-full border border-[#dddbd9] flex items-center justify-center text-[#1a1c1e] hover:bg-[#1a1c1e] hover:text-[#FFFFFF] hover:border-[#1a1c1e] transition-colors"
               >
                 <Instagram className="w-4 h-4" />
               </a>
@@ -942,7 +942,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
-                className="w-11 h-11 rounded-full border border-[#D8CFBC] flex items-center justify-center text-[#2e2e2e] hover:bg-[#2e2e2e] hover:text-[#FFFFFF] hover:border-[#2e2e2e] transition-colors"
+                className="w-11 h-11 rounded-full border border-[#dddbd9] flex items-center justify-center text-[#1a1c1e] hover:bg-[#1a1c1e] hover:text-[#FFFFFF] hover:border-[#1a1c1e] transition-colors"
               >
                 <Music2 className="w-4 h-4" />
               </a>
@@ -951,7 +951,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="w-11 h-11 rounded-full border border-[#D8CFBC] flex items-center justify-center text-[#2e2e2e] hover:bg-[#2e2e2e] hover:text-[#FFFFFF] hover:border-[#2e2e2e] transition-colors"
+                className="w-11 h-11 rounded-full border border-[#dddbd9] flex items-center justify-center text-[#1a1c1e] hover:bg-[#1a1c1e] hover:text-[#FFFFFF] hover:border-[#1a1c1e] transition-colors"
               >
                 <Youtube className="w-4 h-4" />
               </a>
@@ -975,7 +975,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${cell.cls} relative overflow-hidden bg-[#F2ECDE] group rounded-[4px]`}
+                className={`${cell.cls} relative overflow-hidden bg-[#dddbd9] group rounded-[4px]`}
               >
                 <Image
                   src={cell.img}
@@ -984,7 +984,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   sizes="(max-width: 768px) 50vw, 25vw"
                   className="object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
                 />
-                <div className="absolute inset-0 bg-[#2e2e2e]/0 group-hover:bg-[#2e2e2e]/30 transition-colors flex items-center justify-center">
+                <div className="absolute inset-0 bg-[#1a1c1e]/0 group-hover:bg-[#1a1c1e]/30 transition-colors flex items-center justify-center">
                   <Instagram className="w-5 h-5 text-[#FFFFFF] opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </a>
@@ -996,7 +996,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {/* ═══════════════════════════════════════════════════════════
           8. NEWSLETTER — dark editorial subscribe
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#2e2e2e] text-[#FFFFFF]">
+      <section className="py-20 md:py-28 bg-[#1a1c1e] text-[#FFFFFF]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
             <div>
@@ -1035,7 +1035,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 </button>
               </form>
               {newsletterStatus !== "idle" && newsletterStatus !== "loading" && (
-                <p className={`mt-4 text-sm ${newsletterStatus === "success" ? "text-[#D8CFBC]" : "text-red-400"}`}>
+                <p className={`mt-4 text-sm ${newsletterStatus === "success" ? "text-[#dddbd9]" : "text-red-400"}`}>
                   {newsletterMessage}
                 </p>
               )}
@@ -1062,18 +1062,18 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowNewsletter(false)} />
           <div className="bg-[#FFFFFF] max-w-md w-full p-10 relative z-10 animate-scaleIn">
             <button onClick={() => setShowNewsletter(false)} className="absolute top-5 right-5">
-              <X className="w-4 h-4 text-[#2e2e2e]/60 hover:text-[#2e2e2e]" />
+              <X className="w-4 h-4 text-[#1a1c1e]/60 hover:text-[#1a1c1e]" />
             </button>
             <div className="text-center">
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-4">
                 Pridruži se
               </span>
-              <h3 className="text-3xl font-light text-[#2e2e2e] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              <h3 className="text-3xl font-light text-[#1a1c1e] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                 {t("home.popupTitle")}
               </h3>
-              <p className="text-[#2e2e2e]/60 text-sm mb-8 leading-relaxed">{t("home.popupDesc")}</p>
+              <p className="text-[#1a1c1e]/60 text-sm mb-8 leading-relaxed">{t("home.popupDesc")}</p>
               {popupStatus === "success" ? (
-                <p className="text-[#2e2e2e] text-sm py-4">{popupMessage}</p>
+                <p className="text-[#1a1c1e] text-sm py-4">{popupMessage}</p>
               ) : (
                 <form onSubmit={(e) => {
                   e.preventDefault();
@@ -1086,13 +1086,13 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                     placeholder={t("home.emailPlaceholder")}
                     value={popupEmail}
                     onChange={(e) => setPopupEmail(e.target.value)}
-                    className="w-full border-b border-[#D8CFBC] bg-transparent px-0 py-3 text-sm mb-5 focus:border-[#2e2e2e] focus:outline-none"
+                    className="w-full border-b border-[#dddbd9] bg-transparent px-0 py-3 text-sm mb-5 focus:border-[#1a1c1e] focus:outline-none"
                     required
                   />
                   <button
                     type="submit"
                     disabled={popupStatus === "loading"}
-                    className="w-full bg-[#2e2e2e] hover:bg-[#1f1f1f] text-[#FFFFFF] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-60"
+                    className="w-full bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-60"
                   >
                     {popupStatus === "loading" ? t("home.subscribing") : t("home.subscribe")}
                   </button>
@@ -1101,7 +1101,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   )}
                 </form>
               )}
-              <button onClick={() => setShowNewsletter(false)} className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 mt-5 hover:text-[#2e2e2e] block mx-auto">
+              <button onClick={() => setShowNewsletter(false)} className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 mt-5 hover:text-[#1a1c1e] block mx-auto">
                 {t("home.noThanks")}
               </button>
             </div>
@@ -1112,7 +1112,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {!showNewsletter && (
         <button
           onClick={() => setShowNewsletter(true)}
-          className="fixed bottom-6 right-6 w-12 h-12 bg-[#2e2e2e] hover:bg-[#1f1f1f] text-[#FFFFFF] rounded-full flex items-center justify-center z-40 transition-all hover:scale-105 shadow-lg"
+          className="fixed bottom-6 right-6 w-12 h-12 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] rounded-full flex items-center justify-center z-40 transition-all hover:scale-105 shadow-lg"
         >
           <Mail className="w-5 h-5" />
         </button>
@@ -1128,18 +1128,18 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               aria-label="Zatvori"
               className="absolute top-5 right-5 p-1"
             >
-              <X className="w-4 h-4 text-[#2e2e2e]/60 hover:text-[#2e2e2e]" />
+              <X className="w-4 h-4 text-[#1a1c1e]/60 hover:text-[#1a1c1e]" />
             </button>
-            <span className="text-[10px] uppercase tracking-[0.28em] text-[#2e2e2e]/60 font-medium block mb-4">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-4">
               Newsletter
             </span>
             <h3
-              className="text-3xl md:text-4xl font-light text-[#2e2e2e] mb-6 leading-[1.1]"
+              className="text-3xl md:text-4xl font-light text-[#1a1c1e] mb-6 leading-[1.1]"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
             >
               Politika privatnosti
             </h3>
-            <div className="space-y-4 text-[14px] text-[#2e2e2e]/75 leading-[1.75]">
+            <div className="space-y-4 text-[14px] text-[#1a1c1e]/75 leading-[1.75]">
               <p>
                 Prijavom na newsletter saglasni ste da Alta Moda doo koristi vašu email adresu za slanje informacija o novim proizvodima, edukacijama, akcijama i drugim sadržajima iz oblasti profesionalne frizerske industrije u okviru našeg poslovanja.
               </p>
@@ -1152,7 +1152,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </div>
             <button
               onClick={() => setShowPrivacyModal(false)}
-              className="mt-8 w-full bg-[#2e2e2e] hover:bg-[#1f1f1f] text-[#FFFFFF] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors rounded-full"
+              className="mt-8 w-full bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors rounded-full"
             >
               Razumem
             </button>

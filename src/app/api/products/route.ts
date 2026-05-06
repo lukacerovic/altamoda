@@ -547,7 +547,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         colorLevel: body.colorLevel,
         undertoneCode: body.undertoneCode || 'N',
         undertoneName: body.undertoneName || 'Neutralni',
-        hexValue: body.hexValue || '#000000',
+        hexValue: body.hexValue || '#1a1c1e',
         shadeCode: body.shadeCode || '',
       },
     })
