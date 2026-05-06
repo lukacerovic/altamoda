@@ -1656,7 +1656,7 @@ export default function ProductsPage() {
                         className={inputCls}
                         placeholder="npr. Svi tipovi kose, Tanka kosa"
                       />
-                      <p className="text-[11px] text-[#2e2e2e]/50 mt-1">Više tipova razdvojiti zarezom.</p>
+                      <p className="text-[11px] text-[#1a1c1e]/50 mt-1">Više tipova razdvojiti zarezom.</p>
                     </div>
                   </div>
                   <div>
@@ -1668,7 +1668,7 @@ export default function ProductsPage() {
                       className={inputCls}
                       placeholder="npr. volumen, tekstura, kontrola"
                     />
-                    <p className="text-[11px] text-[#2e2e2e]/50 mt-1">Tagove razdvojiti zarezom — koriste se za pretragu i filtriranje.</p>
+                    <p className="text-[11px] text-[#1a1c1e]/50 mt-1">Tagove razdvojiti zarezom — koriste se za pretragu i filtriranje.</p>
                   </div>
                 </div>
               )}

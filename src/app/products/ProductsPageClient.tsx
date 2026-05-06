@@ -873,13 +873,13 @@ export default function ProductsPageClient({
                     onClick={() => toggleProductLine(l.slug)}
                     className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors flex items-baseline justify-between gap-2 ${
                       isActive
-                        ? "bg-[#2e2e2e] text-white"
-                        : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                        ? "bg-[#1a1c1e] text-white"
+                        : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                     }`}
                   >
                     <span className="truncate">{l.name}</span>
                     {selectedBrands.length === 0 && (
-                      <span className={`text-[10px] uppercase tracking-[0.18em] flex-shrink-0 ${isActive ? "text-white/60" : "text-[#2e2e2e]/40"}`}>
+                      <span className={`text-[10px] uppercase tracking-[0.18em] flex-shrink-0 ${isActive ? "text-white/60" : "text-[#1a1c1e]/40"}`}>
                         {l.brand.name}
                       </span>
                     )}
@@ -902,7 +902,7 @@ export default function ProductsPageClient({
                   key={v}
                   onClick={() => toggleProductType(v)}
                   className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors ${
-                    isActive ? "bg-[#2e2e2e] text-white" : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                    isActive ? "bg-[#1a1c1e] text-white" : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                   }`}
                 >
                   {v}
@@ -924,7 +924,7 @@ export default function ProductsPageClient({
                   key={v}
                   onClick={() => toggleHairType(v)}
                   className={`w-full text-left py-2 px-3 rounded-sm text-[13px] transition-colors ${
-                    isActive ? "bg-[#2e2e2e] text-white" : "text-[#2e2e2e]/70 hover:text-[#2e2e2e] hover:bg-[#FFFFFF]"
+                    isActive ? "bg-[#1a1c1e] text-white" : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                   }`}
                 >
                   {v}
@@ -947,8 +947,8 @@ export default function ProductsPageClient({
                   onClick={() => toggleTag(v)}
                   className={`px-3 py-1.5 rounded-full text-[11px] transition-colors ${
                     isActive
-                      ? "bg-[#2e2e2e] text-white"
-                      : "bg-[#F2ECDE]/60 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                      ? "bg-[#1a1c1e] text-white"
+                      : "bg-[#dddbd9]/60 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                   }`}
                 >
                   {v}
@@ -1318,13 +1318,13 @@ export default function ProductsPageClient({
               if (linesForBrands.length === 0) return null;
               const showBrandSuffix = focusedBrandSlugs.length > 1;
               return (
-                <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-10 pb-6 border-b border-[#D8CFBC]/60">
+                <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-10 pb-6 border-b border-[#dddbd9]/60">
                   <button
                     onClick={() => setSelectedProductLines([])}
                     className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
                       selectedProductLines.length === 0
-                        ? "bg-[#2e2e2e] text-white shadow-sm"
-                        : "bg-[#F2ECDE]/50 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                        ? "bg-[#1a1c1e] text-white shadow-sm"
+                        : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                     }`}
                   >
                     {t("products.allLines")}
@@ -1337,13 +1337,13 @@ export default function ProductsPageClient({
                         onClick={() => toggleProductLine(l.slug)}
                         className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
                           isActive
-                            ? "bg-[#2e2e2e] text-white shadow-sm"
-                            : "bg-[#F2ECDE]/50 text-[#2e2e2e]/70 hover:bg-[#F2ECDE] hover:text-[#2e2e2e]"
+                            ? "bg-[#1a1c1e] text-white shadow-sm"
+                            : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                         }`}
                       >
                         {l.name}
                         {showBrandSuffix && (
-                          <span className={`ml-1.5 text-[10px] uppercase tracking-[0.18em] ${isActive ? "text-white/60" : "text-[#2e2e2e]/40"}`}>
+                          <span className={`ml-1.5 text-[10px] uppercase tracking-[0.18em] ${isActive ? "text-white/60" : "text-[#1a1c1e]/40"}`}>
                             {l.brand.name}
                           </span>
                         )}

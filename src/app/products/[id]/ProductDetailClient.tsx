@@ -388,16 +388,16 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               <div className="space-y-2.5 mb-5">
                 {hasText(product.productType) && (
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 min-w-[110px]">Tip proizvoda</span>
-                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#2e2e2e]">{product.productType}</span>
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px]">Tip proizvoda</span>
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]">{product.productType}</span>
                   </div>
                 )}
                 {hasText(product.hairTypes) && (
                   <div className="flex flex-wrap items-start gap-x-3 gap-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 min-w-[110px] pt-1">Tip kose</span>
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px] pt-1">Tip kose</span>
                     <div className="flex flex-wrap gap-1.5">
                       {product.hairTypes!.split(",").map(s => s.trim()).filter(Boolean).map((v, i) => (
-                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]/80 bg-[#F2ECDE] px-2.5 py-1 rounded-sm">
+                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] px-2.5 py-1 rounded-sm">
                           {v}
                         </span>
                       ))}
@@ -406,10 +406,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                 )}
                 {hasText(product.tags) && (
                   <div className="flex flex-wrap items-start gap-x-3 gap-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#2e2e2e]/60 min-w-[110px] pt-1">Funkcija</span>
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px] pt-1">Funkcija</span>
                     <div className="flex flex-wrap gap-1.5">
                       {product.tags!.split(",").map(s => s.trim()).filter(Boolean).map((v, i) => (
-                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#2e2e2e]/80 bg-[#F2ECDE] px-2.5 py-1 rounded-sm">
+                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] px-2.5 py-1 rounded-sm">
                           {v}
                         </span>
                       ))}
