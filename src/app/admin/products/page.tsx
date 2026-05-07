@@ -1694,12 +1694,19 @@ export default function ProductsPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {formData.images.map((img, idx) => (
                         <div key={img.id} className="relative group border border-stone-200 rounded-sm overflow-hidden aspect-square bg-stone-100 flex items-center justify-center">
-                          {img.url.startsWith("/uploads/") ? (
-                            <Image src={img.url} alt={img.alt} width={80} height={80} className="w-full h-full object-cover" />
+                          {img.url ? (
+                            <Image
+                              src={img.url}
+                              alt={img.alt}
+                              width={200}
+                              height={200}
+                              className="w-full h-full object-cover"
+                              unoptimized
+                            />
                           ) : (
                             <div className="text-center p-2">
                               <ImageIcon size={28} className="mx-auto text-[#dddbd9] mb-1" />
-                              <p className="text-[10px] text-[#1a1c1e] truncate max-w-full">{img.url.split("/").pop()}</p>
+                              <p className="text-[10px] text-[#1a1c1e] truncate max-w-full">no image</p>
                             </div>
                           )}
                           {img.isPrimary && (
