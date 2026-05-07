@@ -1329,7 +1329,7 @@ export default function ProductsPageClient({
                     onClick={() => setSelectedProductLines([])}
                     className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
                       selectedProductLines.length === 0
-                        ? "bg-[#1a1c1e] text-white shadow-sm"
+                        ? "bg-[#c19742] text-white shadow-sm"
                         : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                     }`}
                   >
@@ -1343,13 +1343,13 @@ export default function ProductsPageClient({
                         onClick={() => toggleProductLine(l.slug)}
                         className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
                           isActive
-                            ? "bg-[#1a1c1e] text-white shadow-sm"
+                            ? "bg-[#c19742] text-white shadow-sm"
                             : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                         }`}
                       >
                         {l.name}
                         {showBrandSuffix && (
-                          <span className={`ml-1.5 text-[10px] uppercase tracking-[0.18em] ${isActive ? "text-white/60" : "text-[#1a1c1e]/40"}`}>
+                          <span className={`ml-1.5 text-[10px] uppercase tracking-[0.18em] ${isActive ? "text-white/70" : "text-[#1a1c1e]/40"}`}>
                             {l.brand.name}
                           </span>
                         )}
