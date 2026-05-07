@@ -115,6 +115,14 @@ export default function EducationPage() {
                 <span className="text-[10px] uppercase tracking-[0.28em] text-[#413d3a] font-medium block mb-6">
                   {t("education.heroTag")}
                 </span>
+                <Image
+                  src="/altamoda-logoes/ID HAIR ACADEMY BLACK.png"
+                  alt="ID Hair Academy"
+                  width={520}
+                  height={120}
+                  className="h-14 md:h-16 w-auto mb-6"
+                  priority
+                />
                 <h1
                   className="font-light leading-[1.02] mb-7 tracking-[-0.01em]"
                   style={{

@@ -3,6 +3,7 @@ export const revalidate = 60
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import ProductsPageClient from "./ProductsPageClient";
+import { applyBestPromo, fetchActivePromosByProduct } from "@/lib/promotions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [rawTotal, groupedDups] = await Promise.all([
@@ -141,19 +142,26 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         AND product_type IS NOT NULL AND TRIM(product_type) != ''
       ORDER BY value
     `,
-    // Distinct hair types (comma-separated → unnest, dedupe)
+    // Distinct hair types — comma-split, unnested, then re-filtered to drop
+    // empty fragments produced by trailing/double commas (e.g. "hidratacija,").
     prisma.$queryRaw<Array<{ value: string }>>`
-      SELECT DISTINCT TRIM(unnest(string_to_array(hair_types, ','))) AS value FROM products
-      WHERE is_active = true AND stock_quantity > 0
-        AND hair_types IS NOT NULL AND TRIM(hair_types) != ''
-      ORDER BY value
+      SELECT DISTINCT v AS value FROM (
+        SELECT TRIM(unnest(string_to_array(hair_types, ','))) AS v FROM products
+        WHERE is_active = true AND stock_quantity > 0
+          AND hair_types IS NOT NULL AND TRIM(hair_types) != ''
+      ) sub
+      WHERE v <> ''
+      ORDER BY v
     `,
-    // Distinct tags (comma-separated → unnest, dedupe)
+    // Distinct tags — same anti-empty-fragment guard as hair_types above.
     prisma.$queryRaw<Array<{ value: string }>>`
-      SELECT DISTINCT TRIM(unnest(string_to_array(tags, ','))) AS value FROM products
-      WHERE is_active = true AND stock_quantity > 0
-        AND tags IS NOT NULL AND TRIM(tags) != ''
-      ORDER BY value
+      SELECT DISTINCT v AS value FROM (
+        SELECT TRIM(unnest(string_to_array(tags, ','))) AS v FROM products
+        WHERE is_active = true AND stock_quantity > 0
+          AND tags IS NOT NULL AND TRIM(tags) != ''
+      ) sub
+      WHERE v <> ''
+      ORDER BY v
     `,
     // Dynamic attributes
     prisma.dynamicAttribute.findMany({
@@ -185,27 +193,36 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const duplicateCount = groupedDups.reduce((sum: number, g: { _count: number }) => sum + g._count - 1, 0);
   const total = rawTotal - duplicateCount;
 
-  // Get average ratings (needs product IDs from above)
+  // Get average ratings + active promotions in parallel (one query each)
   const productIds = rawProducts.map((p) => p.id);
-  const ratings = await prisma.review.groupBy({
-    by: ["productId"],
-    where: { productId: { in: productIds } },
-    _avg: { rating: true },
-  });
+  const [ratings, promosByProduct] = await Promise.all([
+    prisma.review.groupBy({
+      by: ["productId"],
+      where: { productId: { in: productIds } },
+      _avg: { rating: true },
+    }),
+    fetchActivePromosByProduct(productIds),
+  ]);
   const ratingMap = new Map(ratings.map((r) => [r.productId, r._avg.rating || 0]));
 
-  // Format products
-  const initialProducts = rawProducts.map((p) => ({
+  // Format products. SSR is cached without auth so apply public ('all'/'b2c')
+  // promo audience here — the client refetches via /api/products with the real
+  // role for B2B viewers.
+  const initialProducts = rawProducts.map((p) => {
+    const basePrice = Number(p.priceB2c);
+    const staticOld = p.oldPrice ? Number(p.oldPrice) : null;
+    const { price, oldPrice } = applyBestPromo(promosByProduct.get(p.id) || [], basePrice, staticOld, "b2c");
+    return {
     id: p.id,
     sku: p.sku,
     name: p.nameLat,
     slug: p.slug,
     brand: p.brand ? { id: p.brand.id, name: p.brand.name, slug: p.brand.slug } : null,
     category: p.category ? { id: p.category.id, nameLat: p.category.nameLat, slug: p.category.slug } : null,
-    price: Number(p.priceB2c),
+    price,
     priceB2c: Number(p.priceB2c),
     priceB2b: p.priceB2b ? Number(p.priceB2b) : null,
-    oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+    oldPrice,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,
     isNew: p.isNew,
@@ -223,7 +240,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           shadeCode: p.colorProduct.shadeCode,
         }
       : null,
-  }));
+    };
+  });
 
   const initialPagination = {
     page: 1,

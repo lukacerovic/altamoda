@@ -83,7 +83,7 @@ export default function AdminLayout({
           {sidebarOpen ? (
             <Link href="/" aria-label="Altamoda početna" className="block">
               <Image
-                src="/logo-transparent.png"
+                src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
                 alt="Altamoda"
                 width={742}
                 height={134}
@@ -95,7 +95,7 @@ export default function AdminLayout({
           ) : (
             <Link href="/" aria-label="Altamoda početna" className="mx-auto block">
               <Image
-                src="/logo-transparent.png"
+                src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
                 alt="Altamoda"
                 width={742}
                 height={134}
@@ -182,7 +182,7 @@ export default function AdminLayout({
         <div className="p-8 border-b border-stone-200 flex items-center justify-between">
           <Link href="/" aria-label="Altamoda početna" className="block" onClick={() => setMobileMenuOpen(false)}>
             <Image
-              src="/logo-transparent.png"
+              src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
               alt="Altamoda"
               width={742}
               height={134}

@@ -28,6 +28,7 @@ interface SearchResult {
   slug: string;
   brand: string | null;
   price: number;
+  oldPrice: number | null;
   image: string | null;
 }
 
@@ -144,7 +145,7 @@ export default function Header() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [brands, setBrands] = useState<BrandItem[]>(cachedBrands);
   const siteSettings = useSiteSettings(["logoUrl"]);
-  const logoSrc = siteSettings.logoUrl || "/logo.png";
+  const logoSrc = siteSettings.logoUrl || "/altamoda-logoes/ALTAMODA WHITE.png";
 
   // Fetch brands for the nav dropdown (cached across mounts)
   useEffect(() => {
@@ -190,7 +191,7 @@ export default function Header() {
     }
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}&limit=10`);
         const json = await res.json();
         if (json.success) setSearchResults(json.data);
       } catch (err) {
@@ -240,7 +241,7 @@ export default function Header() {
     <>
       {/* MAIN HEADER - translucent glass (Apple-inspired) */}
       <header
-        className="sticky top-0 z-50 border-b border-[rgba(26,28,30,0.08)] bg-[#FFFFFF]/80"
+        className="sticky top-0 z-50 border-b border-[rgba(255,255,255,0.08)] bg-[#1a1c1e]"
         style={{
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
@@ -248,7 +249,7 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           {/* Mobile hamburger - left */}
-          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#1a1c1e] hover:text-[#c19742] transition-colors">
+          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#FFFFFF] hover:text-[#c19742] transition-colors">
             <Menu className="w-6 h-6" />
           </button>
 
@@ -267,7 +268,7 @@ export default function Header() {
                 >
                   <Link
                     href={l.href}
-                    className="text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors tracking-normal font-normal flex items-center gap-1"
+                    className="text-sm text-[#FFFFFF] hover:text-[#c19742] transition-colors tracking-normal font-normal flex items-center gap-1"
                   >
                     {l.name}
                     {hasMega && <ChevronDown className="w-3 h-3" />}
@@ -394,13 +395,13 @@ export default function Header() {
               <LanguageToggle />
             </div>
             <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#c19742] transition-colors">
-              <User className="w-5 h-5 text-[#1a1c1e]" />
+              <User className="w-5 h-5 text-[#FFFFFF]" />
             </Link>
             <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#c19742] transition-colors">
-              <Search className="w-5 h-5 text-[#1a1c1e]" />
+              <Search className="w-5 h-5 text-[#FFFFFF]" />
             </button>
             <Link href="/wishlist" className="relative hidden xl:block hover:text-[#c19742] transition-colors">
-              <Heart className="w-5 h-5 text-[#1a1c1e]" />
+              <Heart className="w-5 h-5 text-[#FFFFFF]" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c19742] text-white text-[10px] rounded-full flex items-center justify-center">
                   {wishlistCount > 99 ? "99+" : wishlistCount}
@@ -408,7 +409,7 @@ export default function Header() {
               )}
             </Link>
             <Link href="/cart" className="relative hover:text-[#c19742] transition-colors">
-              <ShoppingBag className="w-5 h-5 text-[#1a1c1e]" />
+              <ShoppingBag className="w-5 h-5 text-[#FFFFFF]" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c19742] text-white text-[10px] rounded-full flex items-center justify-center">
                   {cartItemCount > 99 ? "99+" : cartItemCount}
@@ -451,8 +452,15 @@ export default function Header() {
                             <p className="text-sm font-medium text-[#1a1c1e] truncate">{p.name}</p>
                             <p className="text-[11px] text-[#1a1c1e] font-medium">{p.brand}</p>
                           </div>
-                          <span className="text-sm font-bold text-[#1a1c1e]">
-                            {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#dddbd9]">RSD</span>
+                          <span className="flex items-baseline gap-2 text-sm font-bold text-[#1a1c1e] whitespace-nowrap">
+                            {p.oldPrice && p.oldPrice > p.price && (
+                              <span className="text-[11px] font-medium text-[#1a1c1e]/50 line-through">
+                                {p.oldPrice.toLocaleString("sr-RS")}
+                              </span>
+                            )}
+                            <span>
+                              {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#dddbd9]">RSD</span>
+                            </span>
                           </span>
                         </Link>
                       ))}
@@ -473,7 +481,7 @@ export default function Header() {
             <div className="flex items-center justify-between p-4 border-b border-[#dddbd9]">
               <Image src={logoSrc} alt="Alta Moda" width={140} height={40} className="h-5" unoptimized />
               <button onClick={() => setMobileMenu(false)}>
-                <X className="w-5 h-5 text-[#1a1c1e]" />
+                <X className="w-5 h-5 text-[#FFFFFF]" />
               </button>
             </div>
             <div className="p-4 space-y-1">

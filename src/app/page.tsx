@@ -3,21 +3,28 @@ export const revalidate = 60
 import { prisma } from '@/lib/db'
 import HomePageClient from './HomePageClient'
 import type { ProductData, ColorSiblingData } from './HomePageClient'
+import { applyBestPromo, fetchActivePromosByProduct, type ActivePromo } from '@/lib/promotions'
 
+// Homepage is cached (revalidate=60) so the viewer's role isn't resolved here.
+// Apply only public-audience promotions ('all' / 'b2c') to keep B2B-only pricing
+// off the public page; this mirrors the saleProducts audience filter below.
 function formatProduct(p: {
   id: string; nameLat: string; slug: string; sku: string; priceB2c: unknown; priceB2b: unknown; oldPrice: unknown;
   stockQuantity: number; isNew: boolean; isFeatured: boolean; isProfessional: boolean;
   groupSlug: string | null;
   brand: { name: string } | null;
   images: { url: string }[];
-}, avgRating: number, siblings?: ColorSiblingData[]): ProductData {
+}, avgRating: number, promos: ActivePromo[], siblings?: ColorSiblingData[]): ProductData {
+  const basePrice = Number(p.priceB2c)
+  const staticOld = p.oldPrice ? Number(p.oldPrice) : null
+  const { price, oldPrice } = applyBestPromo(promos, basePrice, staticOld, 'b2c')
   return {
     id: p.id,
     name: p.nameLat,
     slug: p.slug,
     brand: p.brand?.name || '',
-    price: Number(p.priceB2c),
-    oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+    price,
+    oldPrice,
     rating: avgRating,
     image: p.images[0]?.url || null,
     isNew: p.isNew,
@@ -107,6 +114,11 @@ export default async function HomePage() {
 
   const getRating = (id: string) => ratingMap.get(id) || 0
 
+  // Pull all currently-active promotions for visible products in one query so
+  // featured/bestseller/new/sale strips all reflect the discounted price.
+  const promosByProduct = await fetchActivePromosByProduct(uniqueIds)
+  const getPromos = (id: string) => promosByProduct.get(id) || []
+
   // Fetch all color siblings in one batch for products belonging to a color group.
   const groupSlugs = [...new Set(allProducts.map(p => p.groupSlug).filter((g): g is string => !!g))]
   const siblingRows = groupSlugs.length > 0
@@ -146,10 +158,10 @@ export default async function HomePage() {
 
   return (
     <HomePageClient
-      featuredProducts={featured.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
-      bestsellers={bestsellers.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
-      newArrivals={newArrivals.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
-      saleProducts={saleProducts.map(p => formatProduct(p, getRating(p.id), getSiblings(p.groupSlug)))}
+      featuredProducts={featured.map(p => formatProduct(p, getRating(p.id), getPromos(p.id), getSiblings(p.groupSlug)))}
+      bestsellers={bestsellers.map(p => formatProduct(p, getRating(p.id), getPromos(p.id), getSiblings(p.groupSlug)))}
+      newArrivals={newArrivals.map(p => formatProduct(p, getRating(p.id), getPromos(p.id), getSiblings(p.groupSlug)))}
+      saleProducts={saleProducts.map(p => formatProduct(p, getRating(p.id), getPromos(p.id), getSiblings(p.groupSlug)))}
       heroImages={heroSetting?.value ? (() => { try { return JSON.parse(heroSetting.value); } catch { return []; } })() : []}
       heroCards={heroCardsSetting?.value ? (() => { try { return JSON.parse(heroCardsSetting.value); } catch { return []; } })() : []}
       socialLinks={{

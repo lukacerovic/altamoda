@@ -1,10 +1,7 @@
 import { prisma } from '@/lib/db'
+import type { Prisma } from '@prisma/client'
 
-// Similarity threshold (0..1) for pg_trgm. Lower = more typo-tolerant but noisier.
-// 0.25 catches single-char typos on 5+ letter words ("shrit" → "shirt") without flooding results.
-const SIMILARITY_THRESHOLD = 0.25
-
-// Cap raw candidate set before it meets other filters (category/price/etc.) and pagination.
+// Cap raw candidate set before downstream filters / pagination.
 const CANDIDATE_LIMIT = 2000
 
 // Serbian diacritics: build all character-level variants so cetkica matches četkica.
@@ -36,41 +33,77 @@ export function expandDiacritics(term: string): string[] {
   return Array.from(results)
 }
 
+function tokenize(query: string): string[] {
+  return query.toLowerCase().trim().split(/\s+/).filter(t => t.length > 0)
+}
+
 /**
- * Return product IDs matching a free-text query, ranked by similarity.
+ * Per-word AND substring match across product name, sku, and brand name —
+ * mirrors the admin grid's intuitive "all words must appear" behavior, with
+ * Serbian diacritic tolerance.
  *
- * Matching strategy (OR'd together):
- *   1. ILIKE '%variant%' over every diacritic expansion — exact substring hits (old behavior).
- *   2. pg_trgm similarity() > threshold — typo-tolerant fuzzy match (new behavior).
+ * Example: "Matrix Miracle" matches "Matrix Total Results Miracle Creator"
+ * (both terms present), but does NOT match "Matrix Color Sync" (no "miracle").
  *
- * Searches product name_lat, product sku, and brand name.
- * Returns up to CANDIDATE_LIMIT IDs so downstream filters (category/price/pagination) still apply.
+ * Ranking (computed in JS after the DB shortlist):
+ *   +10  full phrase appears in name
+ *   + 3  each term appears in name
+ *   + 1  each term appears in brand
+ *   ↑    shorter names break ties (more specific match)
  */
 export async function findFuzzyProductIds(query: string, limit = CANDIDATE_LIMIT): Promise<string[]> {
   const trimmed = query.trim()
   if (!trimmed) return []
 
-  const variants = expandDiacritics(trimmed)
-  const ilikePatterns = variants.map(v => `%${v}%`)
+  const terms = tokenize(trimmed)
+  if (terms.length === 0) return []
 
-  const rows = await prisma.$queryRaw<{ id: string }[]>`
-    SELECT p.id
-    FROM products p
-    LEFT JOIN brands b ON b.id = p.brand_id
-    WHERE
-      p.name_lat ILIKE ANY(${ilikePatterns}::text[])
-      OR p.sku ILIKE ANY(${ilikePatterns}::text[])
-      OR b.name ILIKE ANY(${ilikePatterns}::text[])
-      OR similarity(p.name_lat, ${trimmed}) > ${SIMILARITY_THRESHOLD}
-      OR similarity(p.sku, ${trimmed}) > ${SIMILARITY_THRESHOLD}
-      OR (b.name IS NOT NULL AND similarity(b.name, ${trimmed}) > ${SIMILARITY_THRESHOLD})
-    ORDER BY
-      GREATEST(
-        similarity(p.name_lat, ${trimmed}),
-        similarity(p.sku, ${trimmed}),
-        COALESCE(similarity(b.name, ${trimmed}), 0)
-      ) DESC
-    LIMIT ${limit}
-  `
-  return rows.map(r => r.id)
+  // Each term must match in at least one of name / sku / brand-name.
+  // Diacritic variants are OR'd within each term so cetkica == četkica.
+  const where: Prisma.ProductWhereInput = {
+    AND: terms.map(term => {
+      const variants = expandDiacritics(term)
+      return {
+        OR: variants.flatMap(v => [
+          { nameLat: { contains: v, mode: 'insensitive' as const } },
+          { sku: { contains: v, mode: 'insensitive' as const } },
+          { brand: { name: { contains: v, mode: 'insensitive' as const } } },
+        ]),
+      }
+    }),
+  }
+
+  const candidates = await prisma.product.findMany({
+    where,
+    select: {
+      id: true,
+      nameLat: true,
+      brand: { select: { name: true } },
+    },
+    take: limit,
+  })
+
+  const phraseVariants = expandDiacritics(trimmed.toLowerCase())
+  const termVariants = terms.map(t => expandDiacritics(t))
+
+  const scored = candidates.map(p => {
+    const name = p.nameLat.toLowerCase()
+    const brand = (p.brand?.name || '').toLowerCase()
+    let score = 0
+
+    if (phraseVariants.some(v => name.includes(v))) score += 10
+
+    for (const variants of termVariants) {
+      if (variants.some(v => name.includes(v))) score += 3
+      if (variants.some(v => brand.includes(v))) score += 1
+    }
+
+    // Tiebreaker: shorter names tend to be more specific matches.
+    score -= name.length * 0.001
+
+    return { id: p.id, score }
+  })
+
+  scored.sort((a, b) => b.score - a.score)
+  return scored.map(s => s.id)
 }

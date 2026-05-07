@@ -306,6 +306,16 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+// Hair-type field only makes sense for products that touch hair. Default is
+// "show" — hide only when the category clearly isn't about hair (color
+// development chemistry, tools, mannequins, etc).
+function categoryNeedsHairType(categoryName: string | null | undefined): boolean {
+  if (!categoryName) return true;
+  const slug = slugify(categoryName);
+  const NON_HAIR = ["kolor", "color", "boje", "oksidanti", "dekoloranti", "minival", "pribor", "tools", "lutke", "makaze", "cetke", "feni", "aparati"];
+  return !NON_HAIR.some(n => slug.includes(n));
+}
+
 /* ───────────────────────── Component ───────────────────────── */
 
 export default function ProductsPage() {
@@ -1636,7 +1646,7 @@ export default function ProductsPage() {
                       placeholder="Nanesite na mokru kosu..."
                     />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className={categoryNeedsHairType(formData.category) ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : ""}>
                     <div>
                       <label className={labelCls}>Tip proizvoda</label>
                       <input
@@ -1647,17 +1657,19 @@ export default function ProductsPage() {
                         placeholder="npr. Šampon, Teksturni sprej, Maska"
                       />
                     </div>
-                    <div>
-                      <label className={labelCls}>Tip kose</label>
-                      <input
-                        type="text"
-                        value={formData.hairTypes || ""}
-                        onChange={(e) => updateForm("hairTypes", e.target.value)}
-                        className={inputCls}
-                        placeholder="npr. Svi tipovi kose, Tanka kosa"
-                      />
-                      <p className="text-[11px] text-[#1a1c1e]/50 mt-1">Više tipova razdvojiti zarezom.</p>
-                    </div>
+                    {categoryNeedsHairType(formData.category) && (
+                      <div>
+                        <label className={labelCls}>Tip kose</label>
+                        <input
+                          type="text"
+                          value={formData.hairTypes || ""}
+                          onChange={(e) => updateForm("hairTypes", e.target.value)}
+                          className={inputCls}
+                          placeholder="npr. Svi tipovi kose, Tanka kosa"
+                        />
+                        <p className="text-[11px] text-[#1a1c1e]/50 mt-1">Više tipova razdvojiti zarezom.</p>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className={labelCls}>Funkcija / Tagovi</label>

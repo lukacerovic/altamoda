@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const DEFAULT_LOGO = "/logo.png";
+const DEFAULT_LOGO = "/altamoda-logoes/ALTAMODA WHITE.png";
 
 const SETTINGS_KEYS = [
   "storeName",

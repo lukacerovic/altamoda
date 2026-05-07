@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   Heart, Star, ArrowRight, Music2, ChevronLeft, ChevronRight,
   ShoppingBag, CheckCircle, Palette,
-  Droplet, AudioLines, ShieldCheck, Waves, Atom, Sprout,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   Mail, X, Instagram, Youtube,
 } from "lucide-react";
@@ -485,35 +484,35 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
   const valueCards = [
     {
-      icon: Droplet,
+      icon: "/altamoda_svg_icons/suva_i_ostecena.svg",
       title: "Suva i oštećena kosa",
       desc: "Kosa bez sjaja, sklona lomljenju i ispucalim krajevima.",
       solution: "Intenzivna hidratacija i obnova strukture kose",
       href: buildFilterHref({ hairType: ["Suva kosa", "Oštećena kosa"], tag: ["hidratacija", "obnova"] }),
     },
     {
-      icon: AudioLines,
+      icon: "/altamoda_svg_icons/tanka_kosa.svg",
       title: "Tanka kosa bez volumena",
       desc: "Kosa koja brzo gubi oblik i nema punoću.",
       solution: "Lagana nega koja daje volumen od korena",
       href: buildFilterHref({ hairType: ["Tanka kosa"], tag: ["volumen"] }),
     },
     {
-      icon: ShieldCheck,
+      icon: "/altamoda_svg_icons/obojena_kosa.svg",
       title: "Obojena kosa koja brzo bledi",
       desc: "Boja gubi intenzitet i sjaj već nakon nekoliko pranja.",
       solution: "Zaštita pigmenta, postojanost boje i sjaj",
       href: buildFilterHref({ hairType: ["Hemijski tretirana kosa"] }),
     },
     {
-      icon: Waves,
+      icon: "/altamoda_svg_icons/frizzy_kosa.svg",
       title: "Frizz i neposlušna kosa",
       desc: "Kosa koja reaguje na vlagu i teško se oblikuje.",
       solution: "Zaglađivanje i kontrola vlage bez otežavanja",
       href: buildFilterHref({ hairType: ["Frizz", "Neposlušna kosa"], tag: ["anti-frizz"] }),
     },
     {
-      icon: Atom,
+      icon: "/altamoda_svg_icons/hemijski_ostecena.svg",
       title: "Oštećenja od dekoloranta, hemijskih tretmana i toplote",
       desc: "Slaba, lomljiva i bez elastičnosti.",
       solution: "Rekonstrukcija i jačanje unutrašnje strukture",
@@ -523,7 +522,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       }),
     },
     {
-      icon: Sprout,
+      icon: "/altamoda_svg_icons/masna_kosa_skalp.svg",
       title: "Masna kosa i osetljivo teme",
       desc: "Brzo mašćenje i disbalans vlasišta.",
       solution: "Balansirana nega za čisto i zdravo teme",
@@ -794,15 +793,14 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           {/* Six-card grid */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-7">
             {valueCards.map((card, i) => {
-              const Icon = card.icon;
               return (
                 <Link
                   key={i}
                   href={card.href}
-                  className="group flex flex-col items-center text-center bg-[#FFFFFF] border border-[#dddbd9]/30 rounded-[4px] p-6 md:p-8 transition-all duration-300 hover:border-[#dddbd9] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(65,61,58,0.12)]"
+                  className="group flex flex-col items-center text-center bg-[#dddbd9] border border-[#dddbd9]/30 rounded-[4px] p-6 md:p-8 transition-all duration-300 hover:border-[#dddbd9] hover:-translate-y-0.5 shadow-[0_12px_28px_rgba(65,61,58,0.12)]"
                 >
-                  <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-5 md:mb-6 flex items-center justify-center text-[#1a1c1e]">
-                    <Icon strokeWidth={1.5} className="w-full h-full" />
+                  <div className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-5 md:mb-6 flex items-center justify-center">
+                    <Image src={card.icon} alt={card.title} width={64} height={64} className="w-full h-full object-contain" />
                   </div>
                   <h3
                     className="text-[16px] md:text-[19px] font-semibold text-[#1a1c1e] mb-2 md:mb-3 leading-[1.25]"
@@ -813,12 +811,12 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   <p className="text-[12px] md:text-[13.5px] text-[#1a1c1e]/65 leading-[1.6] mb-4 md:mb-5">
                     {card.desc}
                   </p>
-                  <div className="mt-auto w-full pt-4 md:pt-5 border-t border-[#dddbd9]/20 flex flex-col items-center">
+                  <div className="mt-auto w-full pt-4 md:pt-5 border-t border-[#1a1c1e]/15 flex flex-col items-center">
                     <p className="text-[12px] md:text-[13px] text-[#1a1c1e] leading-[1.6] mb-4">
                       <span className="font-semibold">Rešenje: </span>
                       {card.solution}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#dddbd9]/40 pb-0.5 group-hover:border-[#dddbd9] group-hover:gap-2.5 transition-all">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#FFFFFF]/30 pb-0.5 group-hover:border-[#FFFFFF] group-hover:gap-2.5 transition-all">
                       Otkrij proizvode
                       <ArrowRight className="w-3 h-3" />
                     </span>
@@ -841,12 +839,17 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#FFFFFF]/60 font-medium block mb-6">
                 Edukativni centar
               </span>
+              <Image
+                src="/altamoda-logoes/ID HAIR ACADEMY WHITE.png"
+                alt="ID Hair Academy"
+                width={520}
+                height={120}
+                className="h-12 md:h-14 w-auto mb-6"
+              />
               <h2
                 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                ID Hair Academy.
-                <br />
                 Put ka <em className="italic">uspešnim</em> profesionalcima.
               </h2>
               <p className="text-[14px] text-[#FFFFFF]/60 leading-[1.8] mb-10 max-w-lg">

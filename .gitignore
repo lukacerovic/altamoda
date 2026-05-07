@@ -35,6 +35,9 @@
 /public/uploads/*
 !/public/uploads/.gitkeep
 
+# generated reports from one-off scripts
+/scripts/*-report.csv
+
 # debug
 npm-debug.log*
 yarn-debug.log*

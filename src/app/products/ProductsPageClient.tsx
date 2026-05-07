@@ -112,6 +112,7 @@ interface SearchResult {
   slug: string;
   brand: string | null;
   price: number | null;
+  oldPrice: number | null;
   image: string | null;
   isProfessional: boolean;
 }
@@ -669,7 +670,7 @@ export default function ProductsPageClient({
     }
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}&limit=10`);
         const json = await res.json();
         if (json.success) {
           setSearchResults(json.data);
@@ -893,7 +894,7 @@ export default function ProductsPageClient({
 
       {/* Tip proizvoda */}
       {productTypes.length > 0 && (
-        <FilterSection title="Tip proizvoda" defaultOpen={false} count={selectedProductTypes.length}>
+        <FilterSection title="Tip proizvoda" defaultOpen={selectedProductTypes.length > 0} count={selectedProductTypes.length}>
           <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
             {productTypes.map((v) => {
               const isActive = selectedProductTypes.includes(v);
@@ -915,7 +916,7 @@ export default function ProductsPageClient({
 
       {/* Tip kose */}
       {hairTypes.length > 0 && (
-        <FilterSection title="Tip kose" defaultOpen={false} count={selectedHairTypes.length}>
+        <FilterSection title="Tip kose" defaultOpen={selectedHairTypes.length > 0} count={selectedHairTypes.length}>
           <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
             {hairTypes.map((v) => {
               const isActive = selectedHairTypes.includes(v);
@@ -937,7 +938,7 @@ export default function ProductsPageClient({
 
       {/* Funkcija / Tagovi */}
       {tags.length > 0 && (
-        <FilterSection title="Funkcija" defaultOpen={false} count={selectedTags.length}>
+        <FilterSection title="Funkcija" defaultOpen={selectedTags.length > 0} count={selectedTags.length}>
           <div className="flex flex-wrap gap-1.5 max-h-[260px] overflow-y-auto pr-1">
             {tags.map((v) => {
               const isActive = selectedTags.includes(v);
@@ -1239,7 +1240,12 @@ export default function ProductsPageClient({
                           {p.price == null ? (
                             <span className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]">B2B</span>
                           ) : (
-                            <span className="text-sm text-[#1a1c1e]">{p.price.toLocaleString("sr-RS")} <span className="text-[10px] text-[#1a1c1e]/60">RSD</span></span>
+                            <span className="flex items-baseline gap-2 text-sm text-[#1a1c1e] whitespace-nowrap">
+                              {p.oldPrice && p.oldPrice > p.price && (
+                                <span className="text-[11px] text-[#1a1c1e]/50 line-through">{p.oldPrice.toLocaleString("sr-RS")}</span>
+                              )}
+                              <span>{p.price.toLocaleString("sr-RS")} <span className="text-[10px] text-[#1a1c1e]/60">RSD</span></span>
+                            </span>
                           )}
                         </Link>
                       ))}
