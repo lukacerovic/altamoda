@@ -25,6 +25,7 @@ import {
   BarChart3,
   Layers,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -338,6 +339,10 @@ export default function ProductsPage() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [apiLoaded, setApiLoaded] = useState(false);
+  // True while ANY page is still being fetched (initial + paged fan-out).
+  // Drives the table-body spinner on first load and a subtle "loading more"
+  // indicator while later batches stream in.
+  const [loadingProducts, setLoadingProducts] = useState(true);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<Omit<Product, "id">>(defaultFormData());
@@ -457,6 +462,7 @@ export default function ProductsPage() {
       erpId: (p.erpId || "") as string,
     });
 
+    setLoadingProducts(true);
     try {
       // Step 1 — page 1, awaited. cache:no-store dodges browser cache so a
       // fresh save is always reflected on refresh.
@@ -464,6 +470,7 @@ export default function ProductsPage() {
       const firstJson = await firstRes.json();
       if (!firstJson?.success || !firstJson.data?.products) {
         setApiLoaded(true);
+        setLoadingProducts(false);
         return;
       }
 
@@ -505,6 +512,8 @@ export default function ProductsPage() {
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setApiLoaded(true);
+    } finally {
+      setLoadingProducts(false);
     }
   }, []);
 
@@ -865,7 +874,12 @@ export default function ProductsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.products")}</h1>
-          <p className="text-sm text-[#1a1c1e] mt-1">{products.length} {t("admin.totalProducts")}</p>
+          <p className="text-sm text-[#1a1c1e] mt-1 inline-flex items-center gap-2">
+            {products.length} {t("admin.totalProducts")}
+            {loadingProducts && products.length > 0 && (
+              <Loader2 size={14} className="animate-spin text-[#c19742]" />
+            )}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -1063,7 +1077,14 @@ export default function ProductsPage() {
               {paginated.length === 0 && (
                 <tr>
                   <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#1a1c1e]">
-                    {t("admin.noProductsMatch")}
+                    {loadingProducts ? (
+                      <span className="inline-flex items-center gap-2 text-[#1a1c1e]/70">
+                        <Loader2 size={16} className="animate-spin text-[#c19742]" />
+                        Učitavanje proizvoda...
+                      </span>
+                    ) : (
+                      t("admin.noProductsMatch")
+                    )}
                   </td>
                 </tr>
               )}
