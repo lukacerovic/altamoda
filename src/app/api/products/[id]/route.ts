@@ -4,7 +4,7 @@ import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-util
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
 import { getRouteParams } from '@/lib/route-utils'
 import { updateProductSchema } from '@/lib/validations/product'
-import { resolveBrandId, resolveCategoryId, resolveProductLineId } from '@/lib/taxonomy'
+import { resolveBrandId, resolveCategoryId, resolveProductLineId, cleanupOrphanBrand, cleanupOrphanCategory } from '@/lib/taxonomy'
 
 // GET /api/products/[id] — Full product detail
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
@@ -238,6 +238,18 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     ? body.categoryId
     : body.category !== undefined ? await resolveCategoryId(body.category, body.subCategory) : undefined
 
+  // Snapshot the previous brandId / categoryId so we can sweep them for
+  // orphan-status after the update if the admin moved this product to a
+  // different brand / category.
+  const previous = (brandId !== undefined || categoryId !== undefined)
+    ? await prisma.product.findUnique({
+        where: { id },
+        select: { brandId: true, categoryId: true },
+      })
+    : null
+  const previousBrandId = previous?.brandId ?? null
+  const previousCategoryId = previous?.categoryId ?? null
+
   const product = await prisma.product.update({
     where: { id },
     data: {
@@ -303,6 +315,15 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     await prisma.colorProduct.deleteMany({ where: { productId: id } })
   }
 
+  // If the product was moved to a different brand / category, the old one
+  // may now be orphan — sweep it (and its now-empty children).
+  if (brandId !== undefined && previousBrandId && previousBrandId !== brandId) {
+    await cleanupOrphanBrand(previousBrandId)
+  }
+  if (categoryId !== undefined && previousCategoryId && previousCategoryId !== categoryId) {
+    await cleanupOrphanCategory(previousCategoryId)
+  }
+
   // Invalidate cached pages that display products
   revalidatePath('/')
   revalidatePath('/products')
@@ -334,6 +355,13 @@ export const DELETE = withErrorHandler(async (_req: Request, context: unknown) =
     })
   }
 
+  // Snapshot brandId + categoryId before deletion so we can sweep the
+  // orphans after the product (and its FK) are gone.
+  const prev = await prisma.product.findUnique({
+    where: { id },
+    select: { brandId: true, categoryId: true },
+  })
+
   // Cart and wishlist references aren't cascade-deleted in the schema; clear
   // them first so the FK constraint doesn't reject the hard delete. Reviews,
   // images, color, attributes, and promo links cascade automatically.
@@ -342,6 +370,11 @@ export const DELETE = withErrorHandler(async (_req: Request, context: unknown) =
     prisma.wishlist.deleteMany({ where: { productId: id } }),
     prisma.product.delete({ where: { id } }),
   ])
+
+  // After the product row is gone, sweep both brand and category if they
+  // have no other products (empty product lines / parent categories cascade).
+  await cleanupOrphanBrand(prev?.brandId ?? null)
+  await cleanupOrphanCategory(prev?.categoryId ?? null)
 
   revalidatePath('/')
   revalidatePath('/products')

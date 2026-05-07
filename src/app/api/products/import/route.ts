@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
+import { sweepOrphanBrands, sweepOrphanCategories } from '@/lib/taxonomy'
 import * as XLSX from 'xlsx'
 
 /* ═══════════════════════════════════════════════════════════════
@@ -632,9 +633,17 @@ export const POST = withErrorHandler(async (req: Request) => {
     errors: fileResults.reduce((s, r) => s + r.errors.length, 0),
   }
 
+  // Bulk imports may move products between brands / categories en masse,
+  // leaving the old assignments empty. Sweep both in one pass so the
+  // navigation/filter UI doesn't surface dead entries.
+  const brandSweep = await sweepOrphanBrands()
+  const categorySweep = await sweepOrphanCategories()
+
   return successResponse({
     files: detectedFiles,
     results: fileResults,
     totals,
+    orphanBrandsRemoved: brandSweep.deleted.length,
+    orphanCategoriesRemoved: categorySweep.deleted.length,
   })
 })
