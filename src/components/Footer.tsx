@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSiteSettings } from "@/lib/useSiteSettings";
@@ -19,12 +20,13 @@ export default function Footer() {
     <footer className="bg-[#1a1c1e] mt-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-10 md:px-20 py-16 w-full text-[#FFFFFF]">
       {/* Column 1: Brand */}
       <div className="md:col-span-1">
-        <div
-          className="text-2xl text-[#FFFFFF] mb-6 tracking-[0.15em]"
-          style={{ fontFamily: "'Noto Serif', serif" }}
-        >
-          ALTAMODA
-        </div>
+        <Image
+          src="/altamoda-logoes/ALTAMODA WHITE.png"
+          alt="Altamoda"
+          width={626}
+          height={201}
+          className="h-10 w-auto mb-6"
+        />
         <p className="text-xs tracking-wider uppercase leading-loose text-[#FFFFFF]/80">
           {t("footer.description")}
         </p>

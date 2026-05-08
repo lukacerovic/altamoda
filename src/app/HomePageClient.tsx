@@ -485,37 +485,32 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   const valueCards = [
     {
       icon: "/altamoda_svg_icons/suva_i_ostecena.svg",
-      title: "Suva i oštećena kosa",
+      title: "Suva i oštećena",
       desc: "Kosa bez sjaja, sklona lomljenju i ispucalim krajevima.",
-      solution: "Intenzivna hidratacija i obnova strukture kose",
       href: buildFilterHref({ hairType: ["Suva kosa", "Oštećena kosa"], tag: ["hidratacija", "obnova"] }),
     },
     {
       icon: "/altamoda_svg_icons/tanka_kosa.svg",
-      title: "Tanka kosa bez volumena",
+      title: "Tanka bez volumena",
       desc: "Kosa koja brzo gubi oblik i nema punoću.",
-      solution: "Lagana nega koja daje volumen od korena",
       href: buildFilterHref({ hairType: ["Tanka kosa"], tag: ["volumen"] }),
     },
     {
       icon: "/altamoda_svg_icons/obojena_kosa.svg",
-      title: "Obojena kosa koja brzo bledi",
+      title: "Obojena koja bledi",
       desc: "Boja gubi intenzitet i sjaj već nakon nekoliko pranja.",
-      solution: "Zaštita pigmenta, postojanost boje i sjaj",
       href: buildFilterHref({ hairType: ["Hemijski tretirana kosa"] }),
     },
     {
       icon: "/altamoda_svg_icons/frizzy_kosa.svg",
-      title: "Frizz i neposlušna kosa",
+      title: "Frizz i neposlušna",
       desc: "Kosa koja reaguje na vlagu i teško se oblikuje.",
-      solution: "Zaglađivanje i kontrola vlage bez otežavanja",
       href: buildFilterHref({ hairType: ["Frizz", "Neposlušna kosa"], tag: ["anti-frizz"] }),
     },
     {
       icon: "/altamoda_svg_icons/hemijski_ostecena.svg",
-      title: "Oštećenja od dekoloranta, hemijskih tretmana i toplote",
+      title: "Hemijski tretirana",
       desc: "Slaba, lomljiva i bez elastičnosti.",
-      solution: "Rekonstrukcija i jačanje unutrašnje strukture",
       href: buildFilterHref({
         hairType: ["Oštećena kosa", "Hemijski tretirana kosa", "Zaštita od toplote"],
         tag: ["zaštita od toplote", "obnova"],
@@ -523,9 +518,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
     },
     {
       icon: "/altamoda_svg_icons/masna_kosa_skalp.svg",
-      title: "Masna kosa i osetljivo teme",
+      title: "Masna i osetljivo teme",
       desc: "Brzo mašćenje i disbalans vlasišta.",
-      solution: "Balansirana nega za čisto i zdravo teme",
       href: buildFilterHref({ hairType: ["Masna kosa", "Osetljivo teme"], tag: ["balans vlasišta"] }),
     },
   ];
@@ -797,30 +791,24 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 <Link
                   key={i}
                   href={card.href}
-                  className="group flex flex-col items-center text-center bg-[#dddbd9] border border-[#dddbd9]/30 rounded-[4px] p-6 md:p-8 transition-all duration-300 hover:border-[#dddbd9] hover:-translate-y-0.5 shadow-[0_12px_28px_rgba(65,61,58,0.12)]"
+                  className="group flex flex-col items-center text-center bg-[#dddbd9] border border-[#dddbd9]/30 rounded-[4px] p-5 md:p-6 transition-all duration-300 hover:border-[#dddbd9] hover:-translate-y-0.5 shadow-[0_12px_28px_rgba(65,61,58,0.12)]"
                 >
-                  <div className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-5 md:mb-6 flex items-center justify-center">
-                    <Image src={card.icon} alt={card.title} width={64} height={64} className="w-full h-full object-contain" />
+                  <div className="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 md:mb-4 flex items-center justify-center">
+                    <Image src={card.icon} alt={card.title} width={56} height={56} className="w-full h-full object-contain" />
                   </div>
                   <h3
-                    className="text-[16px] md:text-[19px] font-semibold text-[#1a1c1e] mb-2 md:mb-3 leading-[1.25]"
+                    className="text-[15px] md:text-[18px] font-semibold text-[#1a1c1e] mb-2 leading-[1.25]"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     {card.title}
                   </h3>
-                  <p className="text-[12px] md:text-[13.5px] text-[#1a1c1e]/65 leading-[1.6] mb-4 md:mb-5">
+                  <p className="text-[12px] md:text-[13px] text-[#1a1c1e]/65 leading-[1.55] mb-4">
                     {card.desc}
                   </p>
-                  <div className="mt-auto w-full pt-4 md:pt-5 border-t border-[#1a1c1e]/15 flex flex-col items-center">
-                    <p className="text-[12px] md:text-[13px] text-[#1a1c1e] leading-[1.6] mb-4">
-                      <span className="font-semibold">Rešenje: </span>
-                      {card.solution}
-                    </p>
-                    <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#FFFFFF]/30 pb-0.5 group-hover:border-[#FFFFFF] group-hover:gap-2.5 transition-all">
-                      Otkrij proizvode
-                      <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
+                  <span className="mt-auto inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#FFFFFF]/30 pb-0.5 group-hover:border-[#FFFFFF] group-hover:gap-2.5 transition-all">
+                    Otkrij proizvode
+                    <ArrowRight className="w-3 h-3" />
+                  </span>
                 </Link>
               );
             })}
@@ -842,8 +830,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <Image
                 src="/altamoda-logoes/ID HAIR ACADEMY WHITE.png"
                 alt="ID Hair Academy"
-                width={520}
-                height={120}
+                width={626}
+                height={201}
                 className="h-12 md:h-14 w-auto mb-6"
               />
               <h2

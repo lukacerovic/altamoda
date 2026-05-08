@@ -85,8 +85,8 @@ export default function AdminLayout({
               <Image
                 src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
                 alt="Altamoda"
-                width={742}
-                height={134}
+                width={626}
+                height={201}
                 priority
                 className="h-8 w-auto"
               />
@@ -97,8 +97,8 @@ export default function AdminLayout({
               <Image
                 src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
                 alt="Altamoda"
-                width={742}
-                height={134}
+                width={626}
+                height={201}
                 priority
                 className="h-6 w-auto"
               />
@@ -184,8 +184,8 @@ export default function AdminLayout({
             <Image
               src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
               alt="Altamoda"
-              width={742}
-              height={134}
+              width={626}
+              height={201}
               priority
               className="h-8 w-auto"
             />

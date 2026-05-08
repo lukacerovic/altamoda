@@ -118,8 +118,8 @@ export default function EducationPage() {
                 <Image
                   src="/altamoda-logoes/ID HAIR ACADEMY BLACK.png"
                   alt="ID Hair Academy"
-                  width={520}
-                  height={120}
+                  width={626}
+                  height={201}
                   className="h-14 md:h-16 w-auto mb-6"
                   priority
                 />
