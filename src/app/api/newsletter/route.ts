@@ -30,9 +30,10 @@ export const POST = withErrorHandler(async (req: Request) => {
     })
 
     void (async () => {
-      const { sendTransactional } = await import('@/lib/email')
+      const { sendTransactional, getNewsletterFrom } = await import('@/lib/email')
       const { welcomeTemplate } = await import('@/lib/email-templates')
       return sendTransactional({
+        from: getNewsletterFrom(),
         to: email,
         subject: 'Dobrodošli u Altamoda porodicu! 🎉',
         html: welcomeTemplate(email),
@@ -48,9 +49,10 @@ export const POST = withErrorHandler(async (req: Request) => {
 
   // Send welcome email (non-blocking)
   try {
-    const { sendTransactional } = await import('@/lib/email')
+    const { sendTransactional, getNewsletterFrom } = await import('@/lib/email')
     const { welcomeTemplate } = await import('@/lib/email-templates')
     await sendTransactional({
+      from: getNewsletterFrom(),
       to: email,
       subject: 'Dobrodošli u Altamoda porodicu! 🎉',
       html: welcomeTemplate(email),

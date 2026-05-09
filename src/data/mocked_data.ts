@@ -875,7 +875,7 @@ export const faqSections: FaqSection[] = [
     title: "Povrat i Reklamacije",
     items: [
       { q: "Kakva je politika povrata?", a: "Imate pravo na povrat neotvorenog proizvoda u roku od 14 dana od prijema. Proizvod mora biti u originalnom pakovanju, neoštećen i nekorišćen." },
-      { q: "Kako pokrenuti povrat?", a: "Kontaktirajte nas putem emaila na reklamacije@altamoda.rs ili pozovite +381 11 123 4567. Naš tim će vam dati instrukcije za povrat." },
+      { q: "Kako pokrenuti povrat?", a: "Kontaktirajte nas putem emaila na kontakt@altamoda.rs ili pozovite +381 11 123 4567. Naš tim će vam dati instrukcije za povrat." },
       { q: "Koliko traje refundacija?", a: "Nakon prijema vraćenog proizvoda, refundacija se procesira u roku od 5-7 radnih dana na isti način plaćanja koji ste koristili pri kupovini." },
     ],
   },

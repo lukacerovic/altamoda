@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
-import { sendBulk, rewriteAssetUrls, getUnsubscribeUrl, type BulkEmail } from '@/lib/email'
+import { sendBulk, rewriteAssetUrls, getUnsubscribeUrl, getNewsletterFrom, type BulkEmail } from '@/lib/email'
 import { generateEmailPreview, type EmailTemplateOptions } from '@/lib/email-preview'
 import { reconcileStuckCampaigns } from '@/lib/newsletter-reconcile'
 
@@ -59,6 +59,7 @@ export const POST = withErrorHandler(async (_req: Request, context: unknown) => 
   const options = (campaign.emailOptions ?? undefined) as EmailTemplateOptions | undefined
   const subject = campaign.subject
   const content = campaign.content
+  const newsletterFrom = getNewsletterFrom()
   const recipientList = subscribers.map((s) => s.email)
 
   // Lazy generator — yields one fully-rendered email at a time so we don't
@@ -73,7 +74,7 @@ export const POST = withErrorHandler(async (_req: Request, context: unknown) => 
           const html = rewriteAssetUrls(
             generateEmailPreview(content, options, getUnsubscribeUrl(recipient))
           )
-          return { done: false, value: { to: recipient, subject, html } }
+          return { done: false, value: { from: newsletterFrom, to: recipient, subject, html } }
         },
       }
     },

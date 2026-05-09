@@ -386,7 +386,7 @@ export default function Header() {
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-            <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-6 xl:h-7 w-auto" unoptimized />
+            <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-8 xl:h-9 w-auto" unoptimized />
           </Link>
 
           {/* Icons - right */}
@@ -479,7 +479,7 @@ export default function Header() {
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileMenu(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 bg-white overflow-y-auto animate-slideInRight">
             <div className="flex items-center justify-between p-4 border-b border-[#dddbd9]">
-              <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-5 w-auto" unoptimized />
+              <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-7 w-auto" unoptimized />
               <button onClick={() => setMobileMenu(false)}>
                 <X className="w-5 h-5 text-[#FFFFFF]" />
               </button>
