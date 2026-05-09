@@ -1,5 +1,4 @@
 import { Resend } from 'resend'
-import nodemailer, { type Transporter } from 'nodemailer'
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 
@@ -71,57 +70,14 @@ export async function sendTransactional({ to, subject, html, from }: SendEmailOp
 export const sendEmail = sendTransactional
 
 // ──────────────────────────────────────────────────────────
-// Bulk (cPanel SMTP via nodemailer) — newsletter campaigns
+// Bulk (Resend batch API) — newsletter campaigns
 // ──────────────────────────────────────────────────────────
+// Uses Resend instead of cPanel SMTP so newsletter sending works on Vercel
+// serverless. Resend's batch endpoint accepts up to 100 emails per call;
+// we throttle batches to stay under the 2 req/s default rate limit.
 
-// Hard ceiling on outgoing rate to stay under Adriahost shared-host caps.
-const BULK_HOURLY_CAP = 200
-const BULK_DELAY_MS = Math.ceil((60 * 60 * 1000) / BULK_HOURLY_CAP)
-
-// Singleton across HMR reloads in dev so we don't accumulate transporters and
-// leak SMTP sockets on every save.
-const globalForBulk = globalThis as unknown as { bulkTransporter?: Transporter }
-
-function getBulkTransporter(): Transporter {
-  if (globalForBulk.bulkTransporter) return globalForBulk.bulkTransporter
-
-  const host = process.env.SMTP_HOST
-  const port = parseInt(process.env.SMTP_PORT || '465', 10)
-  const secure = process.env.SMTP_SECURE !== 'false'
-  const user = process.env.SMTP_USER
-  const pass = process.env.SMTP_PASS
-
-  if (!host || !user || !pass) {
-    throw new Error('SMTP not configured: SMTP_HOST, SMTP_USER, SMTP_PASS required')
-  }
-
-  // Pool is rate-limited via the manual delay in sendBulk, not via nodemailer's
-  // rateDelta/rateLimit options — keeping a single source of truth makes the
-  // throttle ceiling easy to reason about (BULK_HOURLY_CAP).
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: { user, pass },
-    pool: true,
-    maxConnections: 3,
-    maxMessages: 100,
-  })
-
-  globalForBulk.bulkTransporter = transporter
-  return transporter
-}
-
-// Release SMTP sockets on graceful shutdown so the OS doesn't hold them in
-// TIME_WAIT for minutes after the process exits.
-if (typeof process !== 'undefined' && !globalForBulk.bulkTransporter) {
-  const shutdown = () => {
-    globalForBulk.bulkTransporter?.close()
-    globalForBulk.bulkTransporter = undefined
-  }
-  process.once('SIGTERM', shutdown)
-  process.once('SIGINT', shutdown)
-}
+const RESEND_BATCH_SIZE = 100
+const RESEND_BATCH_DELAY_MS = 600
 
 export interface BulkEmail {
   to: string
@@ -136,54 +92,62 @@ export interface BulkSendResult {
   failures: { to: string; error: string }[]
 }
 
-// Non-recoverable SMTP error codes — auth failure, host unreachable, etc.
-// On these we abort the rest of the loop instead of failing N times in a row.
-const FATAL_SMTP_CODES = new Set(['EAUTH', 'ECONNECTION', 'ECONNREFUSED', 'EDNS'])
-
-function isFatalSmtpError(err: unknown): boolean {
-  if (!err || typeof err !== 'object') return false
-  const code = (err as { code?: string }).code
-  return code !== undefined && FATAL_SMTP_CODES.has(code)
-}
-
 export async function sendBulk(
   emails: Iterable<BulkEmail> | AsyncIterable<BulkEmail> | BulkEmail[],
-  meta: { total?: number } = {}
+  // `meta.total` was used by the SMTP path to skip a trailing delay;
+  // unused with Resend batch but kept for backwards-compat with callers.
+  _meta: { total?: number } = {}
 ): Promise<BulkSendResult> {
-  const transporter = getBulkTransporter()
+  const resend = getResend()
   const result: BulkSendResult = { sent: 0, failed: 0, failures: [] }
-  const total = meta.total ?? (Array.isArray(emails) ? emails.length : undefined)
-  let index = 0
+  let chunk: BulkEmail[] = []
+  let firstBatch = true
 
-  // Iterate without materializing the full list — supports lazy generators so
-  // a 1000-recipient campaign doesn't hold N × templateSize HTML in RAM.
-  for await (const email of emails as AsyncIterable<BulkEmail>) {
-    try {
-      await transporter.sendMail({
-        from: email.from || getEmailFrom(),
-        to: email.to,
-        subject: email.subject,
-        html: email.html,
-      })
-      result.sent++
-    } catch (err) {
-      result.failed++
-      const message = err instanceof Error ? err.message : String(err)
-      // Don't log full SMTP error bodies — they can include credentials/PII.
-      const safe = message.split('\n')[0].slice(0, 200)
-      result.failures.push({ to: email.to, error: safe })
-      console.error(`[email] Bulk send failed for ${email.to}: ${safe}`)
-      if (isFatalSmtpError(err)) {
-        console.error('[email] Aborting bulk send — fatal SMTP error')
-        break
-      }
+  const flush = async () => {
+    if (chunk.length === 0) return
+
+    if (!firstBatch) {
+      await new Promise((r) => setTimeout(r, RESEND_BATCH_DELAY_MS))
     }
+    firstBatch = false
 
-    index++
-    if (total === undefined || index < total) {
-      await new Promise((resolve) => setTimeout(resolve, BULK_DELAY_MS))
+    const payload = chunk.map((e) => ({
+      from: e.from || getEmailFrom(),
+      to: [e.to],
+      subject: e.subject,
+      html: e.html,
+    }))
+
+    try {
+      const { error } = await resend.batch.send(payload)
+      if (error) {
+        for (const e of chunk) {
+          result.failed++
+          result.failures.push({ to: e.to, error: error.message })
+        }
+        console.error('[email] Resend batch failed:', error)
+      } else {
+        result.sent += chunk.length
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      const safe = message.split('\n')[0].slice(0, 200)
+      for (const e of chunk) {
+        result.failed++
+        result.failures.push({ to: e.to, error: safe })
+      }
+      console.error(`[email] Resend batch crashed: ${safe}`)
+    }
+    chunk = []
+  }
+
+  for await (const email of emails as AsyncIterable<BulkEmail>) {
+    chunk.push(email)
+    if (chunk.length >= RESEND_BATCH_SIZE) {
+      await flush()
     }
   }
+  await flush()
 
   return result
 }

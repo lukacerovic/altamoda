@@ -7,15 +7,14 @@ import { reconcileStuckCampaigns } from '@/lib/newsletter-reconcile'
 
 // POST /api/newsletter/campaigns/[id]/send — send campaign (admin only).
 //
-// The actual SMTP delivery runs in the background; the request returns
+// Delivery runs in the background via Resend's batch API; the request returns
 // immediately after the campaign row flips to `sending`. The DB row's `status`
 // field is the source of truth for completion — admin polls the campaign list.
 //
-// IMPORTANT: This endpoint relies on the Node process staying alive for the
-// full drain (~5 hours for 1000 recipients at 200/hr). Safe on a long-running
-// VPS like Adriahost / `next start`. UNSAFE on Vercel and other serverless
-// platforms which kill the function instance after the response is sent — a
-// queue worker (Inngest, BullMQ, cron) would be required there.
+// On Vercel, the fire-and-forget background task may be killed when the
+// response is sent. For larger lists we should switch to awaiting sendBulk
+// (Resend at 100 emails/batch + 600ms = ~16s for 1000 recipients, fits Pro's
+// 60s function timeout) or use Vercel's `waitUntil`.
 export const POST = withErrorHandler(async (_req: Request, context: unknown) => {
   await requireAdmin()
   await reconcileStuckCampaigns()
