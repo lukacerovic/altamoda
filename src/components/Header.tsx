@@ -386,7 +386,7 @@ export default function Header() {
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-            <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-8 xl:h-9 w-auto" unoptimized />
+            <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-13 xl:h-15 w-auto" unoptimized />
           </Link>
 
           {/* Icons - right */}
