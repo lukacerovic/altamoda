@@ -1,6 +1,6 @@
 import { withErrorHandler, successResponse, errorResponse } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
-import { sendBulk, rewriteAssetUrls } from '@/lib/email'
+import { sendBulk, rewriteAssetUrls, getNewsletterFrom } from '@/lib/email'
 import { welcomeTemplate } from '@/lib/email-templates'
 import { generateEmailPreview } from '@/lib/email-preview'
 import { testSendSchema } from '@/lib/validations/newsletter'
@@ -25,7 +25,10 @@ export const POST = withErrorHandler(async (req: Request) => {
     : welcomeTemplate(body.email)
 
   const finalHtml = rewriteAssetUrls(rendered)
-  const result = await sendBulk([{ to: body.email, subject: finalSubject, html: finalHtml }], { total: 1 })
+  const result = await sendBulk(
+    [{ from: getNewsletterFrom(), to: body.email, subject: finalSubject, html: finalHtml }],
+    { total: 1 }
+  )
 
   if (result.sent === 0) {
     const reason = result.failures[0]?.error ?? 'Unknown SMTP error'

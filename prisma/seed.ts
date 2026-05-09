@@ -574,7 +574,7 @@ async function main() {
   // ==================== SITE SETTINGS ====================
   const siteSettings: Record<string, string> = {
     storeName: 'Alta Moda',
-    storeEmail: 'info@altamoda.rs',
+    storeEmail: 'kontakt@altamoda.rs',
     storePhone: '+381 11 123 4567',
     storeAddress: 'Knez Mihailova 22, 11000 Beograd',
     warehouseAddress: '',
