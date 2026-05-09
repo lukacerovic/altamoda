@@ -68,9 +68,9 @@ export default function ContactPage() {
                     </p>
                     <a
                       className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300"
-                      href="mailto:atelier@altamoda.com"
+                      href="mailto:kontakt@altamoda.rs"
                     >
-                      atelier@altamoda.com
+                      kontakt@altamoda.rs
                     </a>
                   </div>
                   <div className="pt-4 space-y-1">

@@ -171,7 +171,7 @@ export function b2bApprovedUserTemplate(user: B2bApprovedUser): string {
         </tr>
       </table>
       <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #413d3a;">
-        Ako imate bilo kakva pitanja, slobodno nas kontaktirajte na info@altamoda.rs.
+        Ako imate bilo kakva pitanja, slobodno nas kontaktirajte na kontakt@altamoda.rs.
       </p>
     </div>
   `

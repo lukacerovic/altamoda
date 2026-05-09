@@ -21,6 +21,12 @@ function getEmailFrom() {
   return process.env.EMAIL_FROM || 'Altamoda <onboarding@resend.dev>'
 }
 
+function getNewsletterFrom() {
+  return process.env.NEWSLETTER_FROM
+    || process.env.EMAIL_FROM
+    || 'Altamoda Newsletter <newsletter@altamoda.rs>'
+}
+
 function getSiteUrl() {
   const explicit = process.env.SITE_URL
   if (explicit) return explicit
@@ -38,15 +44,16 @@ export interface SendEmailOptions {
   to: string | string[]
   subject: string
   html: string
+  from?: string
 }
 
 // ──────────────────────────────────────────────────────────
 // Transactional (Resend) — critical low-volume mail
 // ──────────────────────────────────────────────────────────
 
-export async function sendTransactional({ to, subject, html }: SendEmailOptions) {
+export async function sendTransactional({ to, subject, html, from }: SendEmailOptions) {
   const result = await getResend().emails.send({
-    from: getEmailFrom(),
+    from: from || getEmailFrom(),
     to: Array.isArray(to) ? to : [to],
     subject,
     html,
@@ -120,6 +127,7 @@ export interface BulkEmail {
   to: string
   subject: string
   html: string
+  from?: string
 }
 
 export interface BulkSendResult {
@@ -152,7 +160,7 @@ export async function sendBulk(
   for await (const email of emails as AsyncIterable<BulkEmail>) {
     try {
       await transporter.sendMail({
-        from: getEmailFrom(),
+        from: email.from || getEmailFrom(),
         to: email.to,
         subject: email.subject,
         html: email.html,
@@ -213,4 +221,4 @@ export function getUnsubscribeUrl(email: string) {
   return `${getSiteUrl()}/newsletter/unsubscribe?token=${token}`
 }
 
-export { getSiteUrl, getEmailFrom }
+export { getSiteUrl, getEmailFrom, getNewsletterFrom }
