@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 
 /* Splits text on *…* markers and wraps the marked spans in italic accent colour. */
 function withEm(text: string, accent: "olive" | "gold" = "olive") {
-  const accentClass = accent === "gold" ? "text-[#c19742]" : "text-[#413d3a]";
+  const accentClass = accent === "gold" ? "text-[#c19742]" : "text-[#1a1c1e]";
   return text.split(/(\*[^*]+\*)/g).map((part, i) => {
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
@@ -325,22 +325,15 @@ export default function EducationPage() {
                   </a>
                 </div>
               </div>
-              <div className="pt-1">
-                <div className="aspect-[4/5] bg-[#1a1c1e] overflow-hidden relative">
+              <div className="pt-1 flex justify-center md:justify-end">
+                <div className="relative aspect-square w-full max-w-[280px] rounded-full overflow-hidden">
                   <Image
-                    src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=80"
-                    alt=""
+                    src="/altamoda-logoes/ILUSTRATION BLACK BACKGROUND.png"
+                    alt="ID Hair Academy mark"
                     fill
-                    className="object-cover"
-                    style={{ filter: "grayscale(1) contrast(1.05)" }}
-                    sizes="(max-width: 1024px) 100vw, 30vw"
+                    className="object-contain p-6 rounded-full"
+                    sizes="(max-width: 1024px) 60vw, 280px"
                   />
-                  <span
-                    className="absolute bottom-3.5 left-4 text-[12px] italic text-white/70"
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                  >
-                    {t("education.section4ImgCredit")}
-                  </span>
                 </div>
               </div>
             </div>
