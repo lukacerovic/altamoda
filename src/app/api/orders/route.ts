@@ -6,6 +6,7 @@ import { generateOrderNumber } from '@/lib/utils'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
 import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
+import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -175,6 +176,10 @@ export const POST = withErrorHandler(async (req: Request) => {
     if (cart) {
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
     }
+
+    // 8. Enqueue outbound Pantheon sync. Same transaction so the queue row and
+    // the order are written atomically — no orphan orders, no orphan queue rows.
+    await enqueueOrderSync(createdOrder.id, tx)
 
     return createdOrder
   })

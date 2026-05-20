@@ -37,6 +37,7 @@
 
 # generated reports from one-off scripts
 /scripts/*-report.csv
+/scripts/backfill-unmatched-*.csv
 
 # debug
 npm-debug.log*
