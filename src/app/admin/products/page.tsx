@@ -333,6 +333,9 @@ export default function ProductsPage() {
   // __all__ | erp_active | erp_inactive | not_linked | needs_review
   // 'needs_review' = visible on site (status=active) AND ERP says inactive.
   const [erpStatusFilter, setErpStatusFilter] = useState("__all__");
+  // __all__ | has_old_price | real_sale | broken_old_price | no_old_price
+  // 'broken_old_price' = oldPrice set but ≤ current price (illogical sale display).
+  const [priceFilter, setPriceFilter] = useState("__all__");
   const [currentPage, setCurrentPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -582,9 +585,16 @@ export default function ProductsPage() {
         (erpStatusFilter === "erp_inactive" && p.erpIsActive === false) ||
         (erpStatusFilter === "not_linked" && (p.erpIsActive === null || p.erpIsActive === undefined)) ||
         (erpStatusFilter === "needs_review" && p.status === "active" && p.erpIsActive === false);
-      return matchSearch && matchBrand && matchCategory && matchStatus && matchUserType && matchErpStatus;
+      const hasOld = p.oldPrice !== undefined && p.oldPrice !== null && p.oldPrice > 0;
+      const matchPrice =
+        priceFilter === "__all__" ||
+        (priceFilter === "has_old_price" && hasOld) ||
+        (priceFilter === "real_sale" && hasOld && (p.oldPrice as number) > p.priceB2C) ||
+        (priceFilter === "broken_old_price" && hasOld && (p.oldPrice as number) <= p.priceB2C) ||
+        (priceFilter === "no_old_price" && !hasOld);
+      return matchSearch && matchBrand && matchCategory && matchStatus && matchUserType && matchErpStatus && matchPrice;
     });
-  }, [products, search, brandFilter, categoryFilter, statusFilter, userTypeFilter, erpStatusFilter, t]);
+  }, [products, search, brandFilter, categoryFilter, statusFilter, userTypeFilter, erpStatusFilter, priceFilter, t]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -981,6 +991,13 @@ export default function ProductsPage() {
               <option value="erp_inactive">Neaktivno u ERP-u</option>
               <option value="not_linked">Nije u ERP-u</option>
               <option value="needs_review">⚠ Treba pregled</option>
+            </select>
+            <select value={priceFilter} onChange={(e) => { setPriceFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
+              <option value="__all__">Sve cene</option>
+              <option value="has_old_price">Sa starom cenom</option>
+              <option value="real_sale">Stvarno sniženje</option>
+              <option value="broken_old_price">⚠ Greška u cenama</option>
+              <option value="no_old_price">Bez stare cene</option>
             </select>
           </div>
         </div>
