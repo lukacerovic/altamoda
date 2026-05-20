@@ -80,6 +80,8 @@ interface Product {
   vatRate: number;
   vatCode: string;
   erpId: string;
+  // Pantheon's active flag, mirrored read-only. null/undefined = not linked.
+  erpIsActive?: boolean | null;
 }
 
 type TabKey = "osnovno" | "cene" | "sadrzaj" | "mediji" | "zalihe";
@@ -328,6 +330,9 @@ export default function ProductsPage() {
   const [statusFilter, setStatusFilter] = useState("__all__");
   // __all__ | retail | professional — matches Product.badges.isProfessionalOnly
   const [userTypeFilter, setUserTypeFilter] = useState("__all__");
+  // __all__ | erp_active | erp_inactive | not_linked | needs_review
+  // 'needs_review' = visible on site (status=active) AND ERP says inactive.
+  const [erpStatusFilter, setErpStatusFilter] = useState("__all__");
   const [currentPage, setCurrentPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -460,6 +465,7 @@ export default function ProductsPage() {
       vatRate: (p.vatRate ?? 20) as number,
       vatCode: (p.vatCode || ((p.vatRate as number) === 10 ? "R1" : "R2")) as string,
       erpId: (p.erpId || "") as string,
+      erpIsActive: (p.erpIsActive ?? null) as boolean | null,
     });
 
     setLoadingProducts(true);
@@ -570,9 +576,15 @@ export default function ProductsPage() {
         userTypeFilter === "__all__" ||
         (userTypeFilter === "professional" && p.badges.isProfessionalOnly) ||
         (userTypeFilter === "retail" && !p.badges.isProfessionalOnly);
-      return matchSearch && matchBrand && matchCategory && matchStatus && matchUserType;
+      const matchErpStatus =
+        erpStatusFilter === "__all__" ||
+        (erpStatusFilter === "erp_active" && p.erpIsActive === true) ||
+        (erpStatusFilter === "erp_inactive" && p.erpIsActive === false) ||
+        (erpStatusFilter === "not_linked" && (p.erpIsActive === null || p.erpIsActive === undefined)) ||
+        (erpStatusFilter === "needs_review" && p.status === "active" && p.erpIsActive === false);
+      return matchSearch && matchBrand && matchCategory && matchStatus && matchUserType && matchErpStatus;
     });
-  }, [products, search, brandFilter, categoryFilter, statusFilter, userTypeFilter, t]);
+  }, [products, search, brandFilter, categoryFilter, statusFilter, userTypeFilter, erpStatusFilter, t]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -899,6 +911,31 @@ export default function ProductsPage() {
         </div>
       </div>
 
+      {/* "Needs ERP review" banner — products visible on the site that Pantheon
+          has marked inactive. Surfaces the count so admin doesn't have to know
+          to look. Clicking applies the erp_status=needs_review filter. */}
+      {(() => {
+        const needsReview = products.filter(p => p.status === "active" && p.erpIsActive === false).length;
+        if (needsReview === 0 || erpStatusFilter === "needs_review") return null;
+        return (
+          <div className="bg-amber-50 border border-amber-200 rounded-sm p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="text-amber-700 flex-shrink-0" />
+              <p className="text-sm text-amber-900">
+                <strong>{needsReview}</strong>{" "}
+                {needsReview === 1 ? "proizvod je vidljiv na sajtu ali je u Pantheon-u neaktivan." : "proizvoda su vidljiva na sajtu ali su u Pantheon-u neaktivna."}
+              </p>
+            </div>
+            <button
+              onClick={() => { setErpStatusFilter("needs_review"); setCurrentPage(1); }}
+              className="text-sm font-medium text-amber-900 hover:text-amber-700 underline underline-offset-2"
+            >
+              Pregledaj
+            </button>
+          </div>
+        );
+      })()}
+
       {/* Search & Filters */}
       <div className="bg-white rounded-sm border border-stone-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
@@ -937,6 +974,13 @@ export default function ProductsPage() {
               <option value="__all__">{t("admin.allStatuses")}</option>
               <option value="active">{t("admin.active")}</option>
               <option value="inactive">{t("admin.inactive")}</option>
+            </select>
+            <select value={erpStatusFilter} onChange={(e) => { setErpStatusFilter(e.target.value); setCurrentPage(1); }} className="px-3 py-2.5 bg-stone-100 border border-transparent rounded-sm text-sm cursor-pointer focus:border-black focus:outline-none">
+              <option value="__all__">Svi ERP statusi</option>
+              <option value="erp_active">Aktivno u ERP-u</option>
+              <option value="erp_inactive">Neaktivno u ERP-u</option>
+              <option value="not_linked">Nije u ERP-u</option>
+              <option value="needs_review">⚠ Treba pregled</option>
             </select>
           </div>
         </div>
@@ -1020,6 +1064,12 @@ export default function ProductsPage() {
                           )}
                           {product.badges.isNew && (
                             <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">{t("admin.new")}</span>
+                          )}
+                          {product.erpIsActive === false && (
+                            <span title="Proizvod je u Pantheon-u označen kao neaktivan." className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-800">ERP neaktivno</span>
+                          )}
+                          {product.erpIsActive === null && (
+                            <span title="Proizvod nije povezan sa Pantheon-om (nema erpId)." className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-600">Nije u ERP-u</span>
                           )}
                         </div>
                       </div>

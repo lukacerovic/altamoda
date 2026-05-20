@@ -1,15 +1,14 @@
 /**
  * Inbound Pantheon syncs: products, prices, stock.
  *
- * Mirrors the legacy CodeIgniter `cron_products()` / `cron_prices()` /
- * `cron_stocks()` flows, with the addition of ErpSyncLog audit entries and
- * batched DB writes.
- *
- * Legacy behavior preserved:
- *   - products sync: INSERTS new products; for existing, updates only isActive
- *     (matches `Synchronization_model::products()` + `update_product()`)
- *   - prices sync:   updates priceB2c + costPrice for existing products
- *   - stock sync:    updates stockQuantity for existing products
+ * Behavior:
+ *   - products sync: INSERTS new products (isActive + erpIsActive both seeded
+ *     from Pantheon's active flag). For existing products, only mirrors the
+ *     Pantheon flag into `erpIsActive` — NEVER touches the website's own
+ *     `isActive`. Policy chosen by the owners (Option C / Hybrid): the website
+ *     decides its own visibility; `erpIsActive` is informational for admin.
+ *   - prices sync:   updates priceB2c + costPrice for existing products.
+ *   - stock sync:    updates stockQuantity for existing products.
  *
  * Match key is always `Product.erpId` (= Pantheon acIdent), trimmed.
  */
@@ -106,7 +105,7 @@ export async function syncProducts(): Promise<SyncResult> {
     const codes = normalized.map((p) => p.code)
     const existing = await prisma.product.findMany({
       where: { erpId: { in: codes } },
-      select: { id: true, erpId: true, isActive: true },
+      select: { id: true, erpId: true, erpIsActive: true },
     })
     const existingByErpId = new Map(
       existing.filter((p): p is typeof p & { erpId: string } => !!p.erpId).map((p) => [p.erpId, p]),
@@ -122,10 +121,10 @@ export async function syncProducts(): Promise<SyncResult> {
         batch.map(async (item) => {
           const found = existingByErpId.get(item.code)
           if (found) {
-            if (found.isActive !== item.isActive) {
+            if (found.erpIsActive !== item.isActive) {
               await prisma.product.update({
                 where: { id: found.id },
-                data: { isActive: item.isActive },
+                data: { erpIsActive: item.isActive },
               })
               updated++
             } else {
@@ -149,6 +148,7 @@ export async function syncProducts(): Promise<SyncResult> {
                 costPrice: new Prisma.Decimal(item.priceWithoutVat),
                 stockQuantity: item.stock,
                 isActive: item.isActive,
+                erpIsActive: item.isActive,
                 erpId: item.code,
                 vatRate: ERP_DEFAULT_VAT_RATE,
               },

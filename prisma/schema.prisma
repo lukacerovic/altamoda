@@ -270,6 +270,7 @@ model Product {
   isBestseller      Boolean  @default(false) @map("is_bestseller")
   gender            String?
   erpId             String?  @map("erp_id")
+  erpIsActive       Boolean? @map("erp_is_active")
   barcode           String?
   subcategory       String?
   productType       String?  @map("product_type")

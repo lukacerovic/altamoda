@@ -443,7 +443,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       isFeatured: p.isFeatured,
       isBestseller: p.isBestseller,
       stockQuantity: p.stockQuantity,
-      ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId } : {}),
+      ...(role === 'admin' ? { barcode: p.barcode, vatRate: p.vatRate, vatCode: p.vatCode, erpId: p.erpId, erpIsActive: p.erpIsActive } : {}),
       promoBadge: promo?.badge || null,
       rating: ratingMap.get(p.id) || 0,
       reviewCount: p._count.reviews,

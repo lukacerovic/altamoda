@@ -1,15 +1,18 @@
 /**
- * Backfill Product.erpId by name-matching our DB against Pantheon.
+ * Backfill Product.erpId by matching our DB against Pantheon.
  *
- * Three matching tiers, applied in order. Each our-product takes the first
+ * Five matching tiers, applied in order. Each our-product takes the first
  * tier that finds a match. Conflicts (1 Pantheon code claimed by multiple of
  * our products at the same tier) are dropped — we never link if there's
  * ambiguity, since wrong-linking a price/stock destination is hard to undo.
  *
- *   tier 1 = exact match on raw name
- *   tier 2 = exact match on normalized name (diacritics removed, lowercased,
+ *   tier 1 = exact match on Product.sku == Pantheon ident (highest confidence)
+ *   tier 2 = exact match on Product.barcode == Pantheon barcode (requires
+ *            --barcodes-json since the products API doesn't return barcodes)
+ *   tier 3 = exact match on raw name
+ *   tier 4 = exact match on normalized name (diacritics removed, lowercased,
  *            whitespace collapsed)
- *   tier 3 = fuzzy: Jaccard token similarity ≥ 0.90, top-1 only
+ *   tier 5 = fuzzy: Jaccard token similarity ≥ 0.90, top-1 only
  *
  * Skips products that already have erpId set (never overwrites).
  * Skips Pantheon codes already claimed by another of our products.
@@ -17,16 +20,20 @@
  * Usage:
  *   node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts
  *   node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts --apply
- *   node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts --apply --tiers=exact,normalized
+ *   node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts --apply --tiers=sku
+ *   node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts --apply --barcodes-json=/tmp/pantheon-active-sifre.json
  *
  * Flags:
- *   --apply               Write changes (default: dry-run)
- *   --tiers=t1,t2,t3      Restrict tiers (e.g. --tiers=exact only)
- *   --threshold=0.90      Fuzzy threshold (default 0.90)
- *   --csv-unmatched       Write unmatched/ambiguous rows to a CSV for review
+ *   --apply                   Write changes (default: dry-run)
+ *   --tiers=t1,t2,...         Restrict tiers (sku|barcode|exact|normalized|fuzzy)
+ *   --threshold=0.90          Fuzzy threshold (default 0.90)
+ *   --csv-unmatched           Write unmatched/ambiguous rows to a CSV for review
+ *   --barcodes-json=<path>    JSON array of { ident, barcode } from an external
+ *                             Pantheon export (the products API does not return
+ *                             barcodes). Enables the barcode tier.
  */
 
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 
 import { prisma } from '../src/lib/db'
 import { getPantheonClient, normalizeProduct } from '../src/lib/pantheon/client'
@@ -37,9 +44,17 @@ import type { NormalizedPantheonProduct } from '../src/lib/pantheon/types'
 const args = process.argv.slice(2)
 const APPLY = args.includes('--apply')
 const WRITE_CSV = args.includes('--csv-unmatched')
+const BARCODES_JSON_PATH = (() => {
+  const flag = args.find((a) => a.startsWith('--barcodes-json='))
+  return flag ? flag.slice('--barcodes-json='.length) : null
+})()
 const ENABLED_TIERS = (() => {
   const flag = args.find((a) => a.startsWith('--tiers='))
-  if (!flag) return new Set(['exact', 'normalized', 'fuzzy'])
+  if (!flag) {
+    const base = new Set(['sku', 'exact', 'normalized', 'fuzzy'])
+    if (BARCODES_JSON_PATH) base.add('barcode')
+    return base
+  }
   return new Set(flag.slice('--tiers='.length).split(',').map((s) => s.trim()))
 })()
 const FUZZY_THRESHOLD = (() => {
@@ -92,7 +107,7 @@ function jaccard(a: Set<string>, b: Set<string>): number {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-type Tier = 'exact' | 'normalized' | 'fuzzy'
+type Tier = 'sku' | 'barcode' | 'exact' | 'normalized' | 'fuzzy'
 
 interface Match {
   ourId: string
@@ -122,6 +137,7 @@ async function main() {
   // Build lookup maps
   const exactByName = new Map<string, NormalizedPantheonProduct[]>()
   const exactByNorm = new Map<string, NormalizedPantheonProduct[]>()
+  const pantheonByCode = new Map<string, NormalizedPantheonProduct>()
   const tokenized = pantheon.map((p) => ({ p, tokens: tokenize(p.name) }))
 
   for (const p of pantheon) {
@@ -131,13 +147,34 @@ async function main() {
     if (!exactByNorm.has(norm)) exactByNorm.set(norm, [])
     exactByName.get(exact)!.push(p)
     exactByNorm.get(norm)!.push(p)
+    pantheonByCode.set(p.code, p)
+  }
+
+  // Optional: barcode lookup from external source (Pantheon products API does
+  // not expose barcodes; we accept a JSON file shaped [{ ident, barcode }, ...]).
+  const byBarcode = new Map<string, NormalizedPantheonProduct[]>()
+  if (BARCODES_JSON_PATH) {
+    type BarcodeRow = { ident: string | number; barcode: string }
+    const rows: BarcodeRow[] = JSON.parse(readFileSync(BARCODES_JSON_PATH, 'utf-8'))
+    let attached = 0
+    for (const row of rows) {
+      const bc = String(row.barcode).trim()
+      if (!bc) continue
+      const ident = String(row.ident).trim()
+      const p = pantheonByCode.get(ident)
+      if (!p) continue
+      if (!byBarcode.has(bc)) byBarcode.set(bc, [])
+      byBarcode.get(bc)!.push(p)
+      attached++
+    }
+    console.log(`${G}✓${X} ${attached} barcodes loaded from ${BARCODES_JSON_PATH}`)
   }
 
   // 2. Load our DB products without erpId
   console.log('Loading our DB products without erpId...')
   const ours = await prisma.product.findMany({
     where: { erpId: null },
-    select: { id: true, sku: true, nameLat: true, isActive: true },
+    select: { id: true, sku: true, nameLat: true, barcode: true, isActive: true },
   })
   console.log(`${G}✓${X} ${ours.length} of our products have erpId = null`)
 
@@ -163,6 +200,54 @@ async function main() {
   for (const o of ours) {
     i++
     if (i % 500 === 0) process.stdout.write(`${D}  ...${i}/${ours.length}\r${X}`)
+
+    // Tier: sku == Pantheon ident (most reliable — exact code match)
+    if (ENABLED_TIERS.has('sku')) {
+      const sku = o.sku?.trim()
+      if (sku && !claimedCodes.has(sku)) {
+        const p = pantheonByCode.get(sku)
+        if (p) {
+          matches.push({
+            ourId: o.id,
+            ourName: o.nameLat,
+            ourSku: o.sku,
+            pantheonCode: p.code,
+            pantheonName: p.name,
+            pantheonActive: p.isActive,
+            tier: 'sku',
+            score: 1,
+          })
+          continue
+        }
+      }
+    }
+
+    // Tier: barcode == Pantheon barcode (requires --barcodes-json)
+    if (ENABLED_TIERS.has('barcode') && o.barcode) {
+      const bc = o.barcode.trim()
+      const hit = (byBarcode.get(bc) ?? []).filter((p) => !claimedCodes.has(p.code))
+      if (hit.length === 1) {
+        matches.push({
+          ourId: o.id,
+          ourName: o.nameLat,
+          ourSku: o.sku,
+          pantheonCode: hit[0].code,
+          pantheonName: hit[0].name,
+          pantheonActive: hit[0].isActive,
+          tier: 'barcode',
+          score: 1,
+        })
+        continue
+      }
+      if (hit.length > 1) {
+        ambiguous.push({
+          ourId: o.id,
+          ourName: o.nameLat,
+          reason: `${hit.length} barcode matches in Pantheon`,
+        })
+        continue
+      }
+    }
 
     // Tier 1: exact
     if (ENABLED_TIERS.has('exact')) {
@@ -290,6 +375,8 @@ async function main() {
 
   // 5. Report
   const byTier = {
+    sku: finalMatches.filter((m) => m.tier === 'sku').length,
+    barcode: finalMatches.filter((m) => m.tier === 'barcode').length,
     exact: finalMatches.filter((m) => m.tier === 'exact').length,
     normalized: finalMatches.filter((m) => m.tier === 'normalized').length,
     fuzzy: finalMatches.filter((m) => m.tier === 'fuzzy').length,
@@ -298,6 +385,8 @@ async function main() {
 
   console.log(`\n${C}═══ Results ═══${X}`)
   console.log(`${G}Matched:${X} ${finalMatches.length}`)
+  console.log(`${D}    sku:        ${byTier.sku}${X}`)
+  console.log(`${D}    barcode:    ${byTier.barcode}${X}`)
   console.log(`${D}    exact:      ${byTier.exact}${X}`)
   console.log(`${D}    normalized: ${byTier.normalized}${X}`)
   console.log(`${D}    fuzzy:      ${byTier.fuzzy}${X}`)
@@ -312,7 +401,7 @@ async function main() {
   // Sample
   if (finalMatches.length > 0) {
     console.log(`\n${C}Sample matches (3 per tier):${X}`)
-    for (const tier of ['exact', 'normalized', 'fuzzy'] as Tier[]) {
+    for (const tier of ['sku', 'barcode', 'exact', 'normalized', 'fuzzy'] as Tier[]) {
       const samples = finalMatches.filter((m) => m.tier === tier).slice(0, 3)
       if (samples.length === 0) continue
       console.log(`  ${tier}:`)

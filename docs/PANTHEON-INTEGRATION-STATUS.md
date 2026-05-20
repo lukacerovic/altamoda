@@ -1,24 +1,24 @@
 # Pantheon Integration — Status & Handoff
 
-**Last updated:** 2026-05-16
-**Status:** ✅ Connected and live for stock sync · ⏳ Waiting on business decision from website owners
+**Last updated:** 2026-05-20
+**Status:** ✅ Option C chosen and executed — products imported, `erpIsActive` populated, admin UI surfaces ERP/site disagreements. Remaining work in [§6 Non-blocked follow-ups](#6-non-blocked-follow-ups).
 
 > **Purpose of this file:** Continuity document for future Claude sessions. Read this first when picking up Pantheon integration work. It captures the full state of the integration, what's been verified, what's pending, and exactly what to do based on the owners' answer to the open decision.
 >
-> **How to use:** When the user says "owners answered X" or "let's continue Pantheon work", read this file end-to-end first, then act based on the decision tree in [§5 Decision-pending actions](#5-decision-pending-actions).
+> **How to use:** The Option-C decision and import are done. New work should focus on [§6 Non-blocked follow-ups](#6-non-blocked-follow-ups) — cron scheduling, admin dashboard at `/admin/erp`, outbound order testing, and reconciling the unmatched products. The [§5 decision tree](#5-decision-resolved--option-c-applied) is preserved for context.
 
 ---
 
 ## 1. TL;DR
 
-The new Next.js site is connected to the legacy DataLab Pantheon ERP via the `tkomserver` middleware. Code is written, deployed locally, and stock data flows for **1,733 products** that have been linked by name match.
+The new Next.js site is connected to the legacy DataLab Pantheon ERP via the `tkomserver` middleware. Stock + price + product sync are live. **2,914 products are now linked** to Pantheon (1,733 originally + 446 via SKU backfill + 735 new imports). Owners chose **Option C (Hybrid)** — Pantheon's active flag is mirrored into a new `Product.erpIsActive` field for admin visibility, but never overrides the website's own `isActive`.
 
-The integration is functionally complete except for:
-1. A **business decision** sent to website owners (active flag policy — see §4)
-2. Production cron scheduling
-3. Admin dashboard UI
-4. Live test of outbound order push (untested in production)
-5. Manual reconciliation of 1,483 unmatched products + 71 ambiguous ones
+What's left:
+1. Production cron scheduling (now safe to enable products sync — see §6.1)
+2. Admin dashboard at `/admin/erp` (sync buttons + log table — see §6.2)
+3. Live test of outbound order push — still untested in prod (see §6.3)
+4. Reconciliation of 1,094 unmatched + 14 ambiguous products (see §6.4)
+5. The 7 SKU-conflict skips from the products sync (see §6.6)
 
 ---
 
@@ -74,7 +74,7 @@ The integration is functionally complete except for:
 |---|---|
 | `types.ts` | Pantheon request/response TypeScript types + field documentation |
 | `client.ts` | `PantheonClient` class (`fetchProducts`, `fetchStock`, `pushOrder`), normalizers, lazy singleton via `getPantheonClient()` |
-| `sync-inbound.ts` | `syncProducts()`, `syncPrices()`, `syncStock()` — batched (50), idempotent, logged to `ErpSyncLog` |
+| `sync-inbound.ts` | `syncProducts()`, `syncPrices()`, `syncStock()` — batched (50), idempotent, logged to `ErpSyncLog`. **`syncProducts()` writes `erpIsActive` (not `isActive`) on existing rows per Option C; new rows get both fields seeded from Pantheon's flag.** |
 | `sync-outbound.ts` | `enqueueOrderSync()`, `processQueue()`, `requeueFailed()`, `buildPantheonOrderPayload()` — queue + worker with retry/backoff |
 
 ### 3.2 API routes
@@ -109,116 +109,70 @@ ERP_CRON_SECRET=<random>                    # for /api/cron/erp-sync auth
 |---|---|
 | `test-pantheon-connection.ts` | Smoke test — fetch products + stock, normalize, cross-check our DB. Read-only. |
 | `test-pantheon-one-product.ts` | End-to-end pipeline test on one product. Self-reverts. Use `--apply` to run. |
-| `backfill-pantheon-erp-id.ts` | Name-match our DB against Pantheon, set `Product.erpId`. Three tiers (exact / normalized / fuzzy ≥0.9). Use `--apply --csv-unmatched`. |
+| `backfill-pantheon-erp-id.ts` | Match our DB against Pantheon, set `Product.erpId`. **Five tiers**: sku → barcode → exact-name → normalized-name → fuzzy ≥0.9. Use `--apply --barcodes-json=<path> --csv-unmatched`. Barcode tier requires an external JSON since the Pantheon products API doesn't return barcodes — extract from any Pantheon "active SKUs" Excel export. |
 
 Run with: `node --env-file=.env --import tsx scripts/<name>.ts`
 
 ---
 
-## 4. Live data snapshot (2026-05-16)
+## 4. Live data snapshot (2026-05-20, post-import)
 
-**Pantheon catalog:**
-- 2,926 raw products → 2,922 valid after filtering bookkeeping entries (codes containing `:`, e.g. `"11:Avans"`)
-- 980 active (g="T") / 1,942 inactive (g="F")
-- 1,783 have price > 0
+**Pantheon catalog (unchanged from 2026-05-16):**
+- ~2,921 valid products after filtering bookkeeping entries (codes containing `:`)
+- ~979 active (g="T") / ~1,942 inactive (g="F")
 
-**Our DB:**
-- 3,287 products total
-- 913 active / 2,374 inactive
-- **1,733 now have `erpId` set** (from backfill — exact name match for 1,726, fuzzy for 7)
-- 1,483 unmatched (no Pantheon counterpart by name)
-- 71 ambiguous (multiple candidates) → exported to `scripts/backfill-unmatched-*.csv`
+**Our DB (after backfill + products sync):**
+- **4,022 products total** (was 3,287 — gained 735 from Pantheon import)
+- **2,914 have `erpId` set** (was 1,733):
+  - 1,733 from original name-match backfill
+  - 446 from SKU-equality backfill pass (the SKU column on the website already equaled the Pantheon ident for these)
+  - 735 newly created during products sync
+- **`erpIsActive` populated**:
+  - 979 = true (matches Pantheon's active flag)
+  - 1,935 = false (Pantheon says inactive — still visible on site per Option C)
+  - 1,108 = NULL (no Pantheon counterpart)
+- **Group structure**: 583 products span 27 distinct color/variant groups
+- 1,094 unmatched + 14 ambiguous → CSV `scripts/backfill-unmatched-1779301278888.csv`
+- 7 products skipped during products sync due to SKU collision (manual reconciliation needed)
 
-**Verified working:**
-- ✅ Stock sync ran live: 1,733 products updated in 734ms, no errors
-- ✅ ErpSyncLog audit trail writing correctly
-- ✅ Pipeline tested end-to-end with one-product script (Pantheon stock → DB update)
+**Verified working (2026-05-20):**
+- ✅ Backfill applied 446 SKU matches; products sync imported 735 new rows + populated `erpIsActive` on 2,179 existing rows in 1.6s
+- ✅ Admin UI badge + filter + "needs review" banner ship at `/admin/products`
+- ✅ Storefront vs admin count discrepancy explained and verified: admin sees 3,466 (post-dedup), storefront sees 873 as a guest (active + in-stock + B2C + dedup pipeline)
+
+**Sanity flag worth checking:** a few SKU-tier matches had divergent names between site and Pantheon (e.g. our SKU 1316 = "Redken Shades EQ 08C Cayanne" but Pantheon SKU 1316 = "R SEQ 08C GOLDEN TOPAZ"). Same code, different shade name. The link by code is correct *if* the SKUs were intentionally shared; spot-check pricing/stock for a few of these before relying on prices flowing through.
 
 ---
 
-## 5. Decision-pending actions
+## 5. Decision resolved — Option C applied
 
-**This is the most important section for future-Claude.**
+**Outcome (2026-05-20):** Owners chose **Option C — Hybrid**. Implementation is done.
 
-We sent the website owners a Serbian message asking them to choose how Pantheon's `isActive` flag should affect the website. The exact message is preserved in §7 below.
+> Website keeps its own `isActive` (Pantheon never overrides visibility); Pantheon's flag mirrors into a new `Product.erpIsActive` field so admin can spot ERP/site disagreements.
 
-**Why this matters:** 1,719 of the 1,733 matched products link to Pantheon entries marked inactive (`g="F"`). The current `syncProducts()` code overwrites `Product.isActive` based on the Pantheon flag. If we ran a products sync right now without changing anything, 1,719 products would disappear from the website overnight.
+### What was actually changed
 
-### Decision tree — what to do based on owners' answer
+| # | Change | File |
+|---|---|---|
+| 1 | Added `erpIsActive Boolean? @map("erp_is_active")` to `Product` model | `prisma/schema.prisma` |
+| 2 | Migration file created and marked applied | `prisma/migrations/20260520120000_add_erp_is_active/migration.sql` |
+| 3 | `syncProducts()` rewritten: existing rows get `erpIsActive` updated (never `isActive`); new rows get both fields seeded from Pantheon | `src/lib/pantheon/sync-inbound.ts` |
+| 4 | Backfill extended with `sku` and `barcode` tiers (5 total) + `--barcodes-json` flag | `scripts/backfill-pantheon-erp-id.ts` |
+| 5 | Admin list API returns `erpIsActive` for admin viewers | `src/app/api/products/route.ts:446` |
+| 6 | Admin products page: badges ("ERP neaktivno" amber, "Nije u ERP-u" gray), ERP Status filter, "needs review" banner | `src/app/admin/products/page.tsx` |
 
-#### 🔴 If they choose **OPTION A** ("Veruj Pantheon-u u potpunosti")
+### Migration history side-quest
 
-> Trust Pantheon: archived in ERP → hidden on website automatically.
+Pre-existing drift on the local DB (orphan `notifications` table from an abandoned `feature/admin-notifications-client-order-link` branch, plus older `db push` residue) prevented `prisma migrate dev` from running cleanly. We cleaned it up minimally:
+- Dropped `notifications` table + `NotificationType` enum
+- Deleted the orphan `_prisma_migrations` row
+- Created the `erp_is_active` migration file manually and marked applied via `prisma migrate resolve`
 
-**Actions:**
-1. No code change needed — `syncProducts()` already does this. Confirm by checking `src/lib/pantheon/sync-inbound.ts:113-122`.
-2. Warn the user this will hide ~1,719 products. Get explicit "yes proceed" before running.
-3. Run products sync once manually:
-   ```bash
-   node --env-file=.env --import tsx -e "import('./src/lib/pantheon/sync-inbound').then(m => m.syncProducts()).then(console.log)"
-   ```
-   Or use the admin endpoint: `POST /api/admin/erp/sync` with `{"type":"products"}`.
-4. Add the products sync to the cron schedule (every 6 hours).
-5. Proceed to §6 (non-blocked follow-ups).
+Older drift (b2b nullable cols, removed indexes, NewsletterSegment enum value) was left alone — out of scope for this work. Future schema changes will need to address those before `prisma migrate dev` will work cleanly.
 
-#### 🟡 If they choose **OPTION B** ("Sajt odlučuje sam")
+### Historical decision tree (preserved for context)
 
-> Ignore Pantheon's active flag entirely; website manages visibility independently.
-
-**Actions:**
-1. **Modify `src/lib/pantheon/sync-inbound.ts`** in `syncProducts()` — remove the `isActive` update on the existing-product branch (around line 113-122). The block to remove/modify:
-   ```ts
-   if (found.isActive !== item.isActive) {
-     await prisma.product.update({
-       where: { id: found.id },
-       data: { isActive: item.isActive },
-     })
-     updated++
-   } else {
-     skipped++
-   }
-   ```
-   Should become:
-   ```ts
-   // Option B: never overwrite isActive on existing products.
-   skipped++
-   ```
-   For NEW products created by Pantheon sync, decide separately — probably default `isActive: false` so admin must manually publish.
-2. Update doc comment at top of file to note the policy.
-3. Add tests if applicable.
-4. Cron schedule for products sync is now safe to enable (6h).
-5. Proceed to §6.
-
-#### 🟢 If they choose **OPTION C** ("Hibrid") — recommended
-
-> Website keeps current `isActive`; Pantheon's flag stored separately for admin visibility.
-
-**Actions:**
-1. **Add a new field to Product schema** (`prisma/schema.prisma`):
-   ```prisma
-   model Product {
-     // ... existing fields
-     erpIsActive Boolean? @map("erp_is_active") // Pantheon's g flag; informational only
-   }
-   ```
-2. Run `npx prisma migrate dev --name add_erp_is_active`.
-3. **Modify `src/lib/pantheon/sync-inbound.ts`** in `syncProducts()` — change the existing-product update to write `erpIsActive` instead of `isActive`:
-   ```ts
-   if (found.erpIsActive !== item.isActive) {
-     await prisma.product.update({
-       where: { id: found.id },
-       data: { erpIsActive: item.isActive },
-     })
-     updated++
-   } else {
-     skipped++
-   }
-   ```
-   Note: need to load `erpIsActive` in the initial `findMany` select.
-4. For NEW products created by sync, set both `isActive: item.isActive` AND `erpIsActive: item.isActive` (first import — they match).
-5. **Admin UI** — add a column/badge to `/admin/products` showing "Inactive in ERP" when `erpIsActive === false`. So admin can spot the 1,719 cases and decide per-product. (Locate the products admin page first via Explore agent.)
-6. Cron schedule for products sync is now safe to enable.
-7. Proceed to §6.
+Options A and B were rejected. The original three-option proposal and the Serbian message sent to owners are preserved in [§7](#7-reference-the-message-sent-to-owners) for reference.
 
 ---
 
@@ -239,11 +193,11 @@ Pick one hosting approach:
     ]
   }
   ```
-  Don't add `products` until the isActive decision is made.
+  Products sync is now safe to enable — add: `{ "path": "/api/cron/erp-sync?type=products&secret=<ERP_CRON_SECRET>", "schedule": "0 */6 * * *" }`
 - **cron-job.org / external** — hit the same URLs with the bearer header.
 - **cPanel cron** — `curl -H "Authorization: Bearer $ERP_CRON_SECRET" https://altamoda.rs/api/cron/erp-sync?type=stock`
 
-Schedule recommendations: stock 15min, prices 1h, orders 5min, products 6h (once unblocked).
+Schedule recommendations: stock 15min, prices 1h, orders 5min, products 6h.
 
 ### 6.2 Admin dashboard UI at `/admin/erp`
 
@@ -266,13 +220,17 @@ Method:
 
 This is also when we discover the real response format. Currently `extractErpRef()` in `sync-outbound.ts` guesses common keys (`acKey`, `order_id`, `ref`, `id`). May need adjustment.
 
-### 6.4 Reconcile the 1,483 unmatched + 71 ambiguous products
+### 6.4 Reconcile the 1,094 unmatched + 14 ambiguous products
 
 Two paths:
-- Admin reviews `scripts/backfill-unmatched-*.csv` and sets `erpId` manually via admin UI (needs a UI for this)
+- Admin reviews `scripts/backfill-unmatched-1779301278888.csv` and sets `erpId` manually via admin UI (needs a UI for this; the new ERP Status filter on `/admin/products` makes it easy to scope to "Nije u ERP-u")
 - Try a more aggressive fuzzy threshold (lower than 0.9) and review the additional matches
 
 Probably not urgent — the unmatched products still display on the site, they just won't get auto-updated stock/prices from Pantheon. That's the same state they were in before this integration.
+
+### 6.6 Reconcile the 7 SKU-collision skips
+
+During the 2026-05-20 products sync, 7 Pantheon products failed to insert because their `acIdent` clashed with an existing `Product.sku` that the backfill couldn't link (probably whitespace/case mismatch or because the existing SKU was already claimed by a different `erpId`). The skips were logged to console; the failed `erpId` values are findable in the sync run output. Manual reconciliation: find each existing DB row by SKU, decide if it's the same product as the Pantheon one, then either set its `erpId` manually or change its SKU and re-run products sync.
 
 ### 6.5 The "altaorder response shape" question to Pantheon
 
@@ -323,7 +281,7 @@ Copy of the Serbian message asking for the isActive decision:
 
 ## 8. Files touched in this work (full list)
 
-Created:
+Created (initial integration, pre-Option C):
 - `src/lib/pantheon/types.ts`
 - `src/lib/pantheon/client.ts`
 - `src/lib/pantheon/sync-inbound.ts`
@@ -338,13 +296,23 @@ Created:
 - `scripts/backfill-pantheon-erp-id.ts`
 - `docs/PANTHEON-INTEGRATION-STATUS.md` (this file)
 
-Modified:
+Created (Option C execution, 2026-05-20):
+- `prisma/migrations/20260520120000_add_erp_is_active/migration.sql` — adds `erp_is_active` column
+
+Modified (initial integration):
 - `.env.example` — replaced API_KEY pattern with USER/PASS, added CRON_SECRET, IP corrected to `89.216.106.135`, single-quote warning for password
 - `src/app/api/orders/route.ts` — added `enqueueOrderSync(createdOrder.id, tx)` inside the order-creation transaction
 - (User) `.env` — added real Pantheon credentials
 
+Modified (Option C execution):
+- `prisma/schema.prisma` — added `erpIsActive Boolean? @map("erp_is_active")` to `Product`
+- `src/lib/pantheon/sync-inbound.ts` — `syncProducts()` writes `erpIsActive` on existing rows; new rows seed both `isActive` + `erpIsActive`; doc comment rewritten
+- `scripts/backfill-pantheon-erp-id.ts` — added `sku` and `barcode` tiers (5 tiers total) + `--barcodes-json=<path>` flag
+- `src/app/api/products/route.ts` — list response includes `erpIsActive` for admin viewers
+- `src/app/admin/products/page.tsx` — `Product.erpIsActive?` field + `mapRaw()` extraction; `erpStatusFilter` state + dropdown; inline badges ("ERP neaktivno" amber, "Nije u ERP-u" gray); top-of-page "needs review" amber banner
+
 Outputs generated:
-- `scripts/backfill-unmatched-*.csv` — list of unmatched/ambiguous products from the backfill run
+- `scripts/backfill-unmatched-1779301278888.csv` — final unmatched/ambiguous list after the 5-tier backfill
 
 ---
 
@@ -371,9 +339,18 @@ node --env-file=.env --import tsx scripts/test-pantheon-connection.ts
 node --env-file=.env --import tsx scripts/test-pantheon-one-product.ts
 node --env-file=.env --import tsx scripts/test-pantheon-one-product.ts --apply
 
-# Backfill erpId across the catalog
+# Backfill erpId across the catalog (5 tiers: sku → barcode → exact → normalized → fuzzy)
 node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts
 node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts --apply --csv-unmatched
+# With barcodes (if you have a Pantheon Excel export):
+python3 -c "
+import openpyxl, json
+wb = openpyxl.load_workbook('/path/to/Stanje aktivnih sifara.xlsx', data_only=True)
+ws = wb['Sheet1']
+rows = list(ws.iter_rows(values_only=True))[1:]
+json.dump([{'ident': str(r[0]).strip(), 'barcode': str(r[1]).strip()} for r in rows if r[1]], open('/tmp/pantheon-barcodes.json','w'))
+"
+node --env-file=.env --import tsx scripts/backfill-pantheon-erp-id.ts --apply --barcodes-json=/tmp/pantheon-barcodes.json --csv-unmatched
 
 # Run a sync manually (via admin endpoint, logged in as admin in browser)
 fetch('/api/admin/erp/sync', {
@@ -394,4 +371,4 @@ curl -X POST http://89.216.106.135:8080/tkomserver/webshop/api \
 
 ---
 
-**End of handoff document.** Future Claude: when the user provides the owners' answer, jump to §5 and execute the matching option's actions. If they ask about something else Pantheon-related, the answer is probably in §3 (what exists), §4 (live data state), or §6 (non-blocked follow-ups).
+**End of handoff document.** Future Claude: Option C is done. New Pantheon work most likely lives in §6 (cron scheduling, admin dashboard at `/admin/erp`, outbound order test, reconciling unmatched + SKU-conflict skips). If something seems contradictory between this doc and reality, trust the code/DB and update this file.
