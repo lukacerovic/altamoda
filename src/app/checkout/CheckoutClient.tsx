@@ -186,8 +186,15 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         return
       }
 
-      clearCart()
-      router.push(`/checkout/confirmation?orderNumber=${data.data.orderNumber}`)
+      const payRedirect = data.data?.payment?.redirectUrl as string | undefined
+      if (payRedirect) {
+        // Card via VPOS: keep the cart until payment actually succeeds, so a
+        // cancelled/failed payment leaves the customer's items intact.
+        router.push(payRedirect)
+      } else {
+        clearCart()
+        router.push(`/checkout/confirmation?orderNumber=${data.data.orderNumber}`)
+      }
     } catch (err) {
       if (err instanceof TypeError && err.message === 'Failed to fetch') {
         setError(t('checkout.noInternetConnection'))
