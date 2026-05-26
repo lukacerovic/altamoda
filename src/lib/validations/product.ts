@@ -1,5 +1,13 @@
 import { z } from 'zod'
 
+/** One product image/media item as sent by the admin product form. */
+export const productImageInput = z.object({
+  url: z.string().min(1),
+  altText: z.string().nullable().optional(),
+  type: z.enum(['image', 'video', 'gif']).optional(),
+  isPrimary: z.boolean().optional(),
+})
+
 export const createProductSchema = z.object({
   sku: z.string().min(1),
   nameLat: z.string().min(1),
@@ -32,6 +40,7 @@ export const createProductSchema = z.object({
   vatRate: z.coerce.number().int().min(0).max(100).default(20),
   vatCode: z.string().optional(),
   erpId: z.string().optional(),
+  images: z.array(productImageInput).optional(),
 })
 
 // String fields where the admin form sends `null` to clear the value.
@@ -82,6 +91,7 @@ export const updateProductSchema = z.object({
   hexValue: z.string().optional(),
   shadeCode: z.string().optional(),
   removeColor: z.boolean().optional(),
+  images: z.array(productImageInput).optional(),
 })
 
 export const productFilterSchema = z.object({

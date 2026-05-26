@@ -315,6 +315,36 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     await prisma.colorProduct.deleteMany({ where: { productId: id } })
   }
 
+  // Sync the images relation. The admin form always sends the full desired set,
+  // so we replace wholesale — drop the existing rows and recreate from the
+  // payload — which covers add, delete, reorder, and primary changes in one
+  // shot. Guarded on `!== undefined` so a partial update that omits `images`
+  // leaves the existing images untouched.
+  let images = product.images
+  if (body.images !== undefined) {
+    await prisma.$transaction([
+      prisma.productImage.deleteMany({ where: { productId: id } }),
+      ...(body.images.length > 0
+        ? [
+            prisma.productImage.createMany({
+              data: body.images.map((img, i) => ({
+                productId: id,
+                url: img.url,
+                altText: img.altText || product.nameLat,
+                type: img.type ?? 'image',
+                sortOrder: i,
+                isPrimary: img.isPrimary ?? i === 0,
+              })),
+            }),
+          ]
+        : []),
+    ])
+    images = await prisma.productImage.findMany({
+      where: { productId: id },
+      orderBy: { sortOrder: 'asc' },
+    })
+  }
+
   // If the product was moved to a different brand / category, the old one
   // may now be orphan — sweep it (and its now-empty children).
   if (brandId !== undefined && previousBrandId && previousBrandId !== brandId) {
@@ -329,7 +359,7 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
   revalidatePath('/products')
   revalidatePath(`/products/${product.slug || id}`)
 
-  return successResponse(product)
+  return successResponse({ ...product, images })
 })
 
 // DELETE /api/products/[id] — Hard delete when safe, soft delete when blocked
