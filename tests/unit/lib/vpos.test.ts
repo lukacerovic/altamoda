@@ -151,7 +151,7 @@ describe('buildPaymentRequest', () => {
     expect(fields.CURRENCY).toBe('941')
     expect(fields.ACCOUNTINGMODE).toBe('I')
     expect(fields.AUTHORMODE).toBe('I')
-    expect(fields.OPTIONS).toBe('G')
+    expect(fields.OPTIONS).toBe('GR')
     expect(fields.MAC).toMatch(/^[0-9a-f]{64}$/)
   })
 

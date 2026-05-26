@@ -126,7 +126,11 @@ export interface PaymentRequest {
  * Assembles the signed field set for the redirect POST form.
  *
  * Fixed policy: immediate auth + booking (AUTHORMODE/ACCOUNTINGMODE = I),
- * OPTION G (on success, skip SIA's receipt and bounce straight back to URLDONE).
+ * OPTIONS = "GR":
+ *   G — on success, skip SIA's receipt and bounce straight back to URLDONE.
+ *   R — calculate and send the MAC to URLMS/URLDONE even when the result is
+ *       negative (declined), so declines can be authenticated too. Same MAC
+ *       attribution rules as the positive case. (Per UniCredit/Nexi, 2026-05-25.)
  * 3DSDATA is intentionally omitted in Phase 1 (valid; add later for 3DS2 uplift).
  */
 export function buildPaymentRequest(input: PaymentRequestInput, config: VposConfig): PaymentRequest {
@@ -140,7 +144,7 @@ export function buildPaymentRequest(input: PaymentRequestInput, config: VposConf
     EXPONENT: config.exponent,
     ACCOUNTINGMODE: 'I',
     AUTHORMODE: 'I',
-    OPTIONS: 'G',
+    OPTIONS: 'GR',
     // POSTed but excluded from the MAC by REQUEST_MAC_ORDER:
     URLBACK: input.urls.urlBack,
     LANG: input.lang ?? 'SR',
