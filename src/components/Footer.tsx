@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { Instagram, Facebook, Music2, AtSign } from "lucide-react";
+import PaymentLogos from "@/components/PaymentLogos";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -100,6 +101,17 @@ export default function Footer() {
           <br />
           {t("footer.bankAccount")}
         </p>
+      </div>
+
+      {/* Payment methods — acquirer-required branding (cards, 3-D Secure, bank) */}
+      <div className="md:col-span-3 border-t border-[#dddbd9]/20 pt-8 flex flex-col gap-4">
+        <Link
+          href="/uslovi-placanja"
+          className="text-xs uppercase tracking-[0.2em] font-bold text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors"
+        >
+          {t("footer.termsOfPayment")}
+        </Link>
+        <PaymentLogos />
       </div>
     </footer>
   );

@@ -11,6 +11,7 @@ import {
   AlertCircle, ChevronLeft, Shield, User,
 } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import PaymentLogos from '@/components/PaymentLogos'
 
 interface Address {
   id: string
@@ -400,6 +401,17 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     </label>
                   ))}
                 </div>
+
+                {/* Accepted-card branding (shown when card payment is selected) */}
+                {paymentMethod === 'card' && (
+                  <div className="mt-4 p-4 bg-[#FFFFFF] rounded-sm">
+                    <p className="text-xs text-[#1a1c1e] mb-3 flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-[#c19742]" />
+                      {t('checkout.securePayment')}
+                    </p>
+                    <PaymentLogos />
+                  </div>
+                )}
 
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-[#1a1c1e] mb-2">{t('checkout.noteOptional')}</label>
