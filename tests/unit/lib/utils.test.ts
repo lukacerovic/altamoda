@@ -44,9 +44,9 @@ describe('slugify', () => {
 })
 
 describe('generateOrderNumber', () => {
-  it('matches ALT-YYYY-NNNN format', () => {
+  it('matches ALT-YYYY-XXXXXXXX format (8 hex chars)', () => {
     const orderNumber = generateOrderNumber()
-    expect(orderNumber).toMatch(/^ALT-\d{4}-\d{4}$/)
+    expect(orderNumber).toMatch(/^ALT-\d{4}-[0-9A-F]{8}$/)
   })
 
   it('uses current year', () => {
@@ -56,9 +56,9 @@ describe('generateOrderNumber', () => {
   })
 
   it('generates unique numbers', () => {
-    const numbers = new Set(Array.from({ length: 100 }, () => generateOrderNumber()))
-    // With 4-digit random, collisions are possible but very unlikely in 100 tries
-    expect(numbers.size).toBeGreaterThan(90)
+    // 8 hex chars (~4.3B values/year) of CSPRNG entropy — no collisions expected.
+    const numbers = new Set(Array.from({ length: 1000 }, () => generateOrderNumber()))
+    expect(numbers.size).toBe(1000)
   })
 })
 

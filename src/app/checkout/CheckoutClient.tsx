@@ -11,6 +11,7 @@ import {
   AlertCircle, ChevronLeft, Shield, User,
 } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import PaymentLogos from '@/components/PaymentLogos'
 
 interface Address {
   id: string
@@ -186,8 +187,15 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         return
       }
 
-      clearCart()
-      router.push(`/checkout/confirmation?orderNumber=${data.data.orderNumber}`)
+      const payRedirect = data.data?.payment?.redirectUrl as string | undefined
+      if (payRedirect) {
+        // Card via VPOS: keep the cart until payment actually succeeds, so a
+        // cancelled/failed payment leaves the customer's items intact.
+        router.push(payRedirect)
+      } else {
+        clearCart()
+        router.push(`/checkout/confirmation?orderNumber=${data.data.orderNumber}`)
+      }
     } catch (err) {
       if (err instanceof TypeError && err.message === 'Failed to fetch') {
         setError(t('checkout.noInternetConnection'))
@@ -393,6 +401,17 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     </label>
                   ))}
                 </div>
+
+                {/* Accepted-card branding (shown when card payment is selected) */}
+                {paymentMethod === 'card' && (
+                  <div className="mt-4 p-4 bg-[#FFFFFF] rounded-sm">
+                    <p className="text-xs text-[#1a1c1e] mb-3 flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-[#c19742]" />
+                      {t('checkout.securePayment')}
+                    </p>
+                    <PaymentLogos />
+                  </div>
+                )}
 
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-[#1a1c1e] mb-2">{t('checkout.noteOptional')}</label>

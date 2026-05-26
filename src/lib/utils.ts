@@ -20,10 +20,14 @@ export function slugify(text: string): string {
 
 export function generateOrderNumber(): string {
   const year = new Date().getFullYear()
-  const seq = Math.floor(Math.random() * 9999)
-    .toString()
-    .padStart(4, '0')
-  return `${ORDER_PREFIX}-${year}-${seq}`
+  // 8 hex chars (~4.3B values/year) of CSPRNG entropy. The DB @unique on
+  // Order.orderNumber is the final guard; this just makes a clash vanishingly
+  // unlikely. Must stay within SIA VPOS ORDERID regex [a-zA-Z0-9\-_] and unique
+  // for 5+ years, since orderNumber is sent to the gateway as ORDERID.
+  const bytes = new Uint8Array(4)
+  globalThis.crypto.getRandomValues(bytes)
+  const rand = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+  return `${ORDER_PREFIX}-${year}-${rand}`
 }
 
 export function calculateDiscountPercentage(

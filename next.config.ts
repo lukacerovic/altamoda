@@ -40,7 +40,10 @@ const nextConfig: NextConfig = {
               "connect-src 'self'",
               "frame-ancestors 'none'",
               "base-uri 'self'",
-              "form-action 'self'",
+              // Allow the card-payment redirect form to POST to the Nexi/SIA VPOS
+              // hosted gateway (test + production). Without these, the browser
+              // silently blocks the submit to the bank's payment page.
+              "form-action 'self' https://virtualpostest.sia.eu https://virtualpos.sia.eu",
             ].join("; "),
           },
         ],

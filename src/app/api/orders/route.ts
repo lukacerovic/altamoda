@@ -7,6 +7,7 @@ import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
 import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
+import { VPOS_ENABLED } from '@/lib/payments/vpos-config'
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -182,7 +183,16 @@ export const POST = withErrorHandler(async (req: Request) => {
     await enqueueOrderSync(createdOrder.id, tx)
 
     return createdOrder
+  }, {
+    // The default interactive-transaction timeout (5s) can be exceeded on a cold
+    // dev DB connection (first request after server start, lazy pool connect).
+    maxWait: 10_000,
+    timeout: 20_000,
   })
+
+  // Card orders go through the VPOS hosted payment page (when enabled). The client
+  // redirects here instead of the confirmation page, and keeps the cart until paid.
+  const needsCardPayment = input.paymentMethod === 'card' && VPOS_ENABLED
 
   return successResponse({
     id: order.id,
@@ -190,5 +200,8 @@ export const POST = withErrorHandler(async (req: Request) => {
     total: Number(order.total),
     status: order.status,
     itemCount: order.items.length,
+    payment: needsCardPayment
+      ? { provider: 'vpos', redirectUrl: `/checkout/pay/${order.orderNumber}` }
+      : null,
   }, 201)
 })

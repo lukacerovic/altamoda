@@ -448,15 +448,39 @@ model Order {
   promoCodeId     String?       @map("promo_code_id")
   erpSynced       Boolean       @default(false) @map("erp_synced")
   erpId           String?       @map("erp_id")
+  // Nexi/SIA VPOS card-payment fields (populated by the URLMS webhook).
+  vposTransactionId String?     @map("vpos_transaction_id")
+  vposAuthNumber    String?     @map("vpos_auth_number")
+  vposResultCode    String?     @map("vpos_result_code")
+  paidAt            DateTime?   @map("paid_at")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
 
-  user          User                 @relation(fields: [userId], references: [id])
-  promoCode     PromoCode?           @relation(fields: [promoCodeId], references: [id])
-  items         OrderItem[]
-  statusHistory OrderStatusHistory[]
+  user            User                 @relation(fields: [userId], references: [id])
+  promoCode       PromoCode?           @relation(fields: [promoCodeId], references: [id])
+  items           OrderItem[]
+  statusHistory   OrderStatusHistory[]
+  paymentAttempts PaymentAttempt[]
 
   @@map("orders")
+}
+
+// Audit trail for VPOS payment outcome notifications (URLMS/URLDONE).
+// Never stores card data — SIA never sends PAN/CVV.
+model PaymentAttempt {
+  id            String   @id @default(cuid())
+  orderId       String   @map("order_id")
+  resultCode    String?  @map("result_code")
+  transactionId String?  @map("transaction_id")
+  authNumber    String?  @map("auth_number")
+  source        String   @default("urlms")
+  rawPayload    Json?    @map("raw_payload")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("payment_attempts")
 }
 
 model OrderItem {
