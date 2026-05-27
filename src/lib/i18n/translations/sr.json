@@ -1012,7 +1012,10 @@
     "emptyTitle": "Vaša lista želja je prazna",
     "emptyDesc": "Dodajte proizvode koje želite da sačuvate za kasnije",
     "unavailable": "Nedostupno",
-    "addToCart": "Dodaj u korpu"
+    "addToCart": "Dodaj u korpu",
+    "removeItem": "Ukloni iz liste želja",
+    "noImage": "Nema slike",
+    "addedToast": "Dodato u korpu"
   },
   "faq": {
     "title": "Često Postavljana Pitanja",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/lib/stores/cart-store";
@@ -11,6 +11,8 @@ import {
   Share2,
   ShoppingCart,
   X,
+  CheckCircle,
+  ImageOff,
 } from "lucide-react";
 
 interface WishlistItem {
@@ -36,6 +38,18 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   const { addItem } = useCartStore();
 
   const [removeError, setRemoveError] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+  }, []);
+
+  const showToast = (message: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToastMessage(message);
+    toastTimerRef.current = setTimeout(() => setToastMessage(null), 2500);
+  };
 
   const removeItem = async (productId: string) => {
     setRemoveError("");
@@ -62,10 +76,26 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
       sku: "",
       stockQuantity: item.inStock ? 1 : 0,
     });
+    showToast(item.name);
   };
 
   const addAllToCart = () => {
-    items.filter((i) => i.inStock).forEach((item) => addToCart(item));
+    const eligible = items.filter((i) => i.inStock);
+    eligible.forEach((item) => {
+      addItem({
+        productId: item.productId,
+        name: item.name,
+        brand: item.brand,
+        price: item.price,
+        quantity: 1,
+        image: item.image,
+        sku: "",
+        stockQuantity: 1,
+      });
+    });
+    if (eligible.length > 0) {
+      showToast(`${eligible.length} × ${t("wishlist.addedToast")}`);
+    }
   };
 
   const discountBadge = (item: WishlistItem) => {
@@ -115,8 +145,15 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                 const badge = discountBadge(item);
                 return (
                   <div key={item.productId} className="bg-white rounded-[4px] overflow-hidden shadow-sm border border-[#dddbd9]/50 group hover:shadow-md transition-all">
-                    <div className="relative overflow-hidden aspect-square">
-                      <Image src={item.image} alt={item.name} width={200} height={200} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="relative overflow-hidden aspect-square bg-[#f5f4f2]">
+                      {item.image ? (
+                        <Image src={item.image} alt={item.name} width={200} height={200} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-[#a8a39d]">
+                          <ImageOff className="w-8 h-8 mb-1" />
+                          <span className="text-[10px] uppercase tracking-wider">{t("wishlist.noImage")}</span>
+                        </div>
+                      )}
                       {badge && (
                         <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-[0.2em] font-medium text-white bg-[rgba(26,28,30,0.5)] backdrop-blur-sm">{badge}</span>
                       )}
@@ -127,9 +164,11 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       )}
                       <button
                         onClick={() => removeItem(item.productId)}
-                        className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:bg-red-50 transition-colors"
+                        title={t("wishlist.removeItem")}
+                        aria-label={t("wishlist.removeItem")}
+                        className="absolute top-3 right-3 w-9 h-9 bg-[rgba(26,28,30,0.75)] backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors"
                       >
-                        <X className="w-4 h-4 text-[#c19742]" />
+                        <X className="w-4 h-4 text-white" />
                       </button>
                     </div>
                     <div className="p-4">
@@ -179,6 +218,27 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
           </div>
         )}
       </div>
+
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 max-w-sm bg-[#1a1c1e] text-white rounded-md shadow-xl px-4 py-3 flex items-start gap-3"
+        >
+          <CheckCircle className="w-5 h-5 text-[#c19742] flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium">{t("wishlist.addedToast")}</p>
+            <p className="text-xs text-white/70 truncate mt-0.5">{toastMessage}</p>
+          </div>
+          <button
+            onClick={() => setToastMessage(null)}
+            aria-label={t("common.close")}
+            className="text-white/50 hover:text-white transition-colors flex-shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

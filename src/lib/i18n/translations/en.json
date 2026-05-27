@@ -1012,7 +1012,10 @@
     "emptyTitle": "Your wishlist is empty",
     "emptyDesc": "Add products you want to save for later",
     "unavailable": "Unavailable",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "removeItem": "Remove from wishlist",
+    "noImage": "No image",
+    "addedToast": "Added to cart"
   },
   "faq": {
     "title": "Frequently Asked Questions",

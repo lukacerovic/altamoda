@@ -15,7 +15,9 @@ export default async function WishlistPage() {
       product: {
         include: {
           brand: true,
-          images: { where: { isPrimary: true }, take: 1 },
+          // Prefer the primary image, but fall back to any image so products
+          // without an isPrimary flag still render instead of showing blank.
+          images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], take: 1 },
           reviews: true,
         },
       },

@@ -17,7 +17,9 @@ export const GET = withErrorHandler(async () => {
       product: {
         include: {
           brand: true,
-          images: { where: { isPrimary: true }, take: 1 },
+          // Prefer primary, fall back to any image so products without the
+          // isPrimary flag still get an image instead of an empty string.
+          images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], take: 1 },
         },
       },
     },
