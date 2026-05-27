@@ -14,6 +14,10 @@ import {
   FileText, Store, Sparkles, ImageOff,
 } from "lucide-react";
 
+// TODO(cart-recs): replace with real data from an /api/products/recommended
+// endpoint (e.g. top-selling or recently-viewed). The IDs below are fake, so
+// clicking through 404s and a quick-add button would push junk into the cart.
+// Until the endpoint exists, this section is informational only.
 const recommended = [
   { id: "5", brand: "L'Oreal", name: "Oxydant Creme 6% 1000ml", price: 1200, rating: 5, image: "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?w=500&h=500&fit=crop" },
   { id: "6", brand: "Kerastase", name: "Nutritive Bain Satin", price: 3400, rating: 4, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop" },

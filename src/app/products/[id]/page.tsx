@@ -55,7 +55,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
       where: relatedWhere.OR.length > 0 ? relatedWhere : { isActive: true, id: { not: product.id } },
       include: {
         brand: { select: { name: true, slug: true } },
-        images: { where: { isPrimary: true }, take: 1 },
+        // Prefer primary, fall back to any image so related cards always
+        // surface something instead of going blank.
+        images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], take: 1 },
       },
       take: 8,
     }),
@@ -136,6 +138,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
     oldPrice: r.oldPrice ? Number(r.oldPrice) : null,
     image: r.images[0]?.url || null,
     isProfessional: r.isProfessional,
+    sku: r.sku,
+    stockQuantity: r.stockQuantity,
   }))
 
   const siblings = colorSiblings.map(s => ({
