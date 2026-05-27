@@ -1018,6 +1018,8 @@
     "addedToast": "Dodato u korpu"
   },
   "faq": {
+    "home": "Početna",
+    "backToHome": "Nazad na početnu",
     "title": "Često Postavljana Pitanja",
     "subtitle": "Pronađite odgovore na najčešća pitanja",
     "searchPlaceholder": "Pretražite pitanja...",

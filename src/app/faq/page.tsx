@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import {
   ChevronDown,
   Search,
   HelpCircle,
   Mail,
   Phone,
+  Home,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -272,7 +274,14 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
-      <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-8">
+          <Link href="/" className="hover:text-[#c19742]">{t("faq.home")}</Link>
+          <span>/</span>
+          <span>{t("faq.title")}</span>
+        </nav>
+
         {/* Title */}
         <div className="text-center mb-10">
           <HelpCircle className="w-12 h-12 text-[#c19742] mx-auto mb-4" />
@@ -347,6 +356,16 @@ export default function FAQPage() {
               <Mail className="w-4 h-4" /> kontakt@altamoda.rs
             </a>
           </div>
+        </div>
+
+        {/* Back to Home */}
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#c19742] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors"
+          >
+            <Home className="w-4 h-4" /> {t("faq.backToHome")}
+          </Link>
         </div>
       </div>
 

@@ -1018,6 +1018,8 @@
     "addedToast": "Added to cart"
   },
   "faq": {
+    "home": "Home",
+    "backToHome": "Back to home",
     "title": "Frequently Asked Questions",
     "subtitle": "Find answers to the most common questions",
     "searchPlaceholder": "Search questions...",
