@@ -1190,9 +1190,9 @@ export default function ProductsPageClient({
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {activeBrand ? (
-                <>{activeBrand.name}, <em className="italic">okupljeno</em>.</>
+                <>{activeBrand.name}, <em className="italic">svi proizvodi</em>.</>
               ) : (
-                <>Svaki ritual, <em className="italic">okupljen</em>.</>
+                <>Svaki ritual, <em className="italic">svi proizvodi</em>.</>
               )}
             </h1>
             <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-lg">
