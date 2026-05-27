@@ -1182,17 +1182,17 @@
     "ctaButton": "POSTANI NAŠ PARTNER"
   },
   "contact": {
-    "heroTitle": "Get in Touch",
-    "heroDescription": "Our atelier is a space of silent luxury and bespoke creation. Connect with us for inquiries regarding collections, heritage, and unique partnerships.",
-    "connect": "Connect",
-    "inquire": "Inquire",
-    "emailLabel": "Email",
-    "phoneLabel": "Private Line",
-    "visit": "Visit",
-    "viewOnMap": "View on Map",
-    "newsletterTitle": "The Heritage Journal",
-    "newsletterDescription": "Receive seasonal insights from our atelier and updates on new heritage collections.",
-    "emailPlaceholder": "Your email address",
-    "subscribe": "Subscribe"
+    "heroTitle": "Stupite u kontakt",
+    "heroDescription": "Naš atelje je prostor tihog luksuza i kreacija po meri. Obratite nam se za pitanja o kolekcijama, nasleđu i jedinstvenim saradnjama.",
+    "connect": "Društvene mreže",
+    "inquire": "Upiti",
+    "emailLabel": "E-pošta",
+    "phoneLabel": "Privatna linija",
+    "visit": "Posetite nas",
+    "viewOnMap": "Pogledajte na mapi",
+    "newsletterTitle": "Žurnal nasleđa",
+    "newsletterDescription": "Primajte sezonske uvide iz našeg ateljea i obaveštenja o novim kolekcijama.",
+    "emailPlaceholder": "Vaša e-mail adresa",
+    "subscribe": "Prijavite se"
   }
 }
