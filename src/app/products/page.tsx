@@ -72,8 +72,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const resolvedParams = await searchParams;
   const brandSlug = typeof resolvedParams.brand === "string" ? resolvedParams.brand : null;
 
+  // ?page is the single source of truth for pagination — bookmarkable + SEO.
+  // Clamp to ≥1; invalid values fall back to page 1.
+  const rawPage = typeof resolvedParams.page === "string" ? resolvedParams.page : null;
+  const parsedPage = rawPage ? parseInt(rawPage, 10) : 1;
+  const page = Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+
   // No auth() call — page is fully cacheable. Role-based filtering happens client-side via API.
   const limit = 12;
+  const skip = (page - 1) * limit;
   // Storefront hides stock=0 entirely (admin grid shows everything via the API).
   const productWhere = { isActive: true, stockQuantity: { gt: 0 } };
 
@@ -101,6 +108,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           _count: { select: { reviews: true } },
         },
         orderBy: { createdAt: "desc" },
+        skip,
         take: limit,
       }),
       prisma.product.count({ where: productWhere }),
@@ -244,7 +252,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   });
 
   const initialPagination = {
-    page: 1,
+    page,
     limit,
     total,
     totalPages: Math.ceil(total / limit),

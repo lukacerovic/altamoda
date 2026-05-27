@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   Search, Heart, Star, SlidersHorizontal,
-  ChevronDown, ChevronRight, Grid3X3, LayoutList,
+  ChevronDown, ChevronLeft, ChevronRight, Grid3X3, LayoutList,
   X, ArrowUpDown, ShoppingBag, CheckCircle, Palette,
 } from "lucide-react";
 import DOMPurify from "isomorphic-dompurify";
@@ -477,7 +477,18 @@ export default function ProductsPageClient({
   const { t } = useLanguage();
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string } | undefined)?.role || _serverRole;
+  const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Read `?page` from URL. ?page is the canonical source of truth so deep-links
+  // and back/forward survive a refresh; in-memory state mirrors it.
+  const parsePageFromUrl = useCallback((): number => {
+    const raw = searchParams.get("page");
+    if (!raw) return 1;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n >= 1 ? n : 1;
+  }, [searchParams]);
+
   const categoryParam = searchParams.get("category");
   const searchParam = searchParams.get("search");
   const genderParam = searchParams.get("gender");
@@ -497,7 +508,7 @@ export default function ProductsPageClient({
   const [gridView, setGridView] = useState(true);
   const [mobileFilter, setMobileFilter] = useState(false);
   const [sortBy, setSortBy] = useState("popular");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => parsePageFromUrl());
   const [searchQuery, setSearchQuery] = useState(searchParam || "");
   const [showSearch, setShowSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -630,25 +641,61 @@ export default function ProductsPageClient({
     }
   }, [buildQueryString]);
 
-  // Re-fetch when filters/sort/visibility change (reset to page 1)
+  // Re-fetch when filters/sort/visibility change. Also clear ?page from URL
+  // so a filter swap on page 7 returns the user to page 1 instead of an empty
+  // results set.
   const isInitialMount = useRef(true);
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
-    setCurrentPage(1);
-    fetchProducts(1);
+    // If currentPage is already 1, the page-change effect won't fire, so fetch
+    // explicitly here. Otherwise setCurrentPage(1) below triggers it.
+    if (currentPage === 1) {
+      fetchProducts(1);
+    } else {
+      setCurrentPage(1);
+    }
+    if (searchParams.has("page")) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("page");
+      router.replace(`/products${params.toString() ? "?" + params.toString() : ""}`, { scroll: false });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
 
-  // Re-fetch when page changes
+  // Re-fetch whenever the page actually changes (skipping the initial render,
+  // which is already hydrated from the server).
+  const isInitialPageMount = useRef(true);
   useEffect(() => {
-    if (currentPage > 1) {
-      fetchProducts(currentPage);
+    if (isInitialPageMount.current) {
+      isInitialPageMount.current = false;
+      return;
     }
+    fetchProducts(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
+
+  // Keep currentPage in lockstep with ?page — this covers back/forward buttons
+  // and bookmarked deep-links. setCurrentPage no-ops when the value already
+  // matches, so this does not cause duplicate fetches on user-driven clicks.
+  useEffect(() => {
+    const pageFromUrl = parsePageFromUrl();
+    setCurrentPage((prev) => (prev === pageFromUrl ? prev : pageFromUrl));
+  }, [searchParams, parsePageFromUrl]);
+
+  const goToPage = useCallback((n: number) => {
+    if (n < 1 || n > pagination.totalPages) return;
+    const params = new URLSearchParams(searchParams.toString());
+    if (n <= 1) params.delete("page");
+    else params.set("page", String(n));
+    const qs = params.toString();
+    router.push(`/products${qs ? "?" + qs : ""}`, { scroll: false });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pagination.totalPages, router, searchParams]);
 
   // Close search dropdown on outside click
   useEffect(() => {
@@ -811,11 +858,19 @@ export default function ProductsPageClient({
   ];
 
   const totalPages = pagination.totalPages;
-  const pageNumbers = Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-    if (totalPages <= 5) return i + 1;
-    const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
-    return start + i;
-  });
+  // Build the list shown in the pager: first ‧ … ‧ [window of 3 around current] ‧ … ‧ last.
+  // For ≤7 pages we show every number to keep the UI uncluttered.
+  const pageItems: (number | "ellipsis-left" | "ellipsis-right")[] = (() => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const items: (number | "ellipsis-left" | "ellipsis-right")[] = [1];
+    if (currentPage > 4) items.push("ellipsis-left");
+    const windowStart = Math.max(2, currentPage - 1);
+    const windowEnd = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = windowStart; i <= windowEnd; i++) items.push(i);
+    if (currentPage < totalPages - 3) items.push("ellipsis-right");
+    items.push(totalPages);
+    return items;
+  })();
 
   /* ─── Filter Sidebar ─── */
   const genderOptions = [
@@ -1467,29 +1522,56 @@ export default function ProductsPageClient({
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-16">
-                {pageNumbers.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setCurrentPage(p)}
-                    className={`w-10 h-10 flex items-center justify-center text-[11px] font-medium transition-all ${
-                      currentPage === p
-                        ? "bg-[#1a1c1e] text-[#FFFFFF]"
-                        : "text-[#1a1c1e]/60 hover:text-[#1a1c1e] border border-[#dddbd9] hover:border-[#1a1c1e]"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-                {currentPage < totalPages && (
-                  <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    className="w-10 h-10 flex items-center justify-center border border-[#dddbd9] hover:border-[#1a1c1e] transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4 text-[#1a1c1e]" />
-                  </button>
+              <nav
+                aria-label="Pagination"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 mt-16"
+              >
+                <button
+                  type="button"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  aria-label={t("products.previousPage")}
+                  className="w-10 h-10 flex items-center justify-center border border-[#dddbd9] text-[#1a1c1e] hover:border-[#1a1c1e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[#dddbd9]"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {pageItems.map((item, idx) =>
+                  item === "ellipsis-left" || item === "ellipsis-right" ? (
+                    <span
+                      key={`${item}-${idx}`}
+                      aria-hidden="true"
+                      className="w-6 h-10 flex items-center justify-center text-[11px] text-[#1a1c1e]/60"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => goToPage(item)}
+                      aria-current={currentPage === item ? "page" : undefined}
+                      className={`w-10 h-10 flex items-center justify-center text-[11px] font-medium transition-all ${
+                        currentPage === item
+                          ? "bg-[#1a1c1e] text-[#FFFFFF]"
+                          : "text-[#1a1c1e]/60 hover:text-[#1a1c1e] border border-[#dddbd9] hover:border-[#1a1c1e]"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  )
                 )}
-              </div>
+
+                <button
+                  type="button"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  aria-label={t("products.nextPage")}
+                  className="w-10 h-10 flex items-center justify-center border border-[#dddbd9] text-[#1a1c1e] hover:border-[#1a1c1e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[#dddbd9]"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </nav>
             )}
           </div>
         </div>
