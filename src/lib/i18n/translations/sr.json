@@ -181,6 +181,8 @@
     "showingResults": "Prikazano",
     "of": "od",
     "productsLabel": "proizvoda",
+    "previousPage": "Prethodna strana",
+    "nextPage": "Sledeća strana",
     "noProducts": "Nema proizvoda koji odgovaraju vašim filterima.",
     "clearFilters": "Obriši filtere",
     "professional": "Business",
@@ -363,7 +365,18 @@
     "oauthB2bBlocked": "Ovaj e-mail je registrovan kao B2B nalog. Molimo prijavite se putem e-maila i lozinke.",
     "oauthMissingEmail": "Vaš Google nalog nije vratio e-mail adresu. Molimo registrujte se putem e-maila.",
     "oauthAccountNotLinked": "Nalog sa ovim e-mailom već postoji. Molimo prijavite se putem lozinke i povežite Google nalog iz profila.",
-    "oauthGenericError": "Prijava nije uspela. Molimo pokušajte ponovo."
+    "oauthGenericError": "Prijava nije uspela. Molimo pokušajte ponovo.",
+    "errRequired": "Polje je obavezno",
+    "errFirstNameMin": "Ime mora imati najmanje 2 karaktera",
+    "errLastNameMin": "Prezime mora imati najmanje 2 karaktera",
+    "errEmailInvalid": "Unesite validnu email adresu",
+    "errPasswordMin": "Lozinka mora imati najmanje 6 karaktera",
+    "errSalonNameMin": "Naziv salona mora imati najmanje 2 karaktera",
+    "errPibDigitsOnly": "PIB sme da sadrži samo cifre",
+    "errPibLength": "PIB mora imati tačno 9 cifara",
+    "errMaticniDigitsOnly": "Matični broj sme da sadrži samo cifre",
+    "errMaticniLength": "Matični broj mora imati tačno 8 cifara",
+    "errFormFix": "Molimo ispravite greške označene crvenom bojom"
   },
   "account": {
     "myOrders": "Moje Porudžbine",
@@ -1001,9 +1014,14 @@
     "emptyTitle": "Vaša lista želja je prazna",
     "emptyDesc": "Dodajte proizvode koje želite da sačuvate za kasnije",
     "unavailable": "Nedostupno",
-    "addToCart": "Dodaj u korpu"
+    "addToCart": "Dodaj u korpu",
+    "removeItem": "Ukloni iz liste želja",
+    "noImage": "Nema slike",
+    "addedToast": "Dodato u korpu"
   },
   "faq": {
+    "home": "Početna",
+    "backToHome": "Nazad na početnu",
     "title": "Često Postavljana Pitanja",
     "subtitle": "Pronađite odgovore na najčešća pitanja",
     "searchPlaceholder": "Pretražite pitanja...",
@@ -1182,17 +1200,17 @@
     "ctaButton": "POSTANI NAŠ PARTNER"
   },
   "contact": {
-    "heroTitle": "Get in Touch",
-    "heroDescription": "Our atelier is a space of silent luxury and bespoke creation. Connect with us for inquiries regarding collections, heritage, and unique partnerships.",
-    "connect": "Connect",
-    "inquire": "Inquire",
-    "emailLabel": "Email",
-    "phoneLabel": "Private Line",
-    "visit": "Visit",
-    "viewOnMap": "View on Map",
-    "newsletterTitle": "The Heritage Journal",
-    "newsletterDescription": "Receive seasonal insights from our atelier and updates on new heritage collections.",
-    "emailPlaceholder": "Your email address",
-    "subscribe": "Subscribe"
+    "heroTitle": "Stupite u kontakt",
+    "heroDescription": "Naš atelje je prostor tihog luksuza i kreacija po meri. Obratite nam se za pitanja o kolekcijama, nasleđu i jedinstvenim saradnjama.",
+    "connect": "Društvene mreže",
+    "inquire": "Upiti",
+    "emailLabel": "E-pošta",
+    "phoneLabel": "Privatna linija",
+    "visit": "Posetite nas",
+    "viewOnMap": "Pogledajte na mapi",
+    "newsletterTitle": "Žurnal nasleđa",
+    "newsletterDescription": "Primajte sezonske uvide iz našeg ateljea i obaveštenja o novim kolekcijama.",
+    "emailPlaceholder": "Vaša e-mail adresa",
+    "subscribe": "Prijavite se"
   }
 }

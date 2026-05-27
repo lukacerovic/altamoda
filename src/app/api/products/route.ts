@@ -217,17 +217,26 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   }
 
-  // Sort — always show in-stock products first
+  // Sort. Price sorts must use the field the viewer actually sees (B2B sees priceB2b),
+  // mirroring the price-range filter above — otherwise B2B users are ordered by prices
+  // they can't purchase at.
+  const sortPriceField = role === 'b2b' ? 'priceB2b' : 'priceB2c'
   let sortOrderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' }
-  if (sort === 'price_asc') sortOrderBy = { priceB2c: 'asc' }
-  else if (sort === 'price_desc') sortOrderBy = { priceB2c: 'desc' }
+  if (sort === 'price_asc') sortOrderBy = { [sortPriceField]: 'asc' }
+  else if (sort === 'price_desc') sortOrderBy = { [sortPriceField]: 'desc' }
   else if (sort === 'newest') sortOrderBy = { createdAt: 'desc' }
   else if (sort === 'name_asc') sortOrderBy = { nameLat: 'asc' }
 
-  const orderBy: Prisma.ProductOrderByWithRelationInput[] = [
-    { stockQuantity: 'desc' },
-    sortOrderBy,
-  ]
+  // When the user picks an explicit sort, that sort must dominate. Previously
+  // `stockQuantity: 'desc'` came first, which ranks by raw quantity and reduces the
+  // chosen sort to a tiebreaker between products with identical stock — so "price high
+  // to low" came out unsorted. Keep stock-first only for the default/popular view, where
+  // it's the intended "in-stock products first" behaviour; for explicit sorts stock is
+  // demoted to the tiebreaker so the visible order matches the selected criterion.
+  const hasExplicitSort = sort === 'price_asc' || sort === 'price_desc' || sort === 'newest' || sort === 'name_asc'
+  const orderBy: Prisma.ProductOrderByWithRelationInput[] = hasExplicitSort
+    ? [sortOrderBy, { stockQuantity: 'desc' }]
+    : [{ stockQuantity: 'desc' }, sortOrderBy]
 
   // For grouped products, find representatives and exclude duplicates
   // Uses 2 queries instead of 3: groupBy for count + single query for rep IDs + all IDs

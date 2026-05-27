@@ -290,7 +290,7 @@ export default function Header() {
                           <h4 className="text-xs font-medium uppercase tracking-wider text-[#c19742] mb-4">
                             {t("nav.ourBrands")}
                           </h4>
-                          <div className="grid grid-cols-3 gap-2">
+                          <div className="grid grid-cols-[repeat(3,max-content)] gap-x-6 gap-y-1">
                             {brands.map((brand) => (
                               <Link
                                 key={brand.id}
@@ -304,7 +304,7 @@ export default function Header() {
                                     <span className="text-xs font-bold text-[#dddbd9]">{brand.name.charAt(0)}</span>
                                   </div>
                                 ); })()}
-                                <span className="text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors truncate">
+                                <span className="text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors whitespace-nowrap">
                                   {brand.name}
                                 </span>
                               </Link>

@@ -11,9 +11,13 @@ import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
   ShoppingBag, Trash2, Minus, Plus, ChevronRight,
   Truck, Shield, Star, AlertCircle,
-  FileText, Store, Sparkles,
+  FileText, Store, Sparkles, ImageOff,
 } from "lucide-react";
 
+// TODO(cart-recs): replace with real data from an /api/products/recommended
+// endpoint (e.g. top-selling or recently-viewed). The IDs below are fake, so
+// clicking through 404s and a quick-add button would push junk into the cart.
+// Until the endpoint exists, this section is informational only.
 const recommended = [
   { id: "5", brand: "L'Oreal", name: "Oxydant Creme 6% 1000ml", price: 1200, rating: 5, image: "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?w=500&h=500&fit=crop" },
   { id: "6", brand: "Kerastase", name: "Nutritive Bain Satin", price: 3400, rating: 4, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop" },
@@ -108,8 +112,14 @@ export default function CartPage() {
                 const outOfStock = item.stockQuantity <= 0;
                 return (
                 <div key={item.productId} className={`bg-white rounded-sm shadow-sm p-4 md:p-6 flex gap-4 ${outOfStock ? "opacity-60" : ""}`}>
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0 relative">
-                    {item.image && <Image src={item.image} alt={item.name} width={80} height={80} className="w-full h-full object-cover" />}
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0 relative bg-[#f5f4f2]">
+                    {item.image ? (
+                      <Image src={item.image} alt={item.name} width={80} height={80} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[#a8a39d]">
+                        <ImageOff className="w-6 h-6" />
+                      </div>
+                    )}
                     {outOfStock && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-red-600 px-2 py-1 rounded-sm">{t("cart.outOfStock")}</span>

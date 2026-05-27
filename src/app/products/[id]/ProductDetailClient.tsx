@@ -49,6 +49,8 @@ interface RelatedProduct {
   oldPrice: number | null;
   image: string | null;
   isProfessional: boolean;
+  sku: string;
+  stockQuantity: number;
 }
 
 interface Product {
@@ -126,6 +128,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   const [reviewRating, setReviewRating] = useState(0);
   const [linkCopied, setLinkCopied] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [addedRelatedId, setAddedRelatedId] = useState<string | null>(null);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [selectedSibling, setSelectedSibling] = useState<ColorSibling | null>(
@@ -230,6 +233,25 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleAddRelatedToCart = (e: React.MouseEvent, r: RelatedProduct) => {
+    // Prevent the surrounding Link from navigating to the PDP.
+    e.preventDefault();
+    e.stopPropagation();
+    if (r.stockQuantity <= 0) return;
+    addItem({
+      productId: r.id,
+      name: r.name,
+      brand: r.brand?.name ?? "",
+      price: r.price,
+      quantity: 1,
+      image: r.image ?? "",
+      sku: r.sku,
+      stockQuantity: r.stockQuantity,
+    });
+    setAddedRelatedId(r.id);
+    setTimeout(() => setAddedRelatedId(prev => (prev === r.id ? null : prev)), 1800);
   };
 
   const handleToggleWishlist = async () => {
@@ -729,7 +751,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               <Link href="/products" className="text-[10px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#1a1c1e] pb-0.5 hover:opacity-60 transition-opacity">Pogledaj sve</Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
-              {related.map((p) => (
+              {related.map((p) => {
+                const relOutOfStock = p.stockQuantity <= 0;
+                const justAdded = addedRelatedId === p.id;
+                return (
                 <Link key={p.id} href={`/products/${p.slug}`} className="group block">
                   <div className="aspect-[4/5] overflow-hidden bg-[#dddbd9] mb-4 rounded-[4px]">
                     <Image src={p.image || defaultImage} alt={p.name} width={500} height={625} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
@@ -741,9 +766,30 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                       {p.oldPrice && <span className="text-[#1a1c1e]/60 line-through text-xs">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
                       <span>{p.price.toLocaleString("sr-RS")} RSD</span>
                     </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleAddRelatedToCart(e, p)}
+                      disabled={relOutOfStock}
+                      className={`mt-3 w-full py-2 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center justify-center gap-2 rounded-[2px] ${
+                        relOutOfStock
+                          ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
+                          : justAdded
+                          ? "bg-[#413d3a] text-[#ffffff]"
+                          : "bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff]"
+                      }`}
+                    >
+                      {relOutOfStock ? (
+                        t("products.outOfStock")
+                      ) : justAdded ? (
+                        <><CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}</>
+                      ) : (
+                        <><ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}</>
+                      )}
+                    </button>
                   </div>
                 </Link>
-              ))}
+              );
+              })}
             </div>
           </section>
         )}

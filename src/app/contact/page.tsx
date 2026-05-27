@@ -3,9 +3,18 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export default function ContactPage() {
   const { t } = useLanguage();
+  // Instagram comes from the same site setting the footer uses, so the two stay in sync;
+  // YouTube/Facebook are fixed brand profiles.
+  const settings = useSiteSettings(["instagram"]);
+  const socialLinks = [
+    settings.instagram && { href: settings.instagram, label: "Instagram" },
+    { href: "https://www.youtube.com/user/altamodabg", label: "YouTube" },
+    { href: "https://www.facebook.com/altamoda.srbija/", label: "Facebook" },
+  ].filter(Boolean) as Array<{ href: string; label: string }>;
 
   return (
     <>
@@ -41,18 +50,17 @@ export default function ContactPage() {
                   {t("contact.connect")}
                 </span>
                 <div className="space-y-6">
-                  <a className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300 italic" href="#">
-                    Instagram
-                  </a>
-                  <a className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300 italic" href="#">
-                    Pinterest
-                  </a>
-                  <a className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300 italic" href="#">
-                    LinkedIn
-                  </a>
-                  <a className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300 italic" href="#">
-                    Vogue Archive
-                  </a>
+                  {socialLinks.map(({ href, label }) => (
+                    <a
+                      key={label}
+                      className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300 italic"
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {label}
+                    </a>
+                  ))}
                 </div>
               </div>
 
@@ -79,9 +87,15 @@ export default function ContactPage() {
                     </p>
                     <a
                       className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300"
-                      href="tel:+39021234567"
+                      href={`tel:${t("footer.phone").replace(/\s|\(|\)/g, "")}`}
                     >
-                      +39 02 123 4567
+                      {t("footer.phone")}
+                    </a>
+                    <a
+                      className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300"
+                      href={`tel:${t("footer.phone2").replace(/\s|\(|\)/g, "")}`}
+                    >
+                      {t("footer.phone2")}
                     </a>
                   </div>
                 </div>
@@ -95,11 +109,9 @@ export default function ContactPage() {
                 <div className="space-y-6">
                   <address className="not-italic space-y-4">
                     <p className="font-serif text-2xl leading-snug italic">
-                      Via Montenapoleone, 27
+                      {t("footer.address")}
                       <br />
-                      20121 Milano MI
-                      <br />
-                      Italy
+                      {t("footer.city")}
                     </p>
                   </address>
                   <div className="pt-2">

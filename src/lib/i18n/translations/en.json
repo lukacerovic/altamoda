@@ -181,6 +181,8 @@
     "showingResults": "Showing",
     "of": "of",
     "productsLabel": "products",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
     "noProducts": "No products match your filters.",
     "clearFilters": "Clear Filters",
     "professional": "Business",
@@ -363,7 +365,18 @@
     "oauthB2bBlocked": "This email is registered as a B2B account. Please sign in with your email and password.",
     "oauthMissingEmail": "Your Google account did not provide an email address. Please register with email.",
     "oauthAccountNotLinked": "An account with this email already exists. Please sign in with your password and link your Google account from your profile.",
-    "oauthGenericError": "Sign-in failed. Please try again."
+    "oauthGenericError": "Sign-in failed. Please try again.",
+    "errRequired": "This field is required",
+    "errFirstNameMin": "First name must be at least 2 characters",
+    "errLastNameMin": "Last name must be at least 2 characters",
+    "errEmailInvalid": "Please enter a valid email address",
+    "errPasswordMin": "Password must be at least 6 characters",
+    "errSalonNameMin": "Salon name must be at least 2 characters",
+    "errPibDigitsOnly": "Tax ID may only contain digits",
+    "errPibLength": "Tax ID must be exactly 9 digits",
+    "errMaticniDigitsOnly": "Registration number may only contain digits",
+    "errMaticniLength": "Registration number must be exactly 8 digits",
+    "errFormFix": "Please correct the fields highlighted in red"
   },
   "account": {
     "myOrders": "My Orders",
@@ -1001,9 +1014,14 @@
     "emptyTitle": "Your wishlist is empty",
     "emptyDesc": "Add products you want to save for later",
     "unavailable": "Unavailable",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "removeItem": "Remove from wishlist",
+    "noImage": "No image",
+    "addedToast": "Added to cart"
   },
   "faq": {
+    "home": "Home",
+    "backToHome": "Back to home",
     "title": "Frequently Asked Questions",
     "subtitle": "Find answers to the most common questions",
     "searchPlaceholder": "Search questions...",

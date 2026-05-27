@@ -49,6 +49,79 @@ function LoginContent() {
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
 
+  type FieldName =
+    | "firstName" | "lastName" | "email" | "password" | "passwordConfirm"
+    | "salonName" | "pib" | "maticniBroj" | "terms";
+  type FieldErrors = Partial<Record<FieldName, string>>;
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  function validateField(name: FieldName): string {
+    switch (name) {
+      case "firstName": {
+        const v = regName.trim();
+        if (!v) return t("auth.errRequired");
+        if (v.length < 2) return t("auth.errFirstNameMin");
+        return "";
+      }
+      case "lastName": {
+        const v = regLastName.trim();
+        if (!v) return t("auth.errRequired");
+        if (v.length < 2) return t("auth.errLastNameMin");
+        return "";
+      }
+      case "email": {
+        const v = regEmail.trim();
+        if (!v) return t("auth.errRequired");
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return t("auth.errEmailInvalid");
+        return "";
+      }
+      case "password": {
+        if (!regPassword) return t("auth.errRequired");
+        if (regPassword.length < 6) return t("auth.errPasswordMin");
+        return "";
+      }
+      case "passwordConfirm": {
+        if (!regPasswordConfirm) return t("auth.errRequired");
+        if (regPasswordConfirm !== regPassword) return t("auth.passwordsDontMatch");
+        return "";
+      }
+      case "salonName": {
+        const v = regSalonName.trim();
+        if (!v) return t("auth.errRequired");
+        if (v.length < 2) return t("auth.errSalonNameMin");
+        return "";
+      }
+      case "pib": {
+        const v = regPib.trim();
+        if (!v) return t("auth.errRequired");
+        if (!/^\d+$/.test(v)) return t("auth.errPibDigitsOnly");
+        if (v.length !== 9) return t("auth.errPibLength");
+        return "";
+      }
+      case "maticniBroj": {
+        const v = regMaticni.trim();
+        if (!v) return t("auth.errRequired");
+        if (!/^\d+$/.test(v)) return t("auth.errMaticniDigitsOnly");
+        if (v.length !== 8) return t("auth.errMaticniLength");
+        return "";
+      }
+      case "terms": {
+        if (!regTerms) return t("auth.mustAcceptTerms");
+        return "";
+      }
+    }
+  }
+
+  const handleBlur = (field: FieldName) => () => {
+    const msg = validateField(field);
+    setFieldErrors(prev => ({ ...prev, [field]: msg }));
+  };
+  const clearFieldError = (field: FieldName) => {
+    if (fieldErrors[field]) setFieldErrors(prev => ({ ...prev, [field]: "" }));
+  };
+  const inputBorder = (field: FieldName) =>
+    fieldErrors[field] ? "border-red-500 focus:border-red-500" : "border-[#dddbd9]";
+
   // Surface OAuth errors that arrive as ?error=… after a failed Google sign-in.
   useEffect(() => {
     const oauthError = searchParams.get("error");
@@ -150,13 +223,20 @@ function LoginContent() {
     setError("");
     setSuccess("");
 
-    if (!regTerms) {
-      setError(t("auth.mustAcceptTerms"));
-      return;
+    const fieldsToCheck: FieldName[] = [
+      "firstName", "lastName", "email", "password", "passwordConfirm", "terms",
+    ];
+    if (registerType === "b2b") {
+      fieldsToCheck.push("salonName", "pib", "maticniBroj");
     }
 
-    if (regPassword !== regPasswordConfirm) {
-      setError(t("auth.passwordsDontMatch"));
+    const errors: FieldErrors = {};
+    for (const f of fieldsToCheck) {
+      const msg = validateField(f);
+      if (msg) errors[f] = msg;
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -220,8 +300,8 @@ function LoginContent() {
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-[#dddbd9]">
-            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
-            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
+            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
+            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
           </div>
 
           <div className="p-6 md:p-8">
@@ -293,15 +373,22 @@ function LoginContent() {
               </form>
             ) : (
               /* REGISTER FORM */
-              <form onSubmit={handleRegister}>
+              <form onSubmit={handleRegister} noValidate>
                 <h2 className="text-2xl font-bold text-[#1a1c1e] mb-4" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.createAccount")}</h2>
+
+                {Object.values(fieldErrors).some(Boolean) && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>{t("auth.errFormFix")}</span>
+                  </div>
+                )}
 
                 {/* B2C / B2B toggle */}
                 <div className="flex gap-2 mb-6">
-                  <button type="button" onClick={() => setRegisterType("b2c")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#c19742] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
+                  <button type="button" onClick={() => { setRegisterType("b2c"); setFieldErrors({}); }} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#c19742] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
                     <User className="w-4 h-4 inline mr-1" /> {t("auth.buyer")}
                   </button>
-                  <button type="button" onClick={() => setRegisterType("b2b")} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#c19742] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
+                  <button type="button" onClick={() => { setRegisterType("b2b"); setFieldErrors({}); }} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#c19742] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
                     <Building2 className="w-4 h-4 inline mr-1" /> {t("auth.salonB2b")}
                   </button>
                 </div>
@@ -327,16 +414,43 @@ function LoginContent() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.firstName")}</label>
-                      <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)} placeholder={t("auth.firstNamePlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                      <input
+                        type="text"
+                        value={regName}
+                        onChange={(e) => { setRegName(e.target.value); clearFieldError("firstName"); }}
+                        onBlur={handleBlur("firstName")}
+                        placeholder={t("auth.firstNamePlaceholder")}
+                        className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("firstName")}`}
+                        aria-invalid={!!fieldErrors.firstName}
+                      />
+                      {fieldErrors.firstName && <p className="mt-1 text-xs text-red-600">{fieldErrors.firstName}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.lastName")}</label>
-                      <input type="text" value={regLastName} onChange={(e) => setRegLastName(e.target.value)} placeholder={t("auth.lastNamePlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                      <input
+                        type="text"
+                        value={regLastName}
+                        onChange={(e) => { setRegLastName(e.target.value); clearFieldError("lastName"); }}
+                        onBlur={handleBlur("lastName")}
+                        placeholder={t("auth.lastNamePlaceholder")}
+                        className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("lastName")}`}
+                        aria-invalid={!!fieldErrors.lastName}
+                      />
+                      {fieldErrors.lastName && <p className="mt-1 text-xs text-red-600">{fieldErrors.lastName}</p>}
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.emailAddress")}</label>
-                    <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="vas@email.com" className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                    <input
+                      type="email"
+                      value={regEmail}
+                      onChange={(e) => { setRegEmail(e.target.value); clearFieldError("email"); }}
+                      onBlur={handleBlur("email")}
+                      placeholder="vas@email.com"
+                      className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("email")}`}
+                      aria-invalid={!!fieldErrors.email}
+                    />
+                    {fieldErrors.email && <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.phonePlaceholder")}</label>
@@ -350,15 +464,46 @@ function LoginContent() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.salonName")}</label>
-                        <input type="text" value={regSalonName} onChange={(e) => setRegSalonName(e.target.value)} placeholder={t("auth.salonNamePlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                        <input
+                          type="text"
+                          value={regSalonName}
+                          onChange={(e) => { setRegSalonName(e.target.value); clearFieldError("salonName"); }}
+                          onBlur={handleBlur("salonName")}
+                          placeholder={t("auth.salonNamePlaceholder")}
+                          className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("salonName")}`}
+                          aria-invalid={!!fieldErrors.salonName}
+                        />
+                        {fieldErrors.salonName && <p className="mt-1 text-xs text-red-600">{fieldErrors.salonName}</p>}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.pib")}</label>
-                        <input type="text" value={regPib} onChange={(e) => setRegPib(e.target.value)} placeholder={t("auth.pibPlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={9}
+                          value={regPib}
+                          onChange={(e) => { setRegPib(e.target.value); clearFieldError("pib"); }}
+                          onBlur={handleBlur("pib")}
+                          placeholder={t("auth.pibPlaceholder")}
+                          className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("pib")}`}
+                          aria-invalid={!!fieldErrors.pib}
+                        />
+                        {fieldErrors.pib && <p className="mt-1 text-xs text-red-600">{fieldErrors.pib}</p>}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.maticniBroj")}</label>
-                        <input type="text" value={regMaticni} onChange={(e) => setRegMaticni(e.target.value)} placeholder={t("auth.maticniBrojPlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={8}
+                          value={regMaticni}
+                          onChange={(e) => { setRegMaticni(e.target.value); clearFieldError("maticniBroj"); }}
+                          onBlur={handleBlur("maticniBroj")}
+                          placeholder={t("auth.maticniBrojPlaceholder")}
+                          className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("maticniBroj")}`}
+                          aria-invalid={!!fieldErrors.maticniBroj}
+                        />
+                        {fieldErrors.maticniBroj && <p className="mt-1 text-xs text-red-600">{fieldErrors.maticniBroj}</p>}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.salonAddress")}</label>
@@ -369,17 +514,44 @@ function LoginContent() {
 
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.password")}</label>
-                    <input type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder={t("auth.passwordPlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                    <input
+                      type="password"
+                      value={regPassword}
+                      onChange={(e) => { setRegPassword(e.target.value); clearFieldError("password"); clearFieldError("passwordConfirm"); }}
+                      onBlur={handleBlur("password")}
+                      placeholder={t("auth.passwordPlaceholder")}
+                      className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("password")}`}
+                      aria-invalid={!!fieldErrors.password}
+                    />
+                    {fieldErrors.password && <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.confirmPassword")}</label>
-                    <input type="password" value={regPasswordConfirm} onChange={(e) => setRegPasswordConfirm(e.target.value)} placeholder={t("auth.confirmPasswordPlaceholder")} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm" required />
+                    <input
+                      type="password"
+                      value={regPasswordConfirm}
+                      onChange={(e) => { setRegPasswordConfirm(e.target.value); clearFieldError("passwordConfirm"); }}
+                      onBlur={handleBlur("passwordConfirm")}
+                      placeholder={t("auth.confirmPasswordPlaceholder")}
+                      className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("passwordConfirm")}`}
+                      aria-invalid={!!fieldErrors.passwordConfirm}
+                    />
+                    {fieldErrors.passwordConfirm && <p className="mt-1 text-xs text-red-600">{fieldErrors.passwordConfirm}</p>}
                   </div>
 
-                  <label className="flex items-start gap-2 text-sm text-[#1a1c1e] cursor-pointer">
-                    <input type="checkbox" checked={regTerms} onChange={(e) => setRegTerms(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#c19742] focus:ring-[#1a1c1e] mt-0.5" />
-                    <span>{t("auth.agreeTerms")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.privacyPolicy")}</a></span>
-                  </label>
+                  <div>
+                    <label className="flex items-start gap-2 text-sm text-[#1a1c1e] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={regTerms}
+                        onChange={(e) => { setRegTerms(e.target.checked); clearFieldError("terms"); }}
+                        className={`w-4 h-4 rounded text-[#c19742] focus:ring-[#1a1c1e] mt-0.5 ${fieldErrors.terms ? "border-red-500" : "border-[#dddbd9]"}`}
+                        aria-invalid={!!fieldErrors.terms}
+                      />
+                      <span>{t("auth.agreeTerms")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.privacyPolicy")}</a></span>
+                    </label>
+                    {fieldErrors.terms && <p className="mt-1 text-xs text-red-600">{fieldErrors.terms}</p>}
+                  </div>
 
                   <button type="submit" disabled={loading} className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.processing") : registerType === "b2b" ? t("auth.submitB2b") : t("auth.registerButton")}
