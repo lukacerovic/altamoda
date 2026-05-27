@@ -77,6 +77,7 @@ export default function ContactPage() {
                     <p className="text-[10px] tracking-widest text-[#1a1c1e] uppercase mb-2">
                       {t("contact.phoneLabel")}
                     </p>
+                    {/* TODO(altamoda-contact): replace placeholder phone with real number; move to i18n if it should localize */}
                     <a
                       className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300"
                       href="tel:+39021234567"
@@ -93,6 +94,7 @@ export default function ContactPage() {
                   {t("contact.visit")}
                 </span>
                 <div className="space-y-6">
+                  {/* TODO(altamoda-contact): replace placeholder Milan address with real Altamoda address; move to i18n if it should localize */}
                   <address className="not-italic space-y-4">
                     <p className="font-serif text-2xl leading-snug italic">
                       Via Montenapoleone, 27
