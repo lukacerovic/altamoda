@@ -9,6 +9,7 @@ import {
   User, Eye, EyeOff, Mail, Lock, Building2, Clock, X, AlertCircle,
 } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
+import Image from "next/image";
 
 export default function LoginPage() {
   return (
@@ -48,6 +49,8 @@ function LoginContent() {
   const [regTerms, setRegTerms] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
+
+  const logoSrc = "/altamoda-logoes/ALTAMODA LOGO BLACK.png";
 
   type FieldName =
     | "firstName" | "lastName" | "email" | "password" | "passwordConfirm"
@@ -295,6 +298,9 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
+      <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
+        <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-13 xl:h-15 w-auto" unoptimized />
+      </Link>
       <div className="max-w-lg mx-auto px-4 py-12 md:py-20">
         {/* Card */}
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
@@ -482,7 +488,11 @@ function LoginContent() {
                           inputMode="numeric"
                           maxLength={9}
                           value={regPib}
-                          onChange={(e) => { setRegPib(e.target.value); clearFieldError("pib"); }}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, "");
+                            setRegPib(value);
+                            clearFieldError("pib");
+                          }}
                           onBlur={handleBlur("pib")}
                           placeholder={t("auth.pibPlaceholder")}
                           className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("pib")}`}
@@ -492,17 +502,21 @@ function LoginContent() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.maticniBroj")}</label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={8}
-                          value={regMaticni}
-                          onChange={(e) => { setRegMaticni(e.target.value); clearFieldError("maticniBroj"); }}
-                          onBlur={handleBlur("maticniBroj")}
-                          placeholder={t("auth.maticniBrojPlaceholder")}
-                          className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("maticniBroj")}`}
-                          aria-invalid={!!fieldErrors.maticniBroj}
-                        />
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={8}
+                            value={regMaticni}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, "");
+                              setRegMaticni(value);
+                              clearFieldError("maticniBroj");
+                            }}
+                            onBlur={handleBlur("maticniBroj")}
+                            placeholder={t("auth.maticniBrojPlaceholder")}
+                            className={`w-full border rounded px-4 py-3 text-sm ${inputBorder("maticniBroj")}`}
+                            aria-invalid={!!fieldErrors.maticniBroj}
+                          />
                         {fieldErrors.maticniBroj && <p className="mt-1 text-xs text-red-600">{fieldErrors.maticniBroj}</p>}
                       </div>
                       <div>

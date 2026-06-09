@@ -1169,15 +1169,21 @@ export default function ProductsPageClient({
             )}
 
             {/* ── Only color products toggle ── */}
-            <label className="flex items-center justify-between cursor-pointer group py-0.5 border-t border-[#dddbd9] pt-3">
-              <span className="text-[12px] text-[#1a1c1e]/60 group-hover:text-[#1a1c1e] transition-colors">Prikaži samo proizvode sa bojom</span>
-              <button
-                onClick={(e) => { e.preventDefault(); setFilterHasColor(!filterHasColor); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${filterHasColor ? "bg-[#1a1c1e]" : "bg-[#dddbd9]"}`}
-              >
-                <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-transform duration-300 ${filterHasColor ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
-              </button>
-            </label>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setFilterHasColor(!filterHasColor);
+              }}
+              className={`relative w-11 h-6 rounded-full transition-all duration-300 ${
+                filterHasColor ? "bg-[#1a1c1e]" : "bg-[#dddbd9]"
+              }`}
+            >
+              <span
+                className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-all duration-300 ${
+                  filterHasColor ? "left-[23px]" : "left-[3px]"
+                }`}
+              />
+            </button>
           </div>
         </FilterSection>
       )}
@@ -1185,13 +1191,33 @@ export default function ProductsPageClient({
       <FilterSection title="Osobine">
         <div className="space-y-3">
           {toggleFilters.map((f) => (
-            <label key={f.key} className="flex items-center justify-between cursor-pointer group py-0.5">
-              <span className="text-[13px] text-[#1a1c1e]/60 group-hover:text-[#1a1c1e] transition-colors">{f.label}</span>
+            <label
+              key={f.key}
+              className="flex items-center justify-between cursor-pointer group py-0.5"
+            >
+              <span className="text-[13px] text-[#1a1c1e]/60 group-hover:text-[#1a1c1e] transition-colors">
+                {f.label}
+              </span>
+
               <button
-                onClick={(e) => { e.preventDefault(); toggleFilter(f.key); }}
-                className={`relative w-11 h-6 rounded-full transition-all duration-300 ${activeToggles.includes(f.key) ? "bg-[#dddbd9]" : "bg-[#dddbd9]"}`}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleFilter(f.key);
+                }}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
+                  activeToggles.includes(f.key)
+                    ? "bg-[#1a1c1e]"
+                    : "bg-[#dddbd9]"
+                }`}
               >
-                <span className={`absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_3px_rgba(26,28,30,0.18)] ring-1 ring-black/5 transition-transform duration-300 ${activeToggles.includes(f.key) ? "translate-x-[22px]" : "translate-x-[3px]"}`} />
+                <span
+                  className={`absolute top-[3px] left-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_3px_rgba(26,28,30,0.18)] ring-1 ring-black/5 transition-transform duration-300 ${
+                    activeToggles.includes(f.key)
+                      ? "translate-x-5"
+                      : "translate-x-0"
+                  }`}
+                />
               </button>
             </label>
           ))}
