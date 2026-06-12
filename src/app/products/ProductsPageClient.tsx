@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -162,6 +162,46 @@ interface ProductsPageClientProps {
 
 /* ─── Helpers ─── */
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&h=500&fit=crop";
+
+/* ─── Seeded shuffle ───
+ * Per-visit randomization for the default "popular" sort. Featured items
+ * stay anchored at the top in their original order; the rest is shuffled with
+ * a fresh seed generated on every page mount — so each refresh / navigation
+ * to /products yields a new order, while pagination clicks and filter changes
+ * within a single visit stay stable (same mount = same seed). SSR is
+ * unaffected — shuffle runs client-side only, preserving ISR cache.
+ */
+function getFreshSeed(): number {
+  if (typeof window === "undefined") return 0;
+  // +1 keeps the seed non-zero (0 is the "no shuffle" sentinel)
+  return Math.floor(Math.random() * 0xfffffffe) + 1;
+}
+
+function mulberry32(seed: number): () => number {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const out = arr.slice();
+  const rand = mulberry32(seed);
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+function applyDefaultShuffle<T>(products: T[], sort: string, seed: number): T[] {
+  if (sort !== "popular" || seed === 0 || products.length < 2) return products;
+  return seededShuffle(products, seed);
+}
 
 /* ─── BrandHeader ─── */
 function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: string | null; description: string | null; content: string | null } }) {
@@ -501,6 +541,9 @@ export default function ProductsPageClient({
   const [wishlistedProductIds, setWishlistedProductIds] = useState<string[]>(_serverWishlist);
   const wishlistedSet = new Set(wishlistedProductIds);
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  // Seed is 0 during SSR / first render → no shuffle. Set on mount so the
+  // initial ISR-cached HTML hydrates byte-for-byte before we re-order.
+  const [shuffleSeed, setShuffleSeed] = useState(0);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState("");
@@ -556,6 +599,22 @@ export default function ProductsPageClient({
   const [visibility, setVisibility] = useState<"all" | "b2c" | "b2b">("all");
 
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Generate a fresh shuffle seed once per mount (post-hydration to keep SSR
+  // markup stable). Each refresh / fresh navigation to /products gets a new
+  // order; within the same mount the seed is stable so pagination & filter
+  // changes don't re-shuffle items the user just looked at.
+  useEffect(() => {
+    setShuffleSeed(getFreshSeed());
+  }, []);
+
+  // Order shown to the user. Featured items stay anchored at the top; the
+  // tail is shuffled with the session seed when sort is the default "popular".
+  // Any explicit sort (price, newest, name) bypasses the shuffle.
+  const displayProducts = useMemo(
+    () => applyDefaultShuffle(products, sortBy, shuffleSeed),
+    [products, sortBy, shuffleSeed]
+  );
 
   // Fetch wishlist IDs client-side when user is authenticated
   useEffect(() => {
@@ -1519,7 +1578,7 @@ export default function ProductsPageClient({
             {/* Product grid */}
             {!loading && (
               <div className={gridView ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8" : "space-y-4"}>
-                {products.map((p) => gridView ? (
+                {displayProducts.map((p) => gridView ? (
                   <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
                 ) : (
                   <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-[#FFFFFF] hover:bg-[#dddbd9]/40 transition-colors overflow-hidden group">

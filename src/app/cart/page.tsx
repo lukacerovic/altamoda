@@ -1,29 +1,174 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
   ShoppingBag, Trash2, Minus, Plus, ChevronRight,
   Truck, Shield, Star, AlertCircle,
   FileText, Store, Sparkles, ImageOff,
+  Heart, CheckCircle, Palette,
 } from "lucide-react";
 
-// TODO(cart-recs): replace with real data from an /api/products/recommended
-// endpoint (e.g. top-selling or recently-viewed). The IDs below are fake, so
-// clicking through 404s and a quick-add button would push junk into the cart.
-// Until the endpoint exists, this section is informational only.
-const recommended = [
-  { id: "5", brand: "L'Oreal", name: "Oxydant Creme 6% 1000ml", price: 1200, rating: 5, image: "https://images.unsplash.com/photo-1585751119414-ef2636f8aede?w=500&h=500&fit=crop" },
-  { id: "6", brand: "Kerastase", name: "Nutritive Bain Satin", price: 3400, rating: 4, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&h=500&fit=crop" },
-  { id: "7", brand: "Olaplex", name: "No.4 Bond Šampon 250ml", price: 3600, rating: 5, image: "https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&h=500&fit=crop" },
-  { id: "8", brand: "Moroccanoil", name: "Treatment Original 100ml", price: 4200, rating: 4, image: "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=500&h=500&fit=crop" },
-];
+const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&h=500&fit=crop";
+
+interface RecommendedProduct {
+  id: string;
+  sku: string;
+  name: string;
+  slug: string;
+  brand: { name: string; slug: string } | null;
+  price: number | null;
+  oldPrice: number | null;
+  image: string | null;
+  isProfessional: boolean;
+  isNew: boolean;
+  isFeatured: boolean;
+  stockQuantity: number;
+  rating: number;
+  variantCount?: number;
+  promoBadge?: string | null;
+  colorSiblings?: { id: string }[];
+}
+
+function getBadge(p: RecommendedProduct): string | null {
+  if (p.promoBadge) return p.promoBadge;
+  if (p.isNew) return "NOVO";
+  if (p.isFeatured) return "HIT";
+  if (p.price != null && p.oldPrice && p.oldPrice > p.price) {
+    const pct = Math.round((1 - p.price / p.oldPrice) * 100);
+    return `-${pct}%`;
+  }
+  return null;
+}
+
+function RecommendedCard({ product, isWishlisted }: { product: RecommendedProduct; isWishlisted: boolean }) {
+  const { t } = useLanguage();
+  const [liked, setLiked] = useState(isWishlisted);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addItem } = useCartStore();
+  const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
+  const badge = getBadge(product);
+  const imgSrc = product.image || PLACEHOLDER_IMG;
+  const hasColors = (product.colorSiblings?.length ?? 0) > 1;
+  const outOfStock = product.stockQuantity <= 0;
+  const b2bOnly = product.price == null;
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const prev = liked;
+    setLiked(!liked);
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+      if (!res.ok) { setLiked(prev); return; }
+      const data = await res.json();
+      if (data.success) {
+        setLiked(data.data.added);
+        if (data.data.added) incWishlist(); else decWishlist();
+      }
+    } catch {
+      setLiked(prev);
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (outOfStock || product.price == null) return;
+    addItem({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand?.name ?? "",
+      price: product.price,
+      quantity: 1,
+      image: product.image ?? "",
+      sku: product.sku,
+      stockQuantity: product.stockQuantity,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 1500);
+  };
+
+  return (
+    <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">
+      <div className="relative aspect-[4/5] overflow-hidden bg-[#dddbd9] mb-4 rounded-[4px]">
+        <Image src={imgSrc} alt={product.name} width={500} height={625} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {badge && (
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] backdrop-blur-sm rounded-full bg-[rgba(26,28,30,0.5)] text-[#FFFFFF]">{badge}</span>
+          )}
+          {product.isProfessional && (
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[rgba(26,28,30,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">{t("products.professional")}</span>
+          )}
+          {product.variantCount != null && product.variantCount > 1 && (
+            <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[rgba(26,28,30,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">
+              {product.variantCount} boja
+            </span>
+          )}
+        </div>
+        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10 opacity-0 group-hover:opacity-100">
+          <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
+        </button>
+        {!b2bOnly && (
+          <div className="hidden md:block absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+            <button
+              onClick={hasColors ? undefined : handleAddToCart}
+              disabled={!hasColors && outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] text-[#ffffff] hover:bg-[#413d3a]"}`}
+            >
+              {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
+                : outOfStock ? <>{t("products.outOfStock")}</>
+                : addedToCart ? <><CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}</>
+                : <><ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}</>}
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col flex-1">
+        <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium block mb-1.5">{product.brand?.name ?? ""}</span>
+        <h3 className="text-base text-[#1a1c1e] mb-1 font-normal line-clamp-2 leading-tight min-h-[2.6em]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.name}</h3>
+        <div className="flex items-center gap-2 text-sm text-[#1a1c1e] mt-1">
+          {product.price == null ? (
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">B2B samo · prijavi se za cenu</span>
+          ) : (
+            <>
+              {product.oldPrice && <span className="text-[#1a1c1e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+              <span>{product.price.toLocaleString("sr-RS")} RSD</span>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-0.5 mt-2">
+          {[...Array(5)].map((_, i) => <Star key={i} className={`w-2.5 h-2.5 ${i < Math.round(product.rating) ? "fill-[#1a1c1e] text-[#1a1c1e]" : "fill-[#1a1c1e]/15 text-[#1a1c1e]/25"}`} />)}
+        </div>
+        {!b2bOnly && (
+          <div className="md:hidden mt-auto pt-3">
+            <button
+              onClick={hasColors ? undefined : handleAddToCart}
+              disabled={!hasColors && outOfStock}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] text-[#ffffff] active:bg-[#413d3a]"}`}
+            >
+              {hasColors ? <><Palette className="w-3 h-3" /> Izaberi boju</>
+                : outOfStock ? <>{t("products.outOfStock")}</>
+                : addedToCart ? <><CheckCircle className="w-3 h-3" /> {t("products.addedToCart")}</>
+                : <><ShoppingBag className="w-3 h-3" /> {t("products.addToCart")}</>}
+            </button>
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
 
 export default function CartPage() {
   const router = useRouter();
@@ -37,6 +182,57 @@ export default function CartPage() {
 
   // Layer 2: Validate stock from DB on cart page load
   const [stockMap, setStockMap] = useState<Record<string, number> | null>(null);
+
+  // Cart-based recommendations: pulled from /api/products, scored by brand match
+  const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
+  const [wishlistedIds, setWishlistedIds] = useState<string[]>([]);
+  const wishlistedSet = useMemo(() => new Set(wishlistedIds), [wishlistedIds]);
+
+  // Refetch only when the *set* of cart products changes, not on quantity edits
+  const cartProductIdsKey = items.map((i) => i.productId).sort().join("|");
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    fetch("/api/wishlist")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.data?.items)) {
+          setWishlistedIds(d.data.items.map((w: { productId: string }) => w.productId));
+        }
+      })
+      .catch(() => {});
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    const currentItems = useCartStore.getState().items;
+    if (currentItems.length === 0) { setRecommended([]); return; }
+    const cartIds = new Set(currentItems.map((i) => i.productId));
+    const cartBrands = new Set(
+      currentItems.map((i) => i.brand?.trim().toLowerCase()).filter(Boolean) as string[]
+    );
+    const ac = new AbortController();
+    fetch("/api/products?inStockOnly=true&sort=popular&limit=24", { signal: ac.signal })
+      .then((r) => r.json())
+      .then((json) => {
+        if (!json.success) return;
+        const pool: RecommendedProduct[] = json.data?.products ?? [];
+        const available = pool.filter((p) => !cartIds.has(p.id));
+        const brandMatches = available.filter(
+          (p) => p.brand?.name && cartBrands.has(p.brand.name.toLowerCase())
+        );
+        let picks: RecommendedProduct[];
+        if (brandMatches.length >= 4) {
+          picks = brandMatches.slice(0, 4);
+        } else {
+          const matchIds = new Set(brandMatches.map((p) => p.id));
+          const fillers = available.filter((p) => !matchIds.has(p.id)).slice(0, 4 - brandMatches.length);
+          picks = [...brandMatches, ...fillers];
+        }
+        setRecommended(picks);
+      })
+      .catch(() => {});
+    return () => ac.abort();
+  }, [cartProductIdsKey]);
 
   useEffect(() => {
     const productIds = useCartStore.getState().items.map((i) => i.productId);
@@ -228,23 +424,17 @@ export default function CartPage() {
           </div>
         )}
 
-        {/* RECOMMENDED */}
-        <section className="mt-16 mb-16">
-          <h2 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.recommended")}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {recommended.map((p) => (
-              <Link key={p.id} href={`/products/${p.id}`} className="product-card bg-white rounded-[4px] shadow-sm hover:shadow-md transition-all group overflow-hidden">
-                <div className="aspect-square overflow-hidden"><Image src={p.image} alt={p.name} width={80} height={80} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /></div>
-                <div className="p-4">
-                  <span className="text-xs text-[#c19742] font-medium uppercase tracking-wider">{p.brand}</span>
-                  <h3 className="text-sm font-medium text-[#1a1c1e] mt-1 line-clamp-2">{p.name}</h3>
-                  <div className="flex items-center gap-0.5 mt-2">{[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < p.rating ? "fill-[#dddbd9] text-[#c19742]" : "text-[#dddbd9]"}`} />)}</div>
-                  <span className="text-base font-bold text-[#1a1c1e] mt-2 block">{p.price.toLocaleString("sr-RS")} RSD</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {/* RECOMMENDED — derived from cart contents (same brand fallback to bestsellers) */}
+        {recommended.length > 0 && (
+          <section className="mt-16 mb-16">
+            <h2 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.recommended")}</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {recommended.map((p) => (
+                <RecommendedCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
