@@ -79,7 +79,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const page = Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
 
   // No auth() call — page is fully cacheable. Role-based filtering happens client-side via API.
-  const limit = 12;
+  const limit = 20;
   const skip = (page - 1) * limit;
   // Storefront hides stock=0 entirely (admin grid shows everything via the API).
   const productWhere = { isActive: true, stockQuantity: { gt: 0 } };

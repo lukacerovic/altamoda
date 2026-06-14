@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   Search, Heart, Star, SlidersHorizontal,
-  ChevronDown, ChevronLeft, ChevronRight, Grid3X3, LayoutList,
+  ChevronDown, ChevronRight, Grid3X3, LayoutList,
   X, ArrowUpDown, ShoppingBag, CheckCircle, Palette,
 } from "lucide-react";
 import DOMPurify from "isomorphic-dompurify";
@@ -517,17 +517,7 @@ export default function ProductsPageClient({
   const { t } = useLanguage();
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string } | undefined)?.role || _serverRole;
-  const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Read `?page` from URL. ?page is the canonical source of truth so deep-links
-  // and back/forward survive a refresh; in-memory state mirrors it.
-  const parsePageFromUrl = useCallback((): number => {
-    const raw = searchParams.get("page");
-    if (!raw) return 1;
-    const n = parseInt(raw, 10);
-    return Number.isFinite(n) && n >= 1 ? n : 1;
-  }, [searchParams]);
 
   const categoryParam = searchParams.get("category");
   const searchParam = searchParams.get("search");
@@ -546,12 +536,18 @@ export default function ProductsPageClient({
   const [shuffleSeed, setShuffleSeed] = useState(0);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
   const [loading, setLoading] = useState(false);
+  // Separate flag for the "load more" append fetch so the existing grid stays
+  // visible (only the button shows a spinner) instead of being replaced by the
+  // full-page loading state used for filter/sort changes.
+  const [loadingMore, setLoadingMore] = useState(false);
   const [fetchError, setFetchError] = useState("");
 
   const [gridView, setGridView] = useState(true);
   const [mobileFilter, setMobileFilter] = useState(false);
   const [sortBy, setSortBy] = useState("popular");
-  const [currentPage, setCurrentPage] = useState(() => parsePageFromUrl());
+  // Highest page currently loaded into the accumulated `products` list. The
+  // "load more" button advances this; filter/sort changes reset it to 1.
+  const [currentPage, setCurrentPage] = useState(initialPagination.page || 1);
   const [searchQuery, setSearchQuery] = useState(searchParam || "");
   const [showSearch, setShowSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -605,16 +601,18 @@ export default function ProductsPageClient({
   // order; within the same mount the seed is stable so pagination & filter
   // changes don't re-shuffle items the user just looked at.
   useEffect(() => {
-    setShuffleSeed(getFreshSeed());
+    const seed = getFreshSeed();
+    setShuffleSeed(seed);
+    // Shuffle the server-rendered first chunk once, post-hydration. Subsequent
+    // chunks are shuffled at fetch time before being appended, so the displayed
+    // order is stable across "load more" clicks (no re-ordering of seen items).
+    setProducts((prev) => applyDefaultShuffle(prev, sortBy, seed));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Order shown to the user. Featured items stay anchored at the top; the
-  // tail is shuffled with the session seed when sort is the default "popular".
-  // Any explicit sort (price, newest, name) bypasses the shuffle.
-  const displayProducts = useMemo(
-    () => applyDefaultShuffle(products, sortBy, shuffleSeed),
-    [products, sortBy, shuffleSeed]
-  );
+  // `products` is already in display order (each chunk shuffled as it arrived),
+  // so no further re-ordering here — that would reshuffle already-shown items.
+  const displayProducts = products;
 
   // Fetch wishlist IDs client-side when user is authenticated
   useEffect(() => {
@@ -633,7 +631,7 @@ export default function ProductsPageClient({
   const buildQueryString = useCallback((page: number) => {
     const params = new URLSearchParams();
     params.set("page", String(page));
-    params.set("limit", "12");
+    params.set("limit", "20");
     params.set("sort", sortBy);
 
     if (!userRole) {
@@ -680,81 +678,53 @@ export default function ProductsPageClient({
     return params.toString();
   }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
 
-  // Fetch products from API
-  const fetchProducts = useCallback(async (page: number) => {
-    setLoading(true);
+  // Fetch products from API. `append` accumulates the next chunk (load more);
+  // otherwise the list is replaced (initial load / filter / sort change).
+  const fetchProducts = useCallback(async (page: number, append = false) => {
+    if (append) setLoadingMore(true);
+    else setLoading(true);
     setFetchError("");
     try {
       const qs = buildQueryString(page);
       const res = await fetch(`/api/products?${qs}`);
       const json = await res.json();
       if (json.success) {
-        setProducts(json.data.products);
+        // Shuffle each chunk as it arrives so "popular" stays randomized without
+        // re-ordering chunks already on screen.
+        const chunk = applyDefaultShuffle(json.data.products as Product[], sortBy, shuffleSeed);
+        setProducts((prev) => (append ? [...prev, ...chunk] : chunk));
         setPagination(json.data.pagination);
       }
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setFetchError("Greška pri učitavanju proizvoda. Pokušajte ponovo.");
     } finally {
-      setLoading(false);
+      if (append) setLoadingMore(false);
+      else setLoading(false);
     }
-  }, [buildQueryString]);
+  }, [buildQueryString, sortBy, shuffleSeed]);
 
-  // Re-fetch when filters/sort/visibility change. Also clear ?page from URL
-  // so a filter swap on page 7 returns the user to page 1 instead of an empty
-  // results set.
+  // Load the next page and append it to the current list.
+  const loadMore = useCallback(() => {
+    if (loading || loadingMore) return;
+    if (currentPage >= pagination.totalPages) return;
+    const next = currentPage + 1;
+    setCurrentPage(next);
+    fetchProducts(next, true);
+  }, [loading, loadingMore, currentPage, pagination.totalPages, fetchProducts]);
+
+  // Re-fetch (replacing the list and resetting to page 1) when filters / sort /
+  // visibility change. With the load-more model there is no ?page in the URL.
   const isInitialMount = useRef(true);
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
-    // If currentPage is already 1, the page-change effect won't fire, so fetch
-    // explicitly here. Otherwise setCurrentPage(1) below triggers it.
-    if (currentPage === 1) {
-      fetchProducts(1);
-    } else {
-      setCurrentPage(1);
-    }
-    if (searchParams.has("page")) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("page");
-      router.replace(`/products${params.toString() ? "?" + params.toString() : ""}`, { scroll: false });
-    }
+    setCurrentPage(1);
+    fetchProducts(1, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
-
-  // Re-fetch whenever the page actually changes (skipping the initial render,
-  // which is already hydrated from the server).
-  const isInitialPageMount = useRef(true);
-  useEffect(() => {
-    if (isInitialPageMount.current) {
-      isInitialPageMount.current = false;
-      return;
-    }
-    fetchProducts(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
-
-  // Keep currentPage in lockstep with ?page — this covers back/forward buttons
-  // and bookmarked deep-links. setCurrentPage no-ops when the value already
-  // matches, so this does not cause duplicate fetches on user-driven clicks.
-  useEffect(() => {
-    const pageFromUrl = parsePageFromUrl();
-    setCurrentPage((prev) => (prev === pageFromUrl ? prev : pageFromUrl));
-  }, [searchParams, parsePageFromUrl]);
-
-  const goToPage = useCallback((n: number) => {
-    if (n < 1 || n > pagination.totalPages) return;
-    const params = new URLSearchParams(searchParams.toString());
-    if (n <= 1) params.delete("page");
-    else params.set("page", String(n));
-    const qs = params.toString();
-    router.push(`/products${qs ? "?" + qs : ""}`, { scroll: false });
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [pagination.totalPages, router, searchParams]);
 
   // Close search dropdown on outside click
   useEffect(() => {
@@ -931,20 +901,8 @@ export default function ProductsPageClient({
       .map((a) => ({ key: a.slug, label: a.nameLat })),
   ];
 
-  const totalPages = pagination.totalPages;
-  // Build the list shown in the pager: first ‧ … ‧ [window of 3 around current] ‧ … ‧ last.
-  // For ≤7 pages we show every number to keep the UI uncluttered.
-  const pageItems: (number | "ellipsis-left" | "ellipsis-right")[] = (() => {
-    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-    const items: (number | "ellipsis-left" | "ellipsis-right")[] = [1];
-    if (currentPage > 4) items.push("ellipsis-left");
-    const windowStart = Math.max(2, currentPage - 1);
-    const windowEnd = Math.min(totalPages - 1, currentPage + 1);
-    for (let i = windowStart; i <= windowEnd; i++) items.push(i);
-    if (currentPage < totalPages - 3) items.push("ellipsis-right");
-    items.push(totalPages);
-    return items;
-  })();
+  // More products remain to load when we haven't reached the last page yet.
+  const hasMore = currentPage < pagination.totalPages;
 
   /* ─── Filter Sidebar ─── */
   const genderOptions = [
@@ -1620,58 +1578,21 @@ export default function ProductsPageClient({
               </div>
             )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <nav
-                aria-label="Pagination"
-                className="flex items-center justify-center gap-1.5 sm:gap-2 mt-16"
-              >
+            {/* Load more */}
+            {!loading && hasMore && (
+              <div className="flex justify-center mt-16">
                 <button
                   type="button"
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage <= 1}
-                  aria-label={t("products.previousPage")}
-                  className="w-10 h-10 flex items-center justify-center border border-[#dddbd9] text-[#1a1c1e] hover:border-[#1a1c1e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[#dddbd9]"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="inline-flex items-center justify-center gap-2 px-10 py-4 border border-[#1a1c1e] text-[#1a1c1e] text-[10px] uppercase tracking-[0.28em] font-medium transition-colors hover:bg-[#1a1c1e] hover:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#1a1c1e]"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  {loadingMore && (
+                    <span className="w-3.5 h-3.5 border-2 border-current/40 border-t-current rounded-full animate-spin" />
+                  )}
+                  {t("products.loadMore")}
                 </button>
-
-                {pageItems.map((item, idx) =>
-                  item === "ellipsis-left" || item === "ellipsis-right" ? (
-                    <span
-                      key={`${item}-${idx}`}
-                      aria-hidden="true"
-                      className="w-6 h-10 flex items-center justify-center text-[11px] text-[#1a1c1e]/60"
-                    >
-                      …
-                    </span>
-                  ) : (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => goToPage(item)}
-                      aria-current={currentPage === item ? "page" : undefined}
-                      className={`w-10 h-10 flex items-center justify-center text-[11px] font-medium transition-all ${
-                        currentPage === item
-                          ? "bg-[#1a1c1e] text-[#FFFFFF]"
-                          : "text-[#1a1c1e]/60 hover:text-[#1a1c1e] border border-[#dddbd9] hover:border-[#1a1c1e]"
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  )
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage >= totalPages}
-                  aria-label={t("products.nextPage")}
-                  className="w-10 h-10 flex items-center justify-center border border-[#dddbd9] text-[#1a1c1e] hover:border-[#1a1c1e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[#dddbd9]"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </nav>
+              </div>
             )}
           </div>
         </div>
