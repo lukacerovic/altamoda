@@ -307,6 +307,7 @@
     "freeShippingOver": "Free shipping over 5,000 RSD"
   },
   "auth": {
+    "home": "Home",
     "login": "Log In",
     "register": "Register",
     "welcomeBack": "Welcome",

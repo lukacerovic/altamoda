@@ -7,9 +7,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   User, Eye, EyeOff, Mail, Lock, Building2, Clock, X, AlertCircle,
+  ChevronRight,
 } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
-import Image from "next/image";
 
 export default function LoginPage() {
   return (
@@ -49,8 +49,6 @@ function LoginContent() {
   const [regTerms, setRegTerms] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
-
-  const logoSrc = "/altamoda-logoes/ALTAMODA LOGO BLACK.png";
 
   type FieldName =
     | "firstName" | "lastName" | "email" | "password" | "passwordConfirm"
@@ -298,10 +296,15 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
-      <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-        <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-13 xl:h-15 w-auto" unoptimized />
-      </Link>
-      <div className="max-w-lg mx-auto px-4 py-12 md:py-20">
+      <div className="max-w-lg mx-auto px-4 pt-8">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-[#1a1c1e]">
+          <Link href="/" className="hover:text-[#c19742]">{t("auth.home")}</Link>
+          <ChevronRight className="w-3 h-3" />
+          <span>{activeTab === "login" ? t("auth.login") : t("auth.register")}</span>
+        </nav>
+      </div>
+      <div className="max-w-lg mx-auto px-4 pt-6 pb-12 md:pb-20">
         {/* Card */}
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
           {/* Tabs */}
@@ -321,9 +324,7 @@ function LoginContent() {
             {activeTab === "login" ? (
               /* LOGIN FORM */
               <form onSubmit={handleLogin}>
-                <Link href="/" className="inline-block mb-6 hover:opacity-70 transition-opacity">
-                  <h2 className="text-2xl font-bold text-[#1a1c1e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.welcomeBack")}</h2>
-                </Link>
+                <h2 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.welcomeBack")}</h2>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.emailAddress")}</label>

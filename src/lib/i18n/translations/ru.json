@@ -307,6 +307,7 @@
     "freeShippingOver": "Бесплатная доставка от 5 000 RSD"
   },
   "auth": {
+    "home": "Главная",
     "login": "Вход",
     "register": "Регистрация",
     "welcomeBack": "Добро пожаловать",
