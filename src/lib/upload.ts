@@ -82,6 +82,107 @@ export async function saveUploadedFile(file: File): Promise<string> {
   return result.secure_url
 }
 
+function decodeHtmlEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&#x2F;/gi, '/')
+    .replace(/&#38;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+}
+
+/**
+ * Resolve an input URL to a direct image URL. If the URL already points at an
+ * image it is returned as-is; if it points at an HTML page (e.g. an Instagram
+ * post link like /p/XXXX/), the page is fetched and its `og:image` meta tag is
+ * extracted — that's the public preview image Instagram exposes for link
+ * unfurling.
+ */
+async function resolveToImageUrl(rawUrl: string): Promise<string> {
+  // Looks like a direct image file already.
+  let pathname = ''
+  try {
+    pathname = new URL(rawUrl).pathname
+  } catch {
+    /* validated by caller */
+  }
+  if (/\.(jpe?g|png|webp|gif|avif)$/i.test(pathname)) return rawUrl
+
+  let res: Response
+  try {
+    res = await fetch(rawUrl, {
+      headers: {
+        // Use Meta's link-unfurling crawler UA: Instagram serves the og:image
+        // meta tag to this crawler, but returns a JS app shell (no meta tags)
+        // to a normal browser UA.
+        'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
+        Accept: 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+      redirect: 'follow',
+    })
+  } catch {
+    throw new Error('Nije moguće pristupiti datom URL-u')
+  }
+
+  const contentType = res.headers.get('content-type') || ''
+  if (contentType.startsWith('image/')) return rawUrl
+  if (!res.ok || !contentType.includes('html')) {
+    throw new Error('Nije moguće preuzeti sliku sa datog URL-a')
+  }
+
+  const html = await res.text()
+  const match =
+    html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+    html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+    html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
+  if (!match?.[1]) {
+    throw new Error('Sa ove stranice nije moguće pročitati sliku. Nalepite direktan URL slike ili je otpremite.')
+  }
+  return decodeHtmlEntities(match[1])
+}
+
+/**
+ * Import a remote image (e.g. an Instagram post link or image URL) into our own
+ * Cloudinary account and return the re-hosted secure URL. Re-hosting is required
+ * because the storefront CSP only whitelists our own CDN, and Instagram CDN URLs
+ * are hotlink-protected and expire.
+ */
+export async function saveImageFromUrl(remoteUrl: string): Promise<string> {
+  let parsed: URL
+  try {
+    parsed = new URL(remoteUrl)
+  } catch {
+    throw new Error('Nevažeći URL slike')
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new Error('URL mora počinjati sa http(s)')
+  }
+
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME
+  const key = process.env.CLOUDINARY_API_KEY
+  const secret = process.env.CLOUDINARY_API_SECRET
+  if (!cloud || !key || !secret) {
+    throw new Error('Cloudinary credentials not configured')
+  }
+  cloudinary.config({ cloud_name: cloud, api_key: key, api_secret: secret })
+
+  const imageUrl = await resolveToImageUrl(remoteUrl)
+
+  try {
+    const result = await cloudinary.uploader.upload(imageUrl, {
+      public_id: `uploads/${randomUUID()}`,
+      resource_type: 'image',
+      folder: 'altamoda',
+    })
+    return result.secure_url
+  } catch {
+    throw new Error('Nije moguće preuzeti sliku sa datog URL-a')
+  }
+}
+
 export async function deleteUploadedFile(url: string): Promise<void> {
   const cloud = process.env.CLOUDINARY_CLOUD_NAME
   const key = process.env.CLOUDINARY_API_KEY

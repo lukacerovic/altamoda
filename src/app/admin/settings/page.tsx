@@ -21,6 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import InstagramGridManager from "@/components/admin/InstagramGridManager";
 
 const DEFAULT_LOGO = "/altamoda-logoes/ALTAMODA WHITE.png";
 
@@ -515,6 +516,9 @@ export default function SettingsPage() {
                   />
                 </div>
               </div>
+
+              {/* Instagram gallery grid — managed independently of the Save button above */}
+              <InstagramGridManager />
             </div>
           )}
 

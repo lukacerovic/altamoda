@@ -354,12 +354,16 @@ interface Props {
   heroImages: string[];
   heroCards?: Partial<HeroCard>[];
   socialLinks?: { instagram?: string; facebook?: string; tiktok?: string };
+  instagramImages?: string[];
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Main editorial home page — inspired by botanical-press aesthetic
 ═══════════════════════════════════════════════════════════════════ */
-export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards, socialLinks }: Props) {
+export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards, socialLinks, instagramImages }: Props) {
+  // Admin-managed Instagram grid images; fall back per-slot to the editorial
+  // defaults so the bento grid is never broken if a slot is left empty.
+  const gridImages = Array.from({ length: 8 }, (_, i) => instagramImages?.[i] || socialImages[i]);
   const instagramUrl = socialLinks?.instagram || "https://www.instagram.com/altamoda_srbija";
   const tiktokUrl = socialLinks?.tiktok || "https://www.tiktok.com/@idhairacademy?lang=de-DE";
   const youtubeUrl = "https://www.youtube.com/@altamodabg";
@@ -952,14 +956,14 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           {/* Bento grid — 4-col × 3-row packed layout (8 images, no gaps) */}
           <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[240px] gap-2 md:gap-3">
             {[
-              { img: socialImages[0], cls: "col-span-2 row-span-1" },            // A — wide top-left
-              { img: socialImages[1], cls: "col-span-1 row-span-1" },            // B — square top-center
-              { img: socialImages[2], cls: "col-span-1 row-span-2" },            // C — tall right
-              { img: socialImages[3], cls: "col-span-1 row-span-1" },            // D — square middle-left
-              { img: socialImages[4], cls: "col-span-2 row-span-1" },            // E — wide middle
-              { img: socialImages[5], cls: "col-span-2 row-span-1" },            // F — wide bottom-left
-              { img: socialImages[6], cls: "col-span-1 row-span-1" },            // G — square bottom-center
-              { img: socialImages[7], cls: "col-span-1 row-span-1" },            // H — square bottom-right
+              { img: gridImages[0], cls: "col-span-2 row-span-1" },            // A — wide top-left
+              { img: gridImages[1], cls: "col-span-1 row-span-1" },            // B — square top-center
+              { img: gridImages[2], cls: "col-span-1 row-span-2" },            // C — tall right
+              { img: gridImages[3], cls: "col-span-1 row-span-1" },            // D — square middle-left
+              { img: gridImages[4], cls: "col-span-2 row-span-1" },            // E — wide middle
+              { img: gridImages[5], cls: "col-span-2 row-span-1" },            // F — wide bottom-left
+              { img: gridImages[6], cls: "col-span-1 row-span-1" },            // G — square bottom-center
+              { img: gridImages[7], cls: "col-span-1 row-span-1" },            // H — square bottom-right
             ].map((cell, i) => (
               <a
                 key={i}

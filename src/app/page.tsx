@@ -49,7 +49,7 @@ export default async function HomePage() {
   const saleAudiences = ['all', 'b2c'] as const
 
   // Fetch all product sets + hero settings + social links in parallel
-  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting, socialSettings] = await Promise.all([
+  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting, socialSettings, instagramImagesSetting] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true, isFeatured: true },
       include: productInclude,
@@ -96,6 +96,7 @@ export default async function HomePage() {
     prisma.siteSetting.findUnique({ where: { key: 'heroImages' } }),
     prisma.siteSetting.findUnique({ where: { key: 'heroCards' } }),
     prisma.siteSetting.findMany({ where: { key: { in: ['instagram', 'facebook', 'tiktok'] } } }),
+    prisma.siteSetting.findUnique({ where: { key: 'instagramImages' } }),
   ])
 
   const socialMap: Record<string, string> = {}
@@ -169,6 +170,7 @@ export default async function HomePage() {
         facebook: socialMap.facebook || '',
         tiktok: socialMap.tiktok || '',
       }}
+      instagramImages={instagramImagesSetting?.value ? (() => { try { return JSON.parse(instagramImagesSetting.value); } catch { return []; } })() : []}
     />
   )
 }
