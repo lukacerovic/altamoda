@@ -163,6 +163,35 @@ interface ProductsPageClientProps {
 /* ─── Helpers ─── */
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&h=500&fit=crop";
 
+/* sessionStorage keys — preserve the accumulated list + scroll position so that
+ * returning from a product detail page restores the exact state the user left,
+ * instead of re-fetching page 1, reshuffling, and jumping to the top. */
+const LIST_SNAPSHOT_KEY = "productsListSnapshot";
+const LIST_RETURN_KEY = "productsListReturn";
+
+/* Restore scroll to `y`, retrying every frame until the (async-rendered) list
+ * is tall enough to actually reach it, then holding briefly to defeat any
+ * competing scroll-to-top from the router. Gives up after ~2.5s. */
+function restoreScrollTo(y: number) {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname;
+  let start = 0;
+  let reachedAt = 0;
+  const step = (now: number) => {
+    // Bail if the user navigated away (e.g. into another product) so we never
+    // hijack the scroll position of a different page.
+    if (window.location.pathname !== path) return;
+    if (!start) start = now;
+    window.scrollTo(0, y);
+    const reached = Math.abs(window.scrollY - y) <= 2;
+    if (reached && !reachedAt) reachedAt = now;
+    const heldLongEnough = reachedAt && now - reachedAt > 250;
+    const timedOut = now - start > 2500;
+    if (!heldLongEnough && !timedOut) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 /* ─── Seeded shuffle ───
  * Per-visit randomization for the default "popular" sort. Featured items
  * stay anchored at the top in their original order; the rest is shuffled with
@@ -256,7 +285,7 @@ function getBadge(product: Product): string | null {
 }
 
 /* ─── ProductCard ─── */
-function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted?: boolean }) {
+function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; isWishlisted?: boolean; onNavigate?: () => void }) {
   const { t } = useLanguage();
   const [liked, setLiked] = useState(isWishlisted ?? false);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -314,7 +343,7 @@ function ProductCard({ product, isWishlisted }: { product: Product; isWishlisted
   };
 
   return (
-    <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">
+    <Link href={`/products/${product.slug}`} onClick={onNavigate} className="group flex flex-col h-full">
       <div className="relative aspect-[4/5] overflow-hidden bg-[#dddbd9] mb-4 rounded-[4px]">
         <Image src={imgSrc} alt={product.name} width={500} height={625} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1200ms] ease-out" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
@@ -561,8 +590,19 @@ export default function ProductsPageClient({
   const [selectedHairTypes, setSelectedHairTypes] = useState<string[]>(hairTypeParams);
   const [selectedTags, setSelectedTags] = useState<string[]>(tagParams);
 
-  // Sync category, gender, brand, lines, attribute filters from URL when navigating between menu links
+  // Sync category, gender, brand, lines, attribute filters from URL when navigating between menu links.
+  // The state above is already seeded from the URL, so we record the mount-time
+  // URL signature and only re-sync when it actually changes. Running it on mount
+  // would create new array refs (triggering a redundant refetch) and reset the
+  // page counter, breaking snapshot restore. Comparing signatures (rather than a
+  // boolean flag) is also robust to React Strict Mode's double-invoke in dev.
+  const lastUrlSig = useRef<string | null>(null);
   useEffect(() => {
+    const urlSig = [categoryParam, genderParam, brandParam, productLineParams.join(","), productTypeParams.join(","), hairTypeParams.join(","), tagParams.join(",")].join("|");
+    if (lastUrlSig.current === urlSig) return; // mount (first record) or no real change
+    const isFirst = lastUrlSig.current === null;
+    lastUrlSig.current = urlSig;
+    if (isFirst) return;
     setSelectedCategory(categoryParam);
     setSelectedGender(genderParam);
     setSelectedBrands(brandParam ? [brandParam] : []);
@@ -596,11 +636,88 @@ export default function ProductsPageClient({
 
   const searchRef = useRef<HTMLDivElement>(null);
 
+  // Signature of the current filter / sort / search set. A saved list snapshot
+  // is only restored when its signature still matches what's being viewed.
+  const listSignature = [
+    sortBy, visibility, searchQuery.trim(), selectedCategory ?? "", selectedGender ?? "",
+    selectedBrands.join(","), selectedProductLines.join(","), selectedProductTypes.join(","),
+    selectedHairTypes.join(","), selectedTags.join(","), priceMin, priceMax,
+    activeToggles.join(","), filterColorLevel ?? "", filterUndertone ?? "", filterHasColor ? "1" : "",
+  ].join("|");
+
+  // Guards the mount init effect so it runs exactly once, even under React
+  // Strict Mode's double-invoke (which would otherwise consume the return
+  // marker and reshuffle the restored list).
+  const didInitRef = useRef(false);
+  // Holds the filter signature whose data we just restored from a snapshot.
+  // While the live signature equals this, the on-mount/filter refetch effect
+  // skips fetching so it can't clobber the restored list with page 1. It clears
+  // automatically the moment the user changes a filter (signature differs).
+  const restoredSignatureRef = useRef<string | null>(null);
+
+  // Persist the current list (accumulated products, page, pagination, scroll)
+  // right before navigating into a product detail, so going back restores the
+  // exact spot instead of resetting to page 1 at the top.
+  const handleProductNavigate = useCallback(() => {
+    try {
+      sessionStorage.setItem(
+        LIST_SNAPSHOT_KEY,
+        JSON.stringify({
+          signature: listSignature,
+          products,
+          currentPage,
+          pagination,
+          shuffleSeed,
+          scrollY: window.scrollY,
+        })
+      );
+      sessionStorage.setItem(LIST_RETURN_KEY, "1");
+    } catch {
+      // sessionStorage unavailable (private mode / quota) — degrade gracefully.
+    }
+  }, [listSignature, products, currentPage, pagination, shuffleSeed]);
+
   // Generate a fresh shuffle seed once per mount (post-hydration to keep SSR
   // markup stable). Each refresh / fresh navigation to /products gets a new
   // order; within the same mount the seed is stable so pagination & filter
   // changes don't re-shuffle items the user just looked at.
   useEffect(() => {
+    // Run exactly once per real mount (Strict Mode double-invokes effects).
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
+    // Returning from a product detail page: restore the saved list + scroll
+    // position instead of reshuffling and resetting to page 1.
+    try {
+      if (sessionStorage.getItem(LIST_RETURN_KEY)) {
+        sessionStorage.removeItem(LIST_RETURN_KEY);
+        const raw = sessionStorage.getItem(LIST_SNAPSHOT_KEY);
+        if (raw) {
+          const snap = JSON.parse(raw);
+          const valid =
+            snap &&
+            snap.signature === listSignature &&
+            Array.isArray(snap.products) && snap.products.length > 0 &&
+            typeof snap.currentPage === "number" &&
+            snap.pagination && typeof snap.pagination.totalPages === "number";
+          if (valid) {
+            // Mark this signature as restored so the refetch effect leaves the
+            // accumulated list intact until the user changes a filter.
+            restoredSignatureRef.current = listSignature;
+            setProducts(snap.products);
+            setCurrentPage(snap.currentPage);
+            setPagination(snap.pagination);
+            if (typeof snap.shuffleSeed === "number") setShuffleSeed(snap.shuffleSeed);
+            // Restore scroll once the restored grid has rendered tall enough.
+            restoreScrollTo(typeof snap.scrollY === "number" ? snap.scrollY : 0);
+            return;
+          }
+        }
+      }
+    } catch {
+      // ignore and fall through to a fresh shuffle
+    }
+
     const seed = getFreshSeed();
     setShuffleSeed(seed);
     // Shuffle the server-rendered first chunk once, post-hydration. Subsequent
@@ -721,10 +838,18 @@ export default function ProductsPageClient({
       isInitialMount.current = false;
       return;
     }
+    if (restoredSignatureRef.current === listSignature) {
+      // The displayed list was restored from a snapshot for exactly these
+      // filters — don't refetch (that would drop the accumulated pages back to
+      // page 1). The moment the user changes any filter the signature differs
+      // and this guard stops applying.
+      return;
+    }
+    restoredSignatureRef.current = null;
     setCurrentPage(1);
     fetchProducts(1, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
+  }, [userRole, sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
 
   // Close search dropdown on outside click
   useEffect(() => {
@@ -1537,9 +1662,9 @@ export default function ProductsPageClient({
             {!loading && (
               <div className={gridView ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8" : "space-y-4"}>
                 {displayProducts.map((p) => gridView ? (
-                  <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} />
+                  <ProductCard key={p.id} product={p} isWishlisted={wishlistedSet.has(p.id)} onNavigate={handleProductNavigate} />
                 ) : (
-                  <Link key={p.id} href={`/products/${p.slug}`} className="flex bg-[#FFFFFF] hover:bg-[#dddbd9]/40 transition-colors overflow-hidden group">
+                  <Link key={p.id} href={`/products/${p.slug}`} onClick={handleProductNavigate} className="flex bg-[#FFFFFF] hover:bg-[#dddbd9]/40 transition-colors overflow-hidden group">
                     <div className="w-36 h-36 bg-[#dddbd9] flex-shrink-0 relative overflow-hidden">
                       <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={400} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
                       {p.isProfessional && (
