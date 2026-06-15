@@ -182,7 +182,9 @@ function restoreScrollTo(y: number) {
     // hijack the scroll position of a different page.
     if (window.location.pathname !== path) return;
     if (!start) start = now;
-    window.scrollTo(0, y);
+    // `behavior: "instant"` overrides the global `html { scroll-behavior: smooth }`
+    // so we snap straight to `y` instead of animating up from the top.
+    window.scrollTo({ top: y, left: 0, behavior: "instant" });
     const reached = Math.abs(window.scrollY - y) <= 2;
     if (reached && !reachedAt) reachedAt = now;
     const heldLongEnough = reachedAt && now - reachedAt > 250;
