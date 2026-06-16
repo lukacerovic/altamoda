@@ -1705,20 +1705,33 @@ export default function ProductsPageClient({
               </div>
             )}
 
-            {/* Load more */}
-            {!loading && hasMore && (
-              <div className="flex justify-center mt-16">
-                <button
-                  type="button"
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="inline-flex items-center justify-center gap-2 px-10 py-4 border border-[#1a1c1e] text-[#1a1c1e] text-[10px] uppercase tracking-[0.28em] font-medium transition-colors hover:bg-[#1a1c1e] hover:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#1a1c1e]"
-                >
-                  {loadingMore && (
-                    <span className="w-3.5 h-3.5 border-2 border-current/40 border-t-current rounded-full animate-spin" />
-                  )}
-                  {t("products.loadMore")}
-                </button>
+            {/* Load progress + Load more */}
+            {!loading && products.length > 0 && pagination.total > 0 && (
+              <div className="flex flex-col items-center mt-16">
+                {/* Progress bar — how many of the total are currently loaded */}
+                <div className="w-full max-w-[420px] h-1 bg-[#dddbd9] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#1a1c1e] rounded-full transition-[width] duration-500 ease-out"
+                    style={{ width: `${Math.min(100, Math.round((displayProducts.length / pagination.total) * 100))}%` }}
+                  />
+                </div>
+                <p className="mt-4 text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium">
+                  Prikazujem {displayProducts.length} od {pagination.total}
+                </p>
+
+                {hasMore && (
+                  <button
+                    type="button"
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="mt-6 inline-flex items-center justify-center gap-2 px-10 py-4 border border-[#1a1c1e] text-[#1a1c1e] text-[10px] uppercase tracking-[0.28em] font-medium transition-colors hover:bg-[#1a1c1e] hover:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#1a1c1e]"
+                  >
+                    {loadingMore && (
+                      <span className="w-3.5 h-3.5 border-2 border-current/40 border-t-current rounded-full animate-spin" />
+                    )}
+                    {t("products.loadMore")}
+                  </button>
+                )}
               </div>
             )}
           </div>
