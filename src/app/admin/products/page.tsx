@@ -475,7 +475,7 @@ export default function ProductsPage() {
     try {
       // Step 1 — page 1, awaited. cache:no-store dodges browser cache so a
       // fresh save is always reflected on refresh.
-      const firstRes = await fetch("/api/products?limit=100&page=1", { cache: "no-store" });
+      const firstRes = await fetch("/api/products?limit=100&page=1&ungroup=true", { cache: "no-store" });
       const firstJson = await firstRes.json();
       if (!firstJson?.success || !firstJson.data?.products) {
         setApiLoaded(true);
@@ -506,7 +506,7 @@ export default function ProductsPage() {
           const batch = remainingPages.slice(i, i + BATCH_SIZE);
           const results = await Promise.all(
             batch.map(pg =>
-              fetch(`/api/products?limit=100&page=${pg}`, { cache: "no-store" })
+              fetch(`/api/products?limit=100&page=${pg}&ungroup=true`, { cache: "no-store" })
                 .then(r => r.json())
                 .catch(() => null),
             ),

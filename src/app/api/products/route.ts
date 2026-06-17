@@ -238,35 +238,41 @@ export const GET = withErrorHandler(async (req: Request) => {
     ? [sortOrderBy, { stockQuantity: 'desc' }]
     : [{ stockQuantity: 'desc' }, sortOrderBy]
 
-  // For grouped products, find representatives and exclude duplicates
-  // Uses 2 queries instead of 3: groupBy for count + single query for rep IDs + all IDs
-  const groupedInFilter = await prisma.product.groupBy({
-    by: ['groupSlug'],
-    where: { ...where, groupSlug: { not: null } },
-    _count: true,
-  })
-  const duplicateCount = groupedInFilter.reduce((sum, g) => sum + g._count - 1, 0)
-
+  // Collapse to one representative per group_slug. Admins can opt out by
+  // passing ?ungroup=true (used by /admin/products) — without that flag, even
+  // admin requests still collapse so the public storefront stays grouped when
+  // an admin is logged in.
+  const ungroup = searchParams.get('ungroup') === 'true' && role === 'admin'
   const excludeIds = new Set<string>()
-  if (groupedInFilter.length > 0) {
-    const groupSlugsInFilter = groupedInFilter.map(g => g.groupSlug).filter(Boolean) as string[]
+  let duplicateCount = 0
+  if (!ungroup) {
+    const groupedInFilter = await prisma.product.groupBy({
+      by: ['groupSlug'],
+      where: { ...where, groupSlug: { not: null } },
+      _count: true,
+    })
+    duplicateCount = groupedInFilter.reduce((sum, g) => sum + g._count - 1, 0)
 
-    // Fetch reps (distinct per group) and all group members in parallel
-    const [reps, allInGroups] = await Promise.all([
-      prisma.product.findMany({
-        where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
-        select: { id: true, groupSlug: true },
-        orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
-        distinct: ['groupSlug'],
-      }),
-      prisma.product.findMany({
-        where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
-        select: { id: true },
-      }),
-    ])
-    const repIds = new Set(reps.map(r => r.id))
-    for (const p of allInGroups) {
-      if (!repIds.has(p.id)) excludeIds.add(p.id)
+    if (groupedInFilter.length > 0) {
+      const groupSlugsInFilter = groupedInFilter.map(g => g.groupSlug).filter(Boolean) as string[]
+
+      // Fetch reps (distinct per group) and all group members in parallel
+      const [reps, allInGroups] = await Promise.all([
+        prisma.product.findMany({
+          where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+          select: { id: true, groupSlug: true },
+          orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
+          distinct: ['groupSlug'],
+        }),
+        prisma.product.findMany({
+          where: { groupSlug: { in: groupSlugsInFilter }, isActive: true },
+          select: { id: true },
+        }),
+      ])
+      const repIds = new Set(reps.map(r => r.id))
+      for (const p of allInGroups) {
+        if (!repIds.has(p.id)) excludeIds.add(p.id)
+      }
     }
   }
 
