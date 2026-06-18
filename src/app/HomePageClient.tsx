@@ -142,8 +142,8 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
                 !hasColors && outOfStock
                   ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                   : addedToCart
-                  ? "bg-[#413d3a] text-[#ffffff]"
-                  : "bg-[#c19742] text-[#ffffff] hover:bg-[#413d3a]"
+                  ? "bg-[#d98fa0] text-[#ffffff]"
+                  : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#d98fa0]"
               }`}
             >
               {hasColors ? (
@@ -196,8 +196,8 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
                 !hasColors && outOfStock
                   ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                   : addedToCart
-                  ? "bg-[#413d3a] text-[#ffffff]"
-                  : "bg-[#c19742] text-[#ffffff] active:bg-[#413d3a]"
+                  ? "bg-[#d98fa0] text-[#ffffff]"
+                  : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"
               }`}
             >
               {hasColors ? (
@@ -757,7 +757,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/account/login"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#c19742] px-8 py-4 rounded-full hover:bg-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19742] focus-visible:ring-offset-2 focus-visible:ring-offset-[#dddbd9]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#edb4bd] px-8 py-4 rounded-full hover:bg-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#edb4bd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#dddbd9]"
                 >
                   Postani naš partner <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -821,7 +821,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          6. EDUCATION CENTER — text left, image right, #1a1c1e bg
+          6. EDUCATION CENTER — text left, image right, #301d16 bg
       ═══════════════════════════════════════════════════════════ */}
       <section className="py-20 md:py-32 bg-[#1a1c1e] text-[#FFFFFF]">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
@@ -832,7 +832,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 Edukativni centar
               </span>
               <Image
-                src="/altamoda-logoes/ID HAIR ACADEMY WHITE.png"
+                src="/altamoda-logoes/idhair-academy-white.png"
                 alt="ID Hair Academy"
                 width={626}
                 height={201}
@@ -879,7 +879,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
                   href="/education"
-                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#c19742] px-8 py-4 rounded-full hover:bg-[#ffffff] hover:text-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c19742] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1c1e]"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#edb4bd] px-8 py-4 rounded-full hover:bg-[#ffffff] hover:text-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#edb4bd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1c1e]"
                 >
                   Upoznaj akademiju <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -1087,7 +1087,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   <button
                     type="submit"
                     disabled={popupStatus === "loading"}
-                    className="w-full bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-60"
+                    className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-60"
                   >
                     {popupStatus === "loading" ? t("home.subscribing") : t("home.subscribe")}
                   </button>
@@ -1107,7 +1107,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       {!showNewsletter && (
         <button
           onClick={() => setShowNewsletter(true)}
-          className="fixed bottom-6 right-6 w-12 h-12 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] rounded-full flex items-center justify-center z-40 transition-all hover:scale-105 shadow-lg"
+          className="fixed bottom-6 right-6 w-12 h-12 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] rounded-full flex items-center justify-center z-40 transition-all hover:scale-105 shadow-lg"
         >
           <Mail className="w-5 h-5" />
         </button>
@@ -1147,7 +1147,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </div>
             <button
               onClick={() => setShowPrivacyModal(false)}
-              className="mt-8 w-full bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors rounded-full"
+              className="mt-8 w-full bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors rounded-full"
             >
               Razumem
             </button>

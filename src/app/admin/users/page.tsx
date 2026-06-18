@@ -218,13 +218,13 @@ export default function UsersPage() {
         {/* B2B Pending count */}
         {pendingCount > 0 && (
           <div className="mt-3 pt-3 border-t border-[#FFFFFF] flex items-center gap-2">
-            <Shield size={16} className="text-[#c19742]" />
+            <Shield size={16} className="text-[#edb4bd]" />
             <span className="text-sm text-[#1a1c1e]">
-              <span className="font-semibold text-[#c19742]">{pendingCount}</span> {t("admin.b2bPendingApproval")}
+              <span className="font-semibold text-[#edb4bd]">{pendingCount}</span> {t("admin.b2bPendingApproval")}
             </span>
             <button
               onClick={() => { setRoleFilter("b2b"); setStatusFilter("pending"); setCurrentPage(1); }}
-              className="ml-2 text-xs text-[#c19742] underline hover:text-black"
+              className="ml-2 text-xs text-[#edb4bd] underline hover:text-black"
             >
               {t("admin.showPending")}
             </button>
@@ -280,7 +280,7 @@ export default function UsersPage() {
                       <td className="px-6 py-4 text-sm font-medium text-black">{user.totalSpent.toLocaleString()} RSD</td>
                       <td className="px-6 py-4">{statusBadge(user.status)}</td>
                       <td className="px-6 py-4">
-                        <button className="p-1.5 text-[#1a1c1e] hover:text-[#c19742] rounded-sm transition-colors">
+                        <button className="p-1.5 text-[#1a1c1e] hover:text-[#edb4bd] rounded-sm transition-colors">
                           <Eye size={16} />
                         </button>
                       </td>
@@ -308,7 +308,7 @@ export default function UsersPage() {
                     page = start + i;
                   }
                   return (
-                    <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-[#c19742] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}>
+                    <button key={page} onClick={() => setCurrentPage(page)} className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-[#edb4bd] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}>
                       {page}
                     </button>
                   );
@@ -334,7 +334,7 @@ export default function UsersPage() {
             <div className="p-6 space-y-6">
               {/* Profile */}
               <div className="text-center">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 ${selectedUser.status === "pending" ? "bg-yellow-50 text-yellow-600" : "bg-black/10 text-[#c19742]"}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 ${selectedUser.status === "pending" ? "bg-yellow-50 text-yellow-600" : "bg-black/10 text-[#edb4bd]"}`}>
                   <User size={28} />
                 </div>
                 <h4 className="font-semibold text-black">{selectedUser.name}</h4>

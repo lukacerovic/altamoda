@@ -11,7 +11,7 @@
 
 export const colors = {
   // ── Brand Accent ──────────────────────────────────────────
-  accent:      '#c19742',  // Primary CTA — buttons, links, highlights (gold)
+  accent:      '#edb4bd',  // Primary CTA — buttons, links, highlights (gold)
   accentLight: '#dddbd9',  // Hover states, subtle accents, scrollbar
   accentDark:  '#413d3a',  // Active/pressed states, deeper emphasis
 
@@ -34,18 +34,18 @@ export const colors = {
   border:      '#dddbd9',  // Default border color
 
   // ── CTA / Button ──────────────────────────────────────────
-  cta:         '#c19742',  // Primary call-to-action
+  cta:         '#edb4bd',  // Primary call-to-action
 
   // ── Status / Feedback (reserved for messages only) ────────
   success:     '#2d7a3a',  // Success messages, confirmations
   error:       '#ba1a1a',  // Error messages, validation failures
-  warning:     '#c19742',  // Warnings, caution states (gold)
+  warning:     '#edb4bd',  // Warnings, caution states (gold)
 } as const;
 
 /**
  * Tailwind class reference (available via @theme inline in globals.css):
  *
- *   bg-accent / text-accent / border-accent          → #c19742 (CTA Gold)
+ *   bg-accent / text-accent / border-accent          → #edb4bd (CTA Gold)
  *   bg-accent-light / text-accent-light               → #dddbd9 (Light Warm Gray)
  *   bg-accent-dark / text-accent-dark                 → #413d3a (Warm Dark Gray)
  *   bg-background                                     → #ffffff (White)
@@ -57,9 +57,9 @@ export const colors = {
  *   bg-dark / text-dark                               → #1a1c1e
  *   bg-dark-light                                     → #413d3a
  *   border-border                                     → #dddbd9
- *   text-success / bg-success                         → #c19742
- *   text-error / bg-error                             → #c19742
- *   text-warning / bg-warning                         → #c19742
+ *   text-success / bg-success                         → #edb4bd
+ *   text-error / bg-error                             → #edb4bd
+ *   text-warning / bg-warning                         → #edb4bd
  *
  * For opacity variants use Tailwind modifiers:
  *   bg-accent/30  → rgba(193,151,66, 0.3)

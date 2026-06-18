@@ -899,21 +899,21 @@ export default function ProductsPage() {
           <p className="text-sm text-[#1a1c1e] mt-1 inline-flex items-center gap-2">
             {products.length} {t("admin.totalProducts")}
             {loadingProducts && products.length > 0 && (
-              <Loader2 size={14} className="animate-spin text-[#c19742]" />
+              <Loader2 size={14} className="animate-spin text-[#edb4bd]" />
             )}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={openAddPanel}
-            className="px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors"
+            className="px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors"
           >
             <Plus size={18} />
             {t("admin.addProduct")}
           </button>
           <Link
             href="/admin/import"
-            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors"
           >
             <Upload size={16} />
             {t("admin.importCsv")}
@@ -1009,7 +1009,7 @@ export default function ProductsPage() {
             <div className="relative">
               <button
                 onClick={() => setShowBulkMenu(!showBulkMenu)}
-                className="px-3 py-1.5 bg-[#c19742] text-white rounded-sm text-sm flex items-center gap-1"
+                className="px-3 py-1.5 bg-[#edb4bd] text-white rounded-sm text-sm flex items-center gap-1"
               >
                 {t("admin.actions")} <MoreVertical size={14} />
               </button>
@@ -1063,7 +1063,7 @@ export default function ProductsPage() {
                       aria-pressed={selectedIds.includes(product.id)}
                       className="text-[#1a1c1e] hover:text-black"
                     >
-                      {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-[#c19742]" /> : <Square size={18} />}
+                      {selectedIds.includes(product.id) ? <CheckSquare size={18} className="text-[#edb4bd]" /> : <Square size={18} />}
                     </button>
                   </td>
                   <td className="px-4 py-3">
@@ -1075,7 +1075,7 @@ export default function ProductsPage() {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-black truncate max-w-[200px]">{product.name}</p>
                           {product.badges.isProfessionalOnly && (
-                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-black/10 text-[#c19742]">
+                            <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-black/10 text-[#edb4bd]">
                               <ShieldCheck size={10} /> B2B
                             </span>
                           )}
@@ -1125,7 +1125,7 @@ export default function ProductsPage() {
                         onClick={() => openEditPanel(product)}
                         aria-label={`${t("admin.editProduct")}: ${product.name}`}
                         title={t("admin.editProduct")}
-                        className="p-1.5 text-[#1a1c1e] hover:text-[#c19742] hover:bg-black/10 rounded-sm transition-colors"
+                        className="p-1.5 text-[#1a1c1e] hover:text-[#edb4bd] hover:bg-black/10 rounded-sm transition-colors"
                       >
                         <Edit3 size={15} />
                       </button>
@@ -1146,7 +1146,7 @@ export default function ProductsPage() {
                   <td colSpan={10} className="px-4 py-12 text-center text-sm text-[#1a1c1e]">
                     {loadingProducts ? (
                       <span className="inline-flex items-center gap-2 text-[#1a1c1e]/70">
-                        <Loader2 size={16} className="animate-spin text-[#c19742]" />
+                        <Loader2 size={16} className="animate-spin text-[#edb4bd]" />
                         Učitavanje proizvoda...
                       </span>
                     ) : (
@@ -1177,7 +1177,7 @@ export default function ProductsPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-[#c19742] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}
+                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-[#edb4bd] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}
                 >
                   {page}
                 </button>
@@ -1221,7 +1221,7 @@ export default function ProductsPage() {
                     onClick={() => setActiveTab(tab.key)}
                     className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.key
-                        ? "border-black text-[#c19742]"
+                        ? "border-black text-[#edb4bd]"
                         : "border-transparent text-[#1a1c1e] hover:text-black hover:border-[#dddbd9]"
                     }`}
                   >
@@ -1292,7 +1292,7 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewProductLine(!showNewProductLine)}
-                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#c19742] hover:bg-stone-50 transition-colors whitespace-nowrap"
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#edb4bd] hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
                           + Nova
                         </button>
@@ -1349,7 +1349,7 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewCategory(!showNewCategory)}
-                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#c19742] hover:bg-stone-50 transition-colors whitespace-nowrap"
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#edb4bd] hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
                           + Nova
                         </button>
@@ -1375,7 +1375,7 @@ export default function ProductsPage() {
                                 setShowNewCategory(false);
                               }
                             }}
-                            className="px-4 py-2 bg-[#c19742] text-white rounded-sm text-xs font-medium hover:bg-[#413d3a] transition-colors"
+                            className="px-4 py-2 bg-[#edb4bd] text-white rounded-sm text-xs font-medium hover:bg-[#413d3a] transition-colors"
                           >
                             Dodaj
                           </button>
@@ -1391,7 +1391,7 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => setShowNewSubCategory(!showNewSubCategory)}
-                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#c19742] hover:bg-stone-50 transition-colors whitespace-nowrap"
+                          className="px-3 py-2 border border-stone-200 rounded-sm text-xs font-medium text-[#edb4bd] hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
                           + Nova
                         </button>
@@ -1420,7 +1420,7 @@ export default function ProductsPage() {
                                 setShowNewSubCategory(false);
                               }
                             }}
-                            className="px-4 py-2 bg-[#c19742] text-white rounded-sm text-xs font-medium hover:bg-[#413d3a] transition-colors"
+                            className="px-4 py-2 bg-[#edb4bd] text-white rounded-sm text-xs font-medium hover:bg-[#413d3a] transition-colors"
                           >
                             Dodaj
                           </button>
@@ -1459,7 +1459,7 @@ export default function ProductsPage() {
                             type="checkbox"
                             checked={formData.badges[key]}
                             onChange={(e) => updateForm("badges", { ...formData.badges, [key]: e.target.checked })}
-                            className="w-4 h-4 rounded border-stone-200 text-[#c19742] accent-[#dddbd9]"
+                            className="w-4 h-4 rounded border-stone-200 text-[#edb4bd] accent-[#dddbd9]"
                           />
                           <span className="text-sm text-[#1a1c1e]">{label}</span>
                         </label>
@@ -1472,11 +1472,11 @@ export default function ProductsPage() {
                     <>
                       <div className="border-t border-stone-200 pt-5 mt-2">
                         <div className="flex items-center gap-2 mb-4">
-                          <Palette size={18} className="text-[#c19742]" />
+                          <Palette size={18} className="text-[#edb4bd]" />
                           <h3 className="text-sm font-semibold text-black">Podaci o boji</h3>
                         </div>
                         <div className="p-3 bg-stone-100 rounded-sm text-xs text-stone-500 flex items-center gap-2 mb-5">
-                          <Palette size={16} className="text-[#c19742]" />
+                          <Palette size={16} className="text-[#edb4bd]" />
                           Dodelite boju proizvodu — podaci se koriste za vizuelni prikaz i filtriranje na sajtu.
                         </div>
 
@@ -1487,7 +1487,7 @@ export default function ProductsPage() {
                             {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
                               const levelHex = [
                                 "#1a1c1e", "#1a1c1e", "#413d3a", "#413d3a", "#413d3a",
-                                "#413d3a", "#413d3a", "#c19742", "#c19742", "#dddbd9",
+                                "#413d3a", "#413d3a", "#edb4bd", "#edb4bd", "#dddbd9",
                               ][n - 1];
                               return (
                                 <button
@@ -1519,7 +1519,7 @@ export default function ProductsPage() {
                                 onClick={() => updateForm("colorUndertone", formData.colorUndertone === u.value ? undefined : u.value)}
                                 className={`px-3 py-1.5 text-xs font-medium border transition-all rounded-sm ${
                                   formData.colorUndertone === u.value
-                                    ? "bg-[#c19742] text-white border-[#c19742]"
+                                    ? "bg-[#edb4bd] text-white border-[#edb4bd]"
                                     : "bg-white text-stone-600 border-stone-200 hover:border-black"
                                 }`}
                               >
@@ -1674,7 +1674,7 @@ export default function ProductsPage() {
                         )}
                       </div>
                       {formData.badges.isProfessionalOnly && (
-                        <p className="text-xs text-[#c19742] mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
+                        <p className="text-xs text-[#edb4bd] mt-1 flex items-center gap-1"><ShieldCheck size={12} /> {t("admin.forProfessionals")}</p>
                       )}
                     </div>
                   </div>
@@ -1798,7 +1798,7 @@ export default function ProductsPage() {
                             </div>
                           )}
                           {img.isPrimary && (
-                            <div className="absolute top-1 left-1 bg-[#c19742] text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
+                            <div className="absolute top-1 left-1 bg-[#edb4bd] text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
                               <Star size={10} /> {t("admin.mainImage")}
                             </div>
                           )}
@@ -1854,7 +1854,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#1a1c1e] hover:border-black hover:text-[#c19742] transition-colors cursor-pointer disabled:opacity-50"
+                        className="border-2 border-dashed border-stone-200 rounded-sm aspect-square flex flex-col items-center justify-center gap-2 text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {uploading ? (
                           <>
@@ -1943,7 +1943,7 @@ export default function ProductsPage() {
               >
                 {t("admin.cancel")}
               </button>
-              <button onClick={handleSave} disabled={saving} className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
+              <button onClick={handleSave} disabled={saving} className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50">
                 {saving ? t("admin.saving") : editingProduct ? t("admin.saveChanges") : t("admin.addProduct")}
               </button>
             </div>
@@ -1986,7 +1986,7 @@ export default function ProductsPage() {
             <div className="px-6 pb-6 pt-2 flex justify-end">
               <button
                 onClick={() => setValidationErrors([])}
-                className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
+                className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium"
               >
                 {t("auth.understood")}
               </button>

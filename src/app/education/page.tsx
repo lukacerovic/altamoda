@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 
 /* Splits text on *…* markers and wraps the marked spans in italic accent colour. */
 function withEm(text: string, accent: "olive" | "gold" = "olive") {
-  const accentClass = accent === "gold" ? "text-[#c19742]" : "text-[#1a1c1e]";
+  const accentClass = accent === "gold" ? "text-[#edb4bd]" : "text-[#1a1c1e]";
   return text.split(/(\*[^*]+\*)/g).map((part, i) => {
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
@@ -116,7 +116,7 @@ export default function EducationPage() {
                   {t("education.heroTag")}
                 </span>
                 <Image
-                  src="/altamoda-logoes/ID HAIR ACADEMY BLACK.png"
+                  src="/altamoda-logoes/idhair-academy-dark.png"
                   alt="ID Hair Academy"
                   width={626}
                   height={201}
@@ -138,7 +138,7 @@ export default function EducationPage() {
                 <div className="flex items-center gap-3.5 flex-wrap">
                   <a
                     href="#kontakt"
-                    className="inline-flex items-center gap-2.5 bg-[#c19742] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-[#413d3a] hover:-translate-y-px transition-all"
+                    className="inline-flex items-center gap-2.5 bg-[#edb4bd] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-[#413d3a] hover:-translate-y-px transition-all"
                   >
                     {t("education.heroCtaPrimary")} <ArrowRight className="w-3 h-3" />
                   </a>
@@ -284,7 +284,7 @@ export default function EducationPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_0.85fr] gap-8 lg:gap-12 items-start">
               <div>
                 <div
-                  className="italic text-[13px] text-[#c19742] mb-2.5"
+                  className="italic text-[13px] text-[#edb4bd] mb-2.5"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   Nº 04
@@ -349,7 +349,7 @@ export default function EducationPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 lg:gap-14 items-start">
               <div>
                 <div
-                  className="italic text-[12px] text-[#c19742] mb-2"
+                  className="italic text-[12px] text-[#edb4bd] mb-2"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   Nº 05

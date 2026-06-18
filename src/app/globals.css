@@ -49,11 +49,11 @@
   --color-inverse-primary: #dddbd9;
 
   /* CTA / Button */
-  --color-cta: #c19742;
+  --color-cta: #edb4bd;
   --color-on-cta: #ffffff;
 
   /* Legacy aliases for gradual migration */
-  --color-accent: #c19742;
+  --color-accent: #edb4bd;
   --color-accent-light: #dddbd9;
   --color-accent-dark: #413d3a;
   --color-dark: #1a1c1e;
@@ -62,7 +62,7 @@
   --color-text-light: #dddbd9;
   --color-border: #dddbd9;
   --color-success: #2d7a3a;
-  --color-warning: #c19742;
+  --color-warning: #edb4bd;
   --color-muted: #dddbd9;
 
   /* Typography */

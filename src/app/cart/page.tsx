@@ -125,7 +125,7 @@ function RecommendedCard({ product, isWishlisted }: { product: RecommendedProduc
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] text-[#ffffff] hover:bg-[#413d3a]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#d98fa0]"}`}
             >
               {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -156,7 +156,7 @@ function RecommendedCard({ product, isWishlisted }: { product: RecommendedProduc
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] text-[#ffffff] active:bg-[#413d3a]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"}`}
             >
               {hasColors ? <><Palette className="w-3 h-3" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -284,12 +284,12 @@ export default function CartPage() {
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
-          <Link href="/" className="hover:text-[#c19742]">{t("cart.home")}</Link><ChevronRight className="w-3 h-3" /><span className="text-[#1a1c1e]">{t("cart.cart")}</span>
+          <Link href="/" className="hover:text-[#edb4bd]">{t("cart.home")}</Link><ChevronRight className="w-3 h-3" /><span className="text-[#1a1c1e]">{t("cart.cart")}</span>
         </nav>
 
         <h1 className="text-3xl font-bold text-[#1a1c1e] mb-8" style={{ fontFamily: "'Noto Serif', serif" }}>{t("cart.title")} ({items.length})</h1>
         <div>
-          <Link href="/products" className="inline-flex items-center gap-2 text-[#c19742] hover:text-[#1a1c1e] text-sm font-medium transition-colors mb-3">
+          <Link href="/products" className="inline-flex items-center gap-2 text-[#edb4bd] hover:text-[#1a1c1e] text-sm font-medium transition-colors mb-3">
             &larr; {t("cart.continueShoppingLink")}
           </Link>
         </div>
@@ -298,7 +298,7 @@ export default function CartPage() {
             <ShoppingBag className="w-16 h-16 text-[#dddbd9] mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-[#1a1c1e] mb-2">{t("cart.empty")}</h2>
             <p className="text-[#1a1c1e] mb-6">{t("cart.emptyDesc")}</p>
-            <Link href="/products" className="inline-flex items-center gap-2 bg-[#c19742] hover:bg-[#413d3a] text-white px-6 py-3 rounded font-medium transition-colors">{t("cart.continueShopping")}</Link>
+            <Link href="/products" className="inline-flex items-center gap-2 bg-[#edb4bd] hover:bg-[#413d3a] text-white px-6 py-3 rounded font-medium transition-colors">{t("cart.continueShopping")}</Link>
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8 items-stretch">
@@ -325,11 +325,11 @@ export default function CartPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-xs text-[#c19742] font-medium uppercase tracking-wider">{item.brand}</span>
+                        <span className="text-xs text-[#edb4bd] font-medium uppercase tracking-wider">{item.brand}</span>
                         <h3 className="text-sm md:text-base font-medium text-[#1a1c1e] mt-1">{item.name}</h3>
                         {outOfStock && <p className="text-xs text-red-600 font-medium mt-1">{t("cart.outOfStockNotice")}</p>}
                       </div>
-                      <button onClick={() => removeItem(item.productId)} className="text-[#1a1c1e] hover:text-[#c19742] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => removeItem(item.productId)} className="text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       {outOfStock ? (
@@ -360,21 +360,21 @@ export default function CartPage() {
               {/* B2B Options Box — only for B2B users */}
               {isB2b && (
                 <div className="bg-white rounded-sm shadow-sm p-6 border-2 border-black">
-                  <h3 className="text-sm font-semibold text-[#c19742] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> {t("cart.b2bOptions")}</h3>
+                  <h3 className="text-sm font-semibold text-[#edb4bd] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> {t("cart.b2bOptions")}</h3>
                   <div className="space-y-3">
                     <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#c19742] focus:ring-[#1a1c1e]" />
+                      <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#edb4bd] focus:ring-[#1a1c1e]" />
                       <span className="text-sm text-[#1a1c1e]">{t("cart.orderWithoutOnlinePayment")}</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#c19742] focus:ring-[#1a1c1e]" />
+                      <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#edb4bd] focus:ring-[#1a1c1e]" />
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-[#1a1c1e]" />
                         <span className="text-sm text-[#1a1c1e]">{t("cart.invoicePayment")}</span>
                       </div>
                     </label>
                     <div className="bg-[#FFFFFF] rounded p-3 text-xs text-[#1a1c1e] flex items-start gap-2">
-                      <Store className="w-4 h-4 text-[#c19742] flex-shrink-0 mt-0.5" />
+                      <Store className="w-4 h-4 text-[#edb4bd] flex-shrink-0 mt-0.5" />
                       <span>{t("cart.minB2bOrder")}: <strong className="text-[#1a1c1e]">{MIN_B2B_ORDER.toLocaleString("sr-RS")} RSD</strong></span>
                     </div>
                   </div>
@@ -405,13 +405,13 @@ export default function CartPage() {
 
                 <div className="flex-1" />
 
-                <button onClick={handleCheckout} disabled={inStockItems.length === 0} className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <button onClick={handleCheckout} disabled={inStockItems.length === 0} className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3.5 rounded font-medium mt-6 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                   {t("cart.proceedToCheckout")} <ChevronRight className="w-4 h-4" />
                 </button>
 
                 <div className="mt-4 space-y-2 text-xs text-[#1a1c1e]">
-                  <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#c19742]" /> {t("cart.freeShippingOver")}</div>
-                  <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#c19742]" /> {t("cart.securePayment")}</div>
+                  <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#edb4bd]" /> {t("cart.freeShippingOver")}</div>
+                  <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#edb4bd]" /> {t("cart.securePayment")}</div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#dddbd9]">

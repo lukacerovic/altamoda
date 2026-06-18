@@ -245,7 +245,7 @@ export default function OrdersPage() {
       case "isporuceno":
         return <CheckCircle size={16} className="text-emerald-500" />;
       case "u_obradi":
-        return <Package size={16} className="text-[#c19742]" />;
+        return <Package size={16} className="text-[#edb4bd]" />;
       case "otkazano":
         return <XCircle size={16} className="text-red-500" />;
       default:
@@ -363,7 +363,7 @@ export default function OrdersPage() {
                       className="hover:bg-stone-100 transition-colors cursor-pointer"
                       onClick={() => toggleExpand(order.id)}
                     >
-                      <td className="px-6 py-4 text-sm font-medium text-[#c19742]">
+                      <td className="px-6 py-4 text-sm font-medium text-[#edb4bd]">
                         {order.orderNumber}
                       </td>
                       <td className="px-6 py-4">
@@ -534,7 +534,7 @@ export default function OrdersPage() {
                                         <td colSpan={3} className="px-4 py-2.5 text-sm font-semibold text-black text-right">
                                           {t("admin.total")}:
                                         </td>
-                                        <td className="px-4 py-2.5 text-sm font-bold text-[#c19742]">
+                                        <td className="px-4 py-2.5 text-sm font-bold text-[#edb4bd]">
                                           {orderDetail.total.toLocaleString()} RSD
                                         </td>
                                       </tr>
@@ -736,7 +736,7 @@ export default function OrdersPage() {
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 sm:w-9 sm:h-9 rounded-sm text-sm font-medium transition-colors ${
                     page === currentPage
-                      ? "bg-[#c19742] text-white"
+                      ? "bg-[#edb4bd] text-white"
                       : "text-[#1a1c1e] hover:bg-stone-100"
                   }`}
                 >

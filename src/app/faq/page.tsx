@@ -277,14 +277,14 @@ export default function FAQPage() {
       <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-8">
-          <Link href="/" className="hover:text-[#c19742]">{t("faq.home")}</Link>
+          <Link href="/" className="hover:text-[#edb4bd]">{t("faq.home")}</Link>
           <span>/</span>
           <span>{t("faq.title")}</span>
         </nav>
 
         {/* Title */}
         <div className="text-center mb-10">
-          <HelpCircle className="w-12 h-12 text-[#c19742] mx-auto mb-4" />
+          <HelpCircle className="w-12 h-12 text-[#edb4bd] mx-auto mb-4" />
           <h1 className="text-3xl md:text-4xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
             {t("faq.title")}
           </h1>
@@ -329,7 +329,7 @@ export default function FAQPage() {
                         className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FFFFFF] transition-colors"
                       >
                         <span className="text-sm font-medium text-[#1a1c1e] pr-4">{item.q}</span>
-                        <ChevronDown className={`w-5 h-5 text-[#c19742] flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown className={`w-5 h-5 text-[#edb4bd] flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isOpen && (
                         <div className="px-5 pb-4 animate-slideDown">
@@ -349,10 +349,10 @@ export default function FAQPage() {
           <h3 className="text-xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
           <p className="text-[#1a1c1e] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#c19742] transition-colors">
+            <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors">
               <Phone className="w-4 h-4" /> +381 (0)11 3088388
             </a>
-            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#c19742] transition-colors">
+            <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors">
               <Mail className="w-4 h-4" /> kontakt@altamoda.rs
             </a>
           </div>
@@ -362,7 +362,7 @@ export default function FAQPage() {
         <div className="mt-8 flex justify-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#c19742] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#edb4bd] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors"
           >
             <Home className="w-4 h-4" /> {t("faq.backToHome")}
           </Link>

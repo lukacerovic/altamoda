@@ -474,7 +474,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               )}
               <span className="text-4xl md:text-5xl font-light text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.price.toLocaleString("sr-RS")} <span className="text-xl">RSD</span></span>
               {discountPct > 0 && (
-                <span className="bg-[#c19742] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">-{discountPct}%</span>
+                <span className="bg-[#edb4bd] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">-{discountPct}%</span>
               )}
             </div>
 
@@ -546,7 +546,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                   <button
                     onClick={handleAddToCart}
                     disabled={disabled}
-                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${disabled ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff]"}`}
+                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${disabled ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff]"}`}
                   >
                     {professionalBlocked ? (
                       <>B2B - samo za salone</>
@@ -558,8 +558,8 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                       <><ShoppingBag className="w-4 h-4" /> {t("productDetail.addToCart")}</>
                     )}
                   </button>
-                  <button onClick={handleToggleWishlist} className={`w-12 h-12 border flex items-center justify-center transition-colors ${liked ? "border-[#c19742] bg-[#c19742]/5" : "border-[#dddbd9] hover:border-[#1a1c1e]"}`}>
-                    <Heart className={`w-4 h-4 ${liked ? "fill-[#c19742] text-[#c19742]" : "text-[#1a1c1e]"}`} />
+                  <button onClick={handleToggleWishlist} className={`w-12 h-12 border flex items-center justify-center transition-colors ${liked ? "border-[#edb4bd] bg-[#edb4bd]/5" : "border-[#dddbd9] hover:border-[#1a1c1e]"}`}>
+                    <Heart className={`w-4 h-4 ${liked ? "fill-[#edb4bd] text-[#edb4bd]" : "text-[#1a1c1e]"}`} />
                   </button>
                 </div>
               )
@@ -690,7 +690,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               ) : canReview ? (
                 <button
                   onClick={() => setShowReviewForm(true)}
-                  className="px-5 md:px-6 py-3 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+                  className="px-5 md:px-6 py-3 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
                 >
                   <Star className="w-3.5 h-3.5" /> {t("productDetail.rateProduct")}
                 </button>
@@ -706,7 +706,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               {!hasAlreadyReviewed && canReview && (
                 <button
                   onClick={() => setShowReviewForm(true)}
-                  className="mt-6 px-6 py-3 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors inline-flex items-center gap-2"
+                  className="mt-6 px-6 py-3 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] text-[10px] uppercase tracking-[0.22em] font-medium transition-colors inline-flex items-center gap-2"
                 >
                   <Star className="w-3.5 h-3.5" /> {t("productDetail.addFirstReview")}
                 </button>
@@ -774,8 +774,8 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                         relOutOfStock
                           ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                           : justAdded
-                          ? "bg-[#413d3a] text-[#ffffff]"
-                          : "bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff]"
+                          ? "bg-[#d98fa0] text-[#ffffff]"
+                          : "bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff]"
                       }`}
                     >
                       {relOutOfStock ? (
@@ -832,7 +832,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                   <button
                     onClick={handleSubmitReview}
                     disabled={reviewRating === 0 || reviewSubmitting}
-                    className="w-full bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-40"
+                    className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors disabled:opacity-40"
                   >
                     {reviewSubmitting ? t("productDetail.submitting") : t("productDetail.submitReview")}
                   </button>

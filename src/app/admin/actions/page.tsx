@@ -120,7 +120,7 @@ const ProductRow = memo(function ProductRow({
       <div className="text-right flex-shrink-0">
         {showDiscount ? (
           <>
-            <p className="text-sm font-bold text-[#c19742]">{discounted.toLocaleString()} RSD</p>
+            <p className="text-sm font-bold text-[#edb4bd]">{discounted.toLocaleString()} RSD</p>
             <p className="text-[10px] text-[#1a1c1e] line-through">{priceB2c.toLocaleString()} RSD</p>
           </>
         ) : (
@@ -484,7 +484,7 @@ export default function ActionsPage() {
           <h1 className="text-2xl font-serif font-bold text-black">{t("admin.actionsAndDiscounts")}</h1>
           <p className="text-sm text-[#1a1c1e] mt-1">{t("admin.manageActionsDesc")}</p>
         </div>
-        <button onClick={openCreate} className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
+        <button onClick={openCreate} className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-5 py-2.5 rounded-sm text-sm flex items-center gap-2 self-start">
           <Plus size={18} /> {t("admin.newAction")}
         </button>
       </div>
@@ -493,7 +493,7 @@ export default function ActionsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-sm border border-stone-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-[#c19742]" /></div>
+            <div className="w-10 h-10 rounded-sm bg-stone-50 flex items-center justify-center"><Zap size={20} className="text-[#edb4bd]" /></div>
             <div>
               <p className="text-xs text-[#1a1c1e]">{t("admin.totalActions")}</p>
               <p className="text-xl font-bold text-black">{actions.length}</p>
@@ -538,7 +538,7 @@ export default function ActionsPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {(["all", "active", "scheduled", "inactive"] as const).map(s => (
-              <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 sm:px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-[#c19742] text-white" : "bg-stone-100 text-[#1a1c1e] hover:bg-[#dddbd9]"}`}>
+              <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 sm:px-4 py-2 rounded-sm text-sm font-medium transition-colors ${statusFilter === s ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-[#1a1c1e] hover:bg-[#dddbd9]"}`}>
                 {s === "all" ? t("admin.all") : s === "active" ? t("admin.active") : s === "scheduled" ? t("admin.scheduled") : t("admin.inactive")}
               </button>
             ))}
@@ -559,7 +559,7 @@ export default function ActionsPage() {
                     <h3 className="text-base font-semibold text-black truncate">{action.name}</h3>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}>{status.label}</span>
                     {action.badge && (
-                      <span className="px-2 py-0.5 rounded bg-[#c19742] text-white text-xs font-bold">{action.badge}</span>
+                      <span className="px-2 py-0.5 rounded bg-[#edb4bd] text-white text-xs font-bold">{action.badge}</span>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-[#1a1c1e]">
@@ -590,7 +590,7 @@ export default function ActionsPage() {
                   <button onClick={() => toggleActive(action.id)} className={`p-2 rounded-sm transition-colors ${action.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-50"}`} title={action.isActive ? t("admin.deactivate") : t("admin.activate")}>
                     {action.isActive ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
-                  <button onClick={() => openEdit(action)} className="p-2 text-[#1a1c1e] hover:text-[#c19742] hover:bg-black/10 rounded-sm transition-colors">
+                  <button onClick={() => openEdit(action)} className="p-2 text-[#1a1c1e] hover:text-[#edb4bd] hover:bg-black/10 rounded-sm transition-colors">
                     <Edit3 size={18} />
                   </button>
                   <button onClick={() => deleteAction(action.id)} className="p-2 text-[#1a1c1e] hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors">
@@ -617,7 +617,7 @@ export default function ActionsPage() {
                           <div>
                             <p className="text-xs font-medium text-black truncate max-w-[150px]">{p.name}</p>
                             <div className="flex items-center gap-1.5">
-                              <span className="text-xs font-bold text-[#c19742]">{discounted.toLocaleString()} RSD</span>
+                              <span className="text-xs font-bold text-[#edb4bd]">{discounted.toLocaleString()} RSD</span>
                               <span className="text-[10px] text-[#1a1c1e] line-through">{p.originalPrice.toLocaleString()} RSD</span>
                             </div>
                           </div>
@@ -625,7 +625,7 @@ export default function ActionsPage() {
                       );
                     })}
                     {action.products.length > 5 && (
-                      <div className="flex items-center px-3 py-2 text-xs text-[#c19742] font-medium">
+                      <div className="flex items-center px-3 py-2 text-xs text-[#edb4bd] font-medium">
                         +{action.products.length - 5} više
                       </div>
                     )}
@@ -641,7 +641,7 @@ export default function ActionsPage() {
             <Zap size={48} className="text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-black mb-2">{t("admin.noActions")}</h3>
             <p className="text-sm text-[#1a1c1e] mb-4">{t("admin.createActionDesc")}</p>
-            <button onClick={openCreate} className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-5 py-2.5 rounded-sm text-sm">{t("admin.newAction")}</button>
+            <button onClick={openCreate} className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-5 py-2.5 rounded-sm text-sm">{t("admin.newAction")}</button>
           </div>
         )}
       </div>
@@ -756,13 +756,13 @@ export default function ActionsPage() {
                       <button
                         type="button"
                         onClick={toggleSelectAllFiltered}
-                        className="text-xs px-2.5 py-1 rounded-sm bg-stone-100 hover:bg-stone-200 text-[#c19742] font-medium transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-sm bg-stone-100 hover:bg-stone-200 text-[#edb4bd] font-medium transition-colors"
                       >
                         {allFilteredSelected ? "Poništi sve" : "Označi sve"} ({filteredProducts.length})
                       </button>
                     )}
                     {form.target !== "product" && (
-                      <span className="text-xs text-[#c19742]">{t("admin.autoSelectedByScope")}</span>
+                      <span className="text-xs text-[#edb4bd]">{t("admin.autoSelectedByScope")}</span>
                     )}
                   </div>
                 </div>
@@ -845,7 +845,7 @@ export default function ActionsPage() {
                       return (
                         <div key={p.id} className="bg-white rounded-sm p-3 relative">
                           {pct > 0 && (
-                            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-[#c19742] text-white text-[10px] font-bold rounded">-{pct}%</span>
+                            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-[#edb4bd] text-white text-[10px] font-bold rounded">-{pct}%</span>
                           )}
                           <div className="w-full h-16 bg-stone-100 rounded mb-2 flex items-center justify-center overflow-hidden">
                             {p.image ? (
@@ -856,7 +856,7 @@ export default function ActionsPage() {
                           </div>
                           <p className="text-xs text-black truncate">{p.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-sm font-bold text-[#c19742]">{discounted.toLocaleString()} RSD</span>
+                            <span className="text-sm font-bold text-[#edb4bd]">{discounted.toLocaleString()} RSD</span>
                             <span className="text-[10px] text-[#1a1c1e] line-through">{p.priceB2c.toLocaleString()} RSD</span>
                           </div>
                         </div>
@@ -870,7 +870,7 @@ export default function ActionsPage() {
             {/* Footer */}
             <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-end gap-3 flex-shrink-0">
               <button onClick={() => setShowPanel(false)} className="px-5 py-2.5 rounded-sm text-sm font-medium text-[#1a1c1e] hover:bg-stone-100 transition-colors">{t("admin.cancel")}</button>
-              <button onClick={handleSave} disabled={saving || !form.name || !form.value || form.selectedProductIds.length === 0} className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+              <button onClick={handleSave} disabled={saving || !form.name || !form.value || form.selectedProductIds.length === 0} className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-5 py-2.5 rounded-sm text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                 {saving ? "..." : editingAction ? t("admin.saveChanges") : t("admin.createAction")}
               </button>
             </div>

@@ -143,7 +143,7 @@ export default function Header() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [brands, setBrands] = useState<BrandItem[]>(cachedBrands);
   const siteSettings = useSiteSettings(["logoUrl"]);
-  const logoSrc = siteSettings.logoUrl || "/altamoda-logoes/ALTAMODA WHITE.png";
+  const logoSrc = siteSettings.logoUrl || "/altamoda-logoes/altamoda-pink.png";
 
   // Fetch brands for the nav dropdown (cached across mounts)
   useEffect(() => {
@@ -247,7 +247,7 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           {/* Mobile hamburger - left */}
-          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#FFFFFF] hover:text-[#c19742] transition-colors">
+          <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#FFFFFF] hover:text-[#edb4bd] transition-colors">
             <Menu className="w-6 h-6" />
           </button>
 
@@ -266,7 +266,7 @@ export default function Header() {
                 >
                   <Link
                     href={l.href}
-                    className="text-sm text-[#FFFFFF] hover:text-[#c19742] transition-colors tracking-normal font-normal flex items-center gap-1"
+                    className="text-sm text-[#FFFFFF] hover:text-[#edb4bd] transition-colors tracking-normal font-normal flex items-center gap-1"
                   >
                     {l.name}
                     {hasMega && <ChevronDown className="w-3 h-3" />}
@@ -285,7 +285,7 @@ export default function Header() {
                       <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
                         <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
                         <div className="p-5">
-                          <h4 className="text-xs font-medium uppercase tracking-wider text-[#c19742] mb-4">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-4">
                             {t("nav.ourBrands")}
                           </h4>
                           <div className="grid grid-cols-[repeat(3,max-content)] gap-x-6 gap-y-1">
@@ -329,7 +329,7 @@ export default function Header() {
                           <div className="flex-1 flex gap-8">
                             {menuData.columns.map((col) => (
                               <div key={col.title} className="min-w-[140px]">
-                                <h4 className="text-xs font-medium uppercase tracking-wider text-[#c19742] mb-3 min-h-[2.5rem] flex items-start">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-3 min-h-[2.5rem] flex items-start">
                                   {col.title}
                                 </h4>
                                 <ul className="space-y-2">
@@ -337,7 +337,7 @@ export default function Header() {
                                     <li key={link.name}>
                                       <Link
                                         href={link.href}
-                                        className="text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors flex items-center gap-1 group"
+                                        className="text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex items-center gap-1 group"
                                       >
                                         <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
                                         {link.name}
@@ -383,8 +383,8 @@ export default function Header() {
           </nav>
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
-          <Link href="/" className="absolute left-1/2 -translate-x-1/2 block">
-            <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-13 xl:h-15 w-auto" unoptimized />
+          <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+            <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-7 xl:h-8 w-auto" unoptimized />
           </Link>
 
           {/* Icons - right */}
@@ -392,24 +392,24 @@ export default function Header() {
             <div className="hidden xl:block">
               <LanguageToggle />
             </div>
-            <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#c19742] transition-colors">
+            <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#edb4bd] transition-colors">
               <User className="w-5 h-5 text-[#FFFFFF]" />
             </Link>
-            <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#c19742] transition-colors">
+            <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#edb4bd] transition-colors">
               <Search className="w-5 h-5 text-[#FFFFFF]" />
             </button>
-            <Link href="/wishlist" className="relative hidden xl:block hover:text-[#c19742] transition-colors">
+            <Link href="/wishlist" className="relative hidden xl:block hover:text-[#edb4bd] transition-colors">
               <Heart className="w-5 h-5 text-[#FFFFFF]" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c19742] text-white text-[10px] rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#edb4bd] text-white text-[10px] rounded-full flex items-center justify-center">
                   {wishlistCount > 99 ? "99+" : wishlistCount}
                 </span>
               )}
             </Link>
-            <Link href="/cart" className="relative hover:text-[#c19742] transition-colors">
+            <Link href="/cart" className="relative hover:text-[#edb4bd] transition-colors">
               <ShoppingBag className="w-5 h-5 text-[#FFFFFF]" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#c19742] text-white text-[10px] rounded-full flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#edb4bd] text-white text-[10px] rounded-full flex items-center justify-center">
                   {cartItemCount > 99 ? "99+" : cartItemCount}
                 </span>
               )}
@@ -479,7 +479,7 @@ export default function Header() {
             <div className="flex items-center justify-between p-4 border-b border-[#dddbd9]">
               <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-7 w-auto" unoptimized />
               <button onClick={() => setMobileMenu(false)}>
-                <X className="w-5 h-5 text-[#FFFFFF]" />
+                <X className="w-5 h-5 text-[#1a1c1e]" />
               </button>
             </div>
             <div className="p-4 space-y-1">
@@ -494,14 +494,14 @@ export default function Header() {
                       <Link
                         href={l.href}
                         onClick={() => setMobileMenu(false)}
-                        className="flex-1 py-3 px-2 text-[#1a1c1e] hover:text-[#c19742] text-sm font-normal tracking-normal"
+                        className="flex-1 py-3 px-2 text-[#1a1c1e] hover:text-[#edb4bd] text-sm font-normal tracking-normal"
                       >
                         {l.name}
                       </Link>
                       {hasMega && (
                         <button
                           onClick={() => toggleMobileSubmenu(l.menuKey)}
-                          className="p-2 hover:text-[#c19742] transition-colors"
+                          className="p-2 hover:text-[#edb4bd] transition-colors"
                         >
                           <ChevronDown
                             className={`w-4 h-4 transition-transform duration-200 ${
@@ -519,7 +519,7 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors"
+                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
                           >
                             {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                               <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
@@ -538,7 +538,7 @@ export default function Header() {
                       <div className="pl-4 pb-2 animate-slideDown">
                         {menuData.columns.map((col) => (
                           <div key={col.title} className="mb-3">
-                            <span className="text-xs font-medium uppercase tracking-wider text-[#c19742] block py-1 px-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] block py-1 px-2">
                               {col.title}
                             </span>
                             {col.links.map((link) => (
@@ -546,7 +546,7 @@ export default function Header() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#c19742] transition-colors"
+                                className="block py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
                               >
                                 {link.name}
                               </Link>
@@ -564,7 +564,7 @@ export default function Header() {
                 <Link
                   href={session ? "/account" : "/account/login"}
                   onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#c19742] text-sm"
+                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#edb4bd] text-sm"
                 >
                   <User className="w-5 h-5" />
                   {session ? t("nav.account") || "Account" : t("nav.login") || "Login"}
@@ -572,12 +572,12 @@ export default function Header() {
                 <Link
                   href="/wishlist"
                   onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#c19742] text-sm"
+                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#edb4bd] text-sm"
                 >
                   <Heart className="w-5 h-5" />
                   {t("nav.wishlist") || "Wishlist"}
                   {wishlistCount > 0 && (
-                    <span className="ml-auto px-2 py-0.5 rounded-full bg-[#c19742] text-white text-[10px]">{wishlistCount}</span>
+                    <span className="ml-auto px-2 py-0.5 rounded-full bg-[#edb4bd] text-white text-[10px]">{wishlistCount}</span>
                   )}
                 </Link>
               </div>

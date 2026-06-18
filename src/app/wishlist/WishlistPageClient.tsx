@@ -109,7 +109,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
-          <Link href="/" className="hover:text-[#c19742]">{t("wishlist.home")}</Link>
+          <Link href="/" className="hover:text-[#edb4bd]">{t("wishlist.home")}</Link>
           <span>/</span>
           <span className="text-[#1a1c1e]">{t("wishlist.title")}</span>
         </div>
@@ -125,7 +125,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             {/* Title + Actions */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-[#c19742] fill-[#dddbd9]" />
+                <Heart className="w-6 h-6 text-[#edb4bd] fill-[#dddbd9]" />
                 <h1 className="text-3xl font-bold text-[#1a1c1e]" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.heading")}</h1>
                 <span className="text-sm text-[#1a1c1e]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
@@ -133,7 +133,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                 <button className="flex items-center gap-2 px-4 py-2 border border-[#dddbd9] text-[#1a1c1e] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
                   <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
-                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#c19742] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors">
+                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#edb4bd] hover:bg-[#d98fa0] text-white text-sm font-medium rounded-sm transition-colors">
                   <ShoppingCart className="w-4 h-4" /> {t("wishlist.addAllToCart")}
                 </button>
               </div>
@@ -172,17 +172,17 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                       </button>
                     </div>
                     <div className="p-4">
-                      <p className="text-[10px] font-semibold tracking-widest uppercase text-[#c19742] mb-1">{item.brand}</p>
+                      <p className="text-[10px] font-semibold tracking-widest uppercase text-[#edb4bd] mb-1">{item.brand}</p>
                       <h3 className="text-sm font-medium text-[#1a1c1e] mb-2 line-clamp-2 leading-snug">{item.name}</h3>
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#dddbd9] text-[#c19742]" : "text-[#dddbd9]"}`} />
+                          <Star key={i} className={`w-3 h-3 ${i < Math.floor(item.rating) ? "fill-[#dddbd9] text-[#edb4bd]" : "text-[#dddbd9]"}`} />
                         ))}
                       </div>
                       <div className="flex items-center gap-2 mb-3">
                         {item.oldPrice && item.oldPrice > item.price ? (
                           <>
-                            <span className="text-base font-bold text-[#c19742]">{item.price.toLocaleString()} RSD</span>
+                            <span className="text-base font-bold text-[#edb4bd]">{item.price.toLocaleString()} RSD</span>
                             <span className="text-xs text-[#1a1c1e] line-through">{item.oldPrice.toLocaleString()} RSD</span>
                           </>
                         ) : (
@@ -194,7 +194,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         onClick={() => addToCart(item)}
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
-                            ? "bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff]"
+                            ? "bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff]"
                             : "bg-[#dddbd9] text-[#1a1c1e] cursor-not-allowed"
                         }`}
                       >
@@ -212,7 +212,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
             <Heart className="w-16 h-16 text-[#dddbd9] mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("wishlist.emptyTitle")}</h2>
             <p className="text-[#1a1c1e] mb-6">{t("wishlist.emptyDesc")}</p>
-            <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#c19742] hover:bg-[#413d3a] text-white font-medium rounded-sm transition-colors">
+            <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#edb4bd] hover:bg-[#413d3a] text-white font-medium rounded-sm transition-colors">
               {t("productDetail.products")}
             </Link>
           </div>
@@ -225,7 +225,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
           aria-live="polite"
           className="fixed bottom-6 right-6 z-50 max-w-sm bg-[#1a1c1e] text-white rounded-md shadow-xl px-4 py-3 flex items-start gap-3"
         >
-          <CheckCircle className="w-5 h-5 text-[#c19742] flex-shrink-0 mt-0.5" />
+          <CheckCircle className="w-5 h-5 text-[#edb4bd] flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium">{t("wishlist.addedToast")}</p>
             <p className="text-xs text-white/70 truncate mt-0.5">{toastMessage}</p>

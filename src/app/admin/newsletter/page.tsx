@@ -567,7 +567,7 @@ export default function NewsletterPage() {
             <button
               onClick={handleSaveTemplate}
               disabled={templateSaving}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
             >
               {templateSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               Sačuvaj
@@ -785,7 +785,7 @@ export default function NewsletterPage() {
               <button
                 onClick={() => setShowSendConfirm(true)}
                 disabled={sending || !sendSubject.trim() || !editorBodyContent.trim() || sendRecipientCount === 0}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 shadow-sm"
               >
                 <Send size={16} />
                 Pošalji newsletter
@@ -917,7 +917,7 @@ export default function NewsletterPage() {
         </div>
         <button
           onClick={() => { setShowTestModal(true); setTestResult(null); setTestEmail(""); }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] text-sm font-medium rounded-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] text-sm font-medium rounded-sm transition-colors"
         >
           <Send className="w-4 h-4" /> Pošalji test email
         </button>
@@ -1112,7 +1112,7 @@ export default function NewsletterPage() {
                   <p className="text-2xl font-bold text-black mt-1">{stats.totalActive}</p>
                 </div>
                 <div className="w-10 h-10 rounded-sm bg-black/10 flex items-center justify-center">
-                  <Users size={20} className="text-[#c19742]" />
+                  <Users size={20} className="text-[#edb4bd]" />
                 </div>
               </div>
             </div>
@@ -1177,7 +1177,7 @@ export default function NewsletterPage() {
                       <tr key={sub.id} className="border-b border-stone-100 hover:bg-stone-100 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <Mail size={14} className="text-[#c19742]" />
+                            <Mail size={14} className="text-[#edb4bd]" />
                             <span className="text-[#1a1c1e]">{sub.email}</span>
                           </div>
                         </td>
@@ -1246,7 +1246,7 @@ export default function NewsletterPage() {
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-stone-200">
               <button onClick={() => setShowNewTemplateModal(false)} className="px-5 py-2.5 border border-stone-200 rounded-sm text-sm font-medium hover:bg-stone-100 transition-colors">Otkaži</button>
-              <button onClick={handleCreateTemplate} disabled={!templateForm.name.trim() || !templateForm.subject.trim() || templateSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#c19742] text-white rounded-sm text-sm font-medium hover:bg-[#413d3a] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button onClick={handleCreateTemplate} disabled={!templateForm.name.trim() || !templateForm.subject.trim() || templateSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#edb4bd] text-white rounded-sm text-sm font-medium hover:bg-[#413d3a] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                 {templateSaving && <Loader2 size={16} className="animate-spin" />}
                 Kreiraj šablon
               </button>
@@ -1300,7 +1300,7 @@ export default function NewsletterPage() {
             )}
             <div className="flex gap-3">
               <button onClick={() => setShowTestModal(false)} className="flex-1 px-4 py-2.5 border border-stone-200 text-[#1a1c1e] rounded-sm text-sm font-medium hover:bg-stone-50 transition-colors">Otkaži</button>
-              <button onClick={handleSendTest} disabled={testSending || !testEmail.trim()} className="flex-1 px-4 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] rounded-sm text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+              <button onClick={handleSendTest} disabled={testSending || !testEmail.trim()} className="flex-1 px-4 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] rounded-sm text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {testSending ? <><Loader2 className="w-4 h-4 animate-spin" /> Slanje...</> : <><Send className="w-4 h-4" /> Pošalji</>}
               </button>
             </div>

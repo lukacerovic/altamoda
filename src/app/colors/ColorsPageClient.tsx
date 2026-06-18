@@ -190,7 +190,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
-          <Link href="/" className="hover:text-[#c19742]">{t("nav.home") || "Početna"}</Link>
+          <Link href="/" className="hover:text-[#edb4bd]">{t("nav.home") || "Početna"}</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-[#1a1c1e]">{t("colors.title")}</span>
         </nav>
@@ -211,7 +211,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
               onClick={() => { setActiveBrand(b.slug); setSelectedColor(null); }}
               className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 activeBrand === b.slug
-                  ? "bg-[#c19742] text-white shadow-sm"
+                  ? "bg-[#edb4bd] text-white shadow-sm"
                   : "bg-white text-[#1a1c1e] border border-[#dddbd9] hover:border-black"
               }`}
             >
@@ -252,7 +252,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                   <button
                     onClick={() => setFilterLevel(null)}
                     className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                      !filterLevel ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
+                      !filterLevel ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
                     }`}
                   >
                     {t("colors.all")}
@@ -262,7 +262,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                       key={l}
                       onClick={() => setFilterLevel(filterLevel === l ? null : l)}
                       className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
-                        filterLevel === l ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
+                        filterLevel === l ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
                       }`}
                     >
                       {l}
@@ -278,7 +278,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                   <button
                     onClick={() => setFilterUndertone(null)}
                     className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                      !filterUndertone ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
+                      !filterUndertone ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
                     }`}
                   >
                     {t("colors.all")}
@@ -288,7 +288,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                       key={ut.key}
                       onClick={() => setFilterUndertone(filterUndertone === ut.key ? null : ut.key)}
                       className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                        filterUndertone === ut.key ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
+                        filterUndertone === ut.key ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e] hover:bg-[#dddbd9]"
                       }`}
                     >
                       {language === "en" ? ut.label : ut.labelSr}
@@ -302,14 +302,14 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             <div className="flex border border-[#dddbd9] rounded-sm overflow-hidden">
               <button
                 onClick={() => setViewMode("matrix")}
-                className={`p-2 ${viewMode === "matrix" ? "bg-[#c19742] text-white" : "bg-white text-[#1a1c1e] hover:bg-[#FFFFFF]"}`}
+                className={`p-2 ${viewMode === "matrix" ? "bg-[#edb4bd] text-white" : "bg-white text-[#1a1c1e] hover:bg-[#FFFFFF]"}`}
                 title={t("colors.matrixView")}
               >
                 <Grid3X3 size={16} />
               </button>
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 ${viewMode === "grid" ? "bg-[#c19742] text-white" : "bg-white text-[#1a1c1e] hover:bg-[#FFFFFF]"}`}
+                className={`p-2 ${viewMode === "grid" ? "bg-[#edb4bd] text-white" : "bg-white text-[#1a1c1e] hover:bg-[#FFFFFF]"}`}
                 title={t("colors.gridView")}
               >
                 <LayoutGrid size={16} />
@@ -319,7 +319,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             {hasActiveFilters && (
               <button
                 onClick={() => { setFilterLevel(null); setFilterUndertone(null); setSearchQuery(""); }}
-                className="text-xs text-[#c19742] hover:text-[#1a1c1e] font-medium flex items-center gap-1"
+                className="text-xs text-[#edb4bd] hover:text-[#1a1c1e] font-medium flex items-center gap-1"
               >
                 <X size={14} /> {t("colors.clearFilters")}
               </button>
@@ -334,7 +334,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                 <div className="flex gap-1.5 flex-wrap">
                   <button
                     onClick={() => setFilterLevel(null)}
-                    className={`w-8 h-8 rounded text-xs font-medium ${!filterLevel ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
+                    className={`w-8 h-8 rounded text-xs font-medium ${!filterLevel ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
                   >
                     {t("colors.all")}
                   </button>
@@ -342,7 +342,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                     <button
                       key={l}
                       onClick={() => setFilterLevel(filterLevel === l ? null : l)}
-                      className={`w-8 h-8 rounded text-xs font-medium ${filterLevel === l ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
+                      className={`w-8 h-8 rounded text-xs font-medium ${filterLevel === l ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
                     >
                       {l}
                     </button>
@@ -354,7 +354,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                 <div className="flex gap-1.5 flex-wrap">
                   <button
                     onClick={() => setFilterUndertone(null)}
-                    className={`px-3 h-8 rounded text-xs font-medium ${!filterUndertone ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
+                    className={`px-3 h-8 rounded text-xs font-medium ${!filterUndertone ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
                   >
                     {t("colors.all")}
                   </button>
@@ -362,7 +362,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                     <button
                       key={ut.key}
                       onClick={() => setFilterUndertone(filterUndertone === ut.key ? null : ut.key)}
-                      className={`px-3 h-8 rounded text-xs font-medium ${filterUndertone === ut.key ? "bg-[#c19742] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
+                      className={`px-3 h-8 rounded text-xs font-medium ${filterUndertone === ut.key ? "bg-[#edb4bd] text-white" : "bg-[#FFFFFF] text-[#1a1c1e]"}`}
                     >
                       {language === "en" ? ut.label : ut.labelSr}
                     </button>
@@ -458,7 +458,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                                         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-2 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                                           {c.name}
                                           <br />
-                                          <span className="text-[#c19742]">{c.price.toLocaleString("sr-RS")} RSD</span>
+                                          <span className="text-[#edb4bd]">{c.price.toLocaleString("sr-RS")} RSD</span>
                                           <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45 -mt-1" />
                                         </div>
                                       </button>
@@ -513,7 +513,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                         <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-2 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                           {color.name}
                           <br />
-                          <span className="text-[#c19742]">{color.price.toLocaleString("sr-RS")} RSD</span>
+                          <span className="text-[#edb4bd]">{color.price.toLocaleString("sr-RS")} RSD</span>
                           <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45 -mt-1" />
                         </div>
                       </button>
@@ -538,7 +538,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 shadow-lg border-4 border-white" style={{ backgroundColor: selectedColor.hexValue }} />
 
                 <div className="text-center mb-4">
-                  <span className="text-xs text-[#c19742] font-medium uppercase tracking-wider">
+                  <span className="text-xs text-[#edb4bd] font-medium uppercase tracking-wider">
                     {selectedColor.productLine?.name || selectedColor.brand?.name}
                   </span>
                   <h3 className="text-lg font-bold text-[#1a1c1e] mt-1">{selectedColor.shadeCode}</h3>
@@ -562,11 +562,11 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
 
                 <Link
                   href={`/products/${selectedColor.slug}`}
-                  className="block w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded-sm font-medium transition-colors text-center mb-2"
+                  className="block w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded-sm font-medium transition-colors text-center mb-2"
                 >
                   {t("colors.viewProduct")}
                 </Link>
-                <button className="w-full bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3 rounded-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <button className="w-full bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff] py-3 rounded-sm font-medium transition-colors flex items-center justify-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> {t("colors.addToCart")}
                 </button>
 
@@ -612,7 +612,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 rounded-full shadow-lg border-4 border-white flex-shrink-0" style={{ backgroundColor: selectedColor.hexValue }} />
               <div>
-                <span className="text-xs text-[#c19742] font-medium uppercase">{selectedColor.productLine?.name}</span>
+                <span className="text-xs text-[#edb4bd] font-medium uppercase">{selectedColor.productLine?.name}</span>
                 <h3 className="text-lg font-bold text-[#1a1c1e]">{selectedColor.shadeCode}</h3>
                 <p className="text-sm text-[#1a1c1e]">{selectedColor.name}</p>
               </div>
@@ -625,11 +625,11 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
             <div className="flex gap-2">
               <Link
                 href={`/products/${selectedColor.slug}`}
-                className="flex-1 bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded-sm font-medium text-center transition-colors"
+                className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded-sm font-medium text-center transition-colors"
               >
                 {t("colors.viewProduct")}
               </Link>
-              <button className="flex-1 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3 rounded-sm font-medium flex items-center justify-center gap-2 transition-colors">
+              <button className="flex-1 bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff] py-3 rounded-sm font-medium flex items-center justify-center gap-2 transition-colors">
                 <ShoppingCart className="w-4 h-4" /> {t("colors.addToCart")}
               </button>
             </div>

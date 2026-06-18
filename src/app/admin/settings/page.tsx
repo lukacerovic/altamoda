@@ -265,7 +265,7 @@ export default function SettingsPage() {
                 ? "bg-emerald-500 text-white"
                 : saving
                   ? "bg-stone-400 text-white cursor-not-allowed"
-                  : "bg-[#c19742] text-white hover:bg-[#413d3a]"
+                  : "bg-[#edb4bd] text-white hover:bg-[#413d3a]"
             }`}
           >
             {saved ? (
@@ -299,7 +299,7 @@ export default function SettingsPage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-3 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                       activeTab === tab.id
-                        ? "bg-black/10 text-[#c19742] border-b-2 lg:border-b-0 lg:border-l-2 border-black"
+                        ? "bg-black/10 text-[#edb4bd] border-b-2 lg:border-b-0 lg:border-l-2 border-black"
                         : "text-[#1a1c1e] hover:text-black hover:bg-stone-100"
                     }`}
                   >
@@ -442,7 +442,7 @@ export default function SettingsPage() {
                     <button
                       onClick={() => logoInputRef.current?.click()}
                       disabled={uploadingLogo}
-                      className="px-4 py-2 rounded-lg text-sm font-medium bg-[#c19742] text-white hover:bg-[#413d3a] flex items-center gap-2 disabled:opacity-60"
+                      className="px-4 py-2 rounded-lg text-sm font-medium bg-[#edb4bd] text-white hover:bg-[#413d3a] flex items-center gap-2 disabled:opacity-60"
                     >
                       {uploadingLogo ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                       {uploadingLogo ? t("admin.saving") : (logoUrl ? "Zameni logo" : "Otpremi logo")}
@@ -595,7 +595,7 @@ export default function SettingsPage() {
                     !newPassword ||
                     !confirmPassword
                       ? "bg-stone-300 text-stone-500 cursor-not-allowed"
-                      : "bg-[#c19742] text-white hover:bg-[#413d3a]"
+                      : "bg-[#edb4bd] text-white hover:bg-[#413d3a]"
                   }`}
                 >
                   {changingPassword ? (

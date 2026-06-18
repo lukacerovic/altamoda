@@ -78,10 +78,10 @@ export default function ConfirmationClient({ orderNumber, state, payUrl }: Props
           {orderNumber && (
             <div className="bg-[#FFFFFF] rounded-lg p-4 mb-6">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Package className="w-5 h-5 text-[#c19742]" />
+                <Package className="w-5 h-5 text-[#edb4bd]" />
                 <span className="text-sm font-semibold text-[#1a1c1e]">Broj porudžbine</span>
               </div>
-              <span className="text-xl font-bold text-[#c19742]">{orderNumber}</span>
+              <span className="text-xl font-bold text-[#edb4bd]">{orderNumber}</span>
             </div>
           )}
 
@@ -96,7 +96,7 @@ export default function ConfirmationClient({ orderNumber, state, payUrl }: Props
               <>
                 <Link
                   href={payUrl}
-                  className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   Pokušaj ponovo <ChevronRight className="w-4 h-4" />
                 </Link>
@@ -110,7 +110,7 @@ export default function ConfirmationClient({ orderNumber, state, payUrl }: Props
             ) : (
               <Link
                 href="/products"
-                className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2"
               >
                 Nastavi kupovinu <ChevronRight className="w-4 h-4" />
               </Link>

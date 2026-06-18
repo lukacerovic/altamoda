@@ -311,7 +311,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     <button
       type="button" onClick={onClick} title={title} disabled={disabled}
       className={`p-2 rounded-md transition-colors ${
-        isActive ? "bg-[#c19742] text-white shadow-sm"
+        isActive ? "bg-[#edb4bd] text-white shadow-sm"
         : disabled ? "text-stone-300 cursor-not-allowed"
         : "text-stone-500 hover:bg-stone-100 hover:text-stone-800"
       }`}
@@ -424,7 +424,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                   type="button"
                   onClick={applyLink}
                   disabled={!linkModal.url.trim()}
-                  className="px-4 py-2 text-sm bg-[#c19742] text-white rounded-md hover:bg-[#413d3a] disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm bg-[#edb4bd] text-white rounded-md hover:bg-[#413d3a] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Sačuvaj
                 </button>

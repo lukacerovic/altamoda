@@ -82,7 +82,7 @@ export default function CookieConsent() {
               </button>
               <button
                 onClick={acceptAll}
-                className="px-6 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors"
+                className="px-6 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors"
               >
                 {t("cookie.acceptAll")}
               </button>
@@ -164,7 +164,7 @@ export default function CookieConsent() {
 
                 <button
                   onClick={saveSettings}
-                  className="mt-2 px-6 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors self-start"
+                  className="mt-2 px-6 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors self-start"
                 >
                   {t("cookie.saveSettings")}
                 </button>

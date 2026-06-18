@@ -9,7 +9,7 @@ import { ArrowRight } from "lucide-react";
 
 /* Splits text on *…* markers and wraps the marked spans in italic accent colour. */
 function withEm(text: string, accent: "olive" | "gold" = "olive") {
-  const accentClass = accent === "gold" ? "text-[#c19742]" : "text-[#413d3a]";
+  const accentClass = accent === "gold" ? "text-[#edb4bd]" : "text-[#413d3a]";
   return text.split(/(\*[^*]+\*)/g).map((part, i) => {
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
@@ -57,7 +57,7 @@ export default function AboutPage() {
                 <div className="flex items-center gap-3.5 flex-wrap">
                   <a
                     href="#partner"
-                    className="inline-flex items-center gap-2.5 bg-[#c19742] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-[#413d3a] hover:-translate-y-px transition-all"
+                    className="inline-flex items-center gap-2.5 bg-[#edb4bd] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-[#413d3a] hover:-translate-y-px transition-all"
                   >
                     {t("about.ctaButton")} <ArrowRight className="w-3 h-3" />
                   </a>

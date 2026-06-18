@@ -30,7 +30,7 @@ export default async function CancelledPage({
             {orderNumber && (
               <Link
                 href={`/checkout/pay/${orderNumber}`}
-                className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors flex items-center justify-center gap-2"
               >
                 Pokušaj ponovo <ChevronRight className="w-4 h-4" />
               </Link>

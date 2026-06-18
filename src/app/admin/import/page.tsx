@@ -178,7 +178,7 @@ export default function ImportPage() {
               <button
                 onClick={handleImport}
                 disabled={uploading}
-                className="w-full py-3 bg-[#c19742] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#edb4bd] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {uploading ? (
                   <><Loader2 size={18} className="animate-spin" /> Uvoz u toku — obrađujem {files.length} {files.length === 1 ? 'fajl' : 'fajlova'}...</>
@@ -307,7 +307,7 @@ export default function ImportPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setFiles([]); setResult(null); setError(null); }}
-                className="flex-1 py-2.5 bg-[#c19742] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors text-sm"
+                className="flex-1 py-2.5 bg-[#edb4bd] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors text-sm"
               >
                 Uvezi još fajlova
               </button>

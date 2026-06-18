@@ -109,7 +109,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                 {totalProducts > 8 && (
                   <Link
                     href={`/products?brand=${brand.slug}`}
-                    className="flex items-center gap-2 bg-[#c19742] text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-[#413d3a] transition-colors"
+                    className="flex items-center gap-2 bg-[#edb4bd] text-white px-5 py-2.5 rounded-sm text-sm font-medium hover:bg-[#413d3a] transition-colors"
                   >
                     {t("brand.viewAll")}
                     <ArrowRight className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                 <div className="text-center mt-10">
                   <Link
                     href={`/products?brand=${brand.slug}`}
-                    className="inline-flex items-center gap-2 border border-[#c19742] text-[#1a1c1e] px-8 py-3 rounded-sm text-sm font-medium hover:bg-[#c19742] hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 border border-[#edb4bd] text-[#1a1c1e] px-8 py-3 rounded-sm text-sm font-medium hover:bg-[#edb4bd] hover:text-white transition-colors"
                   >
                     <ShoppingBag className="w-4 h-4" />
                     {t("brand.viewAllProducts").replace("{brand}", brand.name)}

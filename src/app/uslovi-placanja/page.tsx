@@ -28,7 +28,7 @@ function Section({
   return (
     <section className="mb-10">
       <h2 className="text-lg font-semibold text-[#1a1c1e] mb-3 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-[#c19742]" />
+        <Icon className="w-5 h-5 text-[#edb4bd]" />
         {title}
       </h2>
       <div className="space-y-3 text-sm text-[#1a1c1e] leading-relaxed">{children}</div>
@@ -41,7 +41,7 @@ export default function UsloviPlacanjaPage() {
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <CreditCard className="w-12 h-12 text-[#c19742] mx-auto mb-4" />
+          <CreditCard className="w-12 h-12 text-[#edb4bd] mx-auto mb-4" />
           <h1
             className="text-3xl md:text-4xl font-bold text-[#1a1c1e] mb-3"
             style={{ fontFamily: "'Noto Serif', serif" }}
@@ -64,13 +64,13 @@ export default function UsloviPlacanjaPage() {
             <li>PIB: 101773967</li>
             <li>
               Email:{" "}
-              <a href="mailto:kontakt@altamoda.rs" className="text-[#c19742] hover:underline">
+              <a href="mailto:kontakt@altamoda.rs" className="text-[#edb4bd] hover:underline">
                 kontakt@altamoda.rs
               </a>
             </li>
             <li>
               Telefon:{" "}
-              <a href="tel:+381113088388" className="text-[#c19742] hover:underline">
+              <a href="tel:+381113088388" className="text-[#edb4bd] hover:underline">
                 +381 (0)11 3088388
               </a>
             </li>
@@ -131,7 +131,7 @@ export default function UsloviPlacanjaPage() {
           </p>
           <p>
             Detaljnije uslove povraćaja robe i reklamacija možete pronaći u sekciji{" "}
-            <a href="/faq#reklamacije" className="text-[#c19742] hover:underline">
+            <a href="/faq#reklamacije" className="text-[#edb4bd] hover:underline">
               Reklamacije i povraćaj
             </a>
             .
@@ -144,7 +144,7 @@ export default function UsloviPlacanjaPage() {
             isključivo u svrhu realizacije porudžbine i da ih ne čini dostupnim
             trećim licima, osim kada je to neophodno za isporuku (kurirska služba).
             Više informacija dostupno je u našoj{" "}
-            <a href="/faq#privatnost" className="text-[#c19742] hover:underline">
+            <a href="/faq#privatnost" className="text-[#edb4bd] hover:underline">
               Politici privatnosti
             </a>
             .

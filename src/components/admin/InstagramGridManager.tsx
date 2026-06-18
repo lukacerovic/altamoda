@@ -115,9 +115,9 @@ export default function InstagramGridManager() {
     <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFFFF]">
         <div className="flex items-center gap-3">
-          <div className="text-[#c19742]"><Instagram size={20} /></div>
+          <div className="text-[#edb4bd]"><Instagram size={20} /></div>
           <h2 className="text-lg font-serif font-bold text-black">Instagram galerija</h2>
-          <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#c19742] text-xs font-semibold">
+          <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#edb4bd] text-xs font-semibold">
             {instaImages.filter(Boolean).length} / 8
           </span>
         </div>
@@ -169,7 +169,7 @@ export default function InstagramGridManager() {
                 <button
                   onClick={() => handleImport(slotIndex)}
                   disabled={instaImporting === slotIndex || !instaInputs[slotIndex]?.trim()}
-                  className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-3 py-2 rounded-sm text-xs font-medium flex items-center gap-1.5 disabled:opacity-50 shrink-0"
+                  className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-3 py-2 rounded-sm text-xs font-medium flex items-center gap-1.5 disabled:opacity-50 shrink-0"
                   title="Uvezi sliku sa URL-a"
                 >
                   <Plus size={14} />

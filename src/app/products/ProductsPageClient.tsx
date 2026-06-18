@@ -369,7 +369,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] text-[#ffffff] hover:bg-[#413d3a]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#d98fa0]"}`}
             >
               {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -402,7 +402,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#413d3a] text-[#ffffff]" : "bg-[#c19742] text-[#ffffff] active:bg-[#413d3a]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"}`}
             >
               {hasColors ? <><Palette className="w-3 h-3" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -1219,7 +1219,7 @@ export default function ProductsPageClient({
         </div>
         <button
           onClick={handlePriceApply}
-          className="mt-3 w-full bg-[#c19742] hover:bg-[#413d3a] text-white text-sm py-2.5 rounded-sm font-medium transition-colors"
+          className="mt-3 w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white text-sm py-2.5 rounded-sm font-medium transition-colors"
         >
           Primeni
         </button>
@@ -1551,7 +1551,7 @@ export default function ProductsPageClient({
                   onClick={() => setSelectedBrands([])}
                   className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 ${
                     selectedBrands.length === 0
-                      ? "bg-[#c19742] text-white shadow-sm"
+                      ? "bg-[#edb4bd] text-white shadow-sm"
                       : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                   }`}
                 >
@@ -1565,7 +1565,7 @@ export default function ProductsPageClient({
                       onClick={() => toggleBrand(b.slug)}
                       className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 ${
                         isActive
-                          ? "bg-[#c19742] text-white shadow-sm"
+                          ? "bg-[#edb4bd] text-white shadow-sm"
                           : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                       }`}
                     >
@@ -1590,7 +1590,7 @@ export default function ProductsPageClient({
                     onClick={() => setSelectedProductLines([])}
                     className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
                       selectedProductLines.length === 0
-                        ? "bg-[#c19742] text-white shadow-sm"
+                        ? "bg-[#edb4bd] text-white shadow-sm"
                         : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                     }`}
                   >
@@ -1604,7 +1604,7 @@ export default function ProductsPageClient({
                         onClick={() => toggleProductLine(l.slug)}
                         className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 ${
                           isActive
-                            ? "bg-[#c19742] text-white shadow-sm"
+                            ? "bg-[#edb4bd] text-white shadow-sm"
                             : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                         }`}
                       >
@@ -1778,7 +1778,7 @@ export default function ProductsPageClient({
               <button onClick={() => { clearAllTags(); setMobileFilter(false); }} className="flex-1 border border-[#1a1c1e] text-[#1a1c1e] py-3 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors hover:bg-[#1a1c1e] hover:text-[#FFFFFF]">
                 {t("products.resetFilters")}
               </button>
-              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-[#c19742] hover:bg-[#413d3a] text-[#ffffff] py-3 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors">
+              <button onClick={() => setMobileFilter(false)} className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors">
                 {t("products.applyFilters")}
               </button>
             </div>

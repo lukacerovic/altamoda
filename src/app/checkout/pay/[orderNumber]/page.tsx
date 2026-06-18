@@ -63,7 +63,7 @@ export default async function PayPage({
     <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
       <div className="max-w-md w-full mx-4 text-center">
         <div className="bg-white rounded-sm shadow-sm p-8">
-          <div className="w-12 h-12 border-4 border-[#c19742] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+          <div className="w-12 h-12 border-4 border-[#edb4bd] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
           <h1 className="text-xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
             Preusmeravamo vas na sigurno plaćanje…
           </h1>

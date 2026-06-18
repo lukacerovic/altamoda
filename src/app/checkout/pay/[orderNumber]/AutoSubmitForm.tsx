@@ -27,7 +27,7 @@ export default function AutoSubmitForm({ action, fields }: Props) {
       ))}
       <button
         type="submit"
-        className="px-6 py-3 bg-[#c19742] text-white rounded font-medium hover:bg-[#413d3a]"
+        className="px-6 py-3 bg-[#edb4bd] text-white rounded font-medium hover:bg-[#413d3a]"
       >
         Nastavi na plaćanje
       </button>

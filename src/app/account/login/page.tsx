@@ -299,7 +299,7 @@ function LoginContent() {
       <div className="max-w-lg mx-auto px-4 pt-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-[#1a1c1e]">
-          <Link href="/" className="hover:text-[#c19742]">{t("auth.home")}</Link>
+          <Link href="/" className="hover:text-[#edb4bd]">{t("auth.home")}</Link>
           <ChevronRight className="w-3 h-3" />
           <span>{activeTab === "login" ? t("auth.login") : t("auth.register")}</span>
         </nav>
@@ -309,8 +309,8 @@ function LoginContent() {
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-[#dddbd9]">
-            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
-            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#c19742] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
+            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#edb4bd] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
+            <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#edb4bd] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
           </div>
 
           <div className="p-6 md:p-8">
@@ -345,16 +345,16 @@ function LoginContent() {
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-sm text-[#1a1c1e] cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-[#dddbd9] text-[#c19742] focus:ring-[#1a1c1e]" /> {t("auth.rememberMe")}
+                      <input type="checkbox" className="w-4 h-4 rounded border-[#dddbd9] text-[#edb4bd] focus:ring-[#1a1c1e]" /> {t("auth.rememberMe")}
                     </label>
-                    <button type="button" onClick={(e) => { e.preventDefault(); setForgotPasswordMsg(true); setTimeout(() => setForgotPasswordMsg(false), 3000); }} className="text-sm text-[#c19742] hover:text-[#1a1c1e]">{t("auth.forgotPassword")}</button>
+                    <button type="button" onClick={(e) => { e.preventDefault(); setForgotPasswordMsg(true); setTimeout(() => setForgotPasswordMsg(false), 3000); }} className="text-sm text-[#edb4bd] hover:text-[#1a1c1e]">{t("auth.forgotPassword")}</button>
                   </div>
                   {forgotPasswordMsg && (
                     <div className="p-3 bg-[#FFFFFF] border border-[#dddbd9] text-[#1a1c1e] text-sm rounded">
                       Funkcija resetovanja lozinke uskoro dolazi.
                     </div>
                   )}
-                  <button type="submit" disabled={loading} className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={loading} className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.loggingIn") : t("auth.loginButton")}
                   </button>
                 </div>
@@ -388,10 +388,10 @@ function LoginContent() {
 
                 {/* B2C / B2B toggle */}
                 <div className="flex gap-2 mb-6">
-                  <button type="button" onClick={() => { setRegisterType("b2c"); setFieldErrors({}); }} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#c19742] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
+                  <button type="button" onClick={() => { setRegisterType("b2c"); setFieldErrors({}); }} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2c" ? "bg-[#edb4bd] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
                     <User className="w-4 h-4 inline mr-1" /> {t("auth.buyer")}
                   </button>
-                  <button type="button" onClick={() => { setRegisterType("b2b"); setFieldErrors({}); }} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#c19742] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
+                  <button type="button" onClick={() => { setRegisterType("b2b"); setFieldErrors({}); }} className={`flex-1 py-2.5 rounded text-sm font-medium transition-colors ${registerType === "b2b" ? "bg-[#edb4bd] text-white" : "border border-[#dddbd9] text-[#1a1c1e] hover:border-black"}`}>
                     <Building2 className="w-4 h-4 inline mr-1" /> {t("auth.salonB2b")}
                   </button>
                 </div>
@@ -463,7 +463,7 @@ function LoginContent() {
                   {registerType === "b2b" && (
                     <>
                       <div className="border-t border-[#dddbd9] pt-4">
-                        <h3 className="text-sm font-semibold text-[#1a1c1e] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-[#c19742]" /> {t("auth.salonDetails")}</h3>
+                        <h3 className="text-sm font-semibold text-[#1a1c1e] mb-3 flex items-center gap-2"><Building2 className="w-4 h-4 text-[#edb4bd]" /> {t("auth.salonDetails")}</h3>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.salonName")}</label>
@@ -556,15 +556,15 @@ function LoginContent() {
                         type="checkbox"
                         checked={regTerms}
                         onChange={(e) => { setRegTerms(e.target.checked); clearFieldError("terms"); }}
-                        className={`w-4 h-4 rounded text-[#c19742] focus:ring-[#1a1c1e] mt-0.5 ${fieldErrors.terms ? "border-red-500" : "border-[#dddbd9]"}`}
+                        className={`w-4 h-4 rounded text-[#edb4bd] focus:ring-[#1a1c1e] mt-0.5 ${fieldErrors.terms ? "border-red-500" : "border-[#dddbd9]"}`}
                         aria-invalid={!!fieldErrors.terms}
                       />
-                      <span>{t("auth.agreeTerms")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#c19742] hover:underline">{t("auth.privacyPolicy")}</a></span>
+                      <span>{t("auth.agreeTerms")} <a href="#" className="text-[#edb4bd] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#edb4bd] hover:underline">{t("auth.privacyPolicy")}</a></span>
                     </label>
                     {fieldErrors.terms && <p className="mt-1 text-xs text-red-600">{fieldErrors.terms}</p>}
                   </div>
 
-                  <button type="submit" disabled={loading} className="w-full bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={loading} className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.processing") : registerType === "b2b" ? t("auth.submitB2b") : t("auth.registerButton")}
                   </button>
 
@@ -601,7 +601,7 @@ function LoginContent() {
               </div>
               <button
                 onClick={() => setError("")}
-                className="w-full mt-6 bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors"
+                className="w-full mt-6 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors"
               >
                 {t("auth.understood")}
               </button>
@@ -633,7 +633,7 @@ function LoginContent() {
               </div>
               <button
                 onClick={() => setShowPendingModal(false)}
-                className="w-full mt-6 bg-[#c19742] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors"
+                className="w-full mt-6 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors"
               >
                 {t("auth.understood")}
               </button>

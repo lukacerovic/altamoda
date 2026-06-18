@@ -716,7 +716,7 @@ export const relatedShades: ColorShade[] = [
   { shade: "7.0", name: "Srednje Plava", color: "#dddbd9", active: true },
   { shade: "7.1", name: "Pepeljasto Plava", color: "#dddbd9" },
   { shade: "7.3", name: "Zlatno Plava", color: "#dddbd9" },
-  { shade: "7.4", name: "Bakarno Plava", color: "#c19742" },
+  { shade: "7.4", name: "Bakarno Plava", color: "#edb4bd" },
   { shade: "8.0", name: "Svetlo Plava", color: "#dddbd9" },
   { shade: "8.1", name: "Svetlo Pepeljasta", color: "#dddbd9" },
   { shade: "9.0", name: "Veoma Svetla Plava", color: "#dddbd9" },
@@ -756,9 +756,9 @@ export const colorHexMap: Record<string, Record<string, string>> = {
   "5": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
   "6": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
   "7": { N: "#413d3a", A: "#413d3a", G: "#413d3a", C: "#413d3a", R: "#413d3a", V: "#413d3a", M: "#413d3a", B: "#413d3a" },
-  "8": { N: "#dddbd9", A: "#dddbd9", G: "#c19742", C: "#dddbd9", R: "#dddbd9", V: "#dddbd9", M: "#dddbd9", B: "#dddbd9" },
-  "9": { N: "#dddbd9", A: "#dddbd9", G: "#c19742", C: "#c19742", R: "#c19742", V: "#c19742", M: "#c19742", B: "#c19742" },
-  "10": { N: "#dddbd9", A: "#dddbd9", G: "#c19742", C: "#c19742", R: "#c19742", V: "#dddbd9", M: "#c19742", B: "#c19742" },
+  "8": { N: "#dddbd9", A: "#dddbd9", G: "#edb4bd", C: "#dddbd9", R: "#dddbd9", V: "#dddbd9", M: "#dddbd9", B: "#dddbd9" },
+  "9": { N: "#dddbd9", A: "#dddbd9", G: "#edb4bd", C: "#edb4bd", R: "#edb4bd", V: "#edb4bd", M: "#edb4bd", B: "#edb4bd" },
+  "10": { N: "#dddbd9", A: "#dddbd9", G: "#edb4bd", C: "#edb4bd", R: "#edb4bd", V: "#dddbd9", M: "#edb4bd", B: "#edb4bd" },
 };
 
 export function generateColors(): ColorItem[] {

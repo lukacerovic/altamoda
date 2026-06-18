@@ -356,16 +356,16 @@ export default function HomepagePage() {
           <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFFFF]">
               <div className="flex items-center gap-3">
-                <div className="text-[#c19742]"><ImageIcon size={20} /></div>
+                <div className="text-[#edb4bd]"><ImageIcon size={20} /></div>
                 <h2 className="text-lg font-serif font-bold text-black">Hero kartice</h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#c19742] text-xs font-semibold">
+                <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#edb4bd] text-xs font-semibold">
                   {heroCards.filter((c) => c.image).length} / 3
                 </span>
               </div>
               <button
                 onClick={saveHeroCardsText}
                 disabled={savingText}
-                className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2 disabled:opacity-50"
               >
                 {savingText ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -517,18 +517,18 @@ export default function HomepagePage() {
                 {/* Section Header */}
                 <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#FFFFFF]">
                   <div className="flex items-center gap-3">
-                    <div className="text-[#c19742]">{section.icon}</div>
+                    <div className="text-[#edb4bd]">{section.icon}</div>
                     <h2 className="text-lg font-serif font-bold text-black">
                       {section.label}
                     </h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#c19742] text-xs font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-black/10 text-[#edb4bd] text-xs font-semibold">
                       {products.length}
                     </span>
                   </div>
                   {!section.readOnly && (
                     <button
                       onClick={() => openAddModal(section.key, section.flagField)}
-                      className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2"
+                      className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-4 py-2 rounded-sm text-sm font-medium flex items-center gap-2"
                     >
                       <Plus size={16} />
                       {t("admin.addToSection")}
@@ -687,7 +687,7 @@ export default function HomepagePage() {
               <button
                 onClick={addSelectedProducts}
                 disabled={selectedToAdd.size === 0 || addingProducts}
-                className="bg-[#c19742] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                className="bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors px-6 py-2.5 rounded-sm text-sm font-medium disabled:opacity-50 flex items-center gap-2"
               >
                 {addingProducts ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

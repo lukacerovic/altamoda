@@ -209,7 +209,7 @@ export default function AdminColorsPage() {
         </div>
         <button
           onClick={() => { resetForm(); setShowAddModal(true); }}
-          className="flex items-center gap-2 bg-[#c19742] hover:bg-[#413d3a] text-white px-5 py-2.5 rounded-sm text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-[#edb4bd] hover:bg-[#413d3a] text-white px-5 py-2.5 rounded-sm text-sm font-medium transition-colors"
         >
           <Plus size={18} /> {t("admin.addColor")}
         </button>
@@ -218,7 +218,7 @@ export default function AdminColorsPage() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: t("admin.totalColors"), value: totalColors, icon: Palette, color: "text-[#c19742]" },
+          { label: t("admin.totalColors"), value: totalColors, icon: Palette, color: "text-[#edb4bd]" },
           { label: t("admin.brandLines"), value: brandLines.length, icon: Package, color: "text-blue-600" },
           { label: t("admin.activeBrands"), value: activeBrands, icon: Grid3X3, color: "text-green-600" },
           { label: t("admin.lowStockColors"), value: lowStockColors, icon: AlertTriangle, color: "text-orange-500" },
@@ -245,7 +245,7 @@ export default function AdminColorsPage() {
           <button
             onClick={() => setActiveBrandLine(null)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              !activeBrandLine ? "bg-[#c19742] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+              !activeBrandLine ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
             }`}
           >
             {t("admin.all")} ({totalColors})
@@ -255,7 +255,7 @@ export default function AdminColorsPage() {
               key={bl.slug}
               onClick={() => setActiveBrandLine(activeBrandLine === bl.slug ? null : bl.slug)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                activeBrandLine === bl.slug ? "bg-[#c19742] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                activeBrandLine === bl.slug ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
               }`}
             >
               {bl.name} <span className="text-xs opacity-70">({bl.count})</span>
@@ -283,13 +283,13 @@ export default function AdminColorsPage() {
           <div className="flex border border-stone-200 rounded-sm overflow-hidden flex-shrink-0">
             <button
               onClick={() => setViewMode("matrix")}
-              className={`p-2 ${viewMode === "matrix" ? "bg-[#c19742] text-white" : "bg-white text-gray-500 hover:bg-stone-100"}`}
+              className={`p-2 ${viewMode === "matrix" ? "bg-[#edb4bd] text-white" : "bg-white text-gray-500 hover:bg-stone-100"}`}
             >
               <Grid3X3 size={16} />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 ${viewMode === "list" ? "bg-[#c19742] text-white" : "bg-white text-gray-500 hover:bg-stone-100"}`}
+              className={`p-2 ${viewMode === "list" ? "bg-[#edb4bd] text-white" : "bg-white text-gray-500 hover:bg-stone-100"}`}
             >
               <List size={16} />
             </button>
@@ -298,7 +298,7 @@ export default function AdminColorsPage() {
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs text-[#c19742] hover:text-black font-medium flex items-center gap-1 flex-shrink-0"
+              className="text-xs text-[#edb4bd] hover:text-black font-medium flex items-center gap-1 flex-shrink-0"
             >
               <X size={14} /> {t("admin.clearFilters")}
             </button>
@@ -314,7 +314,7 @@ export default function AdminColorsPage() {
                 key={l}
                 onClick={() => setFilterLevel(filterLevel === l ? null : l)}
                 className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
-                  filterLevel === l ? "bg-[#c19742] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                  filterLevel === l ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
                 }`}
               >
                 {l}
@@ -332,7 +332,7 @@ export default function AdminColorsPage() {
                 key={key}
                 onClick={() => setFilterUndertone(filterUndertone === key ? null : key)}
                 className={`px-2 h-7 rounded text-xs font-medium transition-colors ${
-                  filterUndertone === key ? "bg-[#c19742] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                  filterUndertone === key ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
                 }`}
               >
                 {val.label}
@@ -492,7 +492,7 @@ export default function AdminColorsPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={(e) => { e.stopPropagation(); openEditModal(c); }}
-                      className="p-1.5 text-gray-400 hover:text-[#c19742] hover:bg-stone-100 rounded transition-colors"
+                      className="p-1.5 text-gray-400 hover:text-[#edb4bd] hover:bg-stone-100 rounded transition-colors"
                     >
                       <Edit3 size={14} />
                     </button>
@@ -560,7 +560,7 @@ export default function AdminColorsPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => openEditModal(c)}
-                        className="p-1.5 text-gray-400 hover:text-[#c19742] hover:bg-stone-100 rounded transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-[#edb4bd] hover:bg-stone-100 rounded transition-colors"
                         title={t("admin.edit")}
                       >
                         <Edit3 size={14} />
@@ -612,7 +612,7 @@ export default function AdminColorsPage() {
                 style={{ backgroundColor: selectedColor.hexValue }}
               />
               <div>
-                <p className="text-xs text-[#c19742] font-semibold uppercase tracking-wider">
+                <p className="text-xs text-[#edb4bd] font-semibold uppercase tracking-wider">
                   {selectedColor.productLine?.name}
                 </p>
                 <h4 className="text-lg font-bold text-black">{selectedColor.shadeCode}</h4>
@@ -673,7 +673,7 @@ export default function AdminColorsPage() {
             <div className="mt-6 space-y-2">
               <button
                 onClick={() => openEditModal(selectedColor)}
-                className="w-full flex items-center justify-center gap-2 bg-[#c19742] hover:bg-[#413d3a] text-white py-2.5 rounded-sm text-sm font-medium transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-2.5 rounded-sm text-sm font-medium transition-colors"
               >
                 <Edit3 size={16} /> {t("admin.editColor")}
               </button>
@@ -719,7 +719,7 @@ export default function AdminColorsPage() {
                       key={l}
                       onClick={() => setFormLevel(l)}
                       className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${
-                        formLevel === l ? "bg-[#c19742] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                        formLevel === l ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
                       }`}
                     >
                       {l}
@@ -737,7 +737,7 @@ export default function AdminColorsPage() {
                       key={key}
                       onClick={() => { setFormUndertoneCode(key); setFormUndertoneName(val.label); }}
                       className={`px-3 h-9 rounded-sm text-sm font-medium transition-colors ${
-                        formUndertoneCode === key ? "bg-[#c19742] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
+                        formUndertoneCode === key ? "bg-[#edb4bd] text-white" : "bg-stone-100 text-gray-600 hover:bg-stone-200"
                       }`}
                     >
                       {val.label}
@@ -800,7 +800,7 @@ export default function AdminColorsPage() {
               >
                 {t("admin.cancel")}
               </button>
-              <button className="flex-1 py-2.5 bg-[#c19742] hover:bg-[#413d3a] text-white rounded-sm text-sm font-medium transition-colors">
+              <button className="flex-1 py-2.5 bg-[#edb4bd] hover:bg-[#413d3a] text-white rounded-sm text-sm font-medium transition-colors">
                 {showEditModal ? t("admin.saveChanges") : t("admin.addColor")}
               </button>
             </div>
