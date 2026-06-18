@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+/* Brand descriptions imported from the legacy catalog sometimes contain raw HTML
+ * (wrapping <p>, embedded <img>, inline styles). Strip every tag down to its
+ * visible text so the card shows a clean blurb instead of literal markup. */
+function toPlainText(html: string): string {
+  const text = DOMPurify.sanitize(html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+  return text.replace(/\s+/g, " ").trim();
+}
 
 interface BrandItem {
   id: string;
@@ -63,9 +72,12 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                   )}
                 </div>
                 <h3 className="text-lg font-semibold text-[#1a1c1e] text-center">{brand.name}</h3>
-                {brand.description && (
-                  <p className="text-sm text-[#1a1c1e] text-center mt-2 line-clamp-2">{brand.description}</p>
-                )}
+                {(() => {
+                  const desc = brand.description ? toPlainText(brand.description) : "";
+                  return desc ? (
+                    <p className="text-sm text-[#1a1c1e] text-center mt-2 line-clamp-2">{desc}</p>
+                  ) : null;
+                })()}
                 <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors">
                   <span>{brand._count.products} {t("admin.productsCount")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />

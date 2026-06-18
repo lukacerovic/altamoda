@@ -59,48 +59,46 @@ function useMegaMenus() {
         {
           title: t("nav.hairCare"),
           links: [
-            { name: t("nav.shampoos"), href: "/products?category=sampon" },
-            { name: t("nav.masks"), href: "/products?category=maska" },
-            { name: t("nav.conditioners"), href: "/products?category=regenerator" },
-            { name: t("nav.serums"), href: "/products?category=ulja-serumi-i-kreme" },
-            { name: t("nav.oils"), href: "/products?category=ulja-serumi-i-kreme" },
+            { name: t("nav.shampoos"), href: `/products?productType=${encodeURIComponent("Šampon")}` },
+            { name: t("nav.masks"), href: "/products?productType=Maska" },
+            { name: t("nav.conditioners"), href: "/products?productType=Regenerator" },
+            { name: t("nav.serums"), href: "/products?productType=Serum" },
+            { name: t("nav.oils"), href: "/products?productType=Ulje" },
           ],
         },
         {
           title: t("nav.styling"),
           links: [
             { name: t("nav.styling"), href: "/products?category=stajling" },
-            { name: t("nav.leaveIn"), href: "/products?category=tretman" },
+            { name: t("nav.leaveIn"), href: "/products?productType=Leave-In" },
           ],
         },
         {
           title: t("nav.appliances"),
           links: [
-            { name: t("nav.tools"), href: "/products?category=frizerski-pribor" },
-            { name: t("nav.brushes"), href: "/products?category=cetkice" },
-            { name: t("nav.scissors"), href: "/products?category=makaze-1" },
+            { name: t("nav.tools"), href: "/products?category=pribor" },
+            { name: t("nav.brushes"), href: "/products?category=pribor-cetka" },
+            { name: t("nav.scissors"), href: "/products?category=pribor-makaze" },
           ],
         },
         {
           title: t("nav.hairColors"),
           links: [
-            { name: t("nav.permanent"), href: "/products?category=permanentne-boje" },
-            { name: t("nav.demiPermanent"), href: "/products?category=demi-permanentne-boje" },
-            { name: t("nav.semiPermanent"), href: "/products?category=semi-permanentne-boje" },
+            { name: t("nav.permanent"), href: `/products?productType=${encodeURIComponent("Permanentne boje")}` },
+            { name: t("nav.demiPermanent"), href: `/products?productType=${encodeURIComponent("Demi-permanentne boje")}` },
           ],
         },
         {
           title: t("nav.oxidantsDecolorants"),
           links: [
-            { name: t("nav.oxidants"), href: "/products?category=oksidanti" },
-            { name: t("nav.decolorantPowders"), href: "/products?category=dekoloranti" },
+            { name: t("nav.oxidants"), href: "/products?category=kolor-oksidant" },
+            { name: t("nav.decolorantPowders"), href: "/products?category=kolor-dekolorant" },
           ],
         },
         {
           title: t("nav.manCollection"),
           links: [
             { name: "Redken Brews", href: "/products?search=Brews" },
-            { name: t("nav.menColors"), href: "/products?category=color-camo" },
           ],
         },
       ],

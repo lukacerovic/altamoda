@@ -543,7 +543,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               Od 1999. godine
             </span>
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-light text-[#1a1c1e] leading-[1.02]"
+              className="text-4xl md:text-6xl lg:text-7xl font-light text-[#1a1c1e] leading-[1.02]"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
             >
               Profesionalna nega,
@@ -553,7 +553,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           </div>
 
           {/* Bottom row — three teaser cards (mobile: 1 big + 2 stacked; desktop: 3 equal) */}
-          <div className="grid grid-cols-2 grid-rows-2 aspect-[6/6] gap-3 md:grid-cols-3 md:grid-rows-1 md:aspect-auto md:gap-6">
+          <div className="grid grid-cols-2 grid-rows-2 aspect-[6/8] gap-3 md:grid-cols-3 md:grid-rows-1 md:aspect-auto md:gap-6">
             {heroTeaserCards.map((card, i) => (
               <Link
                 key={i}

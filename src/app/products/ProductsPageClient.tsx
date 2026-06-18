@@ -679,6 +679,17 @@ export default function ProductsPageClient({
     }
   }, [listSignature, products, currentPage, pagination, shuffleSeed]);
 
+  // The SSR/ISR page render is generic and cacheable — it ignores the URL's
+  // filter params and always returns an unfiltered first chunk. So when we land
+  // directly on a filtered URL (e.g. /products?brand=olaplex from the nav brand
+  // dropdown, which redirects here), the initial products must be re-fetched
+  // with the filter applied; otherwise every product would show.
+  const hasUrlFilters = Boolean(
+    categoryParam || genderParam || brandParam || searchParam ||
+    productLineParams.length || productTypeParams.length ||
+    hairTypeParams.length || tagParams.length
+  );
+
   // Generate a fresh shuffle seed once per mount (post-hydration to keep SSR
   // markup stable). Each refresh / fresh navigation to /products gets a new
   // order; within the same mount the seed is stable so pagination & filter
@@ -722,6 +733,16 @@ export default function ProductsPageClient({
 
     const seed = getFreshSeed();
     setShuffleSeed(seed);
+
+    // Landed on a filtered URL: replace the unfiltered SSR chunk with the
+    // correctly filtered first page. The refetch effect below is skipped on this
+    // initial mount, so we trigger the fetch here. (state is already seeded from
+    // the URL params, so buildQueryString picks up the filters.)
+    if (hasUrlFilters) {
+      fetchProducts(1, false);
+      return;
+    }
+
     // Shuffle the server-rendered first chunk once, post-hydration. Subsequent
     // chunks are shuffled at fetch time before being appended, so the displayed
     // order is stable across "load more" clicks (no re-ordering of seen items).
