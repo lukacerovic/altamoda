@@ -544,7 +544,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                   <button
                     onClick={handleAddToCart}
                     disabled={disabled}
-                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${disabled ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff]"}`}
+                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : professionalBlocked ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff]"}`}
                   >
                     {professionalBlocked ? (
                       <>B2B - samo za salone</>
