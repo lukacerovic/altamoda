@@ -369,7 +369,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#413d3a]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#413d3a]"}`}
             >
               {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -402,7 +402,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"}`}
             >
               {hasColors ? <><Palette className="w-3 h-3" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
