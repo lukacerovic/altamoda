@@ -566,7 +566,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
                 >
                   {t("colors.viewProduct")}
                 </Link>
-                <button className="w-full bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff] py-3 rounded-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <button className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3 rounded-sm font-medium transition-colors flex items-center justify-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> {t("colors.addToCart")}
                 </button>
 
@@ -629,7 +629,7 @@ export default function ColorsPageClient({ initialBrandLines, initialColors, ini
               >
                 {t("colors.viewProduct")}
               </Link>
-              <button className="flex-1 bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff] py-3 rounded-sm font-medium flex items-center justify-center gap-2 transition-colors">
+              <button className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3 rounded-sm font-medium flex items-center justify-center gap-2 transition-colors">
                 <ShoppingCart className="w-4 h-4" /> {t("colors.addToCart")}
               </button>
             </div>

@@ -133,7 +133,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                 <button className="flex items-center gap-2 px-4 py-2 border border-[#dddbd9] text-[#1a1c1e] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
                   <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
-                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#edb4bd] hover:bg-[#d98fa0] text-white text-sm font-medium rounded-sm transition-colors">
+                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#edb4bd] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors">
                   <ShoppingCart className="w-4 h-4" /> {t("wishlist.addAllToCart")}
                 </button>
               </div>
@@ -194,7 +194,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         onClick={() => addToCart(item)}
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
-                            ? "bg-[#edb4bd] hover:bg-[#d98fa0] text-[#ffffff]"
+                            ? "bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff]"
                             : "bg-[#dddbd9] text-[#1a1c1e] cursor-not-allowed"
                         }`}
                       >

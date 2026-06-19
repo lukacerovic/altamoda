@@ -125,7 +125,7 @@ function RecommendedCard({ product, isWishlisted }: { product: RecommendedProduc
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#d98fa0]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#413d3a]"}`}
             >
               {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
