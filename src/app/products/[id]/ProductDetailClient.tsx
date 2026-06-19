@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
@@ -113,6 +114,7 @@ const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a3
 export default function ProductDetailClient({ product, related, colorSiblings = [], userRole: _serverRole, initialLiked = false, userExistingRating = null }: Props) {
   const { t } = useLanguage();
   const { data: session } = useSession();
+  const router = useRouter();
   const role = (session?.user as { role?: string } | undefined)?.role || _serverRole;
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
   const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
@@ -507,27 +509,23 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                 <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e] font-medium mb-3">
                   Boje · {colorSiblings.length} nijanse
                 </h4>
-                <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1">
-                  {colorSiblings.map((sibling) => (
-                    <Link
-                      key={sibling.id}
-                      href={`/products/${sibling.slug}`}
-                      onMouseEnter={() => {
-                        setSelectedSibling(sibling);
-                        setActiveThumb(0);
-                      }}
-                      className={`px-3 py-2 text-[10px] uppercase tracking-[0.18em] font-medium border transition-all ${
-                        sibling.isActive
-                          ? "bg-[#1a1c1e] text-[#FFFFFF] border-[#1a1c1e]"
-                          : sibling.inStock
-                            ? "text-[#1a1c1e] border-[#dddbd9] hover:border-[#1a1c1e]"
-                            : "text-[#1a1c1e]/40 border-[#dddbd9]"
-                      }`}
-                    >
-                      {sibling.colorCode || sibling.name}
-                      {!sibling.inStock && <span className="ml-1 text-[9px]">(nema)</span>}
-                    </Link>
-                  ))}
+                <div className="relative">
+                  <select
+                    value={colorSiblings.find(s => s.isActive)?.slug ?? ''}
+                    onChange={(e) => {
+                      const next = colorSiblings.find(s => s.slug === e.target.value);
+                      if (next) router.push(`/products/${next.slug}`);
+                    }}
+                    className="w-full appearance-none border border-[#dddbd9] bg-white px-4 py-3 pr-10 text-[12px] uppercase tracking-[0.18em] text-[#1a1c1e] font-medium focus:outline-none focus:border-[#1a1c1e] transition-colors"
+                  >
+                    {colorSiblings.map((sibling) => (
+                      <option key={sibling.id} value={sibling.slug}>
+                        {sibling.colorCode || sibling.name}
+                        {!sibling.inStock ? ' (nema)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#1a1c1e]/60 pointer-events-none rotate-90" />
                 </div>
               </div>
             )}
