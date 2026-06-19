@@ -81,8 +81,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // No auth() call — page is fully cacheable. Role-based filtering happens client-side via API.
   const limit = 20;
   const skip = (page - 1) * limit;
-  // Storefront hides stock=0 entirely (admin grid shows everything via the API).
-  const productWhere = { isActive: true, stockQuantity: { gt: 0 } };
+  // Storefront shows out-of-stock products too (they render a "Nema na stanju" button).
+  const productWhere = { isActive: true };
 
   const [
     [rawProducts, rawTotal, groupedDups],
@@ -124,16 +124,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       select: { id: true, name: true, slug: true },
       orderBy: { name: "asc" },
     }),
-    // Categories — count only in-stock products to mirror what the storefront list returns.
+    // Categories — count active products (in- and out-of-stock) to mirror the storefront list.
     prisma.category.findMany({
       where: { isActive: true },
-      select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true, stockQuantity: { gt: 0 } } } } } },
+      select: { id: true, nameLat: true, slug: true, parentId: true, sortOrder: true, _count: { select: { products: { where: { isActive: true } } } } },
       orderBy: { sortOrder: "asc" },
     }),
-    // Product lines — only those with at least one active, in-stock product.
+    // Product lines — only those with at least one active product.
     prisma.productLine.findMany({
       where: {
-        products: { some: { isActive: true, stockQuantity: { gt: 0 } } },
+        products: { some: { isActive: true } },
       },
       select: {
         id: true,
@@ -146,7 +146,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     // Distinct product types (single value per row)
     prisma.$queryRaw<Array<{ value: string }>>`
       SELECT DISTINCT TRIM(product_type) AS value FROM products
-      WHERE is_active = true AND stock_quantity > 0
+      WHERE is_active = true
         AND product_type IS NOT NULL AND TRIM(product_type) != ''
       ORDER BY value
     `,
@@ -155,7 +155,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     prisma.$queryRaw<Array<{ value: string }>>`
       SELECT DISTINCT v AS value FROM (
         SELECT TRIM(unnest(string_to_array(hair_types, ','))) AS v FROM products
-        WHERE is_active = true AND stock_quantity > 0
+        WHERE is_active = true
           AND hair_types IS NOT NULL AND TRIM(hair_types) != ''
       ) sub
       WHERE v <> ''
@@ -165,7 +165,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     prisma.$queryRaw<Array<{ value: string }>>`
       SELECT DISTINCT v AS value FROM (
         SELECT TRIM(unnest(string_to_array(tags, ','))) AS v FROM products
-        WHERE is_active = true AND stock_quantity > 0
+        WHERE is_active = true
           AND tags IS NOT NULL AND TRIM(tags) != ''
       ) sub
       WHERE v <> ''

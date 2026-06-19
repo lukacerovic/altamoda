@@ -778,8 +778,8 @@ export default function ProductsPageClient({
       params.set("visibility", visibility);
     }
 
-    // Storefront only ever shows in-stock products; admin uses a separate flow.
-    params.set("inStockOnly", "true");
+    // Storefront shows out-of-stock products too (they render a "Nema na stanju" button).
+    params.set("inStockOnly", "false");
 
     if (selectedCategory) {
       params.set("category", selectedCategory);
