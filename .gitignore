@@ -38,6 +38,10 @@
 # generated reports from one-off scripts
 /scripts/*-report.csv
 /scripts/backfill-unmatched-*.csv
+/reports/
+
+# local & production DB dumps (data, not source — regenerated via pg_dump)
+/backups/
 
 # debug
 npm-debug.log*
