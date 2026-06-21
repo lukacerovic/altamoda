@@ -51,6 +51,7 @@ const normText = (s) =>
   decode(String(s == null ? '' : s).replace(/<[^>]+>/g, ' '))
     .replace(/[•·]/g, ' ')
     .replace(/\s+/g, ' ')
+    .replace(/\s+([,.;:!?])/g, '$1') // tag-stripping can insert a space before punctuation
     .trim();
 
 // cell.h (SheetJS rich-text HTML) -> trimmed lines that may contain inline
