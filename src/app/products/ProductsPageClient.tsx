@@ -361,7 +361,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             </span>
           )}
         </div>
-        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10 opacity-0 group-hover:opacity-100">
+        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100">
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
         </button>
         {!b2bOnly && (

@@ -129,7 +129,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
         )}
         <button
           onClick={(e) => { e.preventDefault(); setLiked(!liked); }}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#FFFFFF]/70 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors opacity-0 group-hover:opacity-100"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#FFFFFF]/70 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
         >
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
         </button>
