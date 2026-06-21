@@ -345,6 +345,127 @@ export interface HeroCard {
   href: string;
 }
 
+/* ─── Single hero teaser card ─── */
+/* `big` scales the overlay typography up; used for the carousel slides and the
+   first (tall) card. `className` lets the parent set sizing/aspect per layout. */
+function HeroTeaserCard({ card, big, eager, className = "" }: { card: HeroCard; big: boolean; eager: boolean; className?: string }) {
+  return (
+    <Link
+      href={card.href}
+      className={`group relative block overflow-hidden rounded-[4px] bg-[#dddbd9] ${className}`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={card.image}
+        alt={card.title}
+        className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : "auto"}
+      />
+      {/* Gradient overlay for readability (stronger on mobile) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c1e]/95 via-[#1a1c1e]/55 to-[#1a1c1e]/10 md:from-[#1a1c1e]/85 md:via-[#1a1c1e]/25 md:to-transparent" />
+
+      {/* Top kicker */}
+      <div className="absolute top-2.5 left-2.5 right-2.5 md:top-5 md:left-5 md:right-5 flex items-center justify-between">
+        <span className={`uppercase tracking-[0.22em] md:tracking-[0.25em] text-[#FFFFFF]/90 font-medium ${
+          big ? "text-[11px] md:text-[9px]" : "text-[7px] md:text-[9px]"
+        }`}>
+          {card.kicker}
+        </span>
+      </div>
+
+      {/* Bottom title + paragraph + CTA */}
+      <div className={`absolute inset-x-0 bottom-0 md:p-7 ${big ? "p-4" : "p-2.5"}`}>
+        <h3
+          className={`font-light text-[#FFFFFF] leading-[1.1] md:text-3xl md:mb-3 ${
+            big ? "text-[24px] mb-2" : "text-[13px] mb-1"
+          }`}
+          style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.01em" }}
+        >
+          {card.title}
+        </h3>
+        {card.paragraph && (
+          <p className={`text-[#FFFFFF]/85 leading-[1.5] md:leading-[1.6] md:text-[12.5px] md:mb-5 ${
+            big ? "text-[13px] mb-3 line-clamp-3" : "text-[9px] mb-1.5 line-clamp-2"
+          }`}>
+            {card.paragraph}
+          </p>
+        )}
+        <div className={`inline-flex items-center gap-1.5 md:gap-2 uppercase tracking-[0.2em] md:tracking-[0.22em] text-[#FFFFFF] font-medium border-b border-[#FFFFFF]/60 pb-0.5 md:pb-1 group-hover:border-[#FFFFFF] transition-colors md:text-[10px] ${
+          big ? "text-[10px]" : "text-[7px]"
+        }`}>
+          {card.cta}
+          <ArrowRight className="w-2.5 h-2.5 md:w-3 md:h-3" />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ─── Mobile-only hero carousel ─── */
+/* Horizontal scroll-snap carousel with dot pagination. Renders only below the
+   `md` breakpoint; desktop keeps the static three-column grid. */
+function HeroCarousel({ cards }: { cards: HeroCard[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  // Per-slide scroll distance = distance between the first two slides' left
+  // edges. Robust to container padding since scrollLeft 0 == first slide.
+  const slideStride = () => {
+    const el = scrollRef.current;
+    if (!el || el.children.length < 2) return el?.clientWidth ?? 0;
+    return (el.children[1] as HTMLElement).offsetLeft - (el.children[0] as HTMLElement).offsetLeft;
+  };
+
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const stride = slideStride();
+    if (!stride) return;
+    const idx = Math.round(el.scrollLeft / stride);
+    setActive(Math.min(cards.length - 1, Math.max(0, idx)));
+  };
+
+  const goTo = (i: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * slideStride(), behavior: "smooth" });
+  };
+
+  return (
+    <div className="md:hidden">
+      <div
+        ref={scrollRef}
+        onScroll={onScroll}
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
+      >
+        {cards.map((card, i) => (
+          <div key={i} className="snap-start shrink-0 w-[82%]">
+            <HeroTeaserCard card={card} big eager={i === 0} className="aspect-[4/5]" />
+          </div>
+        ))}
+      </div>
+
+      {/* Dot pagination */}
+      <div className="flex justify-center gap-2 mt-4">
+        {cards.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => goTo(i)}
+            aria-label={`Pređi na karticu ${i + 1}`}
+            aria-current={i === active}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              i === active ? "w-5 bg-[#1a1c1e]" : "w-2 bg-[#1a1c1e]/25"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Props ─── */
 interface Props {
   featuredProducts: ProductData[];
@@ -552,61 +673,19 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </h1>
           </div>
 
-          {/* Bottom row — three teaser cards (mobile: 1 big + 2 stacked; desktop: 3 equal) */}
-          <div className="grid grid-cols-2 grid-rows-2 aspect-[6/8] gap-3 md:grid-cols-3 md:grid-rows-1 md:aspect-auto md:gap-6">
+          {/* Mobile — swipeable carousel with dot pagination */}
+          <HeroCarousel cards={heroTeaserCards} />
+
+          {/* Desktop — three equal teaser cards */}
+          <div className="hidden md:grid md:grid-cols-3 md:gap-6">
             {heroTeaserCards.map((card, i) => (
-              <Link
+              <HeroTeaserCard
                 key={i}
-                href={card.href}
-                className={`group relative block overflow-hidden rounded-[4px] bg-[#dddbd9] md:aspect-[4/5] ${
-                  i === 0 ? "row-span-2 md:row-span-1" : ""
-                }`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
-                  loading={i === 0 ? "eager" : "lazy"}
-                  fetchPriority={i === 0 ? "high" : "auto"}
-                />
-                {/* Gradient overlay for readability (stronger on mobile) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c1e]/95 via-[#1a1c1e]/55 to-[#1a1c1e]/10 md:from-[#1a1c1e]/85 md:via-[#1a1c1e]/25 md:to-transparent" />
-
-                {/* Top kicker */}
-                <div className="absolute top-2.5 left-2.5 right-2.5 md:top-5 md:left-5 md:right-5 flex items-center justify-between">
-                  <span className={`uppercase tracking-[0.22em] md:tracking-[0.25em] text-[#FFFFFF]/90 font-medium ${
-                    i === 0 ? "text-[8px] md:text-[9px]" : "text-[7px] md:text-[9px]"
-                  }`}>
-                    {card.kicker}
-                  </span>
-                </div>
-
-                {/* Bottom title + paragraph + CTA */}
-                <div className={`absolute inset-x-0 bottom-0 md:p-7 ${i === 0 ? "p-3.5" : "p-2.5"}`}>
-                  <h3
-                    className={`font-light text-[#FFFFFF] leading-[1.1] md:text-3xl md:mb-3 ${
-                      i === 0 ? "text-[17px] mb-1.5" : "text-[13px] mb-1"
-                    }`}
-                    style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.01em" }}
-                  >
-                    {card.title}
-                  </h3>
-                  {card.paragraph && (
-                    <p className={`text-[#FFFFFF]/85 leading-[1.5] md:leading-[1.6] md:text-[12.5px] md:mb-5 ${
-                      i === 0 ? "text-[10px] mb-2 line-clamp-3" : "text-[9px] mb-1.5 line-clamp-2"
-                    }`}>
-                      {card.paragraph}
-                    </p>
-                  )}
-                  <div className={`inline-flex items-center gap-1.5 md:gap-2 uppercase tracking-[0.2em] md:tracking-[0.22em] text-[#FFFFFF] font-medium border-b border-[#FFFFFF]/60 pb-0.5 md:pb-1 group-hover:border-[#FFFFFF] transition-colors md:text-[10px] ${
-                    i === 0 ? "text-[8px]" : "text-[7px]"
-                  }`}>
-                    {card.cta}
-                    <ArrowRight className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                  </div>
-                </div>
-              </Link>
+                card={card}
+                big={i === 0}
+                eager={i === 0}
+                className="md:aspect-[4/5]"
+              />
             ))}
           </div>
         </div>

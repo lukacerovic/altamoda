@@ -53,6 +53,16 @@ export const emailTemplateOptionsSchema = z
     bodyBgImage: safeImageUrl.optional().or(z.literal('')),
     footerText: safeText.optional(),
     footerCopyright: safeText.optional(),
+    // Letterhead scheme fields (altamoda wordmark stationery)
+    pageBg: safeColor.optional(),
+    bodyBg: safeColor.optional(),
+    textColor: safeColor.optional(),
+    mutedColor: safeColor.optional(),
+    accentColor: safeColor.optional(),
+    wordmarkSrc: safeImageUrl.optional().or(z.literal('')),
+    tagline: safeText.optional(),
+    taglineColor: safeColor.optional(),
+    watermarkSrc: safeImageUrl.optional().or(z.literal('')),
   })
   .strict()
 

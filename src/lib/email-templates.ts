@@ -1,8 +1,14 @@
 import { getUnsubscribeUrl, getSiteUrl } from './email'
 
-const BRAND_BG = '#FFFFFF'
-const BRAND_PRIMARY = '#dddbd9'
-const BRAND_TEXT = '#1a1c1e'
+// Altamoda letterhead palette (matches the newsletter stationery).
+const PAGE_BG = '#f6dfe1' // soft pink page behind the card
+const CARD_BG = '#fbf6f2' // cream card
+const HEADER_BG = '#f9e1e1' // pink header band
+const BRAND_BG = '#fbf6f2' // cream (code boxes etc.)
+const BRAND_PRIMARY = '#2c160b' // brown ink — headings, buttons, accents
+const BRAND_TEXT = '#1a1c1e' // body text
+const MUTED = '#9a8f88'
+const TAGLINE = 'BEAUTY DISTRIBUTION &amp; EDUCATION'
 
 interface BaseLayoutOptions {
   /** Recipient email — required when showUnsubscribe is true */
@@ -13,10 +19,13 @@ interface BaseLayoutOptions {
 
 function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
   const { email, showUnsubscribe = false } = opts
+  const site = getSiteUrl().replace(/\/$/, '')
+  const wordmark = `${site}/email/wordmark-brown.png`
+  const watermark = `${site}/email/watermark-d-blush.png`
   const footerUnsub =
     showUnsubscribe && email
-      ? `<p style="margin: 0; font-size: 12px; color: #413d3a; text-align: center;">
-                <a href="${getUnsubscribeUrl(email)}" style="color: ${BRAND_PRIMARY}; text-decoration: underline;">Odjavi se</a> sa newsletter liste.
+      ? `<p style="margin: 8px 0 0; font-size: 12px; color: ${MUTED}; text-align: center;">
+                <a href="${getUnsubscribeUrl(email)}" style="color: ${MUTED}; text-decoration: underline;">Odjavi se</a> sa newsletter liste.
               </p>`
       : ''
 
@@ -25,30 +34,45 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light only" />
   <title>Altamoda</title>
+  <style>
+    /* Force a single light appearance regardless of the client's dark mode. */
+    :root{color-scheme:light only;supported-color-schemes:light only;}
+    @media (prefers-color-scheme:dark){
+      .al-page{background-color:${PAGE_BG}!important}
+      .al-card,.al-body,.al-footer{background-color:${CARD_BG}!important}
+      .al-header{background-color:${HEADER_BG}!important}
+    }
+    [data-ogsc] .al-page{background-color:${PAGE_BG}!important}
+    [data-ogsc] .al-card,[data-ogsc] .al-body,[data-ogsc] .al-footer{background-color:${CARD_BG}!important}
+    [data-ogsc] .al-header{background-color:${HEADER_BG}!important}
+  </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: ${BRAND_BG}; font-family: 'Georgia', 'Times New Roman', serif; color: ${BRAND_TEXT};">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: ${BRAND_BG};">
+<body bgcolor="${PAGE_BG}" style="margin: 0; padding: 0; background-color: ${PAGE_BG}; font-family: 'Georgia', 'Times New Roman', serif; color: ${BRAND_TEXT}; color-scheme: light only;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${PAGE_BG}" class="al-page" style="background-color: ${PAGE_BG};">
     <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(26,28,30, 0.06);">
+      <td align="center" bgcolor="${PAGE_BG}" style="padding: 40px 20px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" bgcolor="${CARD_BG}" class="al-card" style="max-width: 600px; width: 100%; background-color: ${CARD_BG}; border-radius: 2px; overflow: hidden;">
           <tr>
-            <td align="center" style="padding: 32px 40px 24px; background-color: ${BRAND_PRIMARY};">
-              <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: 3px; text-transform: uppercase;">
-                ALTAMODA
-              </h1>
-              <p style="margin: 4px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.8); letter-spacing: 2px; text-transform: uppercase;">
-                Heritage
+            <td align="center" bgcolor="${HEADER_BG}" class="al-header" style="padding: 40px 40px 32px; background-color: ${HEADER_BG};">
+              <img src="${wordmark}" alt="altamoda" style="display: block; margin: 0 auto; width: 200px; max-width: 62%; height: auto;" />
+              <p style="margin: 14px 0 0; font-size: 11px; color: ${BRAND_PRIMARY}; letter-spacing: 4px; text-transform: uppercase;">
+                ${TAGLINE}
               </p>
             </td>
           </tr>
           <tr>
-            <td style="padding: 0;">${content}</td>
+            <td valign="top" bgcolor="${CARD_BG}" class="al-body" style="padding: 0; background-color: ${CARD_BG}; background-image: url('${watermark}'); background-repeat: no-repeat; background-position: bottom right; background-size: auto 50%;">${content}</td>
           </tr>
           <tr>
-            <td style="padding: 24px 40px; background-color: #FFFFFF; border-top: 1px solid #dddbd9;">
-              <p style="margin: 0 0 ${footerUnsub ? '8px' : '0'}; font-size: 12px; color: #413d3a; text-align: center;">
-                &copy; ${new Date().getFullYear()} Altamoda Heritage. Sva prava zadrzana.
+            <td bgcolor="${CARD_BG}" class="al-footer" style="padding: 24px 40px; background-color: ${CARD_BG}; border-top: 1px solid rgba(44,22,11,0.12);">
+              <p style="margin: 0; font-size: 11px; color: ${MUTED}; text-align: center; letter-spacing: 1px; text-transform: uppercase;">
+                ALTAMODA · ${TAGLINE}
+              </p>
+              <p style="margin: 6px 0 0; font-size: 11px; color: ${MUTED}; text-align: center;">
+                &copy; ${new Date().getFullYear()} Altamoda. Sva prava zadržana.
               </p>
               ${footerUnsub}
             </td>

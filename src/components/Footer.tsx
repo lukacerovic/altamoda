@@ -22,10 +22,10 @@ export default function Footer() {
       {/* Column 1: Brand */}
       <div className="md:col-span-1">
         <Image
-          src="/altamoda-logoes/ALTAMODA WHITE.png"
+          src="/altamoda-logoes/altamoda-footer-white.png"
           alt="Altamoda"
-          width={626}
-          height={201}
+          width={1397}
+          height={246}
           className="h-10 w-auto mb-6"
         />
         <p className="text-xs tracking-wider uppercase leading-loose text-[#FFFFFF]/80">

@@ -10,6 +10,14 @@ export const POST = withErrorHandler(async () => {
   let created = 0
   let updated = 0
 
+  // Prune stale default templates (e.g. the old Akcije/Novo/Info) so re-seeding
+  // converges on exactly the current set. Campaigns that referenced them keep
+  // their copied content — the FK is optional and nulls on delete.
+  const keepNames = defaultTemplates.map((t) => t.name)
+  const pruned = await prisma.newsletterTemplate.deleteMany({
+    where: { isDefault: true, name: { notIn: keepNames } },
+  })
+
   for (const t of defaultTemplates) {
     const existing = await prisma.newsletterTemplate.findFirst({
       where: { name: t.name, isDefault: true },
@@ -40,8 +48,9 @@ export const POST = withErrorHandler(async () => {
   }
 
   return successResponse({
-    message: `Šabloni ažurirani: ${created} kreirano, ${updated} ažurirano`,
+    message: `Šabloni ažurirani: ${created} kreirano, ${updated} ažurirano, ${pruned.count} uklonjeno`,
     created,
     updated,
+    pruned: pruned.count,
   })
 })

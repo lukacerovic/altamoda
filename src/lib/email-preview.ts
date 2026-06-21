@@ -11,7 +11,6 @@
 const PAGE_BG = '#dddbd9'
 const HEADER_BG = '#1a1c1e'
 const CONTENT_BG = '#ffffff'
-const FOOTER_BG = '#dddbd9'
 
 const TEXT_PRIMARY = '#1a1c1e'
 const TEXT_BODY = '#413d3a'
@@ -107,15 +106,35 @@ export interface EmailTemplateOptions {
   bodyBgImage?: string
   footerText?: string
   footerCopyright?: string
+
+  // ── Letterhead scheme fields (altamoda wordmark stationery) ──
+  /** Page (outer) background behind the 600px card. */
+  pageBg?: string
+  /** Content/footer background colour. */
+  bodyBg?: string
+  /** Primary body text colour. */
+  textColor?: string
+  /** Muted text colour (footer, fine print). */
+  mutedColor?: string
+  /** Accent colour for links / fine rules. */
+  accentColor?: string
+  /** Wordmark image (overrides headerTitle/headerImage when set). */
+  wordmarkSrc?: string
+  /** Tagline under the wordmark, e.g. "BEAUTY DISTRIBUTION & EDUCATION". */
+  tagline?: string
+  /** Tagline colour. */
+  taglineColor?: string
+  /** Faint "d" watermark shown bottom-right of the body. */
+  watermarkSrc?: string
 }
 
 export const defaultEmailOptions: EmailTemplateOptions = {
-  headerTitle: 'ALTAMODA',
-  headerSubtitle: 'Heritage',
+  headerTitle: 'altamoda',
   headerBg: HEADER_BG,
   headerImage: '',
-  footerText: 'Altamoda Heritage',
-  footerCopyright: `© ${new Date().getFullYear()} · Sva prava zadrzana`,
+  tagline: 'BEAUTY DISTRIBUTION & EDUCATION',
+  footerText: 'ALTAMODA · BEAUTY DISTRIBUTION & EDUCATION',
+  footerCopyright: `© ${new Date().getFullYear()} · Sva prava zadržana`,
 }
 
 /**
@@ -131,10 +150,22 @@ export function wrapInEmailTemplate(
 ): string {
   const o = { ...defaultEmailOptions, ...opts }
   const hBg = o.headerBg || HEADER_BG
+  const pageBg = o.pageBg || PAGE_BG
+  const bodyBg = o.bodyBg || CONTENT_BG
+  const muted = o.mutedColor || TEXT_MUTED
+  const accent = o.accentColor || ACCENT
+  const tagColor = o.taglineColor || 'rgba(255,255,255,0.55)'
   const unsubHref = unsubscribeUrl || '#preview-unsubscribe'
 
-  // Header content — either an image or text
-  const headerContent = o.headerImage
+  // Header content — wordmark (letterhead) wins, then a header image, then text.
+  const headerContent = o.wordmarkSrc
+    ? [
+        `<img src="${o.wordmarkSrc}" alt="${o.headerTitle || 'altamoda'}" style="display:block;margin:0 auto;width:210px;max-width:64%;height:auto;" />`,
+        o.tagline
+          ? `<p style="margin:14px 0 0;font-size:11px;color:${tagColor};letter-spacing:4px;text-transform:uppercase;${FONT}">${o.tagline}</p>`
+          : '',
+      ].join('\n')
+    : o.headerImage
     ? `<img src="${o.headerImage}" alt="${o.headerTitle}" style="max-width:260px;max-height:80px;height:auto;display:block;margin:0 auto;" />`
     : [
         `<p style="margin:0;font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:4px;text-transform:uppercase;${FONT}">· · ·</p>`,
@@ -144,16 +175,28 @@ export function wrapInEmailTemplate(
           : '',
       ].join('\n')
 
+  // The letterhead look (wordmark) drops the accent rule and gives the body a
+  // tall min-height so the corner watermark reads on near-empty stationery.
+  const isLetterhead = !!o.wordmarkSrc
+  const bodyWatermark = o.watermarkSrc
+    ? `background-image:url('${o.watermarkSrc}');background-repeat:no-repeat;background-position:bottom right;background-size:auto 58%;`
+    : o.bodyBgImage
+    ? `background-image:url('${o.bodyBgImage}');background-size:cover;background-position:center;background-repeat:no-repeat;`
+    : ''
+
   return `<!DOCTYPE html>
 <html lang="sr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<meta name="supported-color-schemes" content="light dark" />
+<meta name="color-scheme" content="light only" />
+<meta name="supported-color-schemes" content="light only" />
 <title>${o.headerTitle}</title>
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 <style>
+/* Force a single light appearance — clients that honour color-scheme (Apple
+   Mail, iOS) will not apply their dark-mode colour inversion. */
+:root{color-scheme:light only;supported-color-schemes:light only;}
 @media only screen and (max-width:620px){
 .ew{padding:20px 12px!important}
 .ec{width:100%!important;border-radius:0!important}
@@ -164,33 +207,42 @@ img{max-width:100%!important;height:auto!important}
 h1{font-size:24px!important;letter-spacing:1px!important}
 h2{font-size:20px!important}
 }
+/* Re-assert palette for clients that still swap colours in dark mode. */
+@media (prefers-color-scheme:dark){
+.ep-page{background-color:${pageBg}!important}
+.ep-card,.eb,.ef{background-color:${bodyBg}!important}
+.eh{background-color:${hBg}!important}
+}
+[data-ogsc] .ep-page{background-color:${pageBg}!important}
+[data-ogsc] .ep-card,[data-ogsc] .eb,[data-ogsc] .ef{background-color:${bodyBg}!important}
+[data-ogsc] .eh{background-color:${hBg}!important}
 </style>
 </head>
-<body style="margin:0;padding:0;background-color:${PAGE_BG};${FONT}color:${TEXT_BODY};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${PAGE_BG};">
+<body bgcolor="${pageBg}" style="margin:0;padding:0;background-color:${pageBg};${FONT}color:${TEXT_BODY};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;color-scheme:light only;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${pageBg}" class="ep-page" style="background-color:${pageBg};">
 <tr>
-<td class="ew" align="center" style="padding:48px 20px;">
-<table class="ec" role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${CONTENT_BG};border-radius:2px;overflow:hidden;">
+<td class="ew" align="center" bgcolor="${pageBg}" style="padding:48px 20px;">
+<table class="ec ep-card" role="presentation" width="600" cellpadding="0" cellspacing="0" bgcolor="${bodyBg}" style="max-width:600px;width:100%;background-color:${bodyBg};border-radius:2px;overflow:hidden;">
 
 <!-- Header -->
 <tr>
-<td class="eh" align="center" style="padding:${o.headerBgImage ? '60px 40px 52px' : '36px 40px 28px'};background-color:${hBg};${o.headerBgImage ? `background-image:url('${o.headerBgImage}');background-size:cover;background-position:center;` : ''}">
+<td class="eh" align="center" bgcolor="${hBg}" style="padding:${o.headerBgImage ? '60px 40px 52px' : isLetterhead ? '42px 40px 34px' : '36px 40px 28px'};background-color:${hBg};${o.headerBgImage ? `background-image:url('${o.headerBgImage}');background-size:cover;background-position:center;` : ''}">
 ${headerContent}
 </td>
 </tr>
-
+${isLetterhead ? '' : `
 <!-- Accent line -->
 <tr>
-<td align="center" style="background-color:${CONTENT_BG};">
+<td align="center" bgcolor="${bodyBg}" style="background-color:${bodyBg};">
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-<tr><td style="width:48px;height:1px;background-color:${ACCENT};font-size:0;line-height:0;">&nbsp;</td></tr>
+<tr><td style="width:48px;height:1px;background-color:${accent};font-size:0;line-height:0;">&nbsp;</td></tr>
 </table>
 </td>
-</tr>
+</tr>`}
 
 <!-- Content -->
 <tr>
-<td class="eb" style="padding:40px 48px 32px;${o.bodyBgImage ? `background-image:url('${o.bodyBgImage}');background-size:cover;background-position:center;background-repeat:no-repeat;` : ''}">
+<td class="eb" valign="top" bgcolor="${bodyBg}"${isLetterhead ? ' height="420"' : ''} style="padding:40px 48px 32px;background-color:${bodyBg};${bodyWatermark}${isLetterhead ? 'height:420px;' : ''}">
 <!-- EMAIL_BODY_START -->
 ${styledBody}
 <!-- EMAIL_BODY_END -->
@@ -199,13 +251,13 @@ ${styledBody}
 
 <!-- Footer -->
 <tr>
-<td class="ef" style="padding:28px 48px;background-color:${FOOTER_BG};border-top:1px solid ${DIVIDER};">
+<td class="ef" bgcolor="${bodyBg}" style="padding:28px 48px;background-color:${bodyBg};border-top:1px solid ${accent}22;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
 <td align="center">
-<p style="margin:0 0 6px;font-size:11px;color:${TEXT_MUTED};letter-spacing:1px;text-transform:uppercase;${FONT}">${o.footerText}</p>
-<p style="margin:0 0 12px;font-size:11px;color:${TEXT_MUTED};${FONT}">${o.footerCopyright}</p>
-<p style="margin:0;font-size:11px;${FONT}"><a href="${unsubHref}" style="color:${ACCENT};text-decoration:none;border-bottom:1px solid ${DIVIDER};">Odjavi se</a></p>
+<p style="margin:0 0 6px;font-size:11px;color:${muted};letter-spacing:1px;text-transform:uppercase;${FONT}">${o.footerText}</p>
+<p style="margin:0 0 12px;font-size:11px;color:${muted};${FONT}">${o.footerCopyright}</p>
+<p style="margin:0;font-size:11px;${FONT}"><a href="${unsubHref}" style="color:${muted};text-decoration:none;border-bottom:1px solid ${accent}33;">Odjavi se</a></p>
 </td>
 </tr>
 </table>

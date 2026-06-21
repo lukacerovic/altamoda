@@ -3,20 +3,16 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { generateEmailPreview, extractBodyContent, isFullEmailHtml, defaultEmailOptions, extractBodyBgImage } from "@/lib/email-preview";
+import { generateEmailPreview, extractBodyContent, isFullEmailHtml, defaultEmailOptions } from "@/lib/email-preview";
 import type { EmailTemplateOptions } from "@/lib/email-preview";
+import { schemeOptionsByName } from "@/lib/newsletter-schemes";
 
-// Per-template default email options. Adding a new branded template? Add it
-// here so the editor and the campaign send pipeline pick up the same defaults.
-function templateDefaultOptions(templateName: string, body: string): Partial<EmailTemplateOptions> {
-  switch (templateName) {
-    case 'Akcije':
-      return { headerBgImage: '/hero.png' };
-    case 'Info':
-      return { bodyBgImage: extractBodyBgImage(body) || '/newsletter-info-bg.png' };
-    default:
-      return {};
-  }
+// Per-template default email options — the letterhead colour scheme (wordmark,
+// watermark, palette) keyed by the template name. Adding a new branded
+// template? Add it to newsletter-schemes.ts so the editor, preview and the
+// campaign send pipeline all pick up the same defaults.
+function templateDefaultOptions(templateName: string): Partial<EmailTemplateOptions> {
+  return schemeOptionsByName[templateName] ?? {};
 }
 import {
   Search,
@@ -224,21 +220,29 @@ export default function NewsletterPage() {
     };
   }, []);
 
+  // Seed / refresh the default letterhead templates. The endpoint prunes stale
+  // defaults and (re)creates the current set, so it's safe to run repeatedly.
+  const seedDefaults = useCallback(async () => {
+    setSeeding(true);
+    try {
+      const res = await fetch("/api/newsletter/templates/seed", { method: "POST" });
+      const json = await res.json();
+      if (json.success) fetchTemplates();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSeeding(false);
+    }
+  }, [fetchTemplates]);
+
   // Auto-seed defaults if no templates exist
   const seedingRef = useRef(false);
   useEffect(() => {
     if (!templatesLoading && templates.length === 0 && !seedingRef.current) {
       seedingRef.current = true;
-      setSeeding(true);
-      fetch("/api/newsletter/templates/seed", { method: "POST" })
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.success) fetchTemplates();
-        })
-        .catch(console.error)
-        .finally(() => setSeeding(false));
+      seedDefaults();
     }
-  }, [templatesLoading, templates.length, fetchTemplates]);
+  }, [templatesLoading, templates.length, seedDefaults]);
 
   // ── Derived: live email preview from editor body ──
 
@@ -271,7 +275,7 @@ export default function NewsletterPage() {
     setEditorBodyContent(body);
     setEmailOptions({
       ...defaultEmailOptions,
-      ...templateDefaultOptions(template.name, body),
+      ...templateDefaultOptions(template.name),
     });
     setShowEmailSettings(false);
     setSendSubject(template.subject);
@@ -939,8 +943,17 @@ export default function NewsletterPage() {
       {/* ═══ Templates Tab ═══ */}
       {activeTab === "templates" && (
         <div>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6">
             <p className="text-sm text-[#1a1c1e]">Upravljajte email šablonima za vaše newsletter kampanje.</p>
+            <button
+              onClick={seedDefaults}
+              disabled={seeding}
+              title="Vraća/ažurira podrazumevane memorandum šablone"
+              className="flex items-center gap-2 px-4 py-2.5 border border-stone-300 hover:border-[#1a1c1e] text-[#1a1c1e] text-sm font-medium rounded-sm transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+              Ažuriraj podrazumevane šablone
+            </button>
           </div>
 
           {templatesLoading || seeding ? (
@@ -968,7 +981,7 @@ export default function NewsletterPage() {
                     <iframe
                       srcDoc={generateEmailPreview(template.htmlContent, {
                         ...defaultEmailOptions,
-                        ...templateDefaultOptions(template.name, template.htmlContent),
+                        ...templateDefaultOptions(template.name),
                       })}
                       className="w-[600px] h-[600px] border-0 pointer-events-none"
                       style={{ transform: "scale(0.38)", transformOrigin: "top left" }}
