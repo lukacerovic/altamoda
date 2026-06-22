@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
+import { sanitizeRichText } from '@/lib/sanitize-rich-text'
 import { getRouteParams } from '@/lib/route-utils'
 import { updateProductSchema } from '@/lib/validations/product'
 import { resolveBrandId, resolveCategoryId, resolveProductLineId, cleanupOrphanBrand, cleanupOrphanCategory } from '@/lib/taxonomy'
@@ -258,11 +259,11 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
       brandId,
       productLineId,
       categoryId,
-      description: body.description,
-      benefits: body.benefits,
-      ingredients: body.ingredients,
-      declaration: body.declaration,
-      usageInstructions: body.usageInstructions,
+      description: sanitizeRichText(body.description),
+      benefits: sanitizeRichText(body.benefits),
+      ingredients: sanitizeRichText(body.ingredients),
+      declaration: sanitizeRichText(body.declaration),
+      usageInstructions: sanitizeRichText(body.usageInstructions),
       subcategory: body.subcategory,
       productType: body.productType,
       hairTypes: body.hairTypes,

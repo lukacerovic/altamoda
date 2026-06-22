@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler, getPaginationParams } from '@/lib/api-utils'
 import { requireAdmin, getCurrentUser } from '@/lib/auth-helpers'
+import { sanitizeRichText } from '@/lib/sanitize-rich-text'
 import { slugify } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 import { findFuzzyProductIds } from '@/lib/fuzzy-search'
@@ -519,11 +520,11 @@ export const POST = withErrorHandler(async (req: Request) => {
       brandId,
       productLineId,
       categoryId,
-      description: body.description,
-      benefits: body.benefits,
-      ingredients: body.ingredients,
-      declaration: body.declaration,
-      usageInstructions: body.usageInstructions,
+      description: sanitizeRichText(body.description),
+      benefits: sanitizeRichText(body.benefits),
+      ingredients: sanitizeRichText(body.ingredients),
+      declaration: sanitizeRichText(body.declaration),
+      usageInstructions: sanitizeRichText(body.usageInstructions),
       subcategory: body.subcategory,
       productType: body.productType,
       hairTypes: body.hairTypes,

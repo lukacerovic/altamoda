@@ -208,7 +208,12 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     return (
       <div
         className="text-[#1a1c1e]/60 leading-relaxed [&_p]:mb-3 [&_strong]:text-[#1a1c1e] [&_strong]:font-semibold [&_div]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ["p", "br", "strong", "b", "em", "i", "u", "s", "ul", "ol", "li", "a", "h1", "h2", "h3", "blockquote"],
+            ALLOWED_ATTR: ["href", "target", "rel"],
+          }),
+        }}
       />
     );
   };
