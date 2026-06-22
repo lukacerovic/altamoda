@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { getProductBySlugOrId } from '@/lib/cached-queries'
 import ProductDetailClient from './ProductDetailClient'
+import { htmlToPlainText } from '@/lib/html'
 import type { Metadata } from 'next'
 
 interface PageProps {
@@ -17,12 +18,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!product) return { title: 'Proizvod nije pronađen | Alta Moda' }
 
   const primaryImage = product.images.find(img => img.isPrimary) || product.images[0]
+  // description is stored as HTML — strip tags for plain-text meta contexts.
+  const descPlain = htmlToPlainText(product.description)
   return {
     title: `${product.nameLat} | ${product.brand?.name || 'Alta Moda'}`,
-    description: product.seoDescription || product.description?.slice(0, 160) || `Kupite ${product.nameLat} po najboljoj ceni.`,
+    description: product.seoDescription || descPlain.slice(0, 160) || `Kupite ${product.nameLat} po najboljoj ceni.`,
     openGraph: {
       title: product.seoTitle || product.nameLat,
-      description: product.description?.slice(0, 200) || '',
+      description: descPlain.slice(0, 200),
       images: primaryImage?.url ? [primaryImage.url] : [],
     },
   }

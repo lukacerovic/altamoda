@@ -29,8 +29,21 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+// Rich-text editor for the long-text product fields, so admin-entered content
+// produces the same HTML the storefront renders (matches the Excel import).
+const TiptapEditor = dynamic(() => import("@/components/admin/TiptapEditor"), { ssr: false });
+
+// An empty Tiptap editor yields "<p></p>" — treat that (and bare breaks /
+// whitespace) as no content so the storefront doesn't render empty tabs.
+function cleanRichText(html: string | null | undefined): string | null {
+  if (!html) return null;
+  const stripped = html.replace(/<[^>]*>/g, "").replace(/ /g, " ").trim();
+  return stripped ? html : null;
+}
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -339,6 +352,10 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  // The rich-text fields are fetched async after the panel opens; TiptapEditor
+  // only reads `content` on mount, so we flip this once the detail arrives and
+  // key the editors on it to remount them with the loaded HTML.
+  const [detailLoaded, setDetailLoaded] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [showBulkMenu, setShowBulkMenu] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -609,6 +626,7 @@ export default function ProductsPage() {
     setFormData(defaultFormData());
     setDiscountInput("");
     setActiveTab("osnovno");
+    setDetailLoaded(true); // new product: editors start empty, no async fetch
     setShowPanel(true);
   };
 
@@ -617,6 +635,7 @@ export default function ProductsPage() {
     const { id: _id, ...rest } = product;
     setFormData(rest);
     setActiveTab("osnovno");
+    setDetailLoaded(false); // wait for the async detail fetch before mounting editors
     setShowPanel(true);
 
     // Fetch full product detail to get all fields (costPrice, description, etc.)
@@ -652,6 +671,7 @@ export default function ProductsPage() {
         }));
       }
     } catch { /* keep form data as-is */ }
+    finally { setDetailLoaded(true); } // mount editors now that HTML fields are populated
 
     if (product.oldPrice && product.oldPrice > product.priceB2C) {
       setDiscountInput(Math.round(((product.oldPrice - product.priceB2C) / product.oldPrice) * 100).toString());
@@ -701,11 +721,11 @@ export default function ProductsPage() {
       lowStockThreshold: formData.lowStockThreshold,
       weightGrams: formData.weight || null,
       volumeMl: formData.volume || null,
-      description: formData.description || null,
-      benefits: formData.benefits || null,
-      ingredients: formData.ingredients || null,
-      declaration: formData.declaration || null,
-      usageInstructions: formData.howToUse || null,
+      description: cleanRichText(formData.description),
+      benefits: cleanRichText(formData.benefits),
+      ingredients: cleanRichText(formData.ingredients),
+      declaration: cleanRichText(formData.declaration),
+      usageInstructions: cleanRichText(formData.howToUse),
       productType: formData.productType || null,
       hairTypes: formData.hairTypes || null,
       tags: formData.tags || null,
@@ -1686,52 +1706,42 @@ export default function ProductsPage() {
                 <div className={sectionCls}>
                   <div>
                     <label className={labelCls}>{t("admin.productDescription")}</label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => updateForm("description", e.target.value)}
-                      rows={4}
-                      className={inputCls + " resize-y"}
-                      placeholder={t("admin.detailedDescription")}
+                    <TiptapEditor
+                      key={`description-${editingProduct?.id ?? "new"}-${detailLoaded}`}
+                      content={formData.description || ""}
+                      onChange={(html) => updateForm("description", html)}
                     />
                   </div>
                   <div>
                     <label className={labelCls}>{t("admin.benefits")}</label>
-                    <textarea
-                      value={formData.benefits || ""}
-                      onChange={(e) => updateForm("benefits", e.target.value)}
-                      rows={4}
-                      className={inputCls + " resize-y"}
-                      placeholder={t("admin.benefitsPlaceholder")}
+                    <TiptapEditor
+                      key={`benefits-${editingProduct?.id ?? "new"}-${detailLoaded}`}
+                      content={formData.benefits || ""}
+                      onChange={(html) => updateForm("benefits", html)}
                     />
                   </div>
                   <div>
                     <label className={labelCls}>{t("admin.ingredients")}</label>
-                    <textarea
-                      value={formData.ingredients}
-                      onChange={(e) => updateForm("ingredients", e.target.value)}
-                      rows={4}
-                      className={inputCls + " resize-y"}
-                      placeholder="Aqua, Sodium Laureth Sulfate..."
+                    <TiptapEditor
+                      key={`ingredients-${editingProduct?.id ?? "new"}-${detailLoaded}`}
+                      content={formData.ingredients || ""}
+                      onChange={(html) => updateForm("ingredients", html)}
                     />
                   </div>
                   <div>
                     <label className={labelCls}>{t("admin.declaration")}</label>
-                    <textarea
-                      value={formData.declaration || ""}
-                      onChange={(e) => updateForm("declaration", e.target.value)}
-                      rows={4}
-                      className={inputCls + " resize-y"}
-                      placeholder={t("admin.declarationPlaceholder")}
+                    <TiptapEditor
+                      key={`declaration-${editingProduct?.id ?? "new"}-${detailLoaded}`}
+                      content={formData.declaration || ""}
+                      onChange={(html) => updateForm("declaration", html)}
                     />
                   </div>
                   <div>
                     <label className={labelCls}>{t("admin.howToUse")}</label>
-                    <textarea
-                      value={formData.howToUse}
-                      onChange={(e) => updateForm("howToUse", e.target.value)}
-                      rows={4}
-                      className={inputCls + " resize-y"}
-                      placeholder="Nanesite na mokru kosu..."
+                    <TiptapEditor
+                      key={`howToUse-${editingProduct?.id ?? "new"}-${detailLoaded}`}
+                      content={formData.howToUse || ""}
+                      onChange={(html) => updateForm("howToUse", html)}
                     />
                   </div>
                   <div className={categoryNeedsHairType(formData.category) ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : ""}>
