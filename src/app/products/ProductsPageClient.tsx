@@ -918,12 +918,6 @@ export default function ProductsPageClient({
     fetchProducts(1);
   };
 
-  const toggleBrand = (slug: string) => {
-    setSelectedBrands((prev) =>
-      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
-    );
-  };
-
   const toggleProductLine = (slug: string) => {
     setSelectedProductLines((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
@@ -1562,7 +1556,9 @@ export default function ProductsPageClient({
                   return (
                     <button
                       key={b.slug}
-                      onClick={() => toggleBrand(b.slug)}
+                      // Single-select: picking a brand replaces the previous one;
+                      // clicking the active brand again clears back to all brands.
+                      onClick={() => setSelectedBrands((prev) => (prev.length === 1 && prev[0] === b.slug ? [] : [b.slug]))}
                       className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 ${
                         isActive
                           ? "bg-[#edb4bd] text-white shadow-sm"
