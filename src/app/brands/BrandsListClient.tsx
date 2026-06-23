@@ -6,6 +6,7 @@ import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { resolveBrandLogo } from "@/lib/brand-logos";
 
 /* Brand descriptions imported from the legacy catalog sometimes contain raw HTML
  * (wrapping <p>, embedded <img>, inline styles). Strip every tag down to its
@@ -56,9 +57,9 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                 className="group bg-white border border-[#dddbd9] rounded-sm p-8 hover:border-black hover:shadow-lg transition-all"
               >
                 <div className="h-16 flex items-center justify-center mb-6">
-                  {brand.logoUrl ? (
+                  {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
                     <img
-                      src={brand.logoUrl}
+                      src={logo}
                       alt={brand.name}
                       className="max-h-full max-w-[180px] object-contain group-hover:scale-105 transition-transform"
                     />
@@ -69,7 +70,7 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                     >
                       {brand.name}
                     </span>
-                  )}
+                  ); })()}
                 </div>
                 <h3 className="text-lg font-semibold text-[#1a1c1e] text-center">{brand.name}</h3>
                 {(() => {
