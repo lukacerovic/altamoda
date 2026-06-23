@@ -379,8 +379,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               (the /products listing is 2-up); full size returns at lg where the
               2-column PDP layout kicks in. */}
           <div className="max-w-[60%] mx-auto lg:max-w-none lg:mx-0">
-            <div className="aspect-square overflow-hidden mb-4 relative bg-[#dddbd9] rounded-[4px]">
-              <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-cover" />
+            <div className="aspect-square overflow-hidden mb-4 relative bg-[#FFFFFF] rounded-[4px]">
+              {/* object-contain so tall/long products (e.g. Shades EQ bottles) show
+                  in full instead of being cropped by object-cover. */}
+              <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-contain" />
               {product.images[activeThumb]?.type === 'video' && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/30">
                   <div className="w-16 h-16 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center cursor-pointer hover:bg-[#FFFFFF] transition-colors">
@@ -392,8 +394,8 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
                 {images.map((img, t) => (
-                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#dddbd9] rounded-[4px] ${activeThumb === t ? "ring-1 ring-[#1a1c1e]" : "opacity-70 hover:opacity-100"}`}>
-                    <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-cover" />
+                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#FFFFFF] rounded-[4px] ${activeThumb === t ? "ring-1 ring-[#1a1c1e]" : "opacity-70 hover:opacity-100"}`}>
+                    <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-contain" />
                     {product.images[t]?.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/40"><Play className="w-5 h-5 text-[#FFFFFF]" /></div>
                     )}
