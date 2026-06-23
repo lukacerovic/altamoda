@@ -235,9 +235,14 @@ export const GET = withErrorHandler(async (req: Request) => {
   // it's the intended "in-stock products first" behaviour; for explicit sorts stock is
   // demoted to the tiebreaker so the visible order matches the selected criterion.
   const hasExplicitSort = sort === 'price_asc' || sort === 'price_desc' || sort === 'newest' || sort === 'name_asc'
+  // Default/popular view: surface B2C (non-professional) products first so the
+  // technical / liter salon items don't dominate the top of a brand or the
+  // "Svi proizvodi" page (they otherwise float up via stockQuantity). Explicit
+  // sorts (price/name/newest) must still dominate, so isProfessional isn't
+  // injected there.
   const orderBy: Prisma.ProductOrderByWithRelationInput[] = hasExplicitSort
     ? [sortOrderBy, { stockQuantity: 'desc' }]
-    : [{ stockQuantity: 'desc' }, sortOrderBy]
+    : [{ isProfessional: 'asc' }, { stockQuantity: 'desc' }, sortOrderBy]
 
   // Collapse to one representative per group_slug. Admins can opt out by
   // passing ?ungroup=true (used by /admin/products) — without that flag, even
