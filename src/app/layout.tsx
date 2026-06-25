@@ -3,6 +3,7 @@ import { Inter, Noto_Serif } from "next/font/google";
 import AuthProvider from "@/components/providers/AuthProvider";
 import CartProvider from "@/components/providers/CartProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 
 const inter = Inter({
@@ -46,6 +47,7 @@ export default function RootLayout({
         <LanguageProvider>
           <AuthProvider>
             <CartProvider>{children}</CartProvider>
+            <ScrollToTop />
           </AuthProvider>
         </LanguageProvider>
       </body>

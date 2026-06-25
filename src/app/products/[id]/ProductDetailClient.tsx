@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
-  ShoppingBag, Heart, Star, ChevronRight, Minus, Plus, Truck,
+  ShoppingBag, Heart, Star, ChevronRight, ChevronLeft, Minus, Plus, Truck,
   RotateCcw, Shield, Sparkles,
   Play, CheckCircle, X, Link2, AlertCircle,
 } from "lucide-react";
@@ -114,7 +113,6 @@ const defaultImage = "https://images.unsplash.com/photo-1522337360788-8b13dee7a3
 export default function ProductDetailClient({ product, related, colorSiblings = [], userRole: _serverRole, initialLiked = false, userExistingRating = null }: Props) {
   const { t } = useLanguage();
   const { data: session } = useSession();
-  const router = useRouter();
   const role = (session?.user as { role?: string } | undefined)?.role || _serverRole;
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
   const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
@@ -352,6 +350,15 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
       <Header />
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-10 md:pt-14 pb-10">
+        {/* Back to all products */}
+        <Link
+          href="/products"
+          className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors mb-6"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          {t("productDetail.products")}
+        </Link>
+
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#1a1c1e]/60 mb-10">
           <Link href="/" className="hover:text-[#1a1c1e] transition-colors">{t("productDetail.home")}</Link><ChevronRight className="w-3 h-3" />
@@ -368,9 +375,14 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
         {/* 2-Column layout */}
         <div className="grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16">
           {/* IMAGE GALLERY */}
-          <div>
-            <div className="aspect-square overflow-hidden mb-4 relative bg-[#dddbd9] rounded-[4px]">
-              <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-cover" />
+          {/* On mobile the photo is constrained to roughly a product-card width
+              (the /products listing is 2-up); full size returns at lg where the
+              2-column PDP layout kicks in. */}
+          <div className="max-w-[60%] mx-auto lg:max-w-none lg:mx-0">
+            <div className="aspect-square overflow-hidden mb-4 relative bg-[#FFFFFF] rounded-[4px]">
+              {/* object-contain so tall/long products (e.g. Shades EQ bottles) show
+                  in full instead of being cropped by object-cover. */}
+              <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-contain" />
               {product.images[activeThumb]?.type === 'video' && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/30">
                   <div className="w-16 h-16 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center cursor-pointer hover:bg-[#FFFFFF] transition-colors">
@@ -382,8 +394,8 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
                 {images.map((img, t) => (
-                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#dddbd9] rounded-[4px] ${activeThumb === t ? "ring-1 ring-[#1a1c1e]" : "opacity-70 hover:opacity-100"}`}>
-                    <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-cover" />
+                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#FFFFFF] rounded-[4px] ${activeThumb === t ? "ring-1 ring-[#1a1c1e]" : "opacity-70 hover:opacity-100"}`}>
+                    <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-contain" />
                     {product.images[t]?.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/40"><Play className="w-5 h-5 text-[#FFFFFF]" /></div>
                     )}
@@ -514,23 +526,27 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                 <h4 className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e] font-medium mb-3">
                   Boje · {colorSiblings.length} nijanse
                 </h4>
-                <div className="relative">
-                  <select
-                    value={colorSiblings.find(s => s.isActive)?.slug ?? ''}
-                    onChange={(e) => {
-                      const next = colorSiblings.find(s => s.slug === e.target.value);
-                      if (next) router.push(`/products/${next.slug}`);
-                    }}
-                    className="w-full appearance-none border border-[#dddbd9] bg-white px-4 py-3 pr-10 text-[12px] uppercase tracking-[0.18em] text-[#1a1c1e] font-medium focus:outline-none focus:border-[#1a1c1e] transition-colors"
-                  >
-                    {colorSiblings.map((sibling) => (
-                      <option key={sibling.id} value={sibling.slug}>
-                        {sibling.colorCode || sibling.name}
-                        {!sibling.inStock ? ' (nema)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#1a1c1e]/60 pointer-events-none rotate-90" />
+                <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1">
+                  {colorSiblings.map((sibling) => (
+                    <Link
+                      key={sibling.id}
+                      href={`/products/${sibling.slug}`}
+                      onMouseEnter={() => {
+                        setSelectedSibling(sibling);
+                        setActiveThumb(0);
+                      }}
+                      className={`px-3 py-2 text-[10px] uppercase tracking-[0.18em] font-medium border transition-all ${
+                        sibling.isActive
+                          ? "bg-[#1a1c1e] text-[#FFFFFF] border-[#1a1c1e]"
+                          : sibling.inStock
+                            ? "text-[#1a1c1e] border-[#dddbd9] hover:border-[#1a1c1e]"
+                            : "text-[#1a1c1e]/40 border-[#dddbd9]"
+                      }`}
+                    >
+                      {sibling.colorCode || sibling.name}
+                      {!sibling.inStock && <span className="ml-1 text-[9px]">(nema)</span>}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
