@@ -184,10 +184,10 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
 
   const tabs = [
     { key: "opis", label: t("productDetail.description"), content: product.description },
+    { key: "upotreba", label: t("productDetail.howToUse"), content: product.usageInstructions },
     { key: "benefiti", label: t("productDetail.benefits"), content: product.benefits },
     { key: "sastojci", label: t("productDetail.ingredients"), content: product.ingredients },
     { key: "deklaracija", label: t("productDetail.declaration"), content: product.declaration },
-    { key: "upotreba", label: t("productDetail.howToUse"), content: product.usageInstructions },
   ].filter(tab => hasText(tab.content));
 
   useEffect(() => {
@@ -411,7 +411,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           {/* PRODUCT INFO */}
           <div className="lg:pt-4">
             {product.brand && (
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-3">{product.brand.name}</span>
+              <Link href={`/products?brand=${product.brand.slug}`} className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors font-medium inline-block mb-3">{product.brand.name}</Link>
             )}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#1a1c1e] leading-[1.05] tracking-tight mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               {displayName}
@@ -450,9 +450,9 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px] pt-1">Funkcija</span>
                     <div className="flex flex-wrap gap-1.5">
                       {product.tags!.split(",").map(s => s.trim()).filter(Boolean).map((v, i) => (
-                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] px-2.5 py-1 rounded-sm">
+                        <Link key={i} href={`/products?tag=${encodeURIComponent(v)}`} className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] hover:bg-[#1a1c1e] hover:text-[#FFFFFF] transition-colors px-2.5 py-1 rounded-sm">
                           {v}
-                        </span>
+                        </Link>
                       ))}
                     </div>
                   </div>

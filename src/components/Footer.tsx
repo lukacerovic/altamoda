@@ -26,7 +26,7 @@ export default function Footer() {
           alt="Altamoda"
           width={1397}
           height={246}
-          className="h-10 w-auto mb-6"
+          className="h-7 md:h-10 w-auto mb-6"
         />
         <p className="text-xs tracking-wider uppercase leading-loose text-[#FFFFFF]/80">
           {t("footer.description")}

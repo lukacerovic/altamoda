@@ -19,6 +19,7 @@ export interface HomepageProduct {
   rating: number;
 }
 
+
 export interface ProductsPageProduct {
   id: number;
   brand: string;
