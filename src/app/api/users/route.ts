@@ -17,8 +17,10 @@ export const POST = withErrorHandler(async (req: Request) => {
   const parsed = schema.safeParse(body)
 
   if (!parsed.success) {
-    const firstIssue = parsed.error.issues?.[0]
-    return errorResponse(firstIssue?.message || 'Nevažeći podaci', 400)
+    // Schema messages are translation keys; forward the first as a `code` so the
+    // client can localize it. `error` carries the key too as a plain fallback.
+    const code = parsed.error.issues?.[0]?.message || 'auth.invalidData'
+    return errorResponse(code, 400, code)
   }
 
   const data = parsed.data as Record<string, string | undefined>
@@ -28,7 +30,7 @@ export const POST = withErrorHandler(async (req: Request) => {
   })
 
   if (existing) {
-    return errorResponse('Korisnik sa ovom email adresom već postoji', 409)
+    return errorResponse('auth.emailExists', 409, 'auth.emailExists')
   }
 
   const passwordHash = await hash(data.password as string, 12)

@@ -326,13 +326,13 @@ export default function EducationPage() {
                 </div>
               </div>
               <div className="pt-1 flex justify-center md:justify-end">
-                <div className="relative aspect-square w-full max-w-[280px] rounded-full overflow-hidden">
+                <div className="relative aspect-[3/1] w-full max-w-[300px]">
                   <Image
-                    src="/altamoda-logoes/ILUSTRATION BLACK BACKGROUND.png"
-                    alt="ID Hair Academy mark"
+                    src="/altamoda-logoes/idhair-academy-white.png"
+                    alt="ID Hair Academy"
                     fill
-                    className="object-contain p-6 rounded-full"
-                    sizes="(max-width: 1024px) 60vw, 280px"
+                    className="object-contain"
+                    sizes="(max-width: 1024px) 60vw, 300px"
                   />
                 </div>
               </div>

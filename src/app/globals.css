@@ -240,6 +240,25 @@ body {
   color: var(--color-on-surface);
 }
 
+/* Prevent a stray blinking text caret / accidental text selection when
+   clicking non-editable UI chrome (nav links, buttons, dropdown options,
+   headings, product cards). Body copy stays selectable; editable fields
+   opt back in below. */
+a, button, label, summary, nav,
+h1, h2, h3, h4, h5, h6,
+[role="button"], [role="option"], [role="tab"], [role="menuitem"] {
+  -webkit-user-select: none;
+  user-select: none;
+  caret-color: transparent;
+}
+
+input, textarea, select,
+[contenteditable="true"], [contenteditable=""] {
+  -webkit-user-select: text;
+  user-select: text;
+  caret-color: auto;
+}
+
 /* Focus styles */
 input:focus, textarea:focus, select:focus {
   outline: none;

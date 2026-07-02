@@ -27,6 +27,7 @@ describe('User Validations', () => {
       name: 'Marko Petrović',
       email: 'marko@test.com',
       password: 'sifra123',
+      phone: '+381641234567',
     }
 
     it('accepts valid B2C registration', () => {
@@ -34,9 +35,23 @@ describe('User Validations', () => {
       expect(result.name).toBe('Marko Petrović')
     })
 
-    it('accepts optional phone', () => {
+    it('accepts a valid phone', () => {
       const result = registerB2cSchema.parse({ ...validB2c, phone: '+381641234567' })
       expect(result.phone).toBe('+381641234567')
+    })
+
+    it('rejects missing phone (now required)', () => {
+      const { phone: _omit, ...noPhone } = validB2c
+      expect(() => registerB2cSchema.parse(noPhone)).toThrow()
+    })
+
+    it('rejects phone that is too short / too long', () => {
+      expect(() => registerB2cSchema.parse({ ...validB2c, phone: '12345' })).toThrow()
+      expect(() => registerB2cSchema.parse({ ...validB2c, phone: '1234567890123456' })).toThrow()
+    })
+
+    it('rejects a name containing digits', () => {
+      expect(() => registerB2cSchema.parse({ ...validB2c, name: 'Marko123' })).toThrow()
     })
 
     it('rejects name shorter than 2 chars', () => {
@@ -53,6 +68,7 @@ describe('User Validations', () => {
       name: 'Ana Jovanović',
       email: 'ana@salon.rs',
       password: 'sifra123',
+      phone: '+381641234567',
       salonName: 'Salon Lepota',
       pib: '123456789',
       maticniBroj: '12345678',

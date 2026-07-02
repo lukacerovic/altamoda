@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
 
+// Names: letters (any script + diacritics), spaces, hyphen, apostrophe — no digits.
+const NAME_RE = /^[\p{L}\p{M}\s'’-]+$/u;
+
 export default function LoginPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-[#FFFFFF]" />}>
@@ -51,7 +54,7 @@ function LoginContent() {
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
 
   type FieldName =
-    | "firstName" | "lastName" | "email" | "password" | "passwordConfirm"
+    | "firstName" | "lastName" | "email" | "phone" | "password" | "passwordConfirm"
     | "salonName" | "pib" | "maticniBroj" | "terms";
   type FieldErrors = Partial<Record<FieldName, string>>;
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -62,18 +65,27 @@ function LoginContent() {
         const v = regName.trim();
         if (!v) return t("auth.errRequired");
         if (v.length < 2) return t("auth.errFirstNameMin");
+        if (!NAME_RE.test(v)) return t("auth.errFirstNameLetters");
         return "";
       }
       case "lastName": {
         const v = regLastName.trim();
         if (!v) return t("auth.errRequired");
         if (v.length < 2) return t("auth.errLastNameMin");
+        if (!NAME_RE.test(v)) return t("auth.errLastNameLetters");
         return "";
       }
       case "email": {
         const v = regEmail.trim();
         if (!v) return t("auth.errRequired");
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return t("auth.errEmailInvalid");
+        return "";
+      }
+      case "phone": {
+        const digits = regPhone.replace(/\D/g, "");
+        if (!digits) return t("auth.errPhoneRequired");
+        // Dial code + local number, 8–15 digits total.
+        if (digits.length < 8 || digits.length > 15) return t("auth.errPhoneInvalid");
         return "";
       }
       case "password": {
@@ -193,7 +205,7 @@ function LoginContent() {
     setSuccess("");
 
     const fieldsToCheck: FieldName[] = [
-      "firstName", "lastName", "email", "password", "passwordConfirm", "terms",
+      "firstName", "lastName", "email", "phone", "password", "passwordConfirm", "terms",
     ];
     if (registerType === "b2b") {
       fieldsToCheck.push("salonName", "pib", "maticniBroj");
@@ -235,7 +247,9 @@ function LoginContent() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t("auth.registrationError"));
+        // Server sends a translation key as `code`; localize it in the selected
+        // language. Fall back to any plain message, then a generic error.
+        setError(data.code ? t(data.code) : (data.error || t("auth.registrationError")));
         setLoading(false);
         return;
       }
@@ -393,7 +407,14 @@ function LoginContent() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.phonePlaceholder")}</label>
-                    <PhoneInput value={regPhone} onChange={setRegPhone} placeholder="64 0123456" />
+                    <PhoneInput
+                      value={regPhone}
+                      onChange={(v) => { setRegPhone(v); clearFieldError("phone"); }}
+                      onBlur={handleBlur("phone")}
+                      placeholder="64 0123456"
+                      invalid={!!fieldErrors.phone}
+                    />
+                    {fieldErrors.phone && <p className="mt-1 text-xs text-red-600">{fieldErrors.phone}</p>}
                   </div>
 
                   {registerType === "b2b" && (

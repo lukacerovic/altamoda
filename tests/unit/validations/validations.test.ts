@@ -39,6 +39,7 @@ describe('registerB2cSchema', () => {
     name: 'Marija Petrovic',
     email: 'marija@test.com',
     password: 'test123',
+    phone: '+381641234567',
   }
 
   it('accepts valid B2C registration', () => {
@@ -67,6 +68,7 @@ describe('registerB2bSchema', () => {
     name: 'Salon Glamour',
     email: 'salon@test.com',
     password: 'test123',
+    phone: '+381641234567',
     salonName: 'Salon Glamour',
     pib: '123456789',
     maticniBroj: '12345678',

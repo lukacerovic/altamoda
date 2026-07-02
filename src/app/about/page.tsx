@@ -65,7 +65,7 @@ export default function AboutPage() {
                     href="/education"
                     className="inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] font-medium border-b border-current pb-1 hover:text-[#413d3a] transition-colors"
                   >
-                    Edukativni centar <ArrowRight className="w-3 h-3" />
+                    {t("nav.educationCenter")} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>

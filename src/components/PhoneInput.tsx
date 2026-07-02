@@ -68,12 +68,17 @@ function inferCountry(full: string): Country {
 interface Props {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   required?: boolean;
+  invalid?: boolean;
   id?: string;
 }
 
-export default function PhoneInput({ value, onChange, placeholder, required, id }: Props) {
+// Cap the local (post dial-code) number so users can't paste an endless string.
+const MAX_LOCAL_DIGITS = 12;
+
+export default function PhoneInput({ value, onChange, onBlur, placeholder, required, invalid, id }: Props) {
   const [country, setCountry] = useState<Country>(() => inferCountry(value));
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -96,7 +101,7 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
   }, [open]);
 
   const handleLocalChange = (raw: string) => {
-    const digits = raw.replace(/\D/g, "");
+    const digits = raw.replace(/\D/g, "").slice(0, MAX_LOCAL_DIGITS);
     onChange(digits ? `${country.dial}${digits}` : "");
   };
 
@@ -136,11 +141,14 @@ export default function PhoneInput({ value, onChange, placeholder, required, id 
         type="tel"
         inputMode="numeric"
         autoComplete="tel-national"
+        maxLength={MAX_LOCAL_DIGITS + 4}
         value={local}
         onChange={(e) => handleLocalChange(e.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder || "64 0123456"}
         required={required}
-        className="flex-1 min-w-0 border border-[#dddbd9] rounded px-4 py-3 text-sm"
+        aria-invalid={invalid}
+        className={`flex-1 min-w-0 border rounded px-4 py-3 text-sm ${invalid ? "border-red-500 focus:border-red-500" : "border-[#dddbd9]"}`}
       />
 
       {open && (

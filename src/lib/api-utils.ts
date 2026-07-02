@@ -16,8 +16,11 @@ export function successResponse<T>(data: T, status = 200) {
   return NextResponse.json({ success: true, data }, { status })
 }
 
-export function errorResponse(message: string, status = 400) {
-  return NextResponse.json({ success: false, error: message }, { status })
+export function errorResponse(message: string, status = 400, code?: string) {
+  // `code` is a stable, language-agnostic translation key (e.g. "auth.emailExists").
+  // The server can't know the visitor's selected language, so localized text is
+  // resolved on the client via t(code); `message` stays as a plain fallback.
+  return NextResponse.json({ success: false, error: message, ...(code ? { code } : {}) }, { status })
 }
 
 export function getPaginationParams(searchParams: URLSearchParams) {

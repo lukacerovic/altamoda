@@ -112,6 +112,7 @@ function useMegaMenus() {
   };
 
   const navLinks = [
+    { name: t("nav.home"), href: "/", hasMega: false, menuKey: "" },
     { name: t("nav.products"), href: "/products", hasMega: true, menuKey: "products" },
     { name: t("nav.exploreBrands"), href: "/brands", hasMega: true, menuKey: "brands" },
     { name: t("nav.about"), href: "/about", hasMega: false, menuKey: "" },

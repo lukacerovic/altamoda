@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,6 +16,13 @@ import Footer from "@/components/Footer";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { resolveBrandLogo } from "@/lib/brand-logos";
+
+/** Uppercase only the first letter, leaving the rest as-is. Normalizes
+ * inconsistently-cased DB values (e.g. "makaze" → "Makaze") for display. */
+function capitalizeFirst(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
 
 /* ─── Types ─── */
 interface ProductBrand {
@@ -236,7 +243,11 @@ function applyDefaultShuffle<T>(products: T[], sort: string, seed: number): T[] 
 
 /* ─── BrandHeader ─── */
 function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: string | null; description: string | null; content: string | null } }) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
+  // Legacy altamoda.rs logo URLs are broken for some brands (Biolage, Framesi);
+  // prefer the local override when we have one.
+  const logo = resolveBrandLogo(brand.slug, brand.logoUrl);
   // Strip old altamoda.rs images but keep the rest of HTML
   const cleanHtml = brand.content
     ? DOMPurify.sanitize(
@@ -249,8 +260,8 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
   return (
     <section className="bg-[#FFFFFF] border-b border-[#dddbd9]">
       <div className="max-w-4xl mx-auto px-4 py-6 text-center">
-        {brand.logoUrl ? (
-          <Image src={brand.logoUrl} alt={brand.name} width={80} height={40} className="h-10 mx-auto object-contain mb-3" />
+        {logo ? (
+          <Image src={logo} alt={brand.name} width={80} height={40} className="h-10 mx-auto object-contain mb-3" />
         ) : (
           <h2 className="text-xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
         )}
@@ -265,7 +276,7 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
                 onClick={() => setExpanded((prev) => !prev)}
                 className="mt-2 text-xs font-medium text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors"
               >
-                {expanded ? "▲ Sakrij" : "▼ Prikaži više"}
+                {expanded ? `▲ ${t("products.showLess")}` : `▼ ${t("products.showMore")}`}
               </button>
             )}
           </>
@@ -286,28 +297,40 @@ function getBadge(product: Product): string | null {
   return null;
 }
 
-/* ─── ProductCard ─── */
-function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; isWishlisted?: boolean; onNavigate?: () => void }) {
-  const { t } = useLanguage();
-  const [liked, setLiked] = useState(isWishlisted ?? false);
-  const [addedToCart, setAddedToCart] = useState(false);
-  const { addItem } = useCartStore();
+/* ─── WishlistButton ───
+ * Shared heart toggle used by both grid and list views. Guests (no session)
+ * are sent to the login page instead of hitting the auth-gated wishlist API
+ * (which would 401 and silently do nothing). The filled state re-syncs whenever
+ * the parent's `isWishlisted` prop changes (it loads async after mount). */
+function WishlistButton({ productId, isWishlisted, className, iconClassName }: { productId: string; isWishlisted?: boolean; className?: string; iconClassName?: string }) {
+  const { data: session } = useSession();
+  const router = useRouter();
   const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
-  const badge = getBadge(product);
-  const imgSrc = product.image || PLACEHOLDER_IMG;
-  const hasColors = (product.colorSiblings?.length ?? 0) > 1;
-  const b2bOnly = product.price == null;
+  const [liked, setLiked] = useState(isWishlisted ?? false);
+  // Re-sync when the parent's prop changes (wishlist IDs load async after
+  // mount). Using the render-phase "adjust state on prop change" pattern rather
+  // than an effect avoids an extra render pass.
+  const [prevWished, setPrevWished] = useState(isWishlisted);
+  if (prevWished !== isWishlisted) {
+    setPrevWished(isWishlisted);
+    setLiked(isWishlisted ?? false);
+  }
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!session?.user) {
+      const back = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/products";
+      router.push(`/account/login?callbackUrl=${encodeURIComponent(back)}`);
+      return;
+    }
     const prev = liked;
     setLiked(!liked);
     try {
       const res = await fetch("/api/wishlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id }),
+        body: JSON.stringify({ productId }),
       });
       if (!res.ok) {
         setLiked(prev);
@@ -323,6 +346,23 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
       setLiked(prev);
     }
   };
+
+  return (
+    <button onClick={handleToggleWishlist} aria-label="Wishlist" className={className}>
+      <Heart className={`${iconClassName ?? "w-3.5 h-3.5"} ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
+    </button>
+  );
+}
+
+/* ─── ProductCard ─── */
+function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; isWishlisted?: boolean; onNavigate?: () => void }) {
+  const { t } = useLanguage();
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addItem } = useCartStore();
+  const badge = getBadge(product);
+  const imgSrc = product.image || PLACEHOLDER_IMG;
+  const hasColors = (product.colorSiblings?.length ?? 0) > 1;
+  const b2bOnly = product.price == null;
 
   const outOfStock = product.stockQuantity <= 0;
 
@@ -357,13 +397,15 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
           )}
           {product.variantCount != null && product.variantCount > 1 && (
             <span className="px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.2em] bg-[rgba(26,28,30,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">
-              {product.variantCount} boja
+              {product.variantCount} {t("products.colorsCount")}
             </span>
           )}
         </div>
-        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100">
-          <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
-        </button>
+        <WishlistButton
+          productId={product.id}
+          isWishlisted={isWishlisted}
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+        />
         {!b2bOnly && (
           <div className="hidden md:block absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
             <button
@@ -371,7 +413,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
               disabled={!hasColors && outOfStock}
               className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#413d3a]"}`}
             >
-              {hasColors ? <><Palette className="w-3.5 h-3.5" /> Izaberi boju</>
+              {hasColors ? <><Palette className="w-3.5 h-3.5" /> {t("products.chooseColor")}</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
                 : addedToCart ? <><CheckCircle className="w-3.5 h-3.5" /> {t("products.addedToCart")}</>
                 : <><ShoppingBag className="w-3.5 h-3.5" /> {t("products.addToCart")}</>}
@@ -384,7 +426,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
         <h3 className="text-base text-[#1a1c1e] mb-1 font-normal line-clamp-2 leading-tight min-h-[2.6em]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.name}</h3>
         <div className="flex items-center gap-2 text-sm text-[#1a1c1e] mt-1">
           {product.price == null ? (
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">B2B samo · prijavi se za cenu</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">{t("products.b2bOnlyPrice")}</span>
           ) : (
             <>
               {product.oldPrice && <span className="text-[#1a1c1e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
@@ -404,7 +446,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
               disabled={!hasColors && outOfStock}
               className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"}`}
             >
-              {hasColors ? <><Palette className="w-3 h-3" /> Izaberi boju</>
+              {hasColors ? <><Palette className="w-3 h-3" /> {t("products.chooseColor")}</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
                 : addedToCart ? <><CheckCircle className="w-3 h-3" /> {t("products.addedToCart")}</>
                 : <><ShoppingBag className="w-3 h-3" /> {t("products.addToCart")}</>}
@@ -837,12 +879,12 @@ export default function ProductsPageClient({
       }
     } catch (err) {
       console.error("Failed to fetch products:", err);
-      setFetchError("Greška pri učitavanju proizvoda. Pokušajte ponovo.");
+      setFetchError(t("products.loadError"));
     } finally {
       if (append) setLoadingMore(false);
       else setLoading(false);
     }
-  }, [buildQueryString, sortBy, shuffleSeed]);
+  }, [buildQueryString, sortBy, shuffleSeed, t]);
 
   // Load the next page and append it to the current list.
   const loadMore = useCallback(() => {
@@ -949,15 +991,15 @@ export default function ProductsPageClient({
     const l = productLines.find((pl) => pl.slug === slug);
     if (l) activeTags.push({ key: `productLine:${slug}`, label: l.name });
   });
-  selectedProductTypes.forEach((v) => activeTags.push({ key: `productType:${v}`, label: v }));
-  selectedHairTypes.forEach((v) => activeTags.push({ key: `hairType:${v}`, label: v }));
+  selectedProductTypes.forEach((v) => activeTags.push({ key: `productType:${v}`, label: capitalizeFirst(v) }));
+  selectedHairTypes.forEach((v) => activeTags.push({ key: `hairType:${v}`, label: capitalizeFirst(v) }));
   selectedTags.forEach((v) => activeTags.push({ key: `tag:${v}`, label: v }));
   activeToggles.forEach((key) => {
     const attr = attributes.find((a) => a.slug === key);
     if (attr) activeTags.push({ key: `attr:${key}`, label: attr.nameLat });
-    else if (key === "new") activeTags.push({ key: `toggle:new`, label: "Noviteti" });
-    else if (key === "on_sale") activeTags.push({ key: `toggle:on_sale`, label: "Na akciji" });
-    else if (key === "featured") activeTags.push({ key: `toggle:featured`, label: "Izdvojeno" });
+    else if (key === "new") activeTags.push({ key: `toggle:new`, label: t("products.toggleNew") });
+    else if (key === "on_sale") activeTags.push({ key: `toggle:on_sale`, label: t("products.toggleOnSale") });
+    else if (key === "featured") activeTags.push({ key: `toggle:featured`, label: t("products.toggleFeatured") });
   });
   if (selectedGender) {
     const genderLabels: Record<string, string> = { man: t("nav.manCollection"), woman: t("products.womanCollection") || "Ženska kolekcija" };
@@ -1032,12 +1074,16 @@ export default function ProductsPageClient({
     setFilterHasColor(false);
     setPriceMin("");
     setPriceMax("");
+    // Also reset ordering + guest visibility so "clear filters" returns the
+    // list to its true default state.
+    setSortBy("popular");
+    setVisibility("all");
   };
 
   // Build toggle filters from attributes + built-in toggles
   const toggleFilters: { key: string; label: string }[] = [
-    { key: "new", label: "Noviteti" },
-    { key: "on_sale", label: "Na akciji" },
+    { key: "new", label: t("products.toggleNew") },
+    { key: "on_sale", label: t("products.toggleOnSale") },
     ...attributes
       .filter((a) => a.type === "boolean" && a.slug)
       .map((a) => ({ key: a.slug, label: a.nameLat })),
@@ -1123,7 +1169,7 @@ export default function ProductsPageClient({
 
       {/* Tip proizvoda */}
       {productTypes.length > 0 && (
-        <FilterSection title="Tip proizvoda" defaultOpen={selectedProductTypes.length > 0} count={selectedProductTypes.length}>
+        <FilterSection title={t("products.typeProductTitle")} defaultOpen={selectedProductTypes.length > 0} count={selectedProductTypes.length}>
           <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
             {productTypes.map((v) => {
               const isActive = selectedProductTypes.includes(v);
@@ -1135,7 +1181,7 @@ export default function ProductsPageClient({
                     isActive ? "bg-[#1a1c1e] text-white" : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                   }`}
                 >
-                  {v}
+                  {capitalizeFirst(v)}
                 </button>
               );
             })}
@@ -1145,7 +1191,7 @@ export default function ProductsPageClient({
 
       {/* Tip kose */}
       {hairTypes.length > 0 && (
-        <FilterSection title="Tip kose" defaultOpen={selectedHairTypes.length > 0} count={selectedHairTypes.length}>
+        <FilterSection title={t("products.hairTypeTitle")} defaultOpen={selectedHairTypes.length > 0} count={selectedHairTypes.length}>
           <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
             {hairTypes.map((v) => {
               const isActive = selectedHairTypes.includes(v);
@@ -1157,7 +1203,7 @@ export default function ProductsPageClient({
                     isActive ? "bg-[#1a1c1e] text-white" : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                   }`}
                 >
-                  {v}
+                  {capitalizeFirst(v)}
                 </button>
               );
             })}
@@ -1167,7 +1213,7 @@ export default function ProductsPageClient({
 
       {/* Funkcija / Tagovi */}
       {tags.length > 0 && (
-        <FilterSection title="Funkcija" defaultOpen={selectedTags.length > 0} count={selectedTags.length}>
+        <FilterSection title={t("products.functionTitle")} defaultOpen={selectedTags.length > 0} count={selectedTags.length}>
           <div className="flex flex-wrap gap-1.5 max-h-[260px] overflow-y-auto pr-1">
             {tags.map((v) => {
               const isActive = selectedTags.includes(v);
@@ -1215,13 +1261,13 @@ export default function ProductsPageClient({
           onClick={handlePriceApply}
           className="mt-3 w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white text-sm py-2.5 rounded-sm font-medium transition-colors"
         >
-          Primeni
+          {t("products.apply")}
         </button>
       </FilterSection>
 
       {/* Color filter — only show if there are color products in the DB */}
       {(availableColorLevels.length > 0 || availableColorUndertones.length > 0) && (
-        <FilterSection title={`Nijansa boje (${availableColorLevels.reduce((s, l) => s + l.count, 0)})`} defaultOpen={false}>
+        <FilterSection title={`${t("products.colorShadeTitle")} (${availableColorLevels.reduce((s, l) => s + l.count, 0)})`} defaultOpen={false}>
           <div className="space-y-5">
 
             {/* ── Depth / Level ── only levels that exist */}
@@ -1249,7 +1295,7 @@ export default function ProductsPageClient({
                           }`}
                           style={{ backgroundColor: displayHex }}
                         />
-                        <span className="text-[8px] text-[#1a1c1e]/60 leading-tight text-center font-medium">{labelMap[level] || `Nivo ${level}`}</span>
+                        <span className="text-[8px] text-[#1a1c1e]/60 leading-tight text-center font-medium">{labelMap[level] || `${t("products.level")} ${level}`}</span>
                         <span className="text-[8px] text-[#dddbd9]">({count})</span>
                       </button>
                     );
@@ -1261,7 +1307,7 @@ export default function ProductsPageClient({
             {/* ── Color Family (Undertone) ── only undertones that exist */}
             {availableColorUndertones.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#1a1c1e]/60 mb-3">Porodica boja</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#1a1c1e]/60 mb-3">{t("products.colorFamilyTitle")}</p>
                 <div className="space-y-1">
                   {availableColorUndertones.map((ut) => (
                     <button
@@ -1301,7 +1347,7 @@ export default function ProductsPageClient({
                 <div className="flex flex-wrap gap-1.5">
                   {filterColorLevel && (
                     <span className="inline-flex items-center gap-1 bg-[#FFFFFF] text-[#1a1c1e] text-[10px] font-medium px-2 py-1 rounded-sm">
-                      Nivo {filterColorLevel}
+                      {t("products.level")} {filterColorLevel}
                       <button onClick={() => setFilterColorLevel(null)} className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] ml-0.5">&times;</button>
                     </span>
                   )}
@@ -1313,7 +1359,7 @@ export default function ProductsPageClient({
                   )}
                   {filterHasColor && (
                     <span className="inline-flex items-center gap-1 bg-[#FFFFFF] text-[#1a1c1e] text-[10px] font-medium px-2 py-1 rounded-sm">
-                      Samo boje
+                      {t("products.onlyColors")}
                       <button onClick={() => setFilterHasColor(false)} className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] ml-0.5">&times;</button>
                     </span>
                   )}
@@ -1322,7 +1368,7 @@ export default function ProductsPageClient({
                   onClick={() => { setFilterColorLevel(null); setFilterUndertone(null); setFilterHasColor(false); }}
                   className="text-[10px] text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors uppercase tracking-wider font-medium"
                 >
-                  Resetuj filtere boja
+                  {t("products.resetColorFilters")}
                 </button>
               </div>
             )}
@@ -1347,7 +1393,7 @@ export default function ProductsPageClient({
         </FilterSection>
       )}
 
-      <FilterSection title="Osobine">
+      <FilterSection title={t("products.attributesTitle")}>
         <div className="space-y-3">
           {toggleFilters.map((f) => (
             <label
@@ -1438,20 +1484,20 @@ export default function ProductsPageClient({
           {/* Editorial heading */}
           <div className="max-w-3xl mb-10 md:mb-14">
             <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
-              Kolekcija
+              {t("products.collectionLabel")}
             </span>
             <h1
               className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05] tracking-tight"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {activeBrand ? (
-                <>{activeBrand.name}, <em className="italic">svi proizvodi</em>.</>
+                <>{activeBrand.name}, <em className="italic">{t("products.allProductsEm")}</em>.</>
               ) : (
-                <>Svaki ritual, <em className="italic">svi proizvodi</em>.</>
+                <>{t("products.catchphrasePrefix")}, <em className="italic">{t("products.allProductsEm")}</em>.</>
               )}
             </h1>
             <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-lg">
-              Pregledaj punu paletu altamoda — šamponi, regeneratori, maske, ulja i alati — ručno biran, kliničko-testiran i slavljen u našim neobeleženim doznačima.
+              {t("products.editorialDesc")}
             </p>
             <p className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 mt-6">
               {pagination.total} {t("products.productsLabel")}
@@ -1524,7 +1570,7 @@ export default function ProductsPageClient({
         <div className="flex gap-10">
           {/* SIDEBAR */}
           <aside className="hidden lg:block w-[260px] flex-shrink-0">
-            <div className="sticky top-20">
+            <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto overflow-x-hidden pr-2 hide-scrollbar">
               <h2 className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e] font-medium mb-4 pb-4 border-b border-[#dddbd9]/60">{t("products.filters")}</h2>
               {filterSidebar}
               <button
@@ -1556,9 +1602,9 @@ export default function ProductsPageClient({
                   return (
                     <button
                       key={b.slug}
-                      // Single-select: picking a brand replaces the previous one;
-                      // clicking the active brand again clears back to all brands.
-                      onClick={() => setSelectedBrands((prev) => (prev.length === 1 && prev[0] === b.slug ? [] : [b.slug]))}
+                      // Multi-select: clicking toggles a brand in/out of the set;
+                      // clicking the active brand again removes it.
+                      onClick={() => setSelectedBrands((prev) => (prev.includes(b.slug) ? prev.filter((s) => s !== b.slug) : [...prev, b.slug]))}
                       className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 ${
                         isActive
                           ? "bg-[#edb4bd] text-white shadow-sm"
@@ -1692,6 +1738,12 @@ export default function ProductsPageClient({
                       {getBadge(p) && (
                         <span className="absolute top-2 right-2 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] font-medium bg-[rgba(26,28,30,0.5)] text-[#FFFFFF] backdrop-blur-sm rounded-full">{getBadge(p)}</span>
                       )}
+                      <WishlistButton
+                        productId={p.id}
+                        isWishlisted={wishlistedSet.has(p.id)}
+                        className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-[#FFFFFF]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors z-10"
+                        iconClassName="w-3 h-3"
+                      />
                     </div>
                     <div className="p-5 flex-1 flex flex-col justify-center">
                       <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium">{p.brand?.name ?? ""}</span>
@@ -1701,7 +1753,7 @@ export default function ProductsPageClient({
                       </div>
                       <div className="mt-2 flex items-baseline gap-2 text-[#1a1c1e]">
                         {p.price == null ? (
-                          <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">B2B samo</span>
+                          <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">{t("products.b2bOnly")}</span>
                         ) : (
                           <>
                             {p.oldPrice && <span className="text-xs text-[#1a1c1e]/60 line-through">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
@@ -1733,7 +1785,7 @@ export default function ProductsPageClient({
                   />
                 </div>
                 <p className="mt-4 text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium">
-                  Prikazujem {displayProducts.length} od {pagination.total}
+                  {t("products.showing")} {displayProducts.length} {t("products.of")} {pagination.total}
                 </p>
 
                 {hasMore && (

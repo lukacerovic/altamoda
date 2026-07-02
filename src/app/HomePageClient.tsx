@@ -58,7 +58,6 @@ const brandLogos = [
   { name: "L'Oréal Professionnel", logo: "/brands/loreal.svg", slug: "loreal" },
   { name: "Kérastase", logo: "/brands/kerastase.png", slug: "kerastase" },
   { name: "Biolage", logo: "/brands/biolage.webp", slug: "biolage" },
-  { name: "Olaplex", logo: "/brands/olaplex.svg", slug: "olaplex" },
   { name: "Framesi", logo: "/brands/framesi.webp", slug: "framesi" },
   { name: "Elchim", logo: "/brands/elchim.png", slug: "elchim" },
   { name: "L'image", logo: "/brands/limage.png", slug: "limage" },
@@ -66,6 +65,40 @@ const brandLogos = [
   { name: "Olivia Garden", logo: "/brands/olivia-garden.png", slug: "olivia-garden" },
   { name: "Redken Brews", logo: "/brands/redken-brews.png", slug: "redken-brews" },
 ];
+
+/* ─── BrandCarousel ───
+ * Partner logos in a continuous auto-scrolling marquee (two duplicated sets
+ * give the seamless infinite loop). Olaplex is intentionally excluded. */
+function BrandCarousel() {
+  return (
+    <section className="border-y border-[rgba(26,28,30,0.08)] py-8 md:py-10 overflow-hidden bg-[#FFFFFF]">
+      <div className="relative flex">
+        {[0, 1].map((setIndex) => (
+          <div key={setIndex} className="flex animate-marquee flex-shrink-0">
+            {brandLogos.map((brand) => (
+              <Link
+                key={`${brand.name}-${setIndex}`}
+                href={`/brands/${brand.slug}`}
+                aria-label={brand.name}
+                className="flex-shrink-0 mx-8 md:mx-14 flex items-center group"
+              >
+                <div className="relative h-10 md:h-12 w-32 md:w-44">
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    fill
+                    sizes="176px"
+                    className="object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 /* Social feed — mini editorial grid */
 const socialImages = [
@@ -148,7 +181,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
             >
               {hasColors ? (
                 <>
-                  <Palette className="w-3.5 h-3.5" /> Izaberi boju
+                  <Palette className="w-3.5 h-3.5" /> {t("products.chooseColor")}
                 </>
               ) : outOfStock ? (
                 <>{t("products.outOfStock")}</>
@@ -172,7 +205,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
         </h3>
         <div className="flex items-center gap-2 text-sm text-[#1a1c1e]">
           {product.price == null ? (
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">B2B samo</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e] font-medium">{t("products.b2bOnly")}</span>
           ) : (
             <>
               {product.oldPrice && <span className="text-[#1a1c1e]/60 line-through text-xs">{product.oldPrice.toLocaleString("sr-RS")} RSD</span>}
@@ -202,7 +235,7 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
             >
               {hasColors ? (
                 <>
-                  <Palette className="w-3 h-3" /> Izaberi boju
+                  <Palette className="w-3 h-3" /> {t("products.chooseColor")}
                 </>
               ) : outOfStock ? (
                 <>{t("products.outOfStock")}</>
@@ -406,6 +439,7 @@ function HeroTeaserCard({ card, big, eager, className = "" }: { card: HeroCard; 
 /* Horizontal scroll-snap carousel with dot pagination. Renders only below the
    `md` breakpoint; desktop keeps the static three-column grid. */
 function HeroCarousel({ cards }: { cards: HeroCard[] }) {
+  const { t } = useLanguage();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -454,7 +488,7 @@ function HeroCarousel({ cards }: { cards: HeroCard[] }) {
             key={i}
             type="button"
             onClick={() => goTo(i)}
-            aria-label={`Pređi na karticu ${i + 1}`}
+            aria-label={`${t("home.hpGoToSlide")} ${i + 1}`}
             aria-current={i === active}
             className={`h-2 rounded-full transition-all duration-300 ${
               i === active ? "w-5 bg-[#1a1c1e]" : "w-2 bg-[#1a1c1e]/25"
@@ -521,18 +555,18 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const json = await res.json();
       if (res.ok) {
         setStatus("success");
-        setMessage(json.data?.message || "Uspešno ste se prijavili!");
+        setMessage(t("home.hpNewsSuccess"));
         onSuccess?.();
       } else {
         setStatus("error");
-        setMessage(json.error || "Došlo je do greške");
+        // 409 = already subscribed; anything else is a generic failure.
+        setMessage(res.status === 409 ? t("home.hpNewsAlready") : t("home.hpNewsError"));
       }
     } catch {
       setStatus("error");
-      setMessage("Došlo je do greške");
+      setMessage(t("home.hpNewsError"));
     }
   };
 
@@ -547,9 +581,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   /* Tabbed products section — each tab is only shown if it has products. */
   type ProductTab = "bestsellers" | "new" | "sale";
   const allTabs: { key: ProductTab; label: string; products: ProductData[]; badge?: string | ((i: number) => string | undefined); viewAll: string }[] = [
-    { key: "bestsellers", label: "Najprodavanije", products: bestsellerList, badge: (i: number) => (i === 2 ? "Novo" : "Bestseler"), viewAll: "/products" },
-    { key: "sale", label: "Akcija", products: saleList, viewAll: "/products?onSale=true" },
-    { key: "new", label: "Novo", products: newList, badge: "Novo", viewAll: "/products?sort=new" },
+    { key: "bestsellers", label: t("home.tabBestsellers"), products: bestsellerList, badge: (i: number) => (i === 2 ? t("home.new") : t("home.bestseller")), viewAll: "/products" },
+    { key: "sale", label: t("home.tabSale"), products: saleList, viewAll: "/products?onSale=true" },
+    { key: "new", label: t("home.tabNew"), products: newList, badge: t("home.new"), viewAll: "/products?sort=new" },
   ];
   const visibleTabs = allTabs.filter((t) => t.products.length > 0);
   const [activeTab, setActiveTab] = useState<ProductTab>("bestsellers");
@@ -558,28 +592,28 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   /* Hero teaser cards — shown below the headline; admin-editable via heroCards */
   const defaultHeroCards: HeroCard[] = [
     {
-      kicker: "Novo u ponudi",
-      title: "Nove linije i najave",
-      paragraph: "Otkrijte najnovije kolekcije vodećih brendova za kosu koje smo ekskluzivno doneli u Srbiju.",
+      kicker: t("home.hpCard1Kicker"),
+      title: t("home.hpCard1Title"),
+      paragraph: t("home.hpCard1Text"),
       image: heroImage1,
       href: "/products?sort=new",
-      cta: "Istraži novo",
+      cta: t("home.hpCard1Cta"),
     },
     {
-      kicker: "Bestseleri",
-      title: "Ono što se vraća u korpu",
-      paragraph: "Proverena kvalitetna nega koju hiljade kupaca već godinama smatra obaveznim delom rutine.",
+      kicker: t("home.hpCard2Kicker"),
+      title: t("home.hpCard2Title"),
+      paragraph: t("home.hpCard2Text"),
       image: heroImage2,
       href: "/products",
-      cta: "Pogledaj izbor",
+      cta: t("home.hpCard2Cta"),
     },
     {
-      kicker: "Edukacija",
-      title: "Id Hair Academy",
-      paragraph: "Obuke, seminari i radionice za profesionalce — put ka usavršavanju u svetu profesionalne nege kose.",
+      kicker: t("home.hpCard3Kicker"),
+      title: t("home.hpCard3Title"),
+      paragraph: t("home.hpCard3Text"),
       image: heroImage3,
       href: "/education",
-      cta: "Saznaj više",
+      cta: t("home.hpCard3Cta"),
     },
   ];
   const heroTeaserCards: HeroCard[] = defaultHeroCards.map((def, i) => {
@@ -610,32 +644,32 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   const valueCards = [
     {
       icon: "/altamoda_svg_icons/suva_i_ostecena.svg",
-      title: "Suva i oštećena",
-      desc: "Kosa bez sjaja, sklona lomljenju i ispucalim krajevima.",
+      title: t("home.hpConcern1Title"),
+      desc: t("home.hpConcern1Desc"),
       href: buildFilterHref({ hairType: ["Suva kosa", "Oštećena kosa"], tag: ["hidratacija", "obnova"] }),
     },
     {
       icon: "/altamoda_svg_icons/tanka_kosa.svg",
-      title: "Tanka bez volumena",
-      desc: "Kosa koja brzo gubi oblik i nema punoću.",
+      title: t("home.hpConcern2Title"),
+      desc: t("home.hpConcern2Desc"),
       href: buildFilterHref({ hairType: ["Tanka kosa"], tag: ["volumen"] }),
     },
     {
       icon: "/altamoda_svg_icons/obojena_kosa.svg",
-      title: "Obojena koja bledi",
-      desc: "Boja gubi intenzitet i sjaj već nakon nekoliko pranja.",
+      title: t("home.hpConcern3Title"),
+      desc: t("home.hpConcern3Desc"),
       href: buildFilterHref({ hairType: ["Hemijski tretirana kosa"] }),
     },
     {
       icon: "/altamoda_svg_icons/frizzy_kosa.svg",
-      title: "Frizz i neposlušna",
-      desc: "Kosa koja reaguje na vlagu i teško se oblikuje.",
+      title: t("home.hpConcern4Title"),
+      desc: t("home.hpConcern4Desc"),
       href: buildFilterHref({ hairType: ["Frizz", "Neposlušna kosa"], tag: ["anti-frizz"] }),
     },
     {
       icon: "/altamoda_svg_icons/hemijski_ostecena.svg",
-      title: "Hemijski tretirana",
-      desc: "Slaba, lomljiva i bez elastičnosti.",
+      title: t("home.hpConcern5Title"),
+      desc: t("home.hpConcern5Desc"),
       href: buildFilterHref({
         hairType: ["Oštećena kosa", "Hemijski tretirana kosa", "Zaštita od toplote"],
         tag: ["zaštita od toplote", "obnova"],
@@ -643,8 +677,8 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
     },
     {
       icon: "/altamoda_svg_icons/masna_kosa_skalp.svg",
-      title: "Masna i osetljivo teme",
-      desc: "Brzo mašćenje i disbalans vlasišta.",
+      title: t("home.hpConcern6Title"),
+      desc: t("home.hpConcern6Desc"),
       href: buildFilterHref({ hairType: ["Masna kosa", "Osetljivo teme"], tag: ["balans vlasišta"] }),
     },
   ];
@@ -661,15 +695,15 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           {/* Top row — headline only */}
           <div className="pb-12 md:pb-16">
             <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-6">
-              Od 1999. godine
+              {t("home.hpHeroKicker")}
             </span>
             <h1
               className="text-4xl md:text-6xl lg:text-7xl font-light text-[#1a1c1e] leading-[1.02]"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.02em" }}
             >
-              Profesionalna nega,
+              {t("home.hpHeroTitle")}
               <br />
-              <em className="italic">sa poverenjem</em>.
+              <em className="italic">{t("home.hpHeroTitleEm")}</em>.
             </h1>
           </div>
 
@@ -692,34 +726,9 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          2. BRAND MARQUEE — partner logos (slower scroll)
+          2. BRAND MARQUEE — auto-scrolling partner logos
       ═══════════════════════════════════════════════════════════ */}
-      <section className="border-y border-[rgba(26,28,30,0.08)] py-8 md:py-10 overflow-hidden bg-[#FFFFFF]">
-        <div className="relative flex">
-          {[0, 1].map((setIndex) => (
-            <div key={setIndex} className="flex animate-marquee flex-shrink-0">
-              {brandLogos.map((brand) => (
-                <Link
-                  key={`${brand.name}-${setIndex}`}
-                  href={`/brands/${brand.slug}`}
-                  aria-label={brand.name}
-                  className="flex-shrink-0 mx-8 md:mx-14 flex items-center group"
-                >
-                  <div className="relative h-10 md:h-12 w-32 md:w-44">
-                    <Image
-                      src={brand.logo}
-                      alt={brand.name}
-                      fill
-                      sizes="176px"
-                      className="object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ))}
-        </div>
-      </section>
+      <BrandCarousel />
 
       {/* ═══════════════════════════════════════════════════════════
           3. PRODUCTS — merged tabbed section (Bestsellers / Sale / New)
@@ -732,22 +741,20 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             <div className="flex items-end justify-between mb-10 md:mb-14 gap-8 flex-wrap">
               <div>
                 <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
-                  Odabrani proizvodi
+                  {t("home.hpProductsKicker")}
                 </span>
                 <h2
                   className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05]"
                   style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
                 >
-                  Za kućnu,
-                  <br />
-                  i <em className="italic">salonsku</em> upotrebu.
+                  {t("home.hpProductsTitle")} <em className="italic">{t("home.hpProductsTitleEm")}</em> {t("home.hpProductsTitle2")}
                 </h2>
               </div>
               <Link
                 href={activeTabData.viewAll}
                 className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] hover:opacity-60 transition-opacity flex items-center gap-1.5 pb-1 border-b border-[#1a1c1e]"
               >
-                Pogledaj sve <ArrowRight className="w-3 h-3" />
+                {t("home.viewAll")} <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
@@ -796,33 +803,31 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Right — text */}
             <div>
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/70 font-medium block mb-6">
-                Za salone
+                {t("home.hpB2bKicker")}
               </span>
               <h2
                 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                Partnerstvo koje
-                <br />
-                gradi <em className="italic">uspeh</em>.
+                {t("home.hpB2bTitle")} <em className="italic">{t("home.hpB2bTitleEm")}</em>.
               </h2>
               <p className="text-[14px] text-[#1a1c1e]/80 leading-[1.8] mb-5 max-w-lg">
-                Više od tri decenije gradimo mrežu partnera među frizerskim salonima, profesionalnim web shopovima i distributerima širom regiona.
+                {t("home.hpB2bP1")}
               </p>
               <p className="text-[14px] text-[#1a1c1e]/80 leading-[1.8] mb-5 max-w-lg">
-                Alta Moda povezuje brendove i profesionalce kroz pouzdanu distribuciju, veleprodajne uslove, kao i tehničku i edukativnu podršku.
+                {t("home.hpB2bP2")}
               </p>
               <p className="text-[14px] text-[#1a1c1e]/80 leading-[1.8] mb-10 max-w-lg">
-                Od lokalnih salona i online shopova do velikih distributivnih sistema — naš cilj je isti: dugoročna saradnja i zajednički rast.
+                {t("home.hpB2bP3")}
               </p>
 
               {/* Stats row */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 justify-items-center border-t border-[#1a1c1e]/25 pt-8 mb-10 max-w-lg">
                 {[
-                  { v: "30+", l: "Godina" },
-                  { v: "1000+", l: "Partnera" },
-                  { v: "Usluge", l: "Veleprodaja" },
-                  { v: "1:1", l: "Podrška" },
+                  { v: "30+", l: t("home.hpStatGodina") },
+                  { v: "1000+", l: t("home.hpStatPartnera") },
+                  { v: t("home.hpStatUsluge"), l: t("home.hpStatVeleprodaja") },
+                  { v: "1:1", l: t("home.hpStatPodrska") },
                 ].map((s, i) => (
                   <div key={i} className={`text-center ${i < 3 ? "sm:border-r sm:border-[#1a1c1e]/25" : ""} sm:px-2`}>
                     <div className="text-xl md:text-2xl font-light text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
@@ -838,7 +843,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   href="/account/login"
                   className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#edb4bd] px-8 py-4 rounded-full hover:bg-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#edb4bd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#dddbd9]"
                 >
-                  Postani naš partner <ArrowRight className="w-3.5 h-3.5" />
+                  {t("home.hpB2bCta")} <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -854,16 +859,16 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           {/* Header — kicker / title / subtitle */}
           <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
             <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
-              Rešenja za vašu kosu
+              {t("home.hpConcernKicker")}
             </span>
             <h2
               className="text-3xl md:text-4xl lg:text-5xl font-light text-[#1a1c1e] leading-[1.05] mb-6"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
             >
-              Pronađite rutinu za <em className="italic">vidljive rezultate</em>.
+              {t("home.hpConcernTitle")} <em className="italic">{t("home.hpConcernTitleEm")}</em>.
             </h2>
             <p className="text-[13px] md:text-[15px] text-[#1a1c1e]/70 leading-[1.7] max-w-2xl mx-auto">
-              Od svakodnevne nege do savršenog stilizovanja — izaberite proizvode koji odgovaraju vašem tipu kose i njenim potrebama, kao i željenom izgledu. Hidratacija, obnova, volumen i zaštita boje — sve na jednom mestu.
+              {t("home.hpConcernSubtitle")}
             </p>
           </div>
 
@@ -889,7 +894,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                     {card.desc}
                   </p>
                   <span className="mt-auto inline-flex items-center gap-1.5 text-[10px] md:text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#FFFFFF]/30 pb-0.5 group-hover:border-[#FFFFFF] group-hover:gap-2.5 transition-all">
-                    Otkrij proizvode
+                    {t("home.hpConcernCta")}
                     <ArrowRight className="w-3 h-3" />
                   </span>
                 </Link>
@@ -908,7 +913,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Left — text */}
             <div className="order-2 md:order-1">
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#FFFFFF]/60 font-medium block mb-6">
-                Edukativni centar
+                {t("nav.educationCenter")}
               </span>
               <Image
                 src="/altamoda-logoes/idhair-academy-white.png"
@@ -921,10 +926,10 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05] mb-8"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                Put ka <em className="italic">uspešnim</em> profesionalcima.
+                {t("home.hpEduTitlePre")} <em className="italic">{t("home.hpEduTitleEm")}</em> {t("home.hpEduTitlePost")}
               </h2>
               <p className="text-[14px] text-[#FFFFFF]/60 leading-[1.8] mb-10 max-w-lg">
-                Mesto gde se frizersko znanje pretvara u vrhunski profesionalni rezultat.
+                {t("home.hpEduText")}
               </p>
 
               {/* Stats */}
@@ -934,7 +939,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                     25<span className="text-xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/60 mt-1.5 leading-tight">
-                    Godina<br />iskustva
+                    {t("home.hpEduStat1")}
                   </div>
                 </div>
                 <div>
@@ -942,7 +947,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                     350<span className="text-xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/60 mt-1.5 leading-tight">
-                    Stručnih seminara<br />i edukacija
+                    {t("home.hpEduStat2")}
                   </div>
                 </div>
                 <div>
@@ -950,7 +955,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                     1500<span className="text-xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[0.22em] text-[#FFFFFF]/60 mt-1.5 leading-tight">
-                    Edukovanih<br />frizera
+                    {t("home.hpEduStat3")}
                   </div>
                 </div>
               </div>
@@ -960,7 +965,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   href="/education"
                   className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#edb4bd] px-8 py-4 rounded-full hover:bg-[#ffffff] hover:text-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#edb4bd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1c1e]"
                 >
-                  Upoznaj akademiju <ArrowRight className="w-3.5 h-3.5" />
+                  {t("home.hpEduCta")} <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -987,16 +992,16 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="flex items-end justify-between mb-12 md:mb-16 gap-8 flex-wrap">
             <div>
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-5">
-                Prati nas
+                {t("home.hpSocialKicker")}
               </span>
               <h2
                 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05]"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                <em className="italic">@altamoda_srbija</em> na mreži.
+                <em className="italic">@altamoda_srbija</em> {t("home.hpSocialTitleSuffix")}
               </h2>
               <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-md">
-                Najnoviji trendovi, saveti frizera i najave edukacija — pridruži se zajednici koja živi profesionalnu negu kose.
+                {t("home.hpSocialText")}
               </p>
             </div>
 
@@ -1075,18 +1080,18 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
             <div>
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#FFFFFF]/60 font-medium block mb-5">
-                Newsletter
+                {t("home.hpNewsletterKicker")}
               </span>
               <h2
                 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.05]"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                Novi proizvodi, akcije &amp; <em className="italic">saveti</em>.
+                {t("home.hpNewsTitle")} &amp; <em className="italic">{t("home.hpNewsTitleEm")}</em>.
               </h2>
             </div>
             <div>
               <p className="text-[14px] text-[#FFFFFF]/60 leading-relaxed mb-6 max-w-md">
-                Budi u toku sa novim proizvodima, edukacijama i ekskluzivnim ponudama iz sveta profesionalne frizerske industrije.
+                {t("home.hpNewsText")}
               </p>
               <form
                 onSubmit={(e) => { e.preventDefault(); handleNewsletterSubmit(newsletterEmail, setNewsletterStatus, setNewsletterMessage); }}
@@ -1094,7 +1099,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               >
                 <input
                   type="email"
-                  placeholder="Email adresa"
+                  placeholder={t("home.hpEmailLabel")}
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   className="flex-1 bg-transparent text-[#FFFFFF] placeholder-[#FFFFFF]/40 text-sm focus:outline-none"
@@ -1105,7 +1110,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                   disabled={newsletterStatus === "loading"}
                   className="text-[10px] uppercase tracking-[0.28em] font-medium text-[#FFFFFF] hover:opacity-70 transition-opacity disabled:opacity-40"
                 >
-                  {newsletterStatus === "loading" ? "..." : "Prijavi se"}
+                  {newsletterStatus === "loading" ? "..." : t("home.subscribe")}
                 </button>
               </form>
               {newsletterStatus !== "idle" && newsletterStatus !== "loading" && (
@@ -1114,13 +1119,13 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 </p>
               )}
               <p className="text-[11px] text-[#FFFFFF]/40 mt-5 leading-relaxed">
-                Prijavom prihvatate{" "}
+                {t("home.hpNewsConsentPre")}{" "}
                 <button
                   type="button"
                   onClick={() => setShowPrivacyModal(true)}
                   className="underline hover:text-[#FFFFFF]/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] rounded"
                 >
-                  politiku privatnosti
+                  {t("home.hpPrivacyLink")}
                 </button>.
               </p>
             </div>
@@ -1140,7 +1145,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </button>
             <div className="text-center">
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-4">
-                Pridruži se
+                {t("home.hpPopupJoin")}
               </span>
               <h3 className="text-3xl font-light text-[#1a1c1e] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                 {t("home.popupTitle")}
@@ -1199,36 +1204,30 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
           <div className="bg-[#FFFFFF] max-w-xl w-full p-8 md:p-10 relative z-10 animate-scaleIn rounded-[4px] max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setShowPrivacyModal(false)}
-              aria-label="Zatvori"
+              aria-label={t("home.hpClose")}
               className="absolute top-5 right-5 p-1"
             >
               <X className="w-4 h-4 text-[#1a1c1e]/60 hover:text-[#1a1c1e]" />
             </button>
             <span className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 font-medium block mb-4">
-              Newsletter
+              {t("home.hpNewsletterKicker")}
             </span>
             <h3
               className="text-3xl md:text-4xl font-light text-[#1a1c1e] mb-6 leading-[1.1]"
               style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
             >
-              Politika privatnosti
+              {t("home.hpPrivacyTitle")}
             </h3>
             <div className="space-y-4 text-[14px] text-[#1a1c1e]/75 leading-[1.75]">
-              <p>
-                Prijavom na newsletter saglasni ste da Alta Moda doo koristi vašu email adresu za slanje informacija o novim proizvodima, edukacijama, akcijama i drugim sadržajima iz oblasti profesionalne frizerske industrije u okviru našeg poslovanja.
-              </p>
-              <p>
-                Vaši podaci se koriste isključivo za slanje newsletter komunikacije i neće biti korišćeni u druge svrhe niti prosleđeni trećim licima.
-              </p>
-              <p>
-                U svakom trenutku možete se odjaviti sa liste primalaca klikom na link za odjavu koji se nalazi u svakom emailu ili kontaktiranjem nas direktno.
-              </p>
+              <p>{t("home.hpPrivacyP1")}</p>
+              <p>{t("home.hpPrivacyP2")}</p>
+              <p>{t("home.hpPrivacyP3")}</p>
             </div>
             <button
               onClick={() => setShowPrivacyModal(false)}
               className="mt-8 w-full bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff] py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors rounded-full"
             >
-              Razumem
+              {t("home.hpPrivacyOk")}
             </button>
           </div>
         </div>

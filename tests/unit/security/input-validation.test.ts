@@ -21,16 +21,18 @@ describe('Security: SQL Injection Prevention (Zod Validation)', () => {
 })
 
 describe('Security: XSS Prevention (Input Sanitization via Zod)', () => {
-  it('accepts script tags in name (Zod passes, but React escapes on render)', () => {
-    // Zod doesn't strip HTML - React handles XSS via auto-escaping
+  it('rejects script tags in name (letters-only name validation)', () => {
+    // The name field is now restricted to letters/spaces/hyphen/apostrophe,
+    // so HTML/script payloads are rejected at the validation layer (defense in
+    // depth on top of React's auto-escaping on render).
     const data = {
       name: '<script>alert("xss")</script>',
       email: 'test@test.com',
       password: 'test123',
+      phone: '+381641234567',
     }
     const result = registerB2cSchema.safeParse(data)
-    expect(result.success).toBe(true)
-    // Note: React auto-escapes content. DB stores raw but frontend is safe.
+    expect(result.success).toBe(false)
   })
 
   it('product names with HTML are accepted by validator', () => {
@@ -75,6 +77,7 @@ describe('Security: B2B Registration Validation', () => {
     name: 'Test Salon',
     email: 'salon@test.com',
     password: 'test123',
+    phone: '+381641234567',
     salonName: 'Test',
     pib: '123456789',
     maticniBroj: '12345678',
