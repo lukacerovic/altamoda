@@ -26,7 +26,7 @@ export default function ContactPage() {
             <img
               alt="Luxury atelier interior"
               className="w-full h-full object-cover grayscale-[0.2] opacity-90"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWLUQRi5KiF9GA_UedLyqeZeB9to4I3qzwbm8Ob-kMfA8J-IzZhiYmTlRB9yd9JFWoRbSbWe6iXnRlxWhUgiX_9ugGo6rZBc3BpUYJ3X0NRMZZ11Mio73NnjNU7OgyZoBmC55_teN-MNM8fxA3HvEkiYQZEDHdu2LZDc-NFL-tcygUOI-naBCQ2Q6wxM3YSJ8d2vnA9M9WGJkJAP452qWqUBBD9jUki9fNIVvSd6uryo46ck6BDbtVybnM4wS7E232n5UhlYORod6t"
+              src="/kontakt-1.jpg"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FFFFFF]" />
           </div>

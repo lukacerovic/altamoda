@@ -136,6 +136,8 @@ export default function Header() {
   const { t } = useLanguage();
   const { megaMenus, navLinks } = useMegaMenus();
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [desktopNavOpen, setDesktopNavOpen] = useState(false);
+  const desktopNavRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -177,9 +179,21 @@ export default function Header() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1280) setMobileMenu(false);
+      else setDesktopNavOpen(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Close the desktop nav dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (desktopNavRef.current && !desktopNavRef.current.contains(e.target as Node)) {
+        setDesktopNavOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   // Search autocomplete
@@ -247,149 +261,29 @@ export default function Header() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-          {/* Mobile hamburger - left */}
+          {/* Mobile hamburger - left (below xl) */}
           <button onClick={() => setMobileMenu(true)} className="xl:hidden text-[#FFFFFF] hover:text-[#edb4bd] transition-colors">
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* Nav links - left (Kanva style: Shop v, Collections v, About, Blog, Contact) */}
-          <nav className="hidden xl:flex items-center gap-6">
-            {navLinks.map((l) => {
-              const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || l.menuKey === "brands");
-              const menuData = megaMenus[l.menuKey] || null;
-              const isBrandsMenu = l.menuKey === "brands";
-              return (
-                <div
-                  key={l.menuKey || l.name}
-                  className="nav-item relative h-16 flex items-center"
-                  onMouseEnter={() => hasMega && handleMenuEnter(l.menuKey)}
-                  onMouseLeave={handleMenuLeave}
-                >
-                  <Link
-                    href={l.href}
-                    className="text-sm text-[#FFFFFF] hover:text-[#edb4bd] transition-colors tracking-normal font-normal flex items-center gap-1"
-                  >
-                    {l.name}
-                    {hasMega && <ChevronDown className="w-3 h-3" />}
-                  </Link>
-
-                  {/* Brands Dropdown */}
-                  {isBrandsMenu && brands.length > 0 && (
-                    <div
-                      className={`mega-menu absolute top-full left-0 pt-2 ${
-                        activeMenu === "brands" ? "!opacity-100 !visible !translate-y-0" : ""
-                      }`}
-                      style={{ minWidth: "480px" }}
-                      onMouseEnter={() => handleMenuEnter("brands")}
-                      onMouseLeave={handleMenuLeave}
-                    >
-                      <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
-                        <div className="p-5">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-4">
-                            {t("nav.ourBrands")}
-                          </h4>
-                          <div className="grid grid-cols-[repeat(3,max-content)] gap-x-6 gap-y-1">
-                            {brands.map((brand) => (
-                              <Link
-                                key={brand.id}
-                                href={`/brands/${brand.slug}`}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#FFFFFF] transition-colors group"
-                              >
-                                {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
-                                  <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
-                                ) : (
-                                  <div className="w-8 h-8 bg-[#FFFFFF] rounded-sm flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs font-bold text-[#dddbd9]">{brand.name.charAt(0)}</span>
-                                  </div>
-                                ); })()}
-                                <span className="text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors whitespace-nowrap">
-                                  {brand.name}
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Mega Menu Dropdown (products etc.) */}
-                  {!isBrandsMenu && hasMega && menuData && (
-                    <div
-                      className={`mega-menu absolute top-full left-0 pt-2 ${
-                        activeMenu === l.menuKey ? "!opacity-100 !visible !translate-y-0" : ""
-                      }`}
-                      style={{ minWidth: menuData.columns.length > 1 ? "600px" : "400px" }}
-                      onMouseEnter={() => handleMenuEnter(l.menuKey)}
-                      onMouseLeave={handleMenuLeave}
-                    >
-                      <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
-                        <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
-                        <div className="p-6 flex gap-8">
-                          <div className="flex-1 flex gap-8">
-                            {menuData.columns.map((col) => (
-                              <div key={col.title} className="min-w-[140px]">
-                                <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-3 min-h-[2.5rem] flex items-start">
-                                  {col.title}
-                                </h4>
-                                <ul className="space-y-2">
-                                  {col.links.map((link) => (
-                                    <li key={link.name}>
-                                      <Link
-                                        href={link.href}
-                                        className="text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex items-center gap-1 group"
-                                      >
-                                        <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
-                                        {link.name}
-                                      </Link>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                          {menuData.featured && (
-                            <div className="w-[200px] flex-shrink-0">
-                              <Link href={menuData.featured.href} className="block group">
-                                <div className="relative rounded-sm overflow-hidden aspect-[4/3]">
-                                  <Image
-                                    src={menuData.featured.image}
-                                    alt={menuData.featured.title}
-                                    width={200}
-                                    height={200}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                                    <p className="text-white text-sm font-medium">
-                                      {menuData.featured.title}
-                                    </p>
-                                    <span className="text-[#dddbd9] text-xs font-medium flex items-center gap-1 mt-1">
-                                      {menuData.featured.cta}
-                                      <ChevronRight className="w-3 h-3" />
-                                    </span>
-                                  </div>
-                                </div>
-                              </Link>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
+          {/* Desktop menu toggle - left (xl and up). Header stays collapsed; clicking
+              this drops the nav-links layer below, keeping the logo centered. */}
+          <button
+            onClick={() => setDesktopNavOpen((v) => !v)}
+            className="hidden xl:flex items-center gap-2 text-[#FFFFFF] hover:text-[#edb4bd] transition-colors"
+            aria-expanded={desktopNavOpen}
+          >
+            {desktopNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <span className="text-xs uppercase tracking-[0.22em] font-medium">{t("nav.menu")}</span>
+          </button>
 
           {/* Logo - center (Kanva style: parenthesized brand name) */}
-          <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center pointer-events-auto">
             <Image src={logoSrc} alt="Alta Moda" width={626} height={201} className="h-7 xl:h-8 w-auto" unoptimized />
           </Link>
 
-          {/* Icons - right */}
-          <div className="flex items-center gap-5">
+          {/* Icons */}
+          <div className="flex items-center gap-3 flex-shrink-0">
             <div className="hidden xl:block">
               <LanguageToggle />
             </div>
@@ -417,6 +311,147 @@ export default function Header() {
             </Link>
           </div>
         </div>
+
+        {/* Desktop nav dropdown layer - hidden until the menu button is clicked */}
+        {desktopNavOpen && (
+          <div
+            ref={desktopNavRef}
+            className="hidden xl:block absolute top-full left-0 right-0 bg-[#1a1c1e] border-t border-[rgba(255,255,255,0.08)] animate-slideDown z-40"
+          >
+            <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-10 h-14">
+              {navLinks.map((l) => {
+                const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || l.menuKey === "brands");
+                const menuData = megaMenus[l.menuKey] || null;
+                const isBrandsMenu = l.menuKey === "brands";
+                return (
+                  <div
+                    key={l.menuKey || l.name}
+                    className="nav-item relative h-14 flex items-center"
+                    onMouseEnter={() => hasMega && handleMenuEnter(l.menuKey)}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    <Link
+                      href={l.href}
+                      onClick={() => setDesktopNavOpen(false)}
+                      className="text-xs text-[#FFFFFF] hover:text-[#edb4bd] transition-colors tracking-normal font-normal flex items-center gap-1 whitespace-nowrap"
+                    >
+                      {l.name}
+                      {hasMega && <ChevronDown className="w-3 h-3" />}
+                    </Link>
+
+                    {/* Brands Dropdown */}
+                    {isBrandsMenu && brands.length > 0 && (
+                      <div
+                        className={`mega-menu absolute top-full left-0 pt-2 ${
+                          activeMenu === "brands" ? "!opacity-100 !visible !translate-y-0" : ""
+                        }`}
+                        style={{ minWidth: "480px" }}
+                        onMouseEnter={() => handleMenuEnter("brands")}
+                        onMouseLeave={handleMenuLeave}
+                      >
+                        <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
+                          <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
+                          <div className="p-5">
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-4">
+                              {t("nav.ourBrands")}
+                            </h4>
+                            <div className="grid grid-cols-[repeat(3,max-content)] gap-x-6 gap-y-1">
+                              {brands.map((brand) => (
+                                <Link
+                                  key={brand.id}
+                                  href={`/brands/${brand.slug}`}
+                                  onClick={() => setDesktopNavOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#FFFFFF] transition-colors group"
+                                >
+                                  {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
+                                    <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
+                                  ) : (
+                                    <div className="w-8 h-8 bg-[#FFFFFF] rounded-sm flex items-center justify-center flex-shrink-0">
+                                      <span className="text-xs font-bold text-[#dddbd9]">{brand.name.charAt(0)}</span>
+                                    </div>
+                                  ); })()}
+                                  <span className="text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors whitespace-nowrap">
+                                    {brand.name}
+                                  </span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mega Menu Dropdown (products etc.) */}
+                    {!isBrandsMenu && hasMega && menuData && (
+                      <div
+                        className={`mega-menu absolute top-full left-0 pt-2 ${
+                          activeMenu === l.menuKey ? "!opacity-100 !visible !translate-y-0" : ""
+                        }`}
+                        style={{ minWidth: menuData.columns.length > 1 ? "600px" : "400px" }}
+                        onMouseEnter={() => handleMenuEnter(l.menuKey)}
+                        onMouseLeave={handleMenuLeave}
+                      >
+                        <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
+                          <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
+                          <div className="p-6 flex gap-8">
+                            <div className="flex-1 flex gap-8">
+                              {menuData.columns.map((col) => (
+                                <div key={col.title} className="min-w-[140px]">
+                                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-3 min-h-[2.5rem] flex items-start">
+                                    {col.title}
+                                  </h4>
+                                  <ul className="space-y-2">
+                                    {col.links.map((link) => (
+                                      <li key={link.name}>
+                                        <Link
+                                          href={link.href}
+                                          onClick={() => setDesktopNavOpen(false)}
+                                          className="text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex items-center gap-1 group"
+                                        >
+                                          <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
+                                          {link.name}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                            {menuData.featured && (
+                              <div className="w-[200px] flex-shrink-0">
+                                <Link href={menuData.featured.href} onClick={() => setDesktopNavOpen(false)} className="block group">
+                                  <div className="relative rounded-sm overflow-hidden aspect-[4/3]">
+                                    <Image
+                                      src={menuData.featured.image}
+                                      alt={menuData.featured.title}
+                                      width={200}
+                                      height={200}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                                      <p className="text-white text-sm font-medium">
+                                        {menuData.featured.title}
+                                      </p>
+                                      <span className="text-[#dddbd9] text-xs font-medium flex items-center gap-1 mt-1">
+                                        {menuData.featured.cta}
+                                        <ChevronRight className="w-3 h-3" />
+                                      </span>
+                                    </div>
+                                  </div>
+                                </Link>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Search overlay */}
         {searchOpen && (

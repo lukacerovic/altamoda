@@ -986,7 +986,6 @@ export default function NewsletterPage() {
                       className="w-[600px] h-[600px] border-0 pointer-events-none"
                       style={{ transform: "scale(0.38)", transformOrigin: "top left" }}
                       title={template.name}
-                      sandbox="allow-same-origin"
                       tabIndex={-1}
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30 pointer-events-none" />

@@ -24,7 +24,8 @@ import { Client } from 'pg';
 
 const EXCEL = '/Users/nikola/Downloads/AMS sajt 2026. baza B2C i B2B, FINAL!-3.xlsx';
 const SHEET = 'AMS final baza';
-const DB_URL = 'postgresql://nikola@localhost:5432/altamoda_local_final';
+const DB_URL = process.env.TARGET_DB_URL || 'postgresql://nikola@localhost:5432/altamoda_local_final';
+const DB_SSL = /render\.com/.test(DB_URL) ? { rejectUnauthorized: false } : undefined;
 const APPLY = process.argv.includes('--apply');
 
 const FIELDS = [
@@ -137,8 +138,9 @@ function readExcel() {
 
 async function main() {
   const xl = readExcel();
-  const client = new Client({ connectionString: DB_URL });
+  const client = new Client({ connectionString: DB_URL, ssl: DB_SSL });
   await client.connect();
+  console.log('Target DB:', DB_URL.replace(/:[^:@/]+@/, ':***@'));
   const { rows } = await client.query(
     'select id, sku, description, usage_instructions, ingredients, benefits, declaration from products',
   );

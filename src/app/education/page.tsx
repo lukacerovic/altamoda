@@ -152,7 +152,7 @@ export default function EducationPage() {
               </div>
               <div className="aspect-[5/6] bg-[#1a1c1e] relative overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1400&q=80"
+                  src="/edukacija-1.jpg"
                   alt="ID Hair Academy"
                   fill
                   className="object-cover"
@@ -236,7 +236,7 @@ export default function EducationPage() {
                 num="Nº 01"
                 title={t("education.section1Title")}
                 kicker={t("education.section1Kicker")}
-                img="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=900&q=80"
+                img="/edukacija-3.jpg"
                 credit={t("education.section1ImgCredit")}
               >
                 <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
@@ -249,7 +249,7 @@ export default function EducationPage() {
                 num="Nº 02"
                 title={t("education.section2Title")}
                 kicker={t("education.section2Kicker")}
-                img="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=900&q=80"
+                img="/edukacija-4.jpg"
                 credit={t("education.section2ImgCredit")}
               >
                 <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
@@ -263,7 +263,7 @@ export default function EducationPage() {
                 num="Nº 03"
                 title={t("education.section3Title")}
                 kicker={t("education.section3Kicker")}
-                img="/prodajno-mesto.png"
+                img="/edukacija-5.jpg"
                 credit={t("education.section3ImgCredit")}
               >
                 <p className="mb-3 font-light text-[15px] leading-[1.5] text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>

@@ -792,7 +792,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Left — image (portrait, matches right column height on desktop) */}
             <div className="relative aspect-[3/4] md:aspect-auto md:h-full bg-[#413d3a] overflow-hidden rounded-[4px]">
               <Image
-                src="/b2bhero.png"
+                src="/b2b-partneri.jpg"
                 alt="altamoda saloni partneri"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -973,7 +973,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Right — image */}
             <div className="order-1 md:order-2 relative aspect-[5/6] md:aspect-[4/5] bg-[#1a1c1e] overflow-hidden rounded-[4px]">
               <Image
-                src="/edukacija2.jpg"
+                src="/idhair-academy-home.jpg"
                 alt="ID Hair Academy edukacija"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"

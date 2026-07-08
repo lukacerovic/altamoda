@@ -1,0 +1,47 @@
+{
+  "exceptionBrands": {
+    "L'IMAGE": 9,
+    "ELCHIM": 1
+  },
+  "counts": {
+    "products": 1012,
+    "productsNoCode": 15,
+    "photoFiles": 2917,
+    "distinctCodes": 1000,
+    "matchedCodes": 997,
+    "unmatchedCodes": 3,
+    "productsWithPhotos": 997,
+    "productsNoPhotos": 0
+  },
+  "unmatchedPhotoCodes": [
+    {
+      "code": "3474636961047",
+      "count": 6,
+      "sample": [
+        "3474636961047_1.jpg",
+        "3474636961047_2.jpg",
+        "3474636961047_3.jpg"
+      ]
+    },
+    {
+      "code": "3474637339142    ",
+      "count": 4,
+      "sample": [
+        "3474637339142    _1.jpg",
+        "3474637339142    _2.jpg",
+        "3474637339142    _4.jpg"
+      ]
+    },
+    {
+      "code": "474636484805",
+      "count": 12,
+      "sample": [
+        "474636484805_1.jpg",
+        "474636484805_10.jpg",
+        "474636484805_11.jpg"
+      ]
+    }
+  ],
+  "productsNoPhotos": [],
+  "duplicateCodes": []
+}

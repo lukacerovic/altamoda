@@ -85,6 +85,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Disable the browser's default translucent tap-highlight (renders as a
+   dark flash over colored buttons on mobile Safari/Chrome); we style
+   pressed states explicitly instead. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Material Symbols */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;

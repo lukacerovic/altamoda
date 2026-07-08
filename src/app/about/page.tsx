@@ -71,7 +71,7 @@ export default function AboutPage() {
               </div>
               <div className="aspect-[5/6] bg-[#1a1c1e] relative overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1600948836101-f9ffda59d250?w=1400&q=80"
+                  src="/o-nama-1.jpg"
                   alt="Alta Moda"
                   fill
                   className="object-cover"
@@ -236,7 +236,7 @@ export default function AboutPage() {
               </div>
               <div className="aspect-[4/5] bg-[#1a1c1e] relative overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80"
+                  src="/o-nama-2.jpg"
                   alt="Partner"
                   fill
                   className="object-cover"

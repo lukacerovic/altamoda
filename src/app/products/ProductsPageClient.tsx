@@ -444,7 +444,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#1a1c1e]" : "bg-[#edb4bd] text-[#1a1c1e] active:bg-[#1a1c1e] active:text-[#ffffff]"}`}
             >
               {hasColors ? <><Palette className="w-3 h-3" /> {t("products.chooseColor")}</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
