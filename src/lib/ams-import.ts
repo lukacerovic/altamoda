@@ -13,6 +13,7 @@
  * admin sees exactly what is wrong.
  */
 import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import type { PrismaClient, Prisma } from '@prisma/client'
 import { slugify } from '@/lib/utils'
 import { sanitizeRichText } from '@/lib/sanitize-rich-text'
@@ -241,41 +242,97 @@ export interface AmsExportProduct {
   gender: string | null
 }
 
-/** Build a re-importable AMS .xlsx (same schema the import validates). */
-export function buildAmsExportBuffer(products: AmsExportProduct[]): Buffer {
-  const rows = products.map((p) => {
-    const rec: Record<string, string | number> = {
-      IDENT: p.sku,
-      'EAN CODE': p.barcode ?? '',
-      NAZIV: p.nameLat,
-      // Round-trips isProfessional: no "B2C" => the import marks it professional.
-      PRIMENA: p.isProfessional ? 'B2B' : 'B2B, B2C',
-      BREND: p.brandName ?? '',
-      KATEGORIJA: p.categoryName ?? '',
-      POTKATEGORIJA: p.subcategory ?? '',
-      LINIJA: p.productLineName ?? '',
-      'TIP PROIZVODA': p.productType ?? '',
-      'TIP KOSE': p.hairTypes ?? '',
-      'FUNKCIJA/TAGOVI': p.tags ?? '',
-      OPIS: htmlToText(p.description),
-      UPOTREBA: htmlToText(p.usageInstructions),
-      SASTAV: htmlToText(p.ingredients),
-      BENEFITI: htmlToText(p.benefits),
-      DEKLARACIJA: htmlToText(p.declaration),
-      'VP CENA bez PDV': '',
-      'VP CENA sa PDV': p.priceB2b ?? '',
-      'MP CENA bez PDV': '',
-      // Always export the real priceB2c so it round-trips exactly; PRIMENA (not
-      // the presence of MP) is what carries the professional/B2B-only flag.
-      'MP CENA sa PDV': p.priceB2c,
-      GENDER: p.gender ?? '',
-    }
-    return AMS_COLUMNS.map((c) => rec[c])
+// Column display config for the styled export: width + which columns wrap long
+// text and which hold right-aligned numbers.
+const AMS_COL_CONFIG: Record<string, { width: number; wrap?: boolean; numeric?: boolean }> = {
+  'IDENT': { width: 10 },
+  'EAN CODE': { width: 16 },
+  'NAZIV': { width: 46, wrap: true },
+  'PRIMENA': { width: 12 },
+  'BREND': { width: 18, wrap: true },
+  'KATEGORIJA': { width: 20, wrap: true },
+  'POTKATEGORIJA': { width: 20, wrap: true },
+  'LINIJA': { width: 26, wrap: true },
+  'TIP PROIZVODA': { width: 22, wrap: true },
+  'TIP KOSE': { width: 20, wrap: true },
+  'FUNKCIJA/TAGOVI': { width: 26, wrap: true },
+  'OPIS': { width: 55, wrap: true },
+  'UPOTREBA': { width: 42, wrap: true },
+  'SASTAV': { width: 42, wrap: true },
+  'BENEFITI': { width: 42, wrap: true },
+  'DEKLARACIJA': { width: 40, wrap: true },
+  'VP CENA bez PDV': { width: 15, numeric: true },
+  'VP CENA sa PDV': { width: 15, numeric: true },
+  'MP CENA bez PDV': { width: 15, numeric: true },
+  'MP CENA sa PDV': { width: 15, numeric: true },
+  'GENDER': { width: 11 },
+}
+
+/** Map one product to its AMS row values (keyed by column). */
+function amsExportRecord(p: AmsExportProduct): Record<string, string | number> {
+  return {
+    IDENT: p.sku,
+    'EAN CODE': p.barcode ?? '',
+    NAZIV: p.nameLat,
+    // Round-trips isProfessional: no "B2C" => the import marks it professional.
+    PRIMENA: p.isProfessional ? 'B2B' : 'B2B, B2C',
+    BREND: p.brandName ?? '',
+    KATEGORIJA: p.categoryName ?? '',
+    POTKATEGORIJA: p.subcategory ?? '',
+    LINIJA: p.productLineName ?? '',
+    'TIP PROIZVODA': p.productType ?? '',
+    'TIP KOSE': p.hairTypes ?? '',
+    'FUNKCIJA/TAGOVI': p.tags ?? '',
+    OPIS: htmlToText(p.description),
+    UPOTREBA: htmlToText(p.usageInstructions),
+    SASTAV: htmlToText(p.ingredients),
+    BENEFITI: htmlToText(p.benefits),
+    DEKLARACIJA: htmlToText(p.declaration),
+    'VP CENA bez PDV': '',
+    'VP CENA sa PDV': p.priceB2b ?? '',
+    'MP CENA bez PDV': '',
+    // Always export the real priceB2c so it round-trips exactly; PRIMENA (not
+    // the presence of MP) is what carries the professional/B2B-only flag.
+    'MP CENA sa PDV': p.priceB2c,
+    GENDER: p.gender ?? '',
+  }
+}
+
+/**
+ * Build a re-importable AND presentable AMS .xlsx (same schema the import
+ * validates) — sized columns, wrapped rich-text cells, a styled + frozen
+ * header row, and an auto-filter, mirroring the client's original file.
+ */
+export async function buildAmsExportBuffer(products: AmsExportProduct[]): Promise<Buffer> {
+  const wb = new ExcelJS.Workbook()
+  const ws = wb.addWorksheet(AMS_SHEET, { views: [{ state: 'frozen', ySplit: 1 }] })
+
+  ws.columns = AMS_COLUMNS.map((c) => ({ header: c, key: c, width: AMS_COL_CONFIG[c]?.width ?? 16 }))
+
+  for (const p of products) ws.addRow(amsExportRecord(p))
+
+  // Per-column body alignment (top-align, wrap long text, right-align numbers).
+  AMS_COLUMNS.forEach((c, i) => {
+    const cfg = AMS_COL_CONFIG[c]
+    const col = ws.getColumn(i + 1)
+    col.alignment = { vertical: 'top', horizontal: cfg?.numeric ? 'right' : 'left', wrapText: !!cfg?.wrap }
+    if (cfg?.numeric) col.numFmt = '#,##0.00'
   })
-  const ws = XLSX.utils.aoa_to_sheet([[...AMS_COLUMNS], ...rows])
-  const wb = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(wb, ws, AMS_SHEET)
-  return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }) as Buffer
+
+  // Style the header row last so it wins over the column defaults.
+  const header = ws.getRow(1)
+  header.height = 24
+  header.font = { bold: true, color: { argb: 'FF1A1C1E' } }
+  header.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true }
+  header.eachCell((cell) => {
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3D9DE' } }
+    cell.border = { bottom: { style: 'thin', color: { argb: 'FFE0C4CB' } } }
+  })
+
+  ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: AMS_COLUMNS.length } }
+
+  const buf = await wb.xlsx.writeBuffer()
+  return Buffer.from(buf as ArrayBuffer)
 }
 
 // ── the replace import ─────────────────────────────────────────

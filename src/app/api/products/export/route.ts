@@ -42,7 +42,7 @@ export const GET = async () => {
     gender: p.gender,
   }))
 
-  const buffer = buildAmsExportBuffer(rows)
+  const buffer = await buildAmsExportBuffer(rows)
   const date = new Date().toISOString().slice(0, 10)
   const filename = `altamoda-katalog-backup-${date}.xlsx`
 
