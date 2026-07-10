@@ -3,82 +3,57 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import {
-  Upload, FileSpreadsheet, CheckCircle2, AlertTriangle,
-  XCircle, ArrowLeft, Loader2, Info, ChevronDown, ChevronUp,
-  Package, Layers, BarChart3, X,
+  Upload, FileSpreadsheet, CheckCircle2, XCircle, ArrowLeft, Loader2,
+  Info, X, AlertTriangle, Trash2, Archive, RefreshCw, Download, ShieldCheck,
 } from "lucide-react";
 
-interface FileInfo {
-  name: string;
-  type: string;
-  label: string;
-  rows: number;
-}
+// Expected AMS Excel columns (client's "AMS final baza" structure + GENDER).
+const AMS_COLUMNS = [
+  "IDENT", "EAN CODE", "NAZIV", "PRIMENA", "BREND", "KATEGORIJA", "POTKATEGORIJA",
+  "LINIJA", "TIP PROIZVODA", "TIP KOSE", "FUNKCIJA/TAGOVI", "OPIS", "UPOTREBA",
+  "SASTAV", "BENEFITI", "DEKLARACIJA", "VP CENA bez PDV", "VP CENA sa PDV",
+  "MP CENA bez PDV", "MP CENA sa PDV", "GENDER",
+];
 
-interface FileResult {
-  fileName: string;
-  fileType: string;
-  fileLabel: string;
-  rows: number;
+interface AmsResult {
+  ams: true;
   created: number;
   updated: number;
+  deleted: number;
+  archived: number;
   skipped: number;
-  errors: { row: number; name?: string; error: string }[];
-  newBrands?: string[];
-  newCategories?: string[];
+  total: number;
+  newBrands: string[];
+  newCategories: string[];
+  errors: { row: number; name: string; error: string }[];
 }
-
-interface ImportResponse {
-  files: FileInfo[];
-  results: FileResult[];
-  totals: { created: number; updated: number; skipped: number; errors: number };
-}
-
-const FILE_TYPE_ICONS: Record<string, typeof Package> = {
-  products: Package,
-  categories: Layers,
-  barcodes: BarChart3,
-  altamoda_csv: FileSpreadsheet,
-};
-
-const FILE_TYPE_COLORS: Record<string, string> = {
-  products: "text-green-600 bg-green-50",
-  categories: "text-blue-600 bg-blue-50",
-  barcodes: "text-amber-600 bg-amber-50",
-  altamoda_csv: "text-purple-600 bg-purple-50",
-};
 
 export default function ImportPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [result, setResult] = useState<ImportResponse | null>(null);
+  const [result, setResult] = useState<AmsResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [expandedFile, setExpandedFile] = useState<number | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = (newFiles: FileList | File[]) => {
     const arr = Array.from(newFiles);
-    setFiles(prev => {
-      const existing = new Set(prev.map(f => f.name));
-      return [...prev, ...arr.filter(f => !existing.has(f.name))];
-    });
+    // Catalog import is a single-file replace — keep only the most recent file.
+    setFiles(arr.slice(-1));
     setResult(null);
     setError(null);
   };
 
-  const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
   const handleImport = async () => {
     if (files.length === 0) return;
+    setShowConfirm(false);
     setUploading(true);
     setError(null);
     setResult(null);
 
     try {
       const formData = new FormData();
-      files.forEach(f => formData.append("files", f));
+      files.forEach((f) => formData.append("files", f));
 
       const res = await fetch("/api/products/import", { method: "POST", body: formData });
       const json = await res.json();
@@ -86,7 +61,7 @@ export default function ImportPage() {
       if (!res.ok) {
         setError(json.error || "Greška pri importu");
       } else {
-        setResult(json.data);
+        setResult(json.data as AmsResult);
       }
     } catch {
       setError("Greška u konekciji sa serverom");
@@ -110,25 +85,54 @@ export default function ImportPage() {
             <ArrowLeft size={18} className="text-[#1a1c1e]" />
           </Link>
           <div>
-            <h1 className="text-lg font-semibold text-black">Uvoz proizvoda</h1>
-            <p className="text-sm text-[#1a1c1e]">Uvezite proizvode, kategorije i barkodove iz jednog ili više fajlova</p>
+            <h1 className="text-lg font-semibold text-black">Uvoz kataloga iz Excel-a</h1>
+            <p className="text-sm text-[#1a1c1e]">Excel fajl postaje kompletan spisak proizvoda na sajtu</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-        {/* Info */}
+        {/* REPLACEMENT WARNING */}
+        <div className="bg-red-50 border border-red-200 rounded-sm p-4 flex gap-3">
+          <AlertTriangle size={18} className="text-red-500 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-red-800">
+            <p className="font-semibold mb-1">Pažnja: uvoz ZAMENJUJE ceo katalog</p>
+            <ul className="list-disc list-inside space-y-0.5 text-red-700">
+              <li>Svi postojeći proizvodi kojih <strong>nema</strong> u Excel fajlu biće <strong>obrisani</strong> (ili arhivirani ako imaju porudžbine).</li>
+              <li>Proizvodi iz fajla se dodaju ili ažuriraju podacima iz Excel-a.</li>
+              <li>Slike se <strong>čuvaju</strong> za proizvode koji ostaju (povezivanje po šifri IDENT).</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Backup before importing */}
+        <div className="bg-green-50 border border-green-200 rounded-sm p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <ShieldCheck size={18} className="text-green-600 flex-shrink-0" />
+          <div className="flex-1 text-sm text-green-800">
+            <p className="font-medium">Napravite rezervnu kopiju pre uvoza</p>
+            <p className="text-green-700">Preuzmite trenutni katalog u istoj Excel strukturi. Ako nešto pođe naopako, možete ga ponovo uvesti i vratiti prethodno stanje.</p>
+          </div>
+          <a
+            href="/api/products/export"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-green-300 text-green-800 rounded-sm text-sm font-medium hover:bg-green-100 transition-colors whitespace-nowrap"
+          >
+            <Download size={16} /> Preuzmi backup (Excel)
+          </a>
+        </div>
+
+        {/* Expected columns */}
         <div className="bg-blue-50 border border-blue-200 rounded-sm p-4 flex gap-3">
           <Info size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1.5">Podržani fajlovi</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-blue-700">
-              <div className="flex items-center gap-2"><Package size={14} /> <span><strong>the_setItem</strong> — Proizvodi (cene, nazivi, brendovi)</span></div>
-              <div className="flex items-center gap-2"><Layers size={14} /> <span><strong>tHE_SetItemCateg</strong> — Kategorije i brendovi</span></div>
-              <div className="flex items-center gap-2"><BarChart3 size={14} /> <span><strong>tHE_SetItemExtItemSubj</strong> — Barkodovi</span></div>
-              <div className="flex items-center gap-2"><FileSpreadsheet size={14} /> <span><strong>Alta Moda CSV</strong> — Naš format sa slikama</span></div>
+            <p className="font-medium mb-1.5">Excel mora imati tačno ove kolone (sheet <strong>„AMS final baza”</strong>)</p>
+            <div className="flex flex-wrap gap-1.5">
+              {AMS_COLUMNS.map((c) => (
+                <span key={c} className="inline-block bg-white border border-blue-200 rounded-sm px-2 py-0.5 text-xs text-blue-700 font-mono">
+                  {c}
+                </span>
+              ))}
             </div>
-            <p className="mt-2 text-blue-600">Izaberite jedan ili više fajlova — sistem automatski prepoznaje tip i obrađuje ih pravilnim redosledom (kategorije → proizvodi → barkodovi).</p>
+            <p className="mt-2 text-blue-600">Ako se bilo koji naziv kolone ne poklapa, uvoz se neće pokrenuti i biće prikazano šta nije u redu.</p>
           </div>
         </div>
 
@@ -144,20 +148,18 @@ export default function ImportPage() {
               <input
                 ref={inputRef}
                 type="file"
-                accept=".csv,.xlsx,.xls,.txt"
-                multiple
-                onChange={(e) => { if (e.target.files) addFiles(e.target.files); e.target.value = ''; }}
+                accept=".xlsx,.xls"
+                onChange={(e) => { if (e.target.files) addFiles(e.target.files); e.target.value = ""; }}
                 className="hidden"
               />
               <Upload size={40} className="mx-auto text-[#dddbd9] mb-3" />
-              <p className="text-sm text-[#1a1c1e]">Prevucite fajlove ovde ili <span className="text-black font-medium underline">izaberite fajlove</span></p>
-              <p className="text-xs text-[#1a1c1e] mt-1">CSV, XLSX ili XLS • Više fajlova odjednom • Maksimalno 10MB po fajlu</p>
+              <p className="text-sm text-[#1a1c1e]">Prevucite Excel fajl ovde ili <span className="text-black font-medium underline">izaberite fajl</span></p>
+              <p className="text-xs text-[#1a1c1e] mt-1">XLSX ili XLS • Jedan fajl • Maksimalno 10MB</p>
             </div>
 
-            {/* Selected files list */}
+            {/* Selected file */}
             {files.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-[#1a1c1e] font-medium uppercase tracking-wider">{files.length} {files.length === 1 ? 'fajl izabran' : 'fajlova izabrano'}</p>
                 {files.map((f, i) => (
                   <div key={f.name} className="flex items-center gap-3 bg-white border border-stone-200 rounded-sm px-4 py-2.5">
                     <FileSpreadsheet size={20} className="text-green-600 flex-shrink-0" />
@@ -165,7 +167,7 @@ export default function ImportPage() {
                       <p className="text-sm font-medium text-black truncate">{f.name}</p>
                       <p className="text-xs text-[#1a1c1e]">{formatSize(f.size)}</p>
                     </div>
-                    <button onClick={() => removeFile(i)} className="p-1 hover:bg-stone-100 rounded-sm">
+                    <button onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="p-1 hover:bg-stone-100 rounded-sm">
                       <X size={16} className="text-[#1a1c1e]" />
                     </button>
                   </div>
@@ -176,140 +178,67 @@ export default function ImportPage() {
             {/* Import button */}
             {files.length > 0 && (
               <button
-                onClick={handleImport}
+                onClick={() => setShowConfirm(true)}
                 disabled={uploading}
                 className="w-full py-3 bg-[#edb4bd] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {uploading ? (
-                  <><Loader2 size={18} className="animate-spin" /> Uvoz u toku — obrađujem {files.length} {files.length === 1 ? 'fajl' : 'fajlova'}...</>
+                  <><Loader2 size={18} className="animate-spin" /> Uvoz u toku — zamenjujem katalog...</>
                 ) : (
-                  <><Upload size={18} /> Započni uvoz ({files.length} {files.length === 1 ? 'fajl' : 'fajlova'})</>
+                  <><RefreshCw size={18} /> Zameni katalog iz Excel-a</>
                 )}
               </button>
             )}
           </>
         )}
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-sm p-4">
-            <div className="flex gap-3">
-              <XCircle size={18} className="text-red-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-red-800 mb-1">Greška pri importu</p>
-                <pre className="text-sm text-red-700 whitespace-pre-wrap font-sans">{error}</pre>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Results */}
+        {/* Results (AMS replace) */}
         {result && (
           <div className="space-y-4">
-            {/* Summary banner */}
-            <div className="bg-green-50 border border-green-200 rounded-sm p-4">
-              <div className="flex gap-3">
-                <CheckCircle2 size={18} className="text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-green-800">Uvoz završen — {result.files.length} {result.files.length === 1 ? 'fajl obrađen' : 'fajlova obrađeno'}</p>
-                  <p className="text-xs text-green-600 mt-0.5">
-                    Redosled obrade: {result.files.map(f => f.label).join(' → ')}
-                  </p>
-                </div>
+            <div className="bg-green-50 border border-green-200 rounded-sm p-4 flex gap-3">
+              <CheckCircle2 size={18} className="text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-green-800">Katalog zamenjen — {result.total} proizvoda iz Excel-a</p>
+                <p className="text-xs text-green-600 mt-0.5">Katalog sada odgovara uvezenom Excel fajlu.</p>
               </div>
             </div>
 
-            {/* Totals grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className="text-2xl font-bold text-green-600">{result.totals.created}</p>
-                <p className="text-xs text-[#1a1c1e] mt-1">Kreirano</p>
-              </div>
-              <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className="text-2xl font-bold text-blue-600">{result.totals.updated}</p>
-                <p className="text-xs text-[#1a1c1e] mt-1">Ažurirano</p>
-              </div>
-              <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className="text-2xl font-bold text-[#1a1c1e]">{result.totals.skipped}</p>
-                <p className="text-xs text-[#1a1c1e] mt-1">Preskočeno</p>
-              </div>
-              <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
-                <p className={`text-2xl font-bold ${result.totals.errors > 0 ? "text-red-500" : "text-[#1a1c1e]"}`}>{result.totals.errors}</p>
-                <p className="text-xs text-[#1a1c1e] mt-1">Grešaka</p>
-              </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <Stat value={result.created} label="Kreirano" cls="text-green-600" />
+              <Stat value={result.updated} label="Ažurirano" cls="text-blue-600" />
+              <Stat value={result.deleted} label="Obrisano" cls="text-red-500" icon={<Trash2 size={14} />} />
+              <Stat value={result.archived} label="Arhivirano" cls="text-amber-600" icon={<Archive size={14} />} />
+              <Stat value={result.errors.length} label="Grešaka" cls={result.errors.length ? "text-red-500" : "text-[#1a1c1e]"} />
             </div>
 
-            {/* Per-file results */}
-            {result.results.map((fr, idx) => {
-              const Icon = FILE_TYPE_ICONS[fr.fileType] || FileSpreadsheet;
-              const colors = FILE_TYPE_COLORS[fr.fileType] || "text-gray-600 bg-gray-50";
-              const isExpanded = expandedFile === idx;
+            {(result.newBrands.length > 0 || result.newCategories.length > 0) && (
+              <div className="bg-amber-50 border border-amber-100 rounded-sm p-3 text-xs">
+                {result.newBrands.length > 0 && <p className="text-amber-800">Novi brendovi: <strong>{result.newBrands.join(", ")}</strong></p>}
+                {result.newCategories.length > 0 && <p className="text-amber-800 mt-1">Nove kategorije: <strong>{result.newCategories.join(", ")}</strong></p>}
+              </div>
+            )}
 
-              return (
-                <div key={idx} className="bg-white border border-stone-200 rounded-sm overflow-hidden">
-                  <button
-                    onClick={() => setExpandedFile(isExpanded ? null : idx)}
-                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-stone-50 text-left"
-                  >
-                    <div className={`w-8 h-8 rounded-sm flex items-center justify-center ${colors}`}>
-                      <Icon size={16} />
+            {result.errors.length > 0 && (
+              <div className="bg-white border border-stone-200 rounded-sm p-3">
+                <p className="text-xs font-medium text-red-600 mb-2">{result.errors.length} redova sa greškom</p>
+                <div className="max-h-48 overflow-y-auto">
+                  {result.errors.map((err, i) => (
+                    <div key={i} className="py-1.5 border-b border-stone-100 last:border-0 text-xs">
+                      <span className="text-[#1a1c1e] mr-1">Red {err.row}</span>
+                      <span className="text-black font-medium mr-1">{err.name}</span>
+                      <span className="text-red-600">{err.error}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-black truncate">{fr.fileName}</p>
-                      <p className="text-xs text-[#1a1c1e]">{fr.fileLabel} • {fr.rows} redova</p>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs">
-                      {fr.created > 0 && <span className="text-green-600 font-medium">+{fr.created}</span>}
-                      {fr.updated > 0 && <span className="text-blue-600 font-medium">~{fr.updated}</span>}
-                      {fr.skipped > 0 && <span className="text-[#1a1c1e]">-{fr.skipped}</span>}
-                      {fr.errors.length > 0 && <span className="text-red-500 font-medium">{fr.errors.length} gr.</span>}
-                    </div>
-                    {isExpanded ? <ChevronUp size={16} className="text-[#1a1c1e]" /> : <ChevronDown size={16} className="text-[#1a1c1e]" />}
-                  </button>
-
-                  {isExpanded && (
-                    <div className="border-t border-stone-200 px-4 py-3 space-y-3">
-                      {/* New brands/categories */}
-                      {((fr.newBrands && fr.newBrands.length > 0) || (fr.newCategories && fr.newCategories.length > 0)) && (
-                        <div className="bg-amber-50 border border-amber-100 rounded-sm p-3 text-xs">
-                          {fr.newBrands && fr.newBrands.length > 0 && (
-                            <p className="text-amber-800">Novi brendovi: <strong>{fr.newBrands.join(", ")}</strong></p>
-                          )}
-                          {fr.newCategories && fr.newCategories.length > 0 && (
-                            <p className="text-amber-800 mt-1">Nove kategorije: <strong>{fr.newCategories.join(", ")}</strong></p>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Errors */}
-                      {fr.errors.length > 0 && (
-                        <div className="max-h-48 overflow-y-auto">
-                          {fr.errors.map((err, i) => (
-                            <div key={i} className="py-1.5 border-b border-stone-100 last:border-0 text-xs">
-                              <span className="text-[#1a1c1e] mr-1">Red {err.row}</span>
-                              {err.name && <span className="text-black font-medium mr-1">{err.name}</span>}
-                              <span className="text-red-600">{err.error}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {fr.errors.length === 0 && (
-                        <p className="text-xs text-green-600 flex items-center gap-1"><CheckCircle2 size={12} /> Bez grešaka</p>
-                      )}
-                    </div>
-                  )}
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            )}
 
-            {/* Actions */}
             <div className="flex gap-3">
               <button
                 onClick={() => { setFiles([]); setResult(null); setError(null); }}
                 className="flex-1 py-2.5 bg-[#edb4bd] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors text-sm"
               >
-                Uvezi još fajlova
+                Novi uvoz
               </button>
               <Link
                 href="/admin/products"
@@ -321,6 +250,74 @@ export default function ImportPage() {
           </div>
         )}
       </div>
+
+      {/* Confirmation modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setShowConfirm(false)}>
+          <div className="bg-white rounded-sm max-w-md w-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={20} className="text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-black">Zameniti ceo katalog?</h2>
+                <p className="text-sm text-[#1a1c1e] mt-1.5">
+                  Ova radnja <strong>briše sve proizvode kojih nema</strong> u izabranom Excel fajlu i ažurira ostale.
+                  Radnja se ne može opozvati. Nastaviti?
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 py-2.5 border border-stone-200 text-black rounded-sm font-medium hover:bg-stone-50 transition-colors text-sm"
+              >
+                Otkaži
+              </button>
+              <button
+                onClick={handleImport}
+                className="flex-1 py-2.5 bg-red-600 text-white rounded-sm font-medium hover:bg-red-700 transition-colors text-sm flex items-center justify-center gap-2"
+              >
+                <RefreshCw size={16} /> Da, zameni katalog
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error / validation modal */}
+      {error && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setError(null)}>
+          <div className="bg-white rounded-sm max-w-lg w-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <XCircle size={20} className="text-red-500" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-base font-semibold text-black">Uvoz zaustavljen</h2>
+                <pre className="text-sm text-red-700 whitespace-pre-wrap font-sans mt-1.5 max-h-80 overflow-y-auto">{error}</pre>
+              </div>
+            </div>
+            <div className="flex justify-end mt-5">
+              <button
+                onClick={() => setError(null)}
+                className="py-2.5 px-6 bg-[#edb4bd] text-white rounded-sm font-medium hover:bg-[#413d3a] transition-colors text-sm"
+              >
+                Zatvori
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Stat({ value, label, cls, icon }: { value: number; label: string; cls: string; icon?: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-stone-200 rounded-sm p-4 text-center">
+      <p className={`text-2xl font-bold ${cls}`}>{value}</p>
+      <p className="text-xs text-[#1a1c1e] mt-1 flex items-center justify-center gap-1">{icon}{label}</p>
     </div>
   );
 }

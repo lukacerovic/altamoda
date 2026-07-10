@@ -3,6 +3,7 @@ import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-util
 import { requireAdmin } from '@/lib/auth-helpers'
 import { slugify } from '@/lib/utils'
 import { sweepOrphanBrands, sweepOrphanCategories } from '@/lib/taxonomy'
+import { readAmsHeaders, isAmsFile, validateAmsHeaders, importAmsProducts, AMS_COLUMNS } from '@/lib/ams-import'
 import * as XLSX from 'xlsx'
 
 /* ═══════════════════════════════════════════════════════════════
@@ -537,6 +538,39 @@ export const POST = withErrorHandler(async (req: Request) => {
     const ext = file.name.toLowerCase().split('.').pop()
     if (!['csv', 'xlsx', 'xls', 'txt'].includes(ext || '')) {
       return errorResponse(`Fajl "${file.name}" ima nepodržan format (.${ext}). Koristite .csv, .xlsx ili .xls`, 400)
+    }
+  }
+
+  // ── AMS ("AMS final baza") Excel catalog — strict schema + FULL REPLACE ──
+  // Detected by its signature columns (IDENT + NAZIV). Unlike the additive
+  // Pantheon flow below, this makes the Excel the definitive product list:
+  // existing products missing from it are removed (or archived if they have
+  // order history), matching rows are updated (images kept), new rows created.
+  {
+    const firstBuf = await files[0].arrayBuffer()
+    let amsHeaders: string[] | null = null
+    try { amsHeaders = readAmsHeaders(firstBuf) } catch { amsHeaders = null }
+
+    if (amsHeaders && isAmsFile(amsHeaders)) {
+      if (files.length > 1) {
+        return errorResponse('Uvoz kataloga iz Excel-a podržava samo jedan fajl. Otpremite samo AMS Excel.', 400)
+      }
+      const check = validateAmsHeaders(amsHeaders)
+      if (!check.ok) {
+        const msg: string[] = ['Struktura Excel fajla se ne poklapa sa očekivanom — uvoz nije pokrenut.']
+        if (check.missing.length) msg.push('', 'Nedostaju kolone:', ...check.missing.map((c) => `  • ${c}`))
+        if (check.unexpected.length) msg.push('', 'Nepoznate kolone (proverite naziv/razmake):', ...check.unexpected.map((c) => `  • ${c}`))
+        msg.push('', `Očekivane kolone (${AMS_COLUMNS.length}): ${AMS_COLUMNS.join(', ')}`)
+        return errorResponse(msg.join('\n'), 400)
+      }
+      try {
+        const result = await importAmsProducts(prisma, firstBuf)
+        await sweepOrphanBrands()
+        await sweepOrphanCategories()
+        return successResponse({ ams: true, ...result })
+      } catch (err) {
+        return errorResponse(`Uvoz nije uspeo — nijedna izmena nije sačuvana: ${(err as Error).message}`, 400)
+      }
     }
   }
 

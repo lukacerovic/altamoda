@@ -17,6 +17,7 @@ import {
   Eye,
   EyeOff,
   Upload,
+  Download,
   Image as ImageIcon,
   Star,
   FileImage,
@@ -80,6 +81,7 @@ interface Product {
   productType?: string;
   hairTypes?: string;
   tags?: string;
+  gender?: string;
   images: ProductImage[];
   colorLevel?: number;
   colorUndertone?: string;
@@ -301,6 +303,7 @@ const defaultFormData = (): Omit<Product, "id"> => ({
   productType: "",
   hairTypes: "",
   tags: "",
+  gender: "",
   images: [],
   seoTitle: "",
   metaDescription: "",
@@ -350,6 +353,23 @@ export default function ProductsPage() {
   // 'broken_old_price' = oldPrice set but ≤ current price (illogical sale display).
   const [priceFilter, setPriceFilter] = useState("__all__");
   const [currentPage, setCurrentPage] = useState(1);
+  // Responsive pager: measure the row and show as many numeric page buttons as
+  // fit (capped at 20), so 100+ page catalogs stay on one line with … + last.
+  const [maxPageButtons, setMaxPageButtons] = useState(7);
+  const pagerObserver = useRef<ResizeObserver | null>(null);
+  const measurePagerRow = useCallback((el: HTMLDivElement | null) => {
+    pagerObserver.current?.disconnect();
+    if (!el) return;
+    const compute = () => {
+      // Reserve ~420px for the "showing" label, prev/next arrows, two … gaps and
+      // row padding; each numeric button is ~40px (w-9 + gap-1).
+      const available = el.clientWidth - 420;
+      setMaxPageButtons(Math.max(5, Math.min(20, Math.floor(available / 40))));
+    };
+    compute();
+    pagerObserver.current = new ResizeObserver(compute);
+    pagerObserver.current.observe(el);
+  }, []);
   const [showPanel, setShowPanel] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   // The rich-text fields are fetched async after the panel opens; TiptapEditor
@@ -655,6 +675,7 @@ export default function ProductsPage() {
           productType: p.productType || "",
           hairTypes: p.hairTypes || "",
           tags: p.tags || "",
+          gender: p.gender || "",
           productLine: p.productLine?.name || "",
           brand: p.brand?.name || prev.brand,
           category: p.category?.nameLat || prev.category,
@@ -729,6 +750,7 @@ export default function ProductsPage() {
       productType: formData.productType || null,
       hairTypes: formData.hairTypes || null,
       tags: formData.tags || null,
+      gender: formData.gender || null,
       isProfessional: formData.badges.isProfessionalOnly,
       isNew: formData.badges.isNew,
       isFeatured: formData.badges.isFeatured,
@@ -931,6 +953,14 @@ export default function ProductsPage() {
             <Plus size={18} />
             {t("admin.addProduct")}
           </button>
+          <a
+            href="/api/products/export"
+            className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 border border-stone-300 text-[#1a1c1e] hover:bg-stone-50 transition-colors"
+            title="Preuzmi sve proizvode kao Excel (backup)"
+          >
+            <Download size={16} />
+            Izvezi Excel
+          </a>
           <Link
             href="/admin/import"
             className="px-4 py-2.5 rounded-sm text-sm flex items-center gap-2 bg-[#edb4bd] text-white hover:bg-[#413d3a] transition-colors"
@@ -1181,7 +1211,7 @@ export default function ProductsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-stone-200 flex items-center justify-between">
+          <div ref={measurePagerRow} className="px-6 py-4 border-t border-stone-200 flex items-center justify-between gap-2">
             <span className="text-sm text-[#1a1c1e]">
               {t("admin.showing")} {(currentPage - 1) * perPage + 1}&ndash;{Math.min(currentPage * perPage, filtered.length)} {t("admin.of")} {filtered.length}
             </span>
@@ -1193,15 +1223,45 @@ export default function ProductsPage() {
               >
                 <ChevronLeft size={18} />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${page === currentPage ? "bg-[#edb4bd] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}
-                >
-                  {page}
-                </button>
-              ))}
+              {(() => {
+                // Responsive pager: first page, a window around the current page,
+                // and the last page with … for gaps. The window grows/shrinks with
+                // the measured row width (maxPageButtons, capped at 20) so large
+                // catalogs stay on one line and the arrows stay visible.
+                const items: (number | "dots")[] = [];
+                const maxN = maxPageButtons;
+                if (totalPages <= maxN) {
+                  for (let i = 1; i <= totalPages; i++) items.push(i);
+                } else {
+                  const win = Math.max(1, maxN - 2); // numbers shown besides first & last
+                  let start = Math.max(2, currentPage - Math.floor(win / 2));
+                  let end = start + win - 1;
+                  if (end >= totalPages) { end = totalPages - 1; start = Math.max(2, end - win + 1); }
+                  items.push(1);
+                  if (start > 2) items.push("dots");
+                  for (let i = start; i <= end; i++) items.push(i);
+                  if (end < totalPages - 1) items.push("dots");
+                  items.push(totalPages);
+                }
+                return items.map((it, idx) =>
+                  it === "dots" ? (
+                    <span
+                      key={`dots-${idx}`}
+                      className="w-9 h-9 flex items-center justify-center text-sm text-stone-400 select-none"
+                    >
+                      &hellip;
+                    </span>
+                  ) : (
+                    <button
+                      key={it}
+                      onClick={() => setCurrentPage(it)}
+                      className={`w-9 h-9 rounded-sm text-sm font-medium transition-colors ${it === currentPage ? "bg-[#edb4bd] text-white" : "text-[#1a1c1e] hover:bg-stone-100"}`}
+                    >
+                      {it}
+                    </button>
+                  )
+                );
+              })()}
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
@@ -1401,6 +1461,14 @@ export default function ProductsPage() {
                           </button>
                         </div>
                       )}
+                    </div>
+                    <div>
+                      <label className={labelCls}>Kolekcija (pol)</label>
+                      <select value={formData.gender || ""} onChange={(e) => updateForm("gender", e.target.value)} className={inputCls + " cursor-pointer"}>
+                        <option value="">Nije određeno (unisex)</option>
+                        <option value="man">Muškarci</option>
+                        <option value="woman">Žene</option>
+                      </select>
                     </div>
                     <div>
                       <label className={labelCls}>{t("admin.subcategory")}</label>

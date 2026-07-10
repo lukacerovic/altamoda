@@ -534,6 +534,7 @@ export const POST = withErrorHandler(async (req: Request) => {
       productType: body.productType,
       hairTypes: body.hairTypes,
       tags: body.tags,
+      gender: body.gender,
       priceB2c: body.priceB2c,
       priceB2b: body.priceB2b,
       oldPrice: body.oldPrice,

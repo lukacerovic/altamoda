@@ -82,10 +82,40 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const limit = 20;
   const skip = (page - 1) * limit;
   // Storefront shows out-of-stock products too (they render a "Nema na stanju" button).
-  const productWhere = { isActive: true };
+  const baseWhere = { isActive: true };
+
+  // Collapse color-variant groups to one representative per group_slug, mirroring
+  // /api/products so the SSR landing matches the client-fetched (filtered) view.
+  // Without this the initial render shows every shade of a color line as its own card.
+  const groupedDups = await prisma.product.groupBy({
+    by: ['groupSlug'],
+    where: { ...baseWhere, groupSlug: { not: null } },
+    _count: true,
+  });
+  const groupSlugsAll = groupedDups.map((g) => g.groupSlug).filter(Boolean) as string[];
+  const excludeIds = new Set<string>();
+  if (groupSlugsAll.length > 0) {
+    const [reps, allInGroups] = await Promise.all([
+      prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugsAll }, isActive: true },
+        select: { id: true },
+        orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
+        distinct: ['groupSlug'],
+      }),
+      prisma.product.findMany({
+        where: { groupSlug: { in: groupSlugsAll }, isActive: true },
+        select: { id: true },
+      }),
+    ]);
+    const repIds = new Set(reps.map((r) => r.id));
+    for (const p of allInGroups) if (!repIds.has(p.id)) excludeIds.add(p.id);
+  }
+  const productWhere = excludeIds.size > 0
+    ? { ...baseWhere, NOT: { id: { in: Array.from(excludeIds) } } }
+    : baseWhere;
 
   const [
-    [rawProducts, rawTotal, groupedDups],
+    [rawProducts, rawTotal],
     brandsData,
     flatCategories,
     productLinesData,
@@ -112,11 +142,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         take: limit,
       }),
       prisma.product.count({ where: productWhere }),
-      prisma.product.groupBy({
-        by: ['groupSlug'],
-        where: { ...productWhere, groupSlug: { not: null } },
-        _count: true,
-      }),
     ]),
     // Brands
     prisma.brand.findMany({
@@ -197,9 +222,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       : Promise.resolve(null),
   ]);
 
-  // Deduplicate color groups from total count
-  const duplicateCount = groupedDups.reduce((sum: number, g: { _count: number }) => sum + g._count - 1, 0);
-  const total = rawTotal - duplicateCount;
+  // productWhere already excludes non-representative group members, so the row
+  // count is the deduplicated total directly.
+  const total = rawTotal;
 
   // Get average ratings + active promotions in parallel (one query each)
   const productIds = rawProducts.map((p) => p.id);
@@ -213,6 +238,42 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   ]);
   const ratingMap = new Map(ratings.map((r) => [r.productId, r._avg.rating || 0]));
 
+  // Color siblings + variant counts for the grouped representatives, so the card
+  // shows the "N colors" badge and swatch row (same shape as /api/products).
+  const groupSlugsPresent = [...new Set(rawProducts.map((p) => p.groupSlug).filter(Boolean))] as string[];
+  const [variantCounts, siblingRows] = await Promise.all([
+    groupSlugsPresent.length
+      ? prisma.product.groupBy({ by: ["groupSlug"], where: { groupSlug: { in: groupSlugsPresent }, isActive: true }, _count: true })
+      : Promise.resolve([] as Array<{ groupSlug: string | null; _count: number }>),
+    groupSlugsPresent.length
+      ? prisma.product.findMany({
+          where: { groupSlug: { in: groupSlugsPresent }, isActive: true },
+          select: {
+            id: true, slug: true, nameLat: true, sku: true, priceB2c: true,
+            colorCode: true, colorName: true, groupSlug: true, stockQuantity: true,
+            brand: { select: { name: true } },
+            images: { where: { isPrimary: true }, take: 1 },
+            colorProduct: { select: { hexValue: true } },
+          },
+        })
+      : Promise.resolve([]),
+  ]);
+  const variantCountMap = new Map(variantCounts.map((v) => [v.groupSlug!, v._count]));
+  const siblingsByGroup = new Map<string, Array<{
+    id: string; slug: string; name: string; sku: string; brand: string; price: number;
+    image: string | null; colorCode: string | null; colorName: string | null; hex: string | null; stockQuantity: number;
+  }>>();
+  for (const s of siblingRows) {
+    if (!s.groupSlug) continue;
+    const arr = siblingsByGroup.get(s.groupSlug) || [];
+    arr.push({
+      id: s.id, slug: s.slug, name: s.nameLat, sku: s.sku, brand: s.brand?.name || "",
+      price: Number(s.priceB2c), image: s.images[0]?.url || null,
+      colorCode: s.colorCode, colorName: s.colorName, hex: s.colorProduct?.hexValue || null, stockQuantity: s.stockQuantity,
+    });
+    siblingsByGroup.set(s.groupSlug, arr);
+  }
+
   // Format products. SSR is cached without auth so apply public ('all'/'b2c')
   // promo audience here — the client refetches via /api/products with the real
   // role for B2B viewers.
@@ -220,10 +281,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     const basePrice = Number(p.priceB2c);
     const staticOld = p.oldPrice ? Number(p.oldPrice) : null;
     const { price, oldPrice } = applyBestPromo(promosByProduct.get(p.id) || [], basePrice, staticOld, "b2c");
+    // Strip the color code from the name for grouped products -> clean group label.
+    const displayName = p.groupSlug && p.colorCode
+      ? p.nameLat.replace(p.colorCode, "").replace(/\/+/g, " ").replace(/\s{2,}/g, " ").trim()
+      : p.nameLat;
     return {
     id: p.id,
     sku: p.sku,
-    name: p.nameLat,
+    name: displayName,
     slug: p.slug,
     brand: p.brand ? { id: p.brand.id, name: p.brand.name, slug: p.brand.slug } : null,
     category: p.category ? { id: p.category.id, nameLat: p.category.nameLat, slug: p.category.slug } : null,
@@ -248,6 +313,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           shadeCode: p.colorProduct.shadeCode,
         }
       : null,
+    groupSlug: p.groupSlug,
+    variantCount: p.groupSlug ? variantCountMap.get(p.groupSlug) || 0 : 0,
+    colorSiblings: p.groupSlug ? (siblingsByGroup.get(p.groupSlug) || undefined) : undefined,
     };
   });
 
