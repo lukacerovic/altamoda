@@ -332,7 +332,8 @@
     "outOfStock": "Out of Stock",
     "outOfStockNotice": "This product is currently unavailable",
     "outOfStockWarning": "Some items in your cart are out of stock and won't be included in the total. Remove them or wait until they become available.",
-    "unavailable": "Unavailable"
+    "unavailable": "Unavailable",
+    "selectAtCheckout": "Selected at checkout"
   },
   "checkout": {
     "step1": "Details",

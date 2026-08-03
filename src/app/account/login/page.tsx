@@ -59,6 +59,10 @@ function LoginContent() {
   // Pre-fill from the checkout guest draft (if any) so a guest who decides to
   // log in or register mid-checkout doesn't retype their details. Only fills
   // fields that are still empty — never overwrites what the user typed.
+  // This must be an effect (not a lazy initializer): the draft lives in
+  // localStorage, which doesn't exist during SSR, and initializing from it
+  // during render would cause a hydration mismatch.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const { guestInfo } = useCheckoutStore.getState();
     if (!guestInfo) return;
@@ -90,6 +94,7 @@ function LoginContent() {
       }
     }
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   type FieldName =
     | "firstName" | "lastName" | "email" | "phone" | "password" | "passwordConfirm"

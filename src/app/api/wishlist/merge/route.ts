@@ -19,8 +19,15 @@ export const POST = withErrorHandler(async (req: Request) => {
     return successResponse({ message: 'Ništa za spajanje' })
   }
 
+  // B2C accounts must never hold professional (B2B-only) products — a guest
+  // may have wishlisted them before logging in, so drop them at the merge.
+  const canSeeProfessional = user.role === 'b2b' || user.role === 'admin'
   const validProducts = await prisma.product.findMany({
-    where: { id: { in: productIds }, isActive: true },
+    where: {
+      id: { in: productIds },
+      isActive: true,
+      ...(canSeeProfessional ? {} : { isProfessional: false }),
+    },
     select: { id: true },
   })
 

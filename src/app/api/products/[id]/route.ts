@@ -245,17 +245,23 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
     ? body.categoryId
     : body.category !== undefined ? await resolveCategoryId(body.category, body.subCategory) : undefined
 
-  // Snapshot the previous brandId / categoryId so we can sweep them for
-  // orphan-status after the update if the admin moved this product to a
-  // different brand / category.
-  const previous = (brandId !== undefined || categoryId !== undefined)
-    ? await prisma.product.findUnique({
-        where: { id },
-        select: { brandId: true, categoryId: true },
-      })
-    : null
+  // Snapshot the previous state: brandId/categoryId for orphan sweeping, and
+  // isProfessional for the price-mirror invariant below.
+  const previous = await prisma.product.findUnique({
+    where: { id },
+    select: { brandId: true, categoryId: true, isProfessional: true },
+  })
   const previousBrandId = previous?.brandId ?? null
   const previousCategoryId = previous?.categoryId ?? null
+
+  // Server-owned invariant: a professional product's priceB2c mirrors priceB2b
+  // (the NOT NULL column the storefront masks). Updating only priceB2b on a
+  // professional product must refresh the mirror, or the stale value leaks as
+  // the "B2C price" of a product that has none.
+  const effectiveProfessional = body.isProfessional ?? previous?.isProfessional ?? false
+  const priceB2cUpdate = body.priceB2c ?? (
+    effectiveProfessional && typeof body.priceB2b === 'number' ? body.priceB2b : undefined
+  )
 
   const product = await prisma.product.update({
     where: { id },
@@ -275,7 +281,7 @@ export const PUT = withErrorHandler(async (req: Request, context: unknown) => {
       hairTypes: body.hairTypes,
       tags: body.tags,
       gender: body.gender,
-      priceB2c: body.priceB2c,
+      priceB2c: priceB2cUpdate,
       priceB2b: body.priceB2b,
       oldPrice: body.oldPrice,
       costPrice: body.costPrice,

@@ -332,7 +332,8 @@
     "outOfStock": "Nema na stanju",
     "outOfStockNotice": "Ovaj proizvod trenutno nije dostupan",
     "outOfStockWarning": "Neki proizvodi u korpi nisu na stanju i neće biti uračunati u ukupan iznos. Uklonite ih ili sačekajte da postanu dostupni.",
-    "unavailable": "Nedostupno"
+    "unavailable": "Nedostupno",
+    "selectAtCheckout": "Bira se na plaćanju"
   },
   "checkout": {
     "step1": "Podaci",

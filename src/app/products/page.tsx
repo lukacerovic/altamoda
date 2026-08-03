@@ -244,13 +244,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // Color siblings + variant counts for the grouped representatives, so the card
   // shows the "N colors" badge and swatch row (same shape as /api/products).
   const groupSlugsPresent = [...new Set(rawProducts.map((p) => p.groupSlug).filter(Boolean))] as string[];
+  // Siblings inherit baseWhere (public retail view): professional variants are
+  // excluded so their mirrored B2B prices never end up in the cached HTML.
   const [variantCounts, siblingRows] = await Promise.all([
     groupSlugsPresent.length
-      ? prisma.product.groupBy({ by: ["groupSlug"], where: { groupSlug: { in: groupSlugsPresent }, isActive: true }, _count: true })
+      ? prisma.product.groupBy({ by: ["groupSlug"], where: { groupSlug: { in: groupSlugsPresent }, ...baseWhere }, _count: true })
       : Promise.resolve([] as Array<{ groupSlug: string | null; _count: number }>),
     groupSlugsPresent.length
       ? prisma.product.findMany({
-          where: { groupSlug: { in: groupSlugsPresent }, isActive: true },
+          where: { groupSlug: { in: groupSlugsPresent }, ...baseWhere },
           select: {
             id: true, slug: true, nameLat: true, sku: true, priceB2c: true,
             colorCode: true, colorName: true, groupSlug: true, stockQuantity: true,

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse } from '@/lib/api-utils'
+import { publicLookupRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 
 const resolveSchema = z.object({
@@ -10,6 +11,9 @@ const resolveSchema = z.object({
 // stored wishlist (product IDs) into displayable items. Guests always get
 // B2C prices; B2B prices are never exposed here.
 export const POST = withErrorHandler(async (req: Request) => {
+  const rateLimitResponse = await applyRateLimit(publicLookupRateLimiter, `wishlist-resolve:${getClientIp(req)}`)
+  if (rateLimitResponse) return rateLimitResponse as never
+
   const body = await req.json()
   const { productIds } = resolveSchema.parse(body)
 
@@ -42,8 +46,10 @@ export const POST = withErrorHandler(async (req: Request) => {
       productId: p.id,
       name: p.nameLat,
       brand: p.brand?.name ?? '',
-      price: Number(p.priceB2c),
-      oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+      // Professional products mirror priceB2b into priceB2c — this endpoint is
+      // public, so their prices must never be exposed here.
+      price: p.isProfessional ? null : Number(p.priceB2c),
+      oldPrice: p.isProfessional ? null : p.oldPrice ? Number(p.oldPrice) : null,
       image: p.images[0]?.url ?? '',
       rating: Math.round((ratingMap.get(p.id) ?? 0) * 10) / 10,
       inStock: p.stockQuantity > 0,

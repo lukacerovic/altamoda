@@ -26,7 +26,7 @@ function setCartOwner(userId: string | null) {
 
 export default function CartProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
-  const { items, setItems, clearCart, setLoading, setHydrated } = useCartStore()
+  const { setItems, clearCart, setLoading, setHydrated } = useCartStore()
   const setWishlistCount = useWishlistStore((s) => s.setCount)
   const hasMergedRef = useRef(false)
 

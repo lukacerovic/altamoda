@@ -344,7 +344,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       ? prisma.product.findMany({
           where: { groupSlug: { in: groupSlugs }, isActive: true },
           select: {
-            id: true, slug: true, nameLat: true, sku: true, priceB2c: true,
+            id: true, slug: true, nameLat: true, sku: true, priceB2c: true, isProfessional: true,
             colorCode: true, colorName: true, groupSlug: true, stockQuantity: true,
             brand: { select: { name: true } },
             images: { where: { isPrimary: true }, take: 1 },
@@ -352,7 +352,7 @@ export const GET = withErrorHandler(async (req: Request) => {
           },
         })
       : Promise.resolve([] as Array<{
-          id: string; slug: string; nameLat: string; sku: string; priceB2c: unknown;
+          id: string; slug: string; nameLat: string; sku: string; priceB2c: unknown; isProfessional: boolean;
           colorCode: string | null; colorName: string | null; groupSlug: string | null; stockQuantity: number;
           brand: { name: string } | null;
           images: { url: string }[];
@@ -362,7 +362,7 @@ export const GET = withErrorHandler(async (req: Request) => {
 
   const siblingsByGroup = new Map<string, Array<{
     id: string; slug: string; name: string; sku: string; brand: string;
-    price: number; image: string | null;
+    price: number | null; image: string | null;
     colorCode: string | null; colorName: string | null; hex: string | null;
     stockQuantity: number;
   }>>()
@@ -375,7 +375,9 @@ export const GET = withErrorHandler(async (req: Request) => {
       name: s.nameLat,
       sku: s.sku,
       brand: s.brand?.name || '',
-      price: Number(s.priceB2c),
+      // Professional siblings mirror priceB2b into priceB2c — mask for
+      // everyone who isn't allowed to see B2B pricing.
+      price: role === 'b2b' || role === 'admin' || !s.isProfessional ? Number(s.priceB2c) : null,
       image: s.images[0]?.url || null,
       colorCode: s.colorCode,
       colorName: s.colorName,

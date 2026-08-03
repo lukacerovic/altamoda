@@ -418,7 +418,7 @@ export async function importAmsProducts(prisma: PrismaClient, buffer: ArrayBuffe
   const archiveIds = toRemove.filter((id) => withOrders.has(id))
 
   const uniqueSlug = (base: string) => {
-    let s = slugify(base) || 'proizvod'
+    const s = slugify(base) || 'proizvod'
     if (!slugSet.has(s)) { slugSet.add(s); return s }
     for (let n = 2; n < 100000; n++) { const c = `${s}-${n}`; if (!slugSet.has(c)) { slugSet.add(c); return c } }
     return `${s}-${Date.now().toString(36)}`

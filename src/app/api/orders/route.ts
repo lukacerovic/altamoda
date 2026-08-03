@@ -199,8 +199,10 @@ export const POST = withErrorHandler(async (req: Request) => {
   // Best-effort confirmation email — failure must not fail the request.
   const recipientEmail = user.email
   if (recipientEmail) {
+    const escapeHtml = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     const itemsHtml = order.items
-      .map((i) => `<li>${i.productName} × ${i.quantity} — ${Number(i.totalPrice).toLocaleString('sr-RS')} RSD</li>`)
+      .map((i) => `<li>${escapeHtml(i.productName)} × ${i.quantity} — ${Number(i.totalPrice).toLocaleString('sr-RS')} RSD</li>`)
       .join('')
     sendEmail({
       to: recipientEmail,

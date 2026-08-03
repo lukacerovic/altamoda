@@ -161,6 +161,13 @@ export const orderRateLimiter = createRateLimiter({
   maxRequests: 5,
 })
 
+// Public, unauthenticated endpoints (e.g. guest wishlist resolve) — generous
+// for real users, hostile to scraping loops.
+export const publicLookupRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 30,
+})
+
 export const checkStatusRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   maxRequests: 15,
