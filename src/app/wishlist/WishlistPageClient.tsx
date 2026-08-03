@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Heart,
@@ -20,7 +21,8 @@ interface WishlistItem {
   productId: string;
   name: string;
   brand: string;
-  price: number;
+  // null = price hidden from this viewer (professional product, non-B2B account)
+  price: number | null;
   oldPrice: number | null;
   image: string;
   rating: number;
@@ -30,11 +32,15 @@ interface WishlistItem {
 
 interface Props {
   items: WishlistItem[];
+  isGuest?: boolean;
 }
 
-export default function WishlistPageClient({ items: initialItems }: Props) {
+export default function WishlistPageClient({ items: initialItems, isGuest = false }: Props) {
   const { t } = useLanguage();
   const [items, setItems] = useState(initialItems);
+  // Guests resolve their locally-persisted product ids client-side; keep the
+  // empty state hidden until that resolve finishes so it doesn't flash.
+  const [guestLoading, setGuestLoading] = useState(isGuest);
   const { addItem } = useCartStore();
 
   const [removeError, setRemoveError] = useState("");
@@ -45,6 +51,31 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
   }, []);
 
+  // Guest wishlist: resolve the persisted product ids into displayable items
+  // via the public resolve endpoint (B2C prices, input order preserved,
+  // inactive/missing products dropped).
+  useEffect(() => {
+    if (!isGuest) return;
+    const ids = useWishlistStore.getState().guestItems;
+    if (ids.length === 0) {
+      setGuestLoading(false);
+      return;
+    }
+    fetch("/api/wishlist/resolve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productIds: ids }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.data?.items)) {
+          setItems(d.data.items);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setGuestLoading(false));
+  }, [isGuest]);
+
   const showToast = (message: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToastMessage(message);
@@ -53,12 +84,21 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
 
   const removeItem = async (productId: string) => {
     setRemoveError("");
+    // Guests: remove from the persisted guest store (toggleGuest also keeps
+    // the header badge count in sync) — no API call.
+    if (isGuest) {
+      useWishlistStore.getState().toggleGuest(productId);
+      setItems((prev) => prev.filter((item) => item.productId !== productId));
+      return;
+    }
     try {
       const res = await fetch(`/api/wishlist?productId=${productId}`, { method: "DELETE" });
       if (!res.ok) {
         throw new Error("Server error");
       }
-      setItems(items.filter((item) => item.productId !== productId));
+      setItems((prev) => prev.filter((item) => item.productId !== productId));
+      // Keep the header badge in sync with the server-side removal
+      useWishlistStore.getState().decrement();
     } catch (err) {
       console.error("Failed to remove wishlist item:", err);
       setRemoveError("Greška pri uklanjanju proizvoda. Pokušajte ponovo.");
@@ -66,6 +106,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   };
 
   const addToCart = (item: WishlistItem) => {
+    if (item.price == null) return; // price hidden → not purchasable by this viewer
     addItem({
       productId: item.productId,
       name: item.name,
@@ -80,13 +121,13 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   };
 
   const addAllToCart = () => {
-    const eligible = items.filter((i) => i.inStock);
+    const eligible = items.filter((i) => i.inStock && i.price != null);
     eligible.forEach((item) => {
       addItem({
         productId: item.productId,
         name: item.name,
         brand: item.brand,
-        price: item.price,
+        price: item.price!,
         quantity: 1,
         image: item.image,
         sku: "",
@@ -99,7 +140,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
   };
 
   const discountBadge = (item: WishlistItem) => {
-    if (!item.oldPrice || item.oldPrice <= item.price) return null;
+    if (item.price == null || !item.oldPrice || item.oldPrice <= item.price) return null;
     const pct = Math.round(((item.oldPrice - item.price) / item.oldPrice) * 100);
     return `-${pct}%`;
   };
@@ -180,7 +221,9 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         ))}
                       </div>
                       <div className="flex items-center gap-2 mb-3">
-                        {item.oldPrice && item.oldPrice > item.price ? (
+                        {item.price == null ? (
+                          <span className="text-xs text-[#1a1c1e]/60">{t("productDetail.b2bPriceHint")}</span>
+                        ) : item.oldPrice && item.oldPrice > item.price ? (
                           <>
                             <span className="text-base font-bold text-[#edb4bd]">{item.price.toLocaleString()} RSD</span>
                             <span className="text-xs text-[#1a1c1e] line-through">{item.oldPrice.toLocaleString()} RSD</span>
@@ -190,7 +233,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
                         )}
                       </div>
                       <button
-                        disabled={!item.inStock}
+                        disabled={!item.inStock || item.price == null}
                         onClick={() => addToCart(item)}
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
@@ -206,7 +249,7 @@ export default function WishlistPageClient({ items: initialItems }: Props) {
               })}
             </div>
           </>
-        ) : (
+        ) : guestLoading ? null : (
           /* Empty State */
           <div className="text-center py-20">
             <Heart className="w-16 h-16 text-[#dddbd9] mx-auto mb-4" />

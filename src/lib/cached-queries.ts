@@ -13,7 +13,9 @@ export const getProductBySlugOrId = cache(async (id: string) => {
       category: {
         select: { nameLat: true, slug: true, parent: { select: { nameLat: true, slug: true } } },
       },
-      images: { orderBy: { sortOrder: 'asc' } },
+      // Admin-chosen primary image first, then manual order — the gallery
+      // opens on the default image.
+      images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
       colorProduct: true,
       productAttributes: { include: { attribute: true } },
       reviews: {

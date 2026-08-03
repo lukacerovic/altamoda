@@ -24,7 +24,7 @@ export default function ContactPage() {
         <section className="w-full h-[563px] relative overflow-hidden flex items-center justify-center">
           <div className="absolute inset-0 bg-[#dddbd9]">
             <img
-              alt="Luxury atelier interior"
+              alt={t("contact.heroImageAlt")}
               className="w-full h-full object-cover grayscale-[0.2] opacity-90"
               src="/kontakt-1.jpg"
             />

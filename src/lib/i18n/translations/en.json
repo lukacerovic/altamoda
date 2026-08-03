@@ -408,7 +408,13 @@
     "itemsCount": "items",
     "total": "Total",
     "securePayment": "Secure online payment",
-    "freeShippingOver": "Free shipping over 5,000 RSD"
+    "freeShippingOver": "Free shipping over 5,000 RSD",
+    "gateTitle": "How would you like to continue?",
+    "gateLogin": "Log in",
+    "gateRegister": "Register",
+    "gateGuest": "Continue as guest",
+    "gateHint": "You can fill in your details as a guest — signing in is required to place the order.",
+    "loginToOrder": "Log in to place the order"
   },
   "auth": {
     "home": "Home",
@@ -1015,7 +1021,8 @@
     "level": "Level",
     "shadeCodeHint": "Format depends on brand, e.g. 7.0, 8/1, 6-44",
     "linkToProduct": "Link to product",
-    "selectProduct": "Select product..."
+    "selectProduct": "Select product...",
+    "setMainImage": "Set as main image"
   },
   "colors": {
     "title": "Hair Color Palette",
@@ -1108,7 +1115,10 @@
     "yourB2bPrice": "Your B2B Price",
     "loginLink": "Log in",
     "photoOptional": "Photo (optional)",
-    "clickToAddPhoto": "Click to add a photo"
+    "clickToAddPhoto": "Click to add a photo",
+    "productCode": "Product code",
+    "notFoundTitle": "Product not found",
+    "notFoundDesc": "This product is not available."
   },
   "wishlist": {
     "home": "Home",
@@ -1317,6 +1327,7 @@
     "newsletterTitle": "The Heritage Journal",
     "newsletterDescription": "Receive seasonal insights from our atelier and updates on new heritage collections.",
     "emailPlaceholder": "Your email address",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "heroImageAlt": "Luxury atelier interior"
   }
 }

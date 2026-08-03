@@ -50,10 +50,17 @@ function getBadge(p: RecommendedProduct): string | null {
 
 function RecommendedCard({ product, isWishlisted }: { product: RecommendedProduct; isWishlisted: boolean }) {
   const { t } = useLanguage();
+  const { data: session } = useSession();
   const [liked, setLiked] = useState(isWishlisted);
+  // Re-sync when the parent's prop changes (wishlist IDs load async after mount).
+  const [prevWished, setPrevWished] = useState(isWishlisted);
+  if (prevWished !== isWishlisted) {
+    setPrevWished(isWishlisted);
+    setLiked(isWishlisted);
+  }
   const [addedToCart, setAddedToCart] = useState(false);
   const { addItem } = useCartStore();
-  const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
+  const { increment: incWishlist, decrement: decWishlist, toggleGuest } = useWishlistStore();
   const badge = getBadge(product);
   const imgSrc = product.image || PLACEHOLDER_IMG;
   const hasColors = (product.colorSiblings?.length ?? 0) > 1;
@@ -63,6 +70,11 @@ function RecommendedCard({ product, isWishlisted }: { product: RecommendedProduc
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // Guests toggle the persisted guest wishlist store (merged on login).
+    if (!session?.user) {
+      setLiked(toggleGuest(product.id));
+      return;
+    }
     const prev = liked;
     setLiked(!liked);
     try {
@@ -191,8 +203,14 @@ export default function CartPage() {
   // Refetch only when the *set* of cart products changes, not on quantity edits
   const cartProductIdsKey = items.map((i) => i.productId).sort().join("|");
 
+  // Logged-in users fetch wishlisted ids from the API; guests are seeded from
+  // the persisted guest store (kept in sync via the guestItems subscription).
+  const guestWishlistItems = useWishlistStore((s) => s.guestItems);
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      setWishlistedIds(guestWishlistItems);
+      return;
+    }
     fetch("/api/wishlist")
       .then((r) => r.json())
       .then((d) => {
@@ -201,7 +219,7 @@ export default function CartPage() {
         }
       })
       .catch(() => {});
-  }, [session?.user?.id]);
+  }, [session?.user?.id, guestWishlistItems]);
 
   useEffect(() => {
     const currentItems = useCartStore.getState().items;
@@ -308,7 +326,7 @@ export default function CartPage() {
                 const outOfStock = item.stockQuantity <= 0;
                 return (
                 <div key={item.productId} className={`bg-white rounded-sm shadow-sm p-4 md:p-6 flex gap-4 ${outOfStock ? "opacity-60" : ""}`}>
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0 relative bg-[#f5f4f2]">
+                  <Link href={`/products/${item.productId}`} className="block w-24 h-24 md:w-32 md:h-32 rounded overflow-hidden flex-shrink-0 relative bg-[#f5f4f2]">
                     {item.image ? (
                       <Image src={item.image} alt={item.name} width={80} height={80} className="w-full h-full object-cover" />
                     ) : (
@@ -321,12 +339,16 @@ export default function CartPage() {
                         <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-red-600 px-2 py-1 rounded-sm">{t("cart.outOfStock")}</span>
                       </div>
                     )}
-                  </div>
+                  </Link>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className="text-xs text-[#edb4bd] font-medium uppercase tracking-wider">{item.brand}</span>
-                        <h3 className="text-sm md:text-base font-medium text-[#1a1c1e] mt-1">{item.name}</h3>
+                        <h3 className="text-sm md:text-base font-medium text-[#1a1c1e] mt-1">
+                          <Link href={`/products/${item.productId}`} className="hover:underline underline-offset-2 decoration-[#1a1c1e]/40 transition-colors">
+                            {item.name}
+                          </Link>
+                        </h3>
                         {outOfStock && <p className="text-xs text-red-600 font-medium mt-1">{t("cart.outOfStockNotice")}</p>}
                       </div>
                       <button onClick={() => removeItem(item.productId)} className="text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex-shrink-0"><Trash2 className="w-4 h-4" /></button>

@@ -29,7 +29,7 @@ export const createProductSchema = z.object({
   hairTypes: z.string().optional(),
   tags: z.string().optional(),
   gender: z.string().optional(),
-  priceB2c: z.coerce.number().positive(),
+  priceB2c: z.coerce.number().positive().optional(),
   priceB2b: z.coerce.number().positive().optional(),
   oldPrice: z.coerce.number().positive().optional(),
   costPrice: z.coerce.number().positive().optional(),
@@ -42,6 +42,9 @@ export const createProductSchema = z.object({
   vatCode: z.string().optional(),
   erpId: z.string().optional(),
   images: z.array(productImageInput).optional(),
+}).refine((d) => d.priceB2c || d.priceB2b, {
+  message: 'Najmanje jedna cena (B2C ili B2B) je obavezna',
+  path: ['priceB2c'],
 })
 
 // String fields where the admin form sends `null` to clear the value.

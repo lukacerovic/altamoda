@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
+import { useCheckoutStore } from "@/lib/stores/checkout-store";
 
 // Names: letters (any script + diacritics), spaces, hyphen, apostrophe — no digits.
 const NAME_RE = /^[\p{L}\p{M}\s'’-]+$/u;
@@ -27,7 +28,9 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/account";
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [activeTab, setActiveTab] = useState<"login" | "register">(
+    searchParams.get("tab") === "register" ? "register" : "login"
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [registerType, setRegisterType] = useState<"b2c" | "b2b">("b2c");
   const [error, setError] = useState("");
@@ -52,6 +55,41 @@ function LoginContent() {
   const [regTerms, setRegTerms] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
+
+  // Pre-fill from the checkout guest draft (if any) so a guest who decides to
+  // log in or register mid-checkout doesn't retype their details. Only fills
+  // fields that are still empty — never overwrites what the user typed.
+  useEffect(() => {
+    const { guestInfo } = useCheckoutStore.getState();
+    if (!guestInfo) return;
+
+    const email = guestInfo.email.trim();
+    if (email) {
+      setLoginEmail((prev) => prev || email);
+      setRegEmail((prev) => prev || email);
+    }
+
+    const name = guestInfo.name.trim();
+    if (name) {
+      // Split on the FIRST space: "Ana Marija Kovač" → "Ana" / "Marija Kovač".
+      const spaceIdx = name.indexOf(" ");
+      const first = spaceIdx === -1 ? name : name.slice(0, spaceIdx);
+      const last = spaceIdx === -1 ? "" : name.slice(spaceIdx + 1).trim();
+      if (first) setRegName((prev) => prev || first);
+      if (last) setRegLastName((prev) => prev || last);
+    }
+
+    const rawPhone = guestInfo.phone.trim();
+    if (rawPhone) {
+      // Strip everything but digits, keeping a leading + (registration phone
+      // validation only allows an optional + followed by digits).
+      const digits = rawPhone.replace(/\D/g, "");
+      if (digits) {
+        const phone = (rawPhone.startsWith("+") ? "+" : "") + digits;
+        setRegPhone((prev) => prev || phone);
+      }
+    }
+  }, []);
 
   type FieldName =
     | "firstName" | "lastName" | "email" | "phone" | "password" | "passwordConfirm"

@@ -18,19 +18,20 @@ export default async function ConfirmationPage({
 
   if (orderNumber) {
     const user = await getCurrentUser()
-    if (user) {
-      const order = await prisma.order.findUnique({
-        where: { orderNumber },
-        select: { userId: true, paymentMethod: true, paymentStatus: true },
-      })
-      if (order && order.userId === user.id && VPOS_ENABLED && order.paymentMethod === 'card') {
-        state =
-          order.paymentStatus === 'paid'
-            ? 'success'
-            : order.paymentStatus === 'failed'
-              ? 'failed'
-              : 'pending'
-      }
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      select: { userId: true, paymentMethod: true, paymentStatus: true },
+    })
+    // Resolve payment state for the owning user, or for guest orders (userId null,
+    // reachable only via the unguessable order number).
+    const canView = order && (order.userId === null || (user && order.userId === user.id))
+    if (order && canView && VPOS_ENABLED && order.paymentMethod === 'card') {
+      state =
+        order.paymentStatus === 'paid'
+          ? 'success'
+          : order.paymentStatus === 'failed'
+            ? 'failed'
+            : 'pending'
     }
   }
 

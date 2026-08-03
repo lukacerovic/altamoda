@@ -40,10 +40,11 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
 
   if (!product) return errorResponse('Proizvod nije pronađen', 404)
 
-  // Professional products are only for B2B and admin — guests and B2C are blocked
-  // even via direct URL.
-  if (product.isProfessional && role !== 'b2b' && role !== 'admin') {
-    return errorResponse('Proizvod nije dostupan', 403)
+  // B2C accounts must never reach professional (B2B-only) products, even via
+  // direct URL — indistinguishable from a missing product. Guests may view them
+  // (prices are masked below); B2B/admin see everything.
+  if (product.isProfessional && role === 'b2c') {
+    return errorResponse('Proizvod nije pronađen', 404)
   }
 
   // Average rating
@@ -163,14 +164,18 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     }
   }
 
+  // Professional products mirror priceB2b into priceB2c — mask every price
+  // for viewers who aren't allowed to see B2B pricing (guests).
+  const hideMainPrice = product.isProfessional && !isB2bOrAdmin
+
   const formatted = {
     ...product,
-    priceB2c: Number(product.priceB2c),
+    priceB2c: hideMainPrice ? null : Number(product.priceB2c),
     priceB2b: isB2bOrAdmin && product.priceB2b ? Number(product.priceB2b) : null,
-    oldPrice,
+    oldPrice: hideMainPrice ? null : oldPrice,
     costPrice: role === 'admin' && product.costPrice ? Number(product.costPrice) : null,
-    price: basePrice,
-    promoBadge,
+    price: hideMainPrice ? null : basePrice,
+    promoBadge: hideMainPrice ? null : promoBadge,
     rating: avgRating._avg.rating || 0,
     reviewCount: product._count.reviews,
     colorSiblings: colorSiblings.map(s => ({
@@ -194,13 +199,14 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
         if (dp < relPrice) { relOldPrice = relPrice; relPrice = dp }
       }
 
+      const hideRelPrice = r.isProfessional && !isB2bOrAdmin
       return {
         id: r.id,
         name: r.nameLat,
         slug: r.slug,
         brand: r.brand,
-        price: relPrice,
-        oldPrice: relOldPrice,
+        price: hideRelPrice ? null : relPrice,
+        oldPrice: hideRelPrice ? null : relOldPrice,
         image: r.images[0]?.url || null,
         isProfessional: r.isProfessional,
       }

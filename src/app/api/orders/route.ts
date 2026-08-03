@@ -8,6 +8,7 @@ import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 import { VPOS_ENABLED } from '@/lib/payments/vpos-config'
+import { sendEmail } from '@/lib/email'
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -44,6 +45,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     itemCount: o.items.length,
     createdAt: o.createdAt,
     user: o.user,
+    guest: o.userId ? null : { name: o.guestName, email: o.guestEmail, phone: o.guestPhone },
     erpId: o.erpId,
     erpSynced: o.erpSynced,
   }))
@@ -59,12 +61,16 @@ export const POST = withErrorHandler(async (req: Request) => {
   const rateLimitResponse = await applyRateLimit(orderRateLimiter, `order:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse as never
 
+  // Placing an order requires an account: the viewer's role decides which
+  // products they may order and at which price, so guests are sent to login
+  // (the checkout draft brings them back to the same step afterwards).
   const user = await requireAuth()
   const body = await req.json()
   const input = createOrderSchema.parse(body)
 
+  const role = user.role
   const productIds = input.items.map((i) => i.productId)
-  const isB2b = user.role === 'b2b'
+  const isB2b = role === 'b2b'
 
   // All validation, stock checks, and order creation inside a single transaction
   // to prevent TOCTOU race conditions on stock
@@ -80,9 +86,9 @@ export const POST = withErrorHandler(async (req: Request) => {
 
     const productMap = new Map(products.map((p) => [p.id, p]))
 
-    // 2a. Defense-in-depth: reject any professional (B2B-only) items for non-B2B roles,
-    // in case the product ever reached the cart (stale session, admin role change, etc.).
-    if (user.role !== 'b2b' && user.role !== 'admin') {
+    // 2a. Defense-in-depth: reject any professional (B2B-only) items for non-B2B roles
+    // (including guests), in case the product ever reached the cart.
+    if (role !== 'b2b' && role !== 'admin') {
       const forbidden = products.find((p) => p.isProfessional)
       if (forbidden) {
         throw new ApiError(403, `Proizvod "${forbidden.nameLat}" je dostupan samo profesionalnim salonima`)
@@ -103,7 +109,7 @@ export const POST = withErrorHandler(async (req: Request) => {
     const orderItems = input.items.map((item) => {
       const product = productMap.get(item.productId)!
       const basePrice = isB2b && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
-      const applied = applyBestPromo(basePrice, null, promosByProduct.get(product.id) ?? [], user.role)
+      const applied = applyBestPromo(basePrice, null, promosByProduct.get(product.id) ?? [], role)
       const unitPrice = applied.price
       return {
         productId: product.id,
@@ -189,6 +195,23 @@ export const POST = withErrorHandler(async (req: Request) => {
     maxWait: 10_000,
     timeout: 20_000,
   })
+
+  // Best-effort confirmation email — failure must not fail the request.
+  const recipientEmail = user.email
+  if (recipientEmail) {
+    const itemsHtml = order.items
+      .map((i) => `<li>${i.productName} × ${i.quantity} — ${Number(i.totalPrice).toLocaleString('sr-RS')} RSD</li>`)
+      .join('')
+    sendEmail({
+      to: recipientEmail,
+      subject: `Potvrda porudžbine ${order.orderNumber}`,
+      html: `<p>Hvala na porudžbini!</p>
+<p>Broj porudžbine: <strong>${order.orderNumber}</strong></p>
+<ul>${itemsHtml}</ul>
+<p>Ukupno: <strong>${Number(order.total).toLocaleString('sr-RS')} RSD</strong></p>
+<p>Obavestićemo vas kada porudžbina bude poslata.</p>`,
+    }).catch((err) => console.error('Order confirmation email failed:', err))
+  }
 
   // Card orders go through the VPOS hosted payment page (when enabled). The client
   // redirects here instead of the confirmation page, and keeps the cart until paid.

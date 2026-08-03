@@ -122,6 +122,37 @@ function normalizeGender(v: string): string | null {
   return null
 }
 
+// Product codes ride inside names as a bracketed number: a true 8–14 digit EAN
+// ("Šampon XYZ (8606012345678)") or the product's own SKU/ident
+// ("Redken Color Gels Oils 60ml (1140)"). Neither belongs in the display name —
+// the PDP shows the code as "Šifra proizvoda" instead.
+const EAN_IN_NAME_RE = /\s*\(\s*(\d{8,14})\s*\)/
+
+/**
+ * Split a raw product name into a clean display name + the code found in it.
+ * Strips 8–14 digit EANs anywhere in the name, and (when `sku` is given) a
+ * bracketed code equal to the product's SKU. Short numeric brackets that don't
+ * match the SKU (e.g. sizes) are left alone.
+ */
+export function extractEanFromName(raw: string, sku?: string): { name: string; ean: string | null } {
+  let name = raw.trim()
+  let ean: string | null = null
+
+  const m = name.match(EAN_IN_NAME_RE)
+  if (m) {
+    ean = m[1]
+    name = name.replace(EAN_IN_NAME_RE, ' ').replace(/\s{2,}/g, ' ').trim()
+  }
+
+  if (sku) {
+    const skuRe = new RegExp(`\\s*\\(\\s*${sku.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\)`, 'g')
+    name = name.replace(skuRe, ' ').replace(/\s{2,}/g, ' ').trim()
+  }
+
+  // Never return an empty name — fall back to the original if it was only a code.
+  return { name: name || raw.trim(), ean }
+}
+
 export interface AmsRow {
   rowNum: number
   sku: string
@@ -169,8 +200,12 @@ export function extractAmsRows(buffer: ArrayBuffer): AmsRow[] {
     const idCell = ws[XLSX.utils.encode_cell({ r, c: idc })]
     const sku = idCell ? String(idCell.v).trim() : ''
     if (!sku) continue
-    const name = w(r, 'NAZIV')
-    if (!name) continue
+    const rawName = w(r, 'NAZIV')
+    if (!rawName) continue
+    // EAN codes must never live in the product name — strip "(8606...)" style
+    // codes and keep them as a barcode fallback (the PDP shows them as
+    // "Šifra proizvoda").
+    const { name, ean: eanFromName } = extractEanFromName(rawName, sku)
     if (seen.has(sku)) continue // first occurrence wins
     seen.add(sku)
 
@@ -184,7 +219,7 @@ export function extractAmsRows(buffer: ArrayBuffer): AmsRow[] {
       rowNum: r + 1,
       sku,
       name,
-      barcode: w(r, 'EAN CODE') || null,
+      barcode: w(r, 'EAN CODE') || eanFromName,
       gender: normalizeGender(w(r, 'GENDER')),
       brand: w(r, 'BREND'),
       category: (w(r, 'KATEGORIJA').split(',')[0] || '').trim(),

@@ -274,10 +274,11 @@ export async function processOrderQueueItem(
     shippingAddress: order.shippingAddress as ShippingAddress | null,
     billingAddress: order.billingAddress as ShippingAddress | null,
     notes: order.notes,
-    userName: order.user.name,
-    userEmail: order.user.email,
-    userPhone: order.user.phone,
-    b2b: order.user.b2bProfile
+    // Guest orders have no user — fall back to the guest contact fields.
+    userName: order.user?.name ?? order.guestName ?? '',
+    userEmail: order.user?.email ?? order.guestEmail ?? '',
+    userPhone: order.user?.phone ?? order.guestPhone,
+    b2b: order.user?.b2bProfile
       ? {
           salonName: order.user.b2bProfile.salonName,
           pib: order.user.b2bProfile.pib,

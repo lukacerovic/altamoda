@@ -37,6 +37,8 @@ const PLACEHOLDER_IMG = "https://placehold.co/80x80/faf7f3/ccc?text=No+img";
 /* ─── Mega Menu Data ─── */
 interface MegaMenuColumn {
   title: string;
+  /** Category-filter link the column header navigates to. */
+  href?: string;
   links: { name: string; href: string }[];
 }
 
@@ -58,6 +60,7 @@ function useMegaMenus() {
       columns: [
         {
           title: t("nav.hairCare"),
+          href: "/products?category=nega",
           links: [
             { name: t("nav.shampoos"), href: `/products?productType=${encodeURIComponent("Šampon")}` },
             { name: t("nav.masks"), href: "/products?productType=Maska" },
@@ -68,6 +71,7 @@ function useMegaMenus() {
         },
         {
           title: t("nav.styling"),
+          href: "/products?category=stajling",
           links: [
             { name: t("nav.styling"), href: "/products?category=stajling" },
             { name: t("nav.leaveIn"), href: "/products?productType=Leave-In" },
@@ -75,6 +79,7 @@ function useMegaMenus() {
         },
         {
           title: t("nav.appliances"),
+          href: "/products?category=pribor",
           links: [
             { name: t("nav.tools"), href: "/products?category=pribor" },
             { name: t("nav.brushes"), href: "/products?category=pribor-cetka" },
@@ -82,21 +87,20 @@ function useMegaMenus() {
           ],
         },
         {
+          // "Oksidanti i dekoloranti" are subcategories of Kolor, not a
+          // top-level group — they live under this column.
           title: t("nav.hairColors"),
+          href: "/products?category=kolor",
           links: [
             { name: t("nav.permanent"), href: `/products?productType=${encodeURIComponent("Permanentne boje")}` },
             { name: t("nav.demiPermanent"), href: `/products?productType=${encodeURIComponent("Demi-permanentne boje")}` },
-          ],
-        },
-        {
-          title: t("nav.oxidantsDecolorants"),
-          links: [
             { name: t("nav.oxidants"), href: "/products?category=kolor-oksidant" },
             { name: t("nav.decolorantPowders"), href: "/products?category=kolor-dekolorant" },
           ],
         },
         {
           title: t("nav.manCollection"),
+          href: "/products?search=Brews",
           links: [
             { name: "Redken Brews", href: "/products?search=Brews" },
           ],
@@ -321,8 +325,6 @@ export default function Header() {
             <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-10 h-14">
               {navLinks.map((l) => {
                 const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || l.menuKey === "brands");
-                const menuData = megaMenus[l.menuKey] || null;
-                const isBrandsMenu = l.menuKey === "brands";
                 return (
                   <div
                     key={l.menuKey || l.name}
@@ -339,17 +341,24 @@ export default function Header() {
                       {hasMega && <ChevronDown className="w-3 h-3" />}
                     </Link>
 
-                    {/* Brands Dropdown */}
-                    {isBrandsMenu && brands.length > 0 && (
-                      <div
-                        className={`mega-menu absolute top-full left-0 pt-2 ${
-                          activeMenu === "brands" ? "!opacity-100 !visible !translate-y-0" : ""
-                        }`}
-                        style={{ minWidth: "480px" }}
-                        onMouseEnter={() => handleMenuEnter("brands")}
-                        onMouseLeave={handleMenuLeave}
-                      >
-                        <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Dropdown panels are anchored to this full-width bar (not to the
+                individual nav item) and centered, so they always fit the
+                viewport instead of overflowing off the right edge. */}
+
+            {/* Brands Dropdown */}
+            {activeMenu === "brands" && brands.length > 0 && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 max-w-[calc(100vw-1rem)] animate-slideDown"
+                style={{ minWidth: "480px" }}
+                onMouseEnter={() => handleMenuEnter("brands")}
+                onMouseLeave={handleMenuLeave}
+              >
+                <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
                           <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
                           <div className="p-5">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-4">
@@ -381,75 +390,83 @@ export default function Header() {
                       </div>
                     )}
 
-                    {/* Mega Menu Dropdown (products etc.) */}
-                    {!isBrandsMenu && hasMega && menuData && (
-                      <div
-                        className={`mega-menu absolute top-full left-0 pt-2 ${
-                          activeMenu === l.menuKey ? "!opacity-100 !visible !translate-y-0" : ""
-                        }`}
-                        style={{ minWidth: menuData.columns.length > 1 ? "600px" : "400px" }}
-                        onMouseEnter={() => handleMenuEnter(l.menuKey)}
-                        onMouseLeave={handleMenuLeave}
-                      >
-                        <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
-                          <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
-                          <div className="p-6 flex gap-8">
-                            <div className="flex-1 flex gap-8">
-                              {menuData.columns.map((col) => (
-                                <div key={col.title} className="min-w-[140px]">
-                                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-3 min-h-[2.5rem] flex items-start">
-                                    {col.title}
-                                  </h4>
-                                  <ul className="space-y-2">
-                                    {col.links.map((link) => (
-                                      <li key={link.name}>
-                                        <Link
-                                          href={link.href}
-                                          onClick={() => setDesktopNavOpen(false)}
-                                          className="text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex items-center gap-1 group"
-                                        >
-                                          <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
-                                          {link.name}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              ))}
-                            </div>
-                            {menuData.featured && (
-                              <div className="w-[200px] flex-shrink-0">
-                                <Link href={menuData.featured.href} onClick={() => setDesktopNavOpen(false)} className="block group">
-                                  <div className="relative rounded-sm overflow-hidden aspect-[4/3]">
-                                    <Image
-                                      src={menuData.featured.image}
-                                      alt={menuData.featured.title}
-                                      width={200}
-                                      height={200}
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                                      <p className="text-white text-sm font-medium">
-                                        {menuData.featured.title}
-                                      </p>
-                                      <span className="text-[#dddbd9] text-xs font-medium flex items-center gap-1 mt-1">
-                                        {menuData.featured.cta}
-                                        <ChevronRight className="w-3 h-3" />
-                                      </span>
-                                    </div>
-                                  </div>
-                                </Link>
-                              </div>
+            {/* Mega Menu Dropdown (products etc.) */}
+            {(() => {
+              if (!activeMenu || activeMenu === "brands") return null;
+              const menuData = megaMenus[activeMenu];
+              if (!menuData) return null;
+              return (
+                <div
+                  className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 max-w-[calc(100vw-1rem)] animate-slideDown"
+                  onMouseEnter={() => handleMenuEnter(activeMenu)}
+                  onMouseLeave={handleMenuLeave}
+                >
+                  <div className="bg-white rounded-sm border border-[#dddbd9] overflow-hidden shadow-lg">
+                    <div className="h-0.5 bg-gradient-to-r from-[#1a1c1e] via-[#dddbd9] to-[#1a1c1e]" />
+                    <div className="p-6 flex gap-8">
+                      <div className="flex-1 flex gap-8">
+                        {menuData.columns.map((col) => (
+                          <div key={col.title} className="min-w-[140px]">
+                            {col.href ? (
+                              <Link
+                                href={col.href}
+                                onClick={() => setDesktopNavOpen(false)}
+                                className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] hover:text-[#1a1c1e] transition-colors mb-3 min-h-[2.5rem] flex items-start"
+                              >
+                                {col.title}
+                              </Link>
+                            ) : (
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-[#edb4bd] mb-3 min-h-[2.5rem] flex items-start">
+                                {col.title}
+                              </h4>
                             )}
+                            <ul className="space-y-2">
+                              {col.links.map((link) => (
+                                <li key={link.name}>
+                                  <Link
+                                    href={link.href}
+                                    onClick={() => setDesktopNavOpen(false)}
+                                    className="text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors flex items-center gap-1 group"
+                                  >
+                                    <span className="w-0 group-hover:w-2 h-px bg-black transition-all duration-200" />
+                                    {link.name}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    )}
+                      {menuData.featured && (
+                        <div className="w-[200px] flex-shrink-0">
+                          <Link href={menuData.featured.href} onClick={() => setDesktopNavOpen(false)} className="block group">
+                            <div className="relative rounded-sm overflow-hidden aspect-[4/3]">
+                              <Image
+                                src={menuData.featured.image}
+                                alt={menuData.featured.title}
+                                width={200}
+                                height={200}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                              <div className="absolute bottom-0 left-0 right-0 p-3">
+                                <p className="text-white text-sm font-medium">
+                                  {menuData.featured.title}
+                                </p>
+                                <span className="text-[#dddbd9] text-xs font-medium flex items-center gap-1 mt-1">
+                                  {menuData.featured.cta}
+                                  <ChevronRight className="w-3 h-3" />
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 

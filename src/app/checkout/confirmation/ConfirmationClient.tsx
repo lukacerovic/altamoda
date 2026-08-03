@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { CheckCircle, Package, ChevronRight, Clock, XCircle } from 'lucide-react'
 import { useCartStore } from '@/lib/stores/cart-store'
+import { useCheckoutStore } from '@/lib/stores/checkout-store'
 
 export type ConfirmationState = 'success' | 'pending' | 'failed'
 
@@ -15,13 +16,17 @@ interface Props {
 
 export default function ConfirmationClient({ orderNumber, state, payUrl }: Props) {
   const { clearCart } = useCartStore()
+  const { clearDraft } = useCheckoutStore()
 
   // Clear the cart only once the order is actually settled successfully. For
   // non-card orders this is a harmless no-op (the cart was already cleared at
   // placement). Pending/failed payments keep the cart so the customer can retry.
   useEffect(() => {
-    if (state === 'success') clearCart()
-  }, [state, clearCart])
+    if (state === 'success') {
+      clearCart()
+      clearDraft()
+    }
+  }, [state, clearCart, clearDraft])
 
   // While the URLMS notification is still in flight, refresh shortly to pick up
   // the settled status.

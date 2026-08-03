@@ -82,7 +82,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const limit = 20;
   const skip = (page - 1) * limit;
   // Storefront shows out-of-stock products too (they render a "Nema na stanju" button).
-  const baseWhere = { isActive: true };
+  // SSR is cached role-blind, so it pre-renders the public retail (B2C) view — the
+  // default tab. Professional products and B2B prices only ever come from the
+  // role-aware client refetch via /api/products.
+  const baseWhere = { isActive: true, isProfessional: false };
 
   // Collapse color-variant groups to one representative per group_slug, mirroring
   // /api/products so the SSR landing matches the client-fetched (filtered) view.
@@ -97,13 +100,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   if (groupSlugsAll.length > 0) {
     const [reps, allInGroups] = await Promise.all([
       prisma.product.findMany({
-        where: { groupSlug: { in: groupSlugsAll }, isActive: true },
+        where: { groupSlug: { in: groupSlugsAll }, ...baseWhere },
         select: { id: true },
         orderBy: [{ stockQuantity: 'desc' }, { nameLat: 'asc' }],
         distinct: ['groupSlug'],
       }),
       prisma.product.findMany({
-        where: { groupSlug: { in: groupSlugsAll }, isActive: true },
+        where: { groupSlug: { in: groupSlugsAll }, ...baseWhere },
         select: { id: true },
       }),
     ]);
@@ -294,7 +297,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     category: p.category ? { id: p.category.id, nameLat: p.category.nameLat, slug: p.category.slug } : null,
     price,
     priceB2c: Number(p.priceB2c),
-    priceB2b: p.priceB2b ? Number(p.priceB2b) : null,
+    // Never serialize B2B prices into the cached public HTML — B2B viewers get
+    // them from the role-aware client refetch.
+    priceB2b: null,
     oldPrice,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,

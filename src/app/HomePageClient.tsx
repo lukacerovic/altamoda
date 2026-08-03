@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import {
   Heart, Star, ArrowRight, Music2, ChevronLeft, ChevronRight,
@@ -9,11 +9,13 @@ import {
   Mail, X, Instagram, Youtube,
 } from "lucide-react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
 /* ─── Types ─── */
 export interface ColorSiblingData {
@@ -113,9 +115,17 @@ const socialImages = [
 ];
 
 /* ─── Editorial ProductCard — minimalist reference-aligned ─── */
-function ProductCard({ product, badge }: { product: ProductData; badge?: string }) {
+function ProductCard({ product, badge, isWishlisted }: { product: ProductData; badge?: string; isWishlisted?: boolean }) {
   const { t } = useLanguage();
-  const [liked, setLiked] = useState(false);
+  const { data: session } = useSession();
+  const { increment: incWishlist, decrement: decWishlist, toggleGuest } = useWishlistStore();
+  const [liked, setLiked] = useState(isWishlisted ?? false);
+  // Re-sync when the parent's prop changes (wishlist IDs load async after mount).
+  const [prevWished, setPrevWished] = useState(isWishlisted);
+  if (prevWished !== isWishlisted) {
+    setPrevWished(isWishlisted);
+    setLiked(isWishlisted ?? false);
+  }
   const [addedToCart, setAddedToCart] = useState(false);
   const { addItem } = useCartStore();
   const newLabel = t("home.new");
@@ -143,6 +153,37 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
     setTimeout(() => setAddedToCart(false), 1500);
   };
 
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Guests toggle the persisted guest wishlist store (merged on login).
+    if (!session?.user) {
+      setLiked(toggleGuest(product.id));
+      return;
+    }
+    const prev = liked;
+    setLiked(!liked);
+    try {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+      if (!res.ok) {
+        setLiked(prev);
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        setLiked(data.data.added);
+        if (data.data.added) incWishlist();
+        else decWishlist();
+      }
+    } catch {
+      setLiked(prev);
+    }
+  };
+
   return (
     <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">
       <div
@@ -161,7 +202,8 @@ function ProductCard({ product, badge }: { product: ProductData; badge?: string 
           </span>
         )}
         <button
-          onClick={(e) => { e.preventDefault(); setLiked(!liked); }}
+          onClick={handleToggleWishlist}
+          aria-label="Wishlist"
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#FFFFFF]/70 backdrop-blur-sm flex items-center justify-center hover:bg-[#FFFFFF] transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
         >
           <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#1a1c1e] text-[#1a1c1e]" : "text-[#1a1c1e]"}`} />
@@ -261,10 +303,12 @@ function ProductCarousel({
   products,
   badge,
   desktopPerView = 4,
+  wishlistedIds,
 }: {
   products: ProductData[];
   badge?: string | ((i: number) => string | undefined);
   desktopPerView?: 3 | 4;
+  wishlistedIds?: Set<string>;
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState<number>(desktopPerView);
@@ -318,7 +362,7 @@ function ProductCarousel({
     return (
       <div className={`grid ${desktopPerView === 3 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-2 md:grid-cols-4"} gap-5 md:gap-8`}>
         {products.map((p, i) => (
-          <ProductCard key={p.id} product={p} badge={resolveBadge(i)} />
+          <ProductCard key={p.id} product={p} badge={resolveBadge(i)} isWishlisted={wishlistedIds?.has(p.id)} />
         ))}
       </div>
     );
@@ -345,7 +389,7 @@ function ProductCarousel({
               className="flex-shrink-0 px-2 md:px-3"
               style={{ width: `${slidePercent}%` }}
             >
-              <ProductCard product={p} badge={resolveBadge(i)} />
+              <ProductCard product={p} badge={resolveBadge(i)} isWishlisted={wishlistedIds?.has(p.id)} />
             </div>
           ))}
         </div>
@@ -520,9 +564,52 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
   // defaults so the bento grid is never broken if a slot is left empty.
   const gridImages = Array.from({ length: 8 }, (_, i) => instagramImages?.[i] || socialImages[i]);
   const instagramUrl = socialLinks?.instagram || "https://www.instagram.com/altamoda_srbija";
+  // The section heading shows the admin-configured Instagram account name.
+  // The setting may hold a full profile URL, a bare "name", or "@name" —
+  // extract just the handle for display.
+  const instagramHandle = (() => {
+    const raw = instagramUrl.trim().replace(/^@/, "");
+    try {
+      const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+      if (url.hostname.includes("instagram")) {
+        const segment = url.pathname.split("/").filter(Boolean)[0];
+        if (segment) return segment;
+      } else if (!raw.includes("/")) {
+        return raw; // admin typed a bare handle
+      }
+    } catch {
+      if (!raw.includes("/")) return raw;
+    }
+    return "altamoda_srbija";
+  })();
   const tiktokUrl = socialLinks?.tiktok || "https://www.tiktok.com/@idhairacademy?lang=de-DE";
   const youtubeUrl = "https://www.youtube.com/@altamodabg";
   const { t } = useLanguage();
+  const { data: session } = useSession();
+
+  // Wishlisted product ids for the hearts on the product cards — one fetch at
+  // page level for logged-in users; guests are seeded from the persisted guest
+  // store (kept in sync via the guestItems subscription).
+  const guestWishlistItems = useWishlistStore((s) => s.guestItems);
+  const [userWishlistIds, setUserWishlistIds] = useState<string[]>([]);
+  // Guests read straight from the store subscription (zustand v5 is
+  // hydration-safe via useSyncExternalStore); logged-in users use the ids
+  // fetched below.
+  const wishlistedIds = useMemo(
+    () => new Set(session?.user?.id ? userWishlistIds : guestWishlistItems),
+    [session?.user?.id, userWishlistIds, guestWishlistItems]
+  );
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    fetch("/api/wishlist")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.items)) {
+          setUserWishlistIds(data.data.items.map((w: { productId: string }) => w.productId));
+        }
+      })
+      .catch(() => {});
+  }, [session?.user?.id]);
 
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -778,7 +865,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
               </div>
             )}
 
-            <ProductCarousel products={activeTabData.products} badge={activeTabData.badge} />
+            <ProductCarousel products={activeTabData.products} badge={activeTabData.badge} wishlistedIds={wishlistedIds} />
           </div>
         </section>
       )}
@@ -998,7 +1085,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
                 className="text-4xl md:text-5xl lg:text-6xl font-light text-[#1a1c1e] leading-[1.05]"
                 style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "-0.015em" }}
               >
-                <em className="italic">@altamoda_srbija</em> {t("home.hpSocialTitleSuffix")}
+                <em className="italic">@{instagramHandle}</em> {t("home.hpSocialTitleSuffix")}
               </h2>
               <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-md">
                 {t("home.hpSocialText")}

@@ -80,6 +80,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const serialized = {
     id: product.id,
     sku: product.sku,
+    // Fallback for the "product code" attribute row when sku is empty
+    barcode: product.barcode,
     nameLat: product.nameLat,
     slug: product.slug,
     brand: product.brand,
@@ -98,10 +100,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
     warnings: product.warnings,
     shelfLife: product.shelfLife,
     importerInfo: product.importerInfo,
-    priceB2c: Number(product.priceB2c),
-    priceB2b: product.priceB2b ? Number(product.priceB2b) : null,
-    oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
-    price: Number(product.priceB2c),
+    // This page is cached role-blind, so the payload is the public (guest) view:
+    // B2B prices are never serialized, and professional products (whose priceB2c
+    // mirrors the B2B price) get no price at all. B2B viewers fetch real prices
+    // client-side via /api/products/[id].
+    priceB2c: product.isProfessional ? null : Number(product.priceB2c),
+    priceB2b: null,
+    oldPrice: product.isProfessional ? null : product.oldPrice ? Number(product.oldPrice) : null,
+    price: product.isProfessional ? null : Number(product.priceB2c),
     stockQuantity: product.stockQuantity,
     isProfessional: product.isProfessional,
     isNew: product.isNew,
@@ -137,8 +143,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
     name: r.nameLat,
     slug: r.slug,
     brand: r.brand,
-    price: Number(r.priceB2c),
-    oldPrice: r.oldPrice ? Number(r.oldPrice) : null,
+    price: r.isProfessional ? null : Number(r.priceB2c),
+    oldPrice: r.isProfessional ? null : r.oldPrice ? Number(r.oldPrice) : null,
     image: r.images[0]?.url || null,
     isProfessional: r.isProfessional,
     sku: r.sku,

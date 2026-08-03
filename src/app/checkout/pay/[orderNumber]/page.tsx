@@ -21,9 +21,6 @@ export default async function PayPage({
   const { orderNumber } = await params
 
   const user = await getCurrentUser()
-  if (!user) {
-    redirect(`/account/login?callbackUrl=/checkout/pay/${orderNumber}`)
-  }
 
   // Online card payment off → the order is already placed; show confirmation.
   if (!VPOS_ENABLED) {
@@ -35,8 +32,14 @@ export default async function PayPage({
     include: { user: { select: { email: true } } },
   })
 
-  // Don't leak existence of other users' orders.
-  if (!order || order.userId !== user.id) notFound()
+  if (!order) notFound()
+
+  // Guest orders (userId null) are reachable by their unguessable order number.
+  // Account orders stay owner-only: don't leak existence of other users' orders.
+  if (order.userId) {
+    if (!user) redirect(`/account/login?callbackUrl=/checkout/pay/${orderNumber}`)
+    if (order.userId !== user.id) notFound()
+  }
 
   // Nothing to pay for non-card orders or already-settled ones.
   if (order.paymentMethod !== 'card' || order.paymentStatus === 'paid') {
@@ -53,7 +56,7 @@ export default async function PayPage({
         urlDone: `${baseUrl()}/checkout/confirmation?orderNumber=${order.orderNumber}`,
         urlBack: `${baseUrl()}/checkout/cancelled?orderNumber=${order.orderNumber}`,
       },
-      email: order.user.email ?? undefined,
+      email: order.user?.email ?? order.guestEmail ?? undefined,
       shopEmail: process.env.ADMIN_EMAIL,
     },
     config

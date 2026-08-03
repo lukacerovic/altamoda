@@ -116,10 +116,12 @@ async function handle(req: Request): Promise<Response> {
   })
 
   // 6. Best-effort confirmation email on success — never fail the webhook on email.
-  if (isSuccess && order.user.email) {
+  // Guest orders have no user; fall back to the guest contact email.
+  const notifyEmail = order.user?.email ?? order.guestEmail
+  if (isSuccess && notifyEmail) {
     try {
       await sendEmail({
-        to: order.user.email,
+        to: notifyEmail,
         subject: `Potvrda plaćanja — porudžbina ${order.orderNumber}`,
         html: `<p>Poštovani,</p><p>Vaše plaćanje za porudžbinu <strong>${order.orderNumber}</strong> je uspešno primljeno.</p><p>Hvala na kupovini!</p>`,
       })

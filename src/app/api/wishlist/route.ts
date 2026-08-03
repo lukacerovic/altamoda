@@ -40,9 +40,13 @@ export const GET = withErrorHandler(async () => {
     productId: w.productId,
     name: w.product.nameLat,
     brand: w.product.brand?.name ?? '',
-    price: Number(user.role === 'b2b' && w.product.priceB2b
-      ? w.product.priceB2b
-      : w.product.priceB2c),
+    // Professional products mirror priceB2b into priceB2c — never expose that
+    // to non-B2B viewers (stale wishlist rows can predate a role change).
+    price: user.role === 'b2b' || user.role === 'admin'
+      ? Number(w.product.priceB2b ?? w.product.priceB2c)
+      : w.product.isProfessional
+        ? null
+        : Number(w.product.priceB2c),
     oldPrice: w.product.oldPrice ? Number(w.product.oldPrice) : null,
     image: w.product.images[0]?.url ?? '',
     rating: Math.round((ratingMap.get(w.productId) ?? 0) * 10) / 10,

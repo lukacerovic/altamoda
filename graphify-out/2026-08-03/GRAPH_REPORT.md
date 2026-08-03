@@ -1,16 +1,16 @@
-# Graph Report - altamoda  (2026-08-03)
+# Graph Report - altamoda  (2026-07-10)
 
 ## Corpus Check
-- 334 files · ~801,540 words
+- 327 files · ~794,042 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2561 nodes · 3527 edges · 381 communities (142 shown, 239 thin omitted)
+- 2521 nodes · 3455 edges · 388 communities (149 shown, 239 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 18 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a9fdb498`
+- Built from commit: `f9427c6c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -83,6 +83,7 @@
 - [[_COMMUNITY_PHASE 2 — DONE WHEN|PHASE 2 — DONE WHEN:]]
 - [[_COMMUNITY_link-products-to-photos-2026|link-products-to-photos-2026]]
 - [[_COMMUNITY_page|page]]
+- [[_COMMUNITY_upload|upload]]
 - [[_COMMUNITY_A.10 — Rotating credentials (security in|A.10 — Rotating credentials (security in]]
 - [[_COMMUNITY_PHASE 3 Cart, Wishlist, Orders & Quick|PHASE 3: Cart, Wishlist, Orders & Quick ]]
 - [[_COMMUNITY_PHASE 5 Admin CRM Backend|PHASE 5: Admin CRM Backend]]
@@ -96,6 +97,7 @@
 - [[_COMMUNITY_OAUTH_GOOGLE_LOGIN|OAUTH_GOOGLE_LOGIN]]
 - [[_COMMUNITY_7. Step-by-Step Implementation Plan|7. Step-by-Step Implementation Plan]]
 - [[_COMMUNITY_populate-altamoda-local-final|populate-altamoda-local-final]]
+- [[_COMMUNITY_repopulate-from-excel|repopulate-from-excel]]
 - [[_COMMUNITY_retry-failed-uploads-2026|retry-failed-uploads-2026]]
 - [[_COMMUNITY_sync-from-production.js|sync-from-production.js]]
 - [[_COMMUNITY_layout|layout]]
@@ -124,6 +126,7 @@
 - [[_COMMUNITY_1. Add ERP subject ID to B2bProfile|1. Add ERP subject ID to B2bProfile]]
 - [[_COMMUNITY_Implementation Plan|Implementation Plan]]
 - [[_COMMUNITY_page|page]]
+- [[_COMMUNITY_2. D Express Shipping Integration|2. D Express Shipping Integration]]
 - [[_COMMUNITY_5. Implementation Steps (Execution Order|5. Implementation Steps (Execution Order]]
 - [[_COMMUNITY_Implementation Phases|Implementation Phases]]
 - [[_COMMUNITY_PHASE 7 — DONE WHEN|PHASE 7 — DONE WHEN:]]
@@ -134,6 +137,7 @@
 - [[_COMMUNITY_InstagramGridManager|InstagramGridManager]]
 - [[_COMMUNITY_Action Items (Require Client Input)|Action Items (Require Client Input)]]
 - [[_COMMUNITY_A.1.1 — App information|A.1.1 — App information]]
+- [[_COMMUNITY_1. Payment Service Provider (PSP) — Reco|1. Payment Service Provider (PSP) — Reco]]
 - [[_COMMUNITY_3. Email Notifications (Resend + React E|3. Email Notifications (Resend + React E]]
 - [[_COMMUNITY_seed-site-settings|seed-site-settings]]
 - [[_COMMUNITY_Architecture How the Integration Will W|Architecture: How the Integration Will W]]
@@ -161,6 +165,7 @@
 - [[_COMMUNITY_page|page]]
 - [[_COMMUNITY_page|page]]
 - [[_COMMUNITY_b2b-approval.test|b2b-approval.test]]
+- [[_COMMUNITY_brands-admin.test|brands-admin.test]]
 - [[_COMMUNITY_loading|loading]]
 - [[_COMMUNITY_loading|loading]]
 - [[_COMMUNITY_page|page]]
@@ -375,32 +380,35 @@
 - [[_COMMUNITY_Phase 2 Product Catalog|Phase 2: Product Catalog]]
 - [[_COMMUNITY_Phase 3 Cart, Wishlist, Orders|Phase 3: Cart, Wishlist, Orders]]
 - [[_COMMUNITY_Project Phase Progress Tracker|Project Phase Progress Tracker]]
+- [[_COMMUNITY_auth.ts|auth.ts]]
+- [[_COMMUNITY_phase3-api.test.ts|phase3-api.test.ts]]
 - [[_COMMUNITY_restore-grouped-names.mjs|restore-grouped-names.mjs]]
+- [[_COMMUNITY_route.ts|route.ts]]
 - [[_COMMUNITY_page.tsx|page.tsx]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `useLanguage()` - 71 edges
-2. `successResponse()` - 58 edges
-3. `withErrorHandler()` - 58 edges
+2. `successResponse()` - 56 edges
+3. `withErrorHandler()` - 56 edges
 4. `requireAdmin()` - 44 edges
 5. `ApiError` - 26 edges
 6. `errorResponse()` - 24 edges
 7. `useCartStore` - 21 edges
 8. `Alta Moda — Architecture & Project Guide` - 20 edges
-9. `useWishlistStore` - 19 edges
-10. `Feature Collection — Fixes & Improvements` - 18 edges
+9. `slugify()` - 17 edges
+10. `The 16 Requirements — Mapped to Implementation` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `main()` --calls--> `uniqueSlug()`  [INFERRED]
   scripts/apply-final-finala-delta.mjs → prisma/seed-from-old-db.ts
 - `main()` --calls--> `uniqueSlug()`  [INFERRED]
   scripts/populate-product-lines.mjs → prisma/seed-from-old-db.ts
+- `main()` --calls--> `uniqueSlug()`  [INFERRED]
+  scripts/repopulate-from-excel.mjs → prisma/seed-from-old-db.ts
 - `readRows()` --calls--> `col()`  [INFERRED]
   scripts/apply-final-finala-delta.mjs → src/app/api/products/import/route.ts
 - `main()` --indirect_call--> `normalizeProduct()`  [INFERRED]
   scripts/backfill-pantheon-erp-id.ts → src/lib/pantheon/client.ts
-- `readExcel()` --calls--> `col()`  [INFERRED]
-  scripts/sync-excel-and-relink-images-2026.mjs → src/app/api/products/import/route.ts
 
 ## Import Cycles
 - None detected.
@@ -410,7 +418,7 @@
 - **Incremental Update Flow** — claude_skills_graphify_references_update_incremental_update, claude_skills_graphify_references_update_build_merge, claude_skills_graphify_references_update_prune_deleted, claude_skills_graphify_references_update_code_only_fast_path, claude_skills_graphify_skill_manifest [EXTRACTED 1.00]
 - **Graph Query Interface** — claude_skills_graphify_references_query_query_expansion, claude_skills_graphify_references_query_bfs_dfs_traversal, claude_skills_graphify_references_query_shortest_path, claude_skills_graphify_references_query_explain, claude_skills_graphify_references_query_save_result [EXTRACTED 1.00]
 
-## Communities (381 total, 239 thin omitted)
+## Communities (388 total, 239 thin omitted)
 
 ### Community 0 - "Product Data Models"
 Cohesion: 0.02
@@ -426,15 +434,15 @@ Nodes (39): AddToCartInput, addToCartSchema, UpdateCartItemInput, updateCartItem
 
 ### Community 3 - "Admin CRUD API Routes"
 Cohesion: 0.08
-Nodes (32): CartPage(), getBadge(), RecommendedCard(), RecommendedProduct, brandLogos, HeroCard, HeroCarousel(), HomePageClient() (+24 more)
+Nodes (30): CartPage(), getBadge(), RecommendedCard(), RecommendedProduct, ConfirmationClient(), ConfirmationState, Props, ConfirmationPage() (+22 more)
 
 ### Community 4 - "Newsletter Admin UI"
 Cohesion: 0.06
-Nodes (49): PUT, DELETE, PUT, GET, POST, GET, POST, retrySchema (+41 more)
+Nodes (41): PUT, DELETE, PUT, GET, POST, GET, POST, retrySchema (+33 more)
 
 ### Community 5 - "VPOS Payment Scripts"
-Cohesion: 0.09
-Nodes (38): esc(), main(), main(), main(), extractParams(), GET(), handle(), POST() (+30 more)
+Cohesion: 0.13
+Nodes (29): esc(), main(), main(), extractParams(), GET(), handle(), POST(), text() (+21 more)
 
 ### Community 6 - "DB Migration Analysis"
 Cohesion: 0.04
@@ -442,23 +450,23 @@ Nodes (46): 10. Data Integrity & Skipping Logic, 11. Data Loss Summary, 12. Summ
 
 ### Community 7 - "Sync Trigger API"
 Cohesion: 0.07
-Nodes (30): DELETE, PUT, mergeSchema, POST, GET, GET, POST, GET (+22 more)
+Nodes (32): DELETE, PUT, mergeSchema, POST, DELETE, GET, PUT, CANCELLABLE_STATES (+24 more)
 
 ### Community 8 - "Excel/DB Cleanup Scripts"
-Cohesion: 0.13
-Nodes (21): ExcelRow, main(), readRows(), UpdateAction, DELETE, GET, PUT, GET (+13 more)
+Cohesion: 0.19
+Nodes (14): main(), main(), ExcelRow, main(), readRows(), UpdateAction, cleanupOrphanBrand(), cleanupOrphanCategory() (+6 more)
 
 ### Community 9 - "Project TODO Tracker"
 Cohesion: 0.05
 Nodes (43): Additional work done (beyond original plan):, Alta Moda — TODO / Progress Tracker, Notes, PHASE 1: Foundation ✅ COMPLETE, PHASE 2 — DONE:, PHASE 2: Product Catalog ✅ COMPLETE, PHASE 3: Cart, Wishlist, Orders & Quick Order ✅ COMPLETE, PHASE 3 — DONE: (+35 more)
 
 ### Community 11 - "Legacy DB Seeding"
-Cohesion: 0.10
-Nodes (49): adapter, attributeIdMap, boolVal(), brandIdMap, categoryIdMap, categoryParentCache, decodeHtml(), featureOptionMeta (+41 more)
+Cohesion: 0.13
+Nodes (41): adapter, attributeIdMap, boolVal(), brandIdMap, categoryIdMap, categoryParentCache, decodeHtml(), featureOptionMeta (+33 more)
 
 ### Community 12 - "Account Dashboard"
-Cohesion: 0.06
-Nodes (43): AccountPage(), B2bBalanceSection(), B2bLoyaltySection(), b2bNavKeys, B2bPricesSection(), b2cNavKeys, OrdersSection(), statusColorMap (+35 more)
+Cohesion: 0.08
+Nodes (25): AccountPage(), B2bBalanceSection(), B2bLoyaltySection(), b2bNavKeys, B2bPricesSection(), b2cNavKeys, OrdersSection(), statusColorMap (+17 more)
 
 ### Community 13 - "Architecture Guide"
 Cohesion: 0.06
@@ -473,8 +481,8 @@ Cohesion: 0.09
 Nodes (22): 10. orders -> orders, 11. order_items -> order_items, 12. newsletter_subscribers -> newsletter_subscribers, 13. wishes -> wishlists, 1. brands -> brands, 2. categories -> categories, 3. features -> dynamic_attributes, 4. feature_options -> dynamic_attribute_options (+14 more)
 
 ### Community 16 - "Auth & Rate Limiting"
-Cohesion: 0.09
-Nodes (21): 10. EAN code out of product name → "Šifra proizvoda" attribute, 11. Product list audience tabs — order and default, 12. Cart items link to product details, 13. Brand name bold on product details, 14. Product details gallery — thumbnail slider + mobile swipe, 15. Admin product creation — flexible price requirement, 16. Checkout review step — show everything the user entered, 1. Guest favorites + session persistence + merge on login/registration (+13 more)
+Cohesion: 0.47
+Nodes (4): APPLY, cuid(), main(), readExcel()
 
 ### Community 17 - "Runtime Dependencies"
 Cohesion: 0.06
@@ -489,16 +497,16 @@ Cohesion: 0.07
 Nodes (29): 0. Status & prerequisites, 10. Open questions for the bank, 1. How the flow works, 2.1 Request MAC — signed with the **Start key**, 2.2 Outcome MAC — signed with the **API-Result key**, 2.3 Operational rules (from the plugin, per SIA Oct-2021), 2. The MAC formulas (ground truth from the plugin), 3.1 ORDERID — ⚠️ requires a fix first (+21 more)
 
 ### Community 20 - "Public Page Routing"
-Cohesion: 0.10
-Nodes (17): DELETE, PUT, DELETE, GET, POST, DELETE, GET, PUT (+9 more)
+Cohesion: 0.09
+Nodes (21): DELETE, PATCH, PUT, DELETE, PUT, DELETE, GET, POST (+13 more)
 
 ### Community 21 - "Products Listing UI"
 Cohesion: 0.08
-Nodes (24): applyDefaultShuffle(), AttributeFilter, BrandFilter, CategoryNode, CategoryTreeItem(), ColorLevelFacet, ColorProduct, ColorSibling (+16 more)
+Nodes (21): applyDefaultShuffle(), AttributeFilter, BrandFilter, CategoryNode, ColorLevelFacet, ColorProduct, ColorSibling, ColorUndertoneFacet (+13 more)
 
 ### Community 22 - "Order Retry API"
-Cohesion: 0.13
-Nodes (25): GET, POST, POST, BulkEmail, BulkSendResult, getEmailFrom(), getNewsletterFrom(), getResend() (+17 more)
+Cohesion: 0.11
+Nodes (27): GET, POST, GET, POST, POST, BulkEmail, BulkSendResult, getEmailFrom() (+19 more)
 
 ### Community 23 - "Promotions API"
 Cohesion: 0.12
@@ -513,8 +521,8 @@ Cohesion: 0.07
 Nodes (27): Authentication, Available Actions, Barcodes: Pantheon → Our DB, Categories: Pantheon → Our DB, Constants (`src/lib/constants.ts`), Customers: Pantheon → Our DB, Data Mapping Reference, Endpoint (+19 more)
 
 ### Community 26 - "Resource CRUD Routes"
-Cohesion: 0.31
-Nodes (9): bad(), info(), main(), ok(), warn(), normalizeProduct(), normalizeStock(), PantheonError (+1 more)
+Cohesion: 0.27
+Nodes (9): main(), calculateDiscountPercentage(), formatPrice(), generateOrderNumber(), normalizePostalCode(), pantheonIdToString(), removeVat(), stripRtf() (+1 more)
 
 ### Community 27 - "Performance Report"
 Cohesion: 0.08
@@ -601,12 +609,12 @@ Cohesion: 0.06
 Nodes (32): 10. Risk Mitigation, 1. Payment Service Provider (PSP) — Recommendation, 2. D Express Shipping Integration, 3. Email Notifications (Resend + React Email), 4. B2B Invoice PDF Generation, 5. Implementation Steps (Execution Order), 6. Environment Variables Required, 7. Database Changes (+24 more)
 
 ### Community 51 - "Admin Product Editor"
-Cohesion: 0.25
-Nodes (14): APPLY, main(), POST, triggerSchema, GET(), getPantheonClient(), finishLog(), getPendingUnsyncedQuantitiesByProductId() (+6 more)
+Cohesion: 0.19
+Nodes (20): bad(), info(), main(), ok(), warn(), APPLY, main(), GET() (+12 more)
 
 ### Community 52 - "SKU Delta Import"
-Cohesion: 0.43
-Nodes (6): adapter, decodeHtml(), main(), parseInsert(), prisma, valOrNull()
+Cohesion: 0.15
+Nodes (15): BarcodeResult, CategoryResult, cleanId(), col(), FILE_TYPE_LABELS, FileInfo, importBarcodes(), importCategories() (+7 more)
 
 ### Community 53 - "Excel Match Reporting"
 Cohesion: 0.22
@@ -618,7 +626,7 @@ Nodes (21): 10. Duplicate delivery-method selector at start of cart, 11. Paginat
 
 ### Community 55 - "Stress Testing"
 Cohesion: 0.16
-Nodes (16): ERP_SYNC_RETRY_DELAYS_MS, ERP_VAT_CODES, areAddressesDifferent(), buildPantheonOrderPayload(), enqueueOrderSync(), extractErpRef(), formatPantheonDate(), handleQueueFailure() (+8 more)
+Nodes (17): ERP_SYNC_RETRY_DELAYS_MS, ERP_VAT_CODES, areAddressesDifferent(), buildPantheonOrderPayload(), enqueueOrderSync(), extractErpRef(), formatPantheonDate(), handleQueueFailure() (+9 more)
 
 ### Community 58 - "Hair Colors UI"
 Cohesion: 0.14
@@ -645,12 +653,16 @@ Cohesion: 0.18
 Nodes (11): PHASE 2 — DONE WHEN:, PHASE 2: Product Catalog, Step 2.1 — Product APIs, Step 2.2 — Category, Brand, Attribute APIs, Step 2.3 — Color Chart API (REQ 5), Step 2.4 — File Upload, Step 2.5 — CSV Import (REQ 7), Step 2.6 — Connect Product Listing Page (+3 more)
 
 ### Community 66 - "link-products-to-photos-2026"
-Cohesion: 0.18
-Nodes (10): APPLY, byBarcode, byCode, bySku, matched, prisma, PROD, totalImgs (+2 more)
+Cohesion: 0.12
+Nodes (16): APPLY, byBarcode, byCode, bySku, matched, prisma, PROD, totalImgs (+8 more)
 
 ### Community 67 - "page"
 Cohesion: 0.21
 Nodes (11): PantheonClient, PantheonClientConfig, NormalizedPantheonProduct, NormalizedPantheonStock, PantheonAction, PantheonOrderPayload, PantheonOrderResponse, PantheonProductsResponse (+3 more)
+
+### Community 68 - "upload"
+Cohesion: 0.21
+Nodes (10): AdminLayout(), NavSection, languages, LanguageToggle(), Language, LanguageContext, LanguageContextType, languageFlags (+2 more)
 
 ### Community 69 - "A.10 — Rotating credentials (security in"
 Cohesion: 0.20
@@ -677,8 +689,8 @@ Cohesion: 0.33
 Nodes (9): APPLY, cellToHtml(), decode(), FIELDS, linesToHtml(), main(), normText(), readExcel() (+1 more)
 
 ### Community 75 - "page"
-Cohesion: 0.05
-Nodes (46): main(), main(), APPLY, cuid(), main(), readExcel(), dryRun, main() (+38 more)
+Cohesion: 0.13
+Nodes (20): GET(), AMS_COL_CONFIG, AMS_COLUMNS, AmsExportProduct, amsExportRecord(), AmsImportResult, AmsRow, AmsSheet (+12 more)
 
 ### Community 76 - "PhoneInput"
 Cohesion: 0.18
@@ -700,6 +712,10 @@ Nodes (9): 7. Step-by-Step Implementation Plan, Step 1 — Provision Google OAut
 Cohesion: 0.44
 Nodes (7): buildBrandLookup(), cuid(), ensureCategories(), main(), parsePrice(), readExcel(), slugify()
 
+### Community 82 - "repopulate-from-excel"
+Cohesion: 0.47
+Nodes (8): cuid(), ensureCategories(), main(), parsePrice(), readExcel(), slugify(), snapshotImages(), title()
+
 ### Community 83 - "retry-failed-uploads-2026"
 Cohesion: 0.22
 Nodes (6): byCode, FAILED, map, results, tmp, touched
@@ -713,8 +729,8 @@ Cohesion: 0.22
 Nodes (13): APPLY, cellToHtml(), cuid(), linesToHtml(), main(), NEW_SKUS, parsePrice(), readRows() (+5 more)
 
 ### Community 86 - "10. Duplicate delivery-method selector a"
-Cohesion: 0.09
-Nodes (21): DELETE, PATCH, PUT, formatPromotion(), GET, mapPromotion(), POST, GET (+13 more)
+Cohesion: 0.12
+Nodes (18): formatPromotion(), GET, mapPromotion(), POST, GET, POST, GET, POST (+10 more)
 
 ### Community 87 - "Decision 1: VAT Handling"
 Cohesion: 0.25
@@ -765,8 +781,8 @@ Cohesion: 0.57
 Nodes (6): hasPhoto(), loadDb(), main(), matchRow(), normName(), pickBest()
 
 ### Community 101 - "migrate-product-details"
-Cohesion: 0.08
-Nodes (20): LoginContent(), Address, CheckoutClient(), Props, Step, ConfirmationClient(), ConfirmationState, Props (+12 more)
+Cohesion: 0.22
+Nodes (7): Address, CheckoutClient(), Props, Step, JWT, Session, User
 
 ### Community 102 - "populate-color-groups2"
 Cohesion: 0.33
@@ -795,6 +811,10 @@ Nodes (6): Implementation Plan, Phase 1: Schema Migration + Connection (Week 1),
 ### Community 110 - "page"
 Cohesion: 0.23
 Nodes (13): APPLY, cellToHtml(), cuid(), __dirname, IMAGES_JSON, linesToHtml(), main(), parsePrice() (+5 more)
+
+### Community 111 - "2. D Express Shipping Integration"
+Cohesion: 0.22
+Nodes (4): LoginContent(), COUNTRIES, Country, Props
 
 ### Community 112 - "5. Implementation Steps (Execution Order"
 Cohesion: 0.22
@@ -827,6 +847,10 @@ Nodes (5): Action Items (Require Client Input), Business Rules, Important Consid
 ### Community 121 - "A.1.1 — App information"
 Cohesion: 0.40
 Nodes (5): A.1.1 — App information, A.1.2 — Audience, A.1.3 — Contact information, A.1.4 — Finish, A.1 — Get started wizard
+
+### Community 122 - "1. Payment Service Provider (PSP) — Reco"
+Cohesion: 0.29
+Nodes (6): AdminColorsPage(), ALL_LEVELS, BrandLine, ColorItem, UNDERTONE_MAP, ViewMode
 
 ### Community 124 - "seed-site-settings"
 Cohesion: 0.40
@@ -888,6 +912,10 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
+### Community 151 - "brands-admin.test"
+Cohesion: 0.33
+Nodes (5): defaultHeroCardsAdmin, HeroCardAdmin, HomepagePage(), SectionConfig, SectionProduct
+
 ### Community 155 - "loading"
 Cohesion: 0.67
 Nodes (3): Order Status Mapping, Our System → Pantheon (Outbound), Pantheon → Our System (Inbound)
@@ -900,29 +928,41 @@ Nodes (3): The Big Picture, What is Pantheon and How Does It Relate to Alta Moda
 Cohesion: 0.50
 Nodes (4): Error Handling & Retry Strategy, Idempotency Rules, Retry Backoff Schedule, What Happens on Permanent Failure
 
+### Community 383 - "auth.ts"
+Cohesion: 0.33
+Nodes (4): FaqItem, faqItemsData, FAQPage(), FaqSection
+
+### Community 384 - "phase3-api.test.ts"
+Cohesion: 0.33
+Nodes (5): mockAdminUser, mockPrisma, mockRequireAdmin, mockRequireAuth, mockUser
+
 ### Community 385 - "restore-grouped-names.mjs"
 Cohesion: 0.40
 Nodes (5): APPLY, BACKUP, __dirname, main(), targetDbUrl()
 
+### Community 386 - "route.ts"
+Cohesion: 0.25
+Nodes (7): GET, POST, expandDiacritics(), findFuzzyProductIds(), tokenize(), ALLOWED_TAGS, sanitizeRichText()
+
 ## Knowledge Gaps
-- **1522 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+1517 more)
+- **1494 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+1489 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **239 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useLanguage()` connect `Account Dashboard` to `Admin CRUD API Routes`, `migrate-product-details`, `PhoneInput`, `5. Implementation Steps (Execution Order`, `prisma-schema.test`, `Cart & Checkout`, `Products Listing UI`, `Promotions API`, `Hair Colors UI`, `page`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
-- **Why does `uniqueSlug()` connect `Legacy DB Seeding` to `page`, `layout`?**
+- **Why does `useLanguage()` connect `Account Dashboard` to `Admin CRUD API Routes`, `upload`, `migrate-product-details`, `1. Payment Service Provider (PSP) — Reco`, `PhoneInput`, `2. D Express Shipping Integration`, `5. Implementation Steps (Execution Order`, `prisma-schema.test`, `Cart & Checkout`, `Products Listing UI`, `Promotions API`, `brands-admin.test`, `Hair Colors UI`, `page`, `auth.ts`?**
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+- **Why does `col()` connect `SKU Delta Import` to `Auth & Rate Limiting`, `layout`, `page`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `uniqueSlug()` connect `Legacy DB Seeding` to `Auth & Rate Limiting`, `repopulate-from-excel`, `layout`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `col()` connect `page` to `layout`, `page`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _1568 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1540 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Product Data Models` be split into smaller, more focused modules?**
   _Cohesion score 0.017094017094017096 - nodes in this community are weakly interconnected._
 - **Should `Zod Validation Schemas` be split into smaller, more focused modules?**
   _Cohesion score 0.06327683615819209 - nodes in this community are weakly interconnected._
 - **Should `Admin CRUD API Routes` be split into smaller, more focused modules?**
-  _Cohesion score 0.07632850241545894 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08130081300813008 - nodes in this community are weakly interconnected._

@@ -230,7 +230,7 @@ export default function AboutPage() {
                     href="/faq#kontakt"
                     className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white/40 hover:bg-white hover:text-[#1a1c1e] transition-colors"
                   >
-                    Kontakt <ArrowRight className="w-3 h-3" />
+                    {t("nav.contact")} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>

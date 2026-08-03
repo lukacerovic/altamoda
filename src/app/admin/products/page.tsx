@@ -706,11 +706,12 @@ export default function ProductsPage() {
     const errors: string[] = [];
     if (!formData.name.trim()) errors.push(t("admin.productName"));
     if (!formData.sku.trim()) errors.push(t("admin.skuCode"));
-    if (formData.badges.isProfessionalOnly) {
-      if (!formData.priceB2B || formData.priceB2B <= 0) errors.push(t("admin.priceB2b"));
-    } else {
-      if (!formData.priceB2C || formData.priceB2C <= 0) errors.push(t("admin.priceB2c"));
-    }
+    // Neither price is individually mandatory — but at least one must be set.
+    // The entered prices determine the audience: only B2C → retail product,
+    // only B2B → professional product, both → available to both.
+    const hasB2c = !!formData.priceB2C && formData.priceB2C > 0;
+    const hasB2b = !!formData.priceB2B && formData.priceB2B > 0;
+    if (!hasB2c && !hasB2b) errors.push(`${t("admin.priceB2c")} / ${t("admin.priceB2b")}`);
     if (formData.stock === undefined || formData.stock < 0) errors.push(t("admin.stockQuantity"));
 
     if (errors.length > 0) {
@@ -729,13 +730,10 @@ export default function ProductsPage() {
       category: formData.category || null,
       subCategory: formData.subCategory || null,
       // B2B-only products still need a non-null priceB2c (schema constraint);
-      // mirror priceB2b into priceB2c so the DB is satisfied and the public
-      // storefront — which only ever reads priceB2c for unauth'd users — has a
-      // sensible fallback price to hide behind the "sign-in for wholesale" UX.
-      priceB2c: formData.badges.isProfessionalOnly
-        ? (formData.priceB2C || formData.priceB2B)
-        : formData.priceB2C,
-      priceB2b: formData.priceB2B || null,
+      // mirror priceB2b into priceB2c so the DB is satisfied. The storefront
+      // masks that mirrored value for everyone who isn't B2B/admin.
+      priceB2c: hasB2c ? formData.priceB2C : formData.priceB2B,
+      priceB2b: hasB2b ? formData.priceB2B : null,
       oldPrice: formData.oldPrice || null,
       costPrice: formData.purchasePrice > 0 ? formData.purchasePrice : null,
       stockQuantity: formData.stock,
@@ -751,7 +749,8 @@ export default function ProductsPage() {
       hairTypes: formData.hairTypes || null,
       tags: formData.tags || null,
       gender: formData.gender || null,
-      isProfessional: formData.badges.isProfessionalOnly,
+      // Explicit badge, or derived: a product with only a B2B price is B2B-only.
+      isProfessional: formData.badges.isProfessionalOnly || (hasB2b && !hasB2c),
       isNew: formData.badges.isNew,
       isFeatured: formData.badges.isFeatured,
       isBestseller: formData.badges.isBestseller,
@@ -1881,8 +1880,29 @@ export default function ProductsPage() {
                             </div>
                           )}
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            {!img.isPrimary && (
+                              <button
+                                onClick={() =>
+                                  updateForm(
+                                    "images",
+                                    formData.images.map((im, i) => ({ ...im, isPrimary: i === idx }))
+                                  )
+                                }
+                                className="p-1.5 bg-white rounded-sm text-[#edb4bd] hover:bg-stone-50"
+                                title={t("admin.setMainImage")}
+                              >
+                                <Star size={14} />
+                              </button>
+                            )}
                             <button
-                              onClick={() => updateForm("images", formData.images.filter((_, i) => i !== idx))}
+                              onClick={() => {
+                                const remaining = formData.images.filter((_, i) => i !== idx);
+                                // Deleting the primary image promotes the first remaining one.
+                                if (img.isPrimary && remaining.length > 0 && !remaining.some((im) => im.isPrimary)) {
+                                  remaining[0] = { ...remaining[0], isPrimary: true };
+                                }
+                                updateForm("images", remaining);
+                              }}
                               className="p-1.5 bg-white rounded-sm text-red-500 hover:bg-red-50"
                               title={t("admin.remove")}
                             >

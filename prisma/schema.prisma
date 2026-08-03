@@ -431,7 +431,11 @@ model Wishlist {
 model Order {
   id              String        @id @default(cuid())
   orderNumber     String        @unique @map("order_number")
-  userId          String        @map("user_id")
+  userId          String?       @map("user_id")
+  // Guest checkout: orders placed without an account carry contact info here.
+  guestName       String?       @map("guest_name")
+  guestEmail      String?       @map("guest_email")
+  guestPhone      String?       @map("guest_phone")
   status          OrderStatus   @default(novi)
   subtotal        Decimal       @db.Decimal(10, 2)
   discountAmount  Decimal       @default(0) @map("discount_amount") @db.Decimal(10, 2)
@@ -456,7 +460,7 @@ model Order {
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
 
-  user            User                 @relation(fields: [userId], references: [id])
+  user            User?                @relation(fields: [userId], references: [id])
   promoCode       PromoCode?           @relation(fields: [promoCodeId], references: [id])
   items           OrderItem[]
   statusHistory   OrderStatusHistory[]

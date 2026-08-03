@@ -12,6 +12,7 @@ import {
   MapPin,
   Mail,
   Package,
+  Phone,
   Clock,
   CheckCircle,
   XCircle,
@@ -34,6 +35,7 @@ interface OrderListItem {
   itemCount: number;
   createdAt: string;
   user: { id: string; name: string | null; email: string; role: string } | null;
+  guest: { name: string | null; email: string | null; phone: string | null } | null;
 }
 
 interface OrderDetail {
@@ -52,6 +54,7 @@ interface OrderDetail {
   notes: string | null;
   createdAt: string;
   user: { id: string; name: string | null; email: string; role: string } | null;
+  guest: { name: string | null; email: string | null; phone: string | null } | null;
   items: {
     id: string;
     productName: string;
@@ -219,8 +222,8 @@ export default function OrdersPage() {
     const matchSearch =
       !search ||
       o.orderNumber.toLowerCase().includes(searchLower) ||
-      (o.user?.name || "").toLowerCase().includes(searchLower) ||
-      (o.user?.email || "").toLowerCase().includes(searchLower);
+      (o.user?.name || o.guest?.name || "").toLowerCase().includes(searchLower) ||
+      (o.user?.email || o.guest?.email || "").toLowerCase().includes(searchLower);
     const matchStatus = statusFilter === "all" || o.status === statusFilter;
     return matchSearch && matchStatus;
   });
@@ -368,7 +371,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-sm font-medium text-black">
-                          {order.user?.name || order.user?.email || "—"}
+                          {order.user?.name || order.user?.email || order.guest?.name || order.guest?.email || "—"}
                         </p>
                         {order.user?.role === "b2b" && (
                           <span className="text-[10px] font-semibold bg-stone-200 text-[#1a1c1e] px-1.5 py-0.5 rounded">
@@ -562,6 +565,31 @@ export default function OrdersPage() {
                                               B2B
                                             </span>
                                           )}
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+                                  {orderDetail.guest && (
+                                    <>
+                                      {orderDetail.guest.email && (
+                                        <div className="flex items-center gap-2 text-sm text-[#1a1c1e]">
+                                          <Mail size={14} className="text-[#1a1c1e]" />{" "}
+                                          {orderDetail.guest.email}
+                                        </div>
+                                      )}
+                                      {orderDetail.guest.name && (
+                                        <div className="flex items-center gap-2 text-sm text-[#1a1c1e]">
+                                          <Package size={14} className="text-[#1a1c1e]" />{" "}
+                                          {orderDetail.guest.name}
+                                          <span className="text-[10px] font-semibold bg-stone-200 text-[#1a1c1e] px-1.5 py-0.5 rounded ml-1">
+                                            GOST
+                                          </span>
+                                        </div>
+                                      )}
+                                      {orderDetail.guest.phone && (
+                                        <div className="flex items-center gap-2 text-sm text-[#1a1c1e]">
+                                          <Phone size={14} className="text-[#1a1c1e]" />{" "}
+                                          {orderDetail.guest.phone}
                                         </div>
                                       )}
                                     </>

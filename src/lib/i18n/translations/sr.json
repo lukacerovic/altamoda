@@ -408,7 +408,13 @@
     "itemsCount": "stavki",
     "total": "Ukupno",
     "securePayment": "Sigurno online plaćanje",
-    "freeShippingOver": "Besplatna dostava preko 5.000 RSD"
+    "freeShippingOver": "Besplatna dostava preko 5.000 RSD",
+    "gateTitle": "Kako želite da nastavite?",
+    "gateLogin": "Prijavi se",
+    "gateRegister": "Registruj se",
+    "gateGuest": "Nastavi kao gost",
+    "gateHint": "Podatke možete popuniti i kao gost — za potvrdu porudžbine biće potrebna prijava.",
+    "loginToOrder": "Prijavi se i poruči"
   },
   "auth": {
     "home": "Početna",
@@ -1015,7 +1021,8 @@
     "level": "Nivo",
     "shadeCodeHint": "Format zavisi od brenda, npr. 7.0, 8/1, 6-44",
     "linkToProduct": "Poveži sa proizvodom",
-    "selectProduct": "Izaberi proizvod..."
+    "selectProduct": "Izaberi proizvod...",
+    "setMainImage": "Postavi kao glavnu sliku"
   },
   "colors": {
     "title": "Paleta Boja za Kosu",
@@ -1108,7 +1115,10 @@
     "yourB2bPrice": "Vaša B2B cena",
     "loginLink": "Prijavite se",
     "photoOptional": "Fotografija (opciono)",
-    "clickToAddPhoto": "Kliknite da dodate fotografiju"
+    "clickToAddPhoto": "Kliknite da dodate fotografiju",
+    "productCode": "Šifra proizvoda",
+    "notFoundTitle": "Proizvod nije pronađen",
+    "notFoundDesc": "Ovaj proizvod nije dostupan."
   },
   "wishlist": {
     "home": "Početna",
@@ -1317,6 +1327,7 @@
     "newsletterTitle": "Žurnal nasleđa",
     "newsletterDescription": "Primajte sezonske uvide iz našeg ateljea i obaveštenja o novim kolekcijama.",
     "emailPlaceholder": "Vaša e-mail adresa",
-    "subscribe": "Prijavite se"
+    "subscribe": "Prijavite se",
+    "heroImageAlt": "Enterijer luksuznog ateljea"
   }
 }

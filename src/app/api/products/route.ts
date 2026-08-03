@@ -291,7 +291,13 @@ export const GET = withErrorHandler(async (req: Request) => {
   // exceeds the number of pages that actually have products. Previously this counted
   // against `where` and subtracted duplicates, which could drift and leave an empty
   // trailing page in the paginator.
-  const [products, total] = await Promise.all([
+  // Brand facet: which brands actually have products in the CURRENT result set.
+  // Computed with every filter applied EXCEPT the brand filter itself, so an
+  // already-selected brand doesn't hide the other still-selectable brands.
+  const { brandId: _selectedBrandFilter, ...brandFacetWhere } = where
+  void _selectedBrandFilter
+
+  const [products, total, brandFacetRows] = await Promise.all([
     prisma.product.findMany({
       where: finalWhere,
       include: {
@@ -307,7 +313,14 @@ export const GET = withErrorHandler(async (req: Request) => {
       take: limit,
     }),
     prisma.product.count({ where: finalWhere }),
+    prisma.product.groupBy({
+      by: ['brandId'],
+      where: { ...brandFacetWhere, brandId: { not: null } },
+    }),
   ])
+  const availableBrandIds = brandFacetRows
+    .map(r => r.brandId)
+    .filter((id): id is string => Boolean(id))
   void duplicateCount // kept computed for possible future telemetry
 
   // Calculate avg ratings + variant counts in parallel
@@ -487,6 +500,11 @@ export const GET = withErrorHandler(async (req: Request) => {
       total,
       totalPages: Math.ceil(total / limit),
     },
+    facets: {
+      // Brands with ≥1 product matching the current search/filters (minus the
+      // brand filter itself) — the client hides brand options not in this list.
+      brandIds: availableBrandIds,
+    },
   })
   res.headers.set('Cache-Control', 'no-store, must-revalidate')
   return res
@@ -497,8 +515,12 @@ export const POST = withErrorHandler(async (req: Request) => {
   await requireAdmin()
   const body = await req.json()
 
-  if (!body.nameLat || !body.priceB2c) {
-    return errorResponse('Naziv i cena su obavezni', 400)
+  // At least one price is required — B2C, B2B, or both. The prices determine
+  // the audience: only-B2B products are professional; only-B2C are retail.
+  const hasB2c = Number(body.priceB2c) > 0
+  const hasB2b = Number(body.priceB2b) > 0
+  if (!body.nameLat || (!hasB2c && !hasB2b)) {
+    return errorResponse('Naziv i najmanje jedna cena (B2C ili B2B) su obavezni', 400)
   }
 
   const slug = slugify(body.nameLat)
@@ -535,15 +557,17 @@ export const POST = withErrorHandler(async (req: Request) => {
       hairTypes: body.hairTypes,
       tags: body.tags,
       gender: body.gender,
-      priceB2c: body.priceB2c,
-      priceB2b: body.priceB2b,
+      // priceB2c is NOT NULL in the schema — B2B-only products mirror priceB2b
+      // into it; the storefront masks the mirrored value for non-B2B viewers.
+      priceB2c: hasB2c ? body.priceB2c : body.priceB2b,
+      priceB2b: hasB2b ? body.priceB2b : null,
       oldPrice: body.oldPrice,
       costPrice: body.costPrice,
       stockQuantity: body.stockQuantity || 0,
       lowStockThreshold: body.lowStockThreshold || 5,
       weightGrams: body.weightGrams,
       volumeMl: body.volumeMl,
-      isProfessional: body.isProfessional || false,
+      isProfessional: body.isProfessional || (hasB2b && !hasB2c),
       isNew: body.isNew || false,
       isFeatured: body.isFeatured || false,
       isBestseller: body.isBestseller || false,

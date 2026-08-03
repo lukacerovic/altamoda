@@ -40,9 +40,12 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     // No user logged in — clear any leftover cart from a previous user
     if (!currentUserId) {
       if (cartOwner) {
-        // Cart belongs to a user who logged out — wipe it
+        // Cart belongs to a user who logged out — wipe it. The guest wishlist
+        // (guestItems) survives logout; the previous user's server-side
+        // wishlist was never in local state, so the badge falls back to
+        // whatever the guest has locally.
         clearCart()
-        setWishlistCount(0)
+        setWishlistCount(useWishlistStore.getState().guestItems.length)
         setCartOwner(null)
       }
       // Guest with no leftover data — nothing to do
@@ -52,7 +55,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     // User is logged in but cart belongs to a different user — clear stale data
     if (cartOwner && cartOwner !== currentUserId) {
       clearCart()
-      setWishlistCount(0)
+      setWishlistCount(useWishlistStore.getState().guestItems.length)
       hasMergedRef.current = false
     }
 
@@ -76,6 +79,27 @@ export default function CartProvider({ children }: { children: React.ReactNode }
               })),
             }),
           })
+        }
+
+        // Merge the guest wishlist into the user's DB wishlist. The endpoint
+        // is a union and idempotent, so no once-per-login guard is needed —
+        // guest ids are only cleared after a successful merge, and the GET
+        // below always sets the authoritative count.
+        try {
+          const guestWishlist = useWishlistStore.getState().guestItems
+          if (guestWishlist.length > 0) {
+            const mergeRes = await fetch('/api/wishlist/merge', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ productIds: guestWishlist }),
+            })
+            if (mergeRes.ok) {
+              useWishlistStore.getState().clearGuest()
+            }
+          }
+        } catch (err) {
+          // Keep guestItems so the merge can retry on the next sync
+          console.error('Wishlist merge error:', err)
         }
 
         // Fetch the authoritative cart from DB — always replaces localStorage

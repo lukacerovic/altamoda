@@ -59,15 +59,18 @@ export const GET = withErrorHandler(async (req: Request) => {
       staticOld,
       role,
     )
+    // Professional products mirror priceB2b into priceB2c — never expose that
+    // value to guests/B2C viewers (same masking as the main list endpoint).
+    const isProOnlyHiddenPrice = p.isProfessional && role !== 'b2b' && role !== 'admin'
     return {
       id: p.id,
       name: p.nameLat,
       slug: p.slug,
       sku: p.sku,
       brand: p.brand?.name,
-      price,
-      oldPrice,
-      promoBadge,
+      price: isProOnlyHiddenPrice ? null : price,
+      oldPrice: isProOnlyHiddenPrice ? null : oldPrice,
+      promoBadge: isProOnlyHiddenPrice ? null : promoBadge,
       image: p.images[0]?.url || null,
       isProfessional: p.isProfessional,
     }

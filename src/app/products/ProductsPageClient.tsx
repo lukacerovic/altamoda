@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,11 +18,11 @@ import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { resolveBrandLogo } from "@/lib/brand-logos";
 
-/** Uppercase only the first letter, leaving the rest as-is. Normalizes
- * inconsistently-cased DB values (e.g. "makaze" → "Makaze") for display. */
-function capitalizeFirst(s: string): string {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-}
+/** Sentence-case a display value: first letter uppercase, rest lowercase
+ * (Serbian locale). Normalizes inconsistently-cased DB values (e.g. "MAKAZE"
+ * → "Makaze") for display only — never applied to values sent to the API. */
+const sentenceCase = (s: string) =>
+  s ? s.charAt(0).toLocaleUpperCase("sr") + s.slice(1).toLocaleLowerCase("sr") : s;
 
 /* ─── Types ─── */
 interface ProductBrand {
@@ -299,13 +299,13 @@ function getBadge(product: Product): string | null {
 
 /* ─── WishlistButton ───
  * Shared heart toggle used by both grid and list views. Guests (no session)
- * are sent to the login page instead of hitting the auth-gated wishlist API
- * (which would 401 and silently do nothing). The filled state re-syncs whenever
- * the parent's `isWishlisted` prop changes (it loads async after mount). */
+ * toggle the local guest wishlist store (persisted, merged into the DB on
+ * login) instead of hitting the auth-gated wishlist API. The filled state
+ * re-syncs whenever the parent's `isWishlisted` prop changes (it loads async
+ * after mount). */
 function WishlistButton({ productId, isWishlisted, className, iconClassName }: { productId: string; isWishlisted?: boolean; className?: string; iconClassName?: string }) {
   const { data: session } = useSession();
-  const router = useRouter();
-  const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
+  const { increment: incWishlist, decrement: decWishlist, toggleGuest } = useWishlistStore();
   const [liked, setLiked] = useState(isWishlisted ?? false);
   // Re-sync when the parent's prop changes (wishlist IDs load async after
   // mount). Using the render-phase "adjust state on prop change" pattern rather
@@ -320,8 +320,7 @@ function WishlistButton({ productId, isWishlisted, className, iconClassName }: {
     e.preventDefault();
     e.stopPropagation();
     if (!session?.user) {
-      const back = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/products";
-      router.push(`/account/login?callbackUrl=${encodeURIComponent(back)}`);
+      setLiked(toggleGuest(productId));
       return;
     }
     const prev = liked;
@@ -501,7 +500,7 @@ function CategoryTreeItem({ item, depth = 0, onSelect, selectedSlug }: { item: C
           <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 text-[#1a1c1e]/60 ${expanded ? "rotate-90" : ""}`} />
         )}
         {!hasChildren && <span className="w-3.5 flex-shrink-0" />}
-        {item.nameLat}
+        {sentenceCase(item.nameLat)}
       </button>
       {expanded && hasChildren && (
         <div className="animate-slideDown">
@@ -675,8 +674,13 @@ export default function ProductsPageClient({
   const [filterUndertone, setFilterUndertone] = useState<string | null>(null);
   const [filterHasColor, setFilterHasColor] = useState(false);
 
-  // Visibility tab for guests
-  const [visibility, setVisibility] = useState<"all" | "b2c" | "b2b">("all");
+  // Visibility tab for guests — retail (b2c) is the default view.
+  const [visibility, setVisibility] = useState<"all" | "b2c" | "b2b">("b2c");
+
+  // Brand ids that have ≥1 product under the current filters / search, from the
+  // /api/products `facets` payload. null = no fetch response yet (SSR chunk),
+  // in which case all brands are shown.
+  const [availableBrandIds, setAvailableBrandIds] = useState<Set<string> | null>(null);
 
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -708,6 +712,9 @@ export default function ProductsPageClient({
         LIST_SNAPSHOT_KEY,
         JSON.stringify({
           signature: listSignature,
+          // Saved separately so a snapshot taken on a non-default tab can be
+          // restored (the remount always starts from the default "b2c" tab).
+          visibility,
           products,
           currentPage,
           pagination,
@@ -719,7 +726,7 @@ export default function ProductsPageClient({
     } catch {
       // sessionStorage unavailable (private mode / quota) — degrade gracefully.
     }
-  }, [listSignature, products, currentPage, pagination, shuffleSeed]);
+  }, [listSignature, visibility, products, currentPage, pagination, shuffleSeed]);
 
   // The SSR/ISR page render is generic and cacheable — it ignores the URL's
   // filter params and always returns an unfiltered first chunk. So when we land
@@ -749,16 +756,32 @@ export default function ProductsPageClient({
         const raw = sessionStorage.getItem(LIST_SNAPSHOT_KEY);
         if (raw) {
           const snap = JSON.parse(raw);
+          // The snapshot may have been taken on a different visibility tab than
+          // the default ("b2c") this remount starts on. Rebuild the signature
+          // the current state would produce under the snapshot's tab (it is the
+          // 2nd "|" segment; the segment before it — sortBy — never contains
+          // "|") so those snapshots restore normally too.
+          const snapVisibility: "all" | "b2c" | "b2b" | null =
+            snap && (snap.visibility === "all" || snap.visibility === "b2c" || snap.visibility === "b2b")
+              ? snap.visibility
+              : null;
+          let expectedSignature = listSignature;
+          if (snapVisibility && snapVisibility !== visibility) {
+            const parts = listSignature.split("|");
+            parts[1] = snapVisibility;
+            expectedSignature = parts.join("|");
+          }
           const valid =
             snap &&
-            snap.signature === listSignature &&
+            snap.signature === expectedSignature &&
             Array.isArray(snap.products) && snap.products.length > 0 &&
             typeof snap.currentPage === "number" &&
             snap.pagination && typeof snap.pagination.totalPages === "number";
           if (valid) {
             // Mark this signature as restored so the refetch effect leaves the
             // accumulated list intact until the user changes a filter.
-            restoredSignatureRef.current = listSignature;
+            restoredSignatureRef.current = expectedSignature;
+            if (snapVisibility && snapVisibility !== visibility) setVisibility(snapVisibility);
             setProducts(snap.products);
             setCurrentPage(snap.currentPage);
             setPagination(snap.pagination);
@@ -780,7 +803,10 @@ export default function ProductsPageClient({
     // correctly filtered first page. The refetch effect below is skipped on this
     // initial mount, so we trigger the fetch here. (state is already seeded from
     // the URL params, so buildQueryString picks up the filters.)
-    if (hasUrlFilters) {
+    // Guests also refetch: the cacheable SSR chunk is unfiltered ("all") while
+    // their default tab is now "b2c", so the first page must be re-fetched with
+    // visibility applied.
+    if (hasUrlFilters || !userRole) {
       fetchProducts(1, false);
       return;
     }
@@ -796,9 +822,15 @@ export default function ProductsPageClient({
   // so no further re-ordering here — that would reshuffle already-shown items.
   const displayProducts = products;
 
-  // Fetch wishlist IDs client-side when user is authenticated
+  // Fetch wishlist IDs client-side when user is authenticated; guests are
+  // seeded from the persisted guest store (kept in sync via the guestItems
+  // subscription, so toggling a heart updates every card on the page).
+  const guestWishlistItems = useWishlistStore((s) => s.guestItems);
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      setWishlistedProductIds(guestWishlistItems);
+      return;
+    }
     fetch('/api/wishlist')
       .then(r => r.json())
       .then(data => {
@@ -807,7 +839,7 @@ export default function ProductsPageClient({
         }
       })
       .catch(() => {});
-  }, [session?.user?.id]);
+  }, [session?.user?.id, guestWishlistItems]);
 
   // Build query string from current filters
   const buildQueryString = useCallback((page: number) => {
@@ -876,6 +908,13 @@ export default function ProductsPageClient({
         const chunk = applyDefaultShuffle(json.data.products as Product[], sortBy, shuffleSeed);
         setProducts((prev) => (append ? [...prev, ...chunk] : chunk));
         setPagination(json.data.pagination);
+        // Brand facet: brands with ≥1 product under the current filters/search
+        // (computed server-side without the brand filter itself, so selected
+        // brands stay listed). Used to narrow the brand pill row.
+        const facetBrandIds: unknown = json.data.facets?.brandIds;
+        if (Array.isArray(facetBrandIds)) {
+          setAvailableBrandIds(new Set<string>(facetBrandIds as string[]));
+        }
       }
     } catch (err) {
       console.error("Failed to fetch products:", err);
@@ -991,12 +1030,12 @@ export default function ProductsPageClient({
     const l = productLines.find((pl) => pl.slug === slug);
     if (l) activeTags.push({ key: `productLine:${slug}`, label: l.name });
   });
-  selectedProductTypes.forEach((v) => activeTags.push({ key: `productType:${v}`, label: capitalizeFirst(v) }));
-  selectedHairTypes.forEach((v) => activeTags.push({ key: `hairType:${v}`, label: capitalizeFirst(v) }));
-  selectedTags.forEach((v) => activeTags.push({ key: `tag:${v}`, label: v }));
+  selectedProductTypes.forEach((v) => activeTags.push({ key: `productType:${v}`, label: sentenceCase(v) }));
+  selectedHairTypes.forEach((v) => activeTags.push({ key: `hairType:${v}`, label: sentenceCase(v) }));
+  selectedTags.forEach((v) => activeTags.push({ key: `tag:${v}`, label: sentenceCase(v) }));
   activeToggles.forEach((key) => {
     const attr = attributes.find((a) => a.slug === key);
-    if (attr) activeTags.push({ key: `attr:${key}`, label: attr.nameLat });
+    if (attr) activeTags.push({ key: `attr:${key}`, label: sentenceCase(attr.nameLat) });
     else if (key === "new") activeTags.push({ key: `toggle:new`, label: t("products.toggleNew") });
     else if (key === "on_sale") activeTags.push({ key: `toggle:on_sale`, label: t("products.toggleOnSale") });
     else if (key === "featured") activeTags.push({ key: `toggle:featured`, label: t("products.toggleFeatured") });
@@ -1181,7 +1220,7 @@ export default function ProductsPageClient({
                     isActive ? "bg-[#1a1c1e] text-white" : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                   }`}
                 >
-                  {capitalizeFirst(v)}
+                  {sentenceCase(v)}
                 </button>
               );
             })}
@@ -1203,7 +1242,7 @@ export default function ProductsPageClient({
                     isActive ? "bg-[#1a1c1e] text-white" : "text-[#1a1c1e]/70 hover:text-[#1a1c1e] hover:bg-[#FFFFFF]"
                   }`}
                 >
-                  {capitalizeFirst(v)}
+                  {sentenceCase(v)}
                 </button>
               );
             })}
@@ -1227,7 +1266,7 @@ export default function ProductsPageClient({
                       : "bg-[#dddbd9]/60 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"
                   }`}
                 >
-                  {v}
+                  {sentenceCase(v)}
                 </button>
               );
             })}
@@ -1332,7 +1371,7 @@ export default function ProductsPageClient({
                       <div className="min-w-0 flex-1">
                         <span className={`text-[12px] font-medium block leading-tight ${
                           filterUndertone === ut.code ? "text-[#1a1c1e]" : "text-[#1a1c1e]/60"
-                        }`}>{ut.name}</span>
+                        }`}>{sentenceCase(ut.name)}</span>
                       </div>
                       <span className="text-[10px] text-[#dddbd9] font-medium">{ut.count}</span>
                     </button>
@@ -1353,7 +1392,7 @@ export default function ProductsPageClient({
                   )}
                   {filterUndertone && (
                     <span className="inline-flex items-center gap-1 bg-[#FFFFFF] text-[#1a1c1e] text-[10px] font-medium px-2 py-1 rounded-sm">
-                      {availableColorUndertones.find(u => u.code === filterUndertone)?.name || filterUndertone}
+                      {sentenceCase(availableColorUndertones.find(u => u.code === filterUndertone)?.name || filterUndertone)}
                       <button onClick={() => setFilterUndertone(null)} className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] ml-0.5">&times;</button>
                     </span>
                   )}
@@ -1401,7 +1440,7 @@ export default function ProductsPageClient({
               className="flex items-center justify-between cursor-pointer group py-0.5"
             >
               <span className="text-[13px] text-[#1a1c1e]/60 group-hover:text-[#1a1c1e] transition-colors">
-                {f.label}
+                {sentenceCase(f.label)}
               </span>
 
               <button
@@ -1435,9 +1474,9 @@ export default function ProductsPageClient({
   const visibilityTabs = !userRole ? (
     <div className="flex items-center gap-6">
       {([
-        { key: "all" as const, label: t("products.allProducts") },
         { key: "b2c" as const, label: t("products.retail") },
         { key: "b2b" as const, label: t("products.professional") },
+        { key: "all" as const, label: t("products.allProducts") },
       ]).map((tab) => (
         <button
           key={tab.key}
@@ -1597,7 +1636,13 @@ export default function ProductsPageClient({
                 >
                   {t("products.allBrands")}
                 </button>
-                {brands.map((b) => {
+                {brands
+                  // Show only brands with matching products under the current
+                  // filters/search once the facet is known (null = pre-fetch,
+                  // show all). Selected brands always stay visible so they can
+                  // be toggled off even if momentarily absent from the facet.
+                  .filter((b) => !availableBrandIds || availableBrandIds.has(b.id) || selectedBrands.includes(b.slug))
+                  .map((b) => {
                   const isActive = selectedBrands.includes(b.slug);
                   return (
                     <button

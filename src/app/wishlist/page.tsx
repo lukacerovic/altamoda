@@ -6,7 +6,8 @@ export default async function WishlistPage() {
   const user = await getCurrentUser()
 
   if (!user) {
-    return <WishlistPageClient items={[]} />
+    // Guests resolve their locally-persisted wishlist client-side
+    return <WishlistPageClient items={[]} isGuest />
   }
 
   const wishlistItems = await prisma.wishlist.findMany({
@@ -36,9 +37,13 @@ export default async function WishlistPage() {
       productId: w.productId,
       name: w.product.nameLat,
       brand: w.product.brand?.name ?? '',
-      price: Number(user.role === 'b2b' && w.product.priceB2b
-        ? w.product.priceB2b
-        : w.product.priceB2c),
+      // Professional products mirror priceB2b into priceB2c — mask it for
+      // non-B2B viewers (stale wishlist rows can predate a role change).
+      price: user.role === 'b2b' || user.role === 'admin'
+        ? Number(w.product.priceB2b ?? w.product.priceB2c)
+        : w.product.isProfessional
+          ? null
+          : Number(w.product.priceB2c),
       oldPrice: w.product.oldPrice ? Number(w.product.oldPrice) : null,
       image: w.product.images[0]?.url ?? '',
       rating: Math.round(avgRating * 10) / 10,

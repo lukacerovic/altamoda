@@ -1,17 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/stores/cart-store'
+import { useCheckoutStore } from '@/lib/stores/checkout-store'
 import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from '@/lib/constants'
 import {
   ChevronRight, MapPin, Truck, CreditCard, CheckCircle,
-  AlertCircle, ChevronLeft, Shield, User,
+  AlertCircle, ChevronLeft, Shield, User, LogIn, UserPlus,
 } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import PaymentLogos from '@/components/PaymentLogos'
+import PhoneInput from '@/components/PhoneInput'
 
 interface Address {
   id: string
@@ -54,23 +56,48 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         { key: 'review', label: t('checkout.step5'), icon: CheckCircle },
       ]
 
-  const [step, setStep] = useState<Step>(STEPS[0].key)
+  // Persisted checkout draft (localStorage). Raw persisted values are
+  // normalized below against the current session (role, saved addresses).
+  const {
+    step: draftStep,
+    guestInfo,
+    selectedAddressId: draftSelectedAddressId,
+    newAddress,
+    useNewAddress: draftUseNewAddress,
+    shippingMethod,
+    paymentMethod: draftPaymentMethod,
+    notes,
+    guestMode,
+    setStep,
+    setGuestInfo,
+    setSelectedAddressId,
+    setNewAddress,
+    setUseNewAddress,
+    setShippingMethod,
+    setPaymentMethod,
+    setNotes,
+    setGuestMode,
+    clearDraft,
+  } = useCheckoutStore()
 
-  // Guest contact info
-  const [guestInfo, setGuestInfo] = useState({
-    name: '', email: '', phone: '',
-  })
+  // Gate rendering until after mount so the persisted draft never causes a
+  // hydration mismatch (the page is client-rendered; a brief blank is fine).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  // If the persisted step is not part of the current flow (e.g. 'contact' was
+  // persisted as a guest but the user is now logged in), fall back to STEPS[0].
+  const step: Step = STEPS.some((s) => s.key === draftStep)
+    ? (draftStep as Step)
+    : STEPS[0].key
 
   // Address form
   const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0]
-  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddr?.id ?? '')
-  const [newAddress, setNewAddress] = useState({
-    street: '', city: '', postalCode: '', country: 'Srbija',
-  })
-  const [useNewAddress, setUseNewAddress] = useState(addresses.length === 0)
-
-  // Shipping
-  const [shippingMethod, setShippingMethod] = useState('standard')
+  const selectedAddressId =
+    draftSelectedAddressId && addresses.some((a) => a.id === draftSelectedAddressId)
+      ? draftSelectedAddressId
+      : defaultAddr?.id ?? ''
+  const useNewAddress = draftUseNewAddress ?? addresses.length === 0
 
   // Payment — guests can't use invoice
   const isB2b = userRole === 'b2b'
@@ -84,10 +111,14 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         { key: 'bank_transfer', label: t('checkout.bankTransfer') },
         { key: 'cash_on_delivery', label: t('checkout.cashOnDelivery') },
       ]
-  const [paymentMethod, setPaymentMethod] = useState(isB2b ? 'invoice' : 'card')
-
-  // Notes
-  const [notes, setNotes] = useState('')
+  // A persisted method that is not offered to this user (e.g. a guest draft
+  // holding 'invoice') falls back to the role default.
+  const paymentMethod =
+    draftPaymentMethod && paymentOptions.some((o) => o.key === draftPaymentMethod)
+      ? draftPaymentMethod
+      : isB2b
+      ? 'invoice'
+      : 'card'
 
   const subtotal = getTotal()
   const shippingCost =
@@ -105,7 +136,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
     : addresses.find((a) => a.id === selectedAddressId)
 
   const canProceedContact = isGuest
-    ? guestInfo.name.trim() && guestInfo.email.trim() && guestInfo.phone.trim()
+    ? guestInfo.name.trim() &&
+      guestInfo.email.trim() &&
+      // dial code + local number: a real phone has at least 8 digits total
+      guestInfo.phone.replace(/\D/g, '').length >= 8
     : true
 
   const canProceedAddress = useNewAddress
@@ -113,6 +147,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
     : !!selectedAddressId
 
   const b2bMinimumMet = !isB2b || subtotal >= MIN_B2B_ORDER
+
+  // Avoid a server/client mismatch while the persisted draft hydrates.
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#FFFFFF]" />
+  }
 
   if (items.length === 0 && step !== 'review') {
     return (
@@ -128,8 +167,63 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
     )
   }
 
+  // Guest gate: guests must explicitly choose how to continue before the flow.
+  if (isGuest && !guestMode) {
+    return (
+      <div className="min-h-screen bg-[#FFFFFF]">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-[#1a1c1e] mb-6">
+            <Link href="/" className="hover:text-[#edb4bd]">{t('checkout.breadcrumbHome')}</Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/cart" className="hover:text-[#edb4bd]">{t('checkout.breadcrumbCart')}</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-[#1a1c1e]">{t('checkout.breadcrumbCheckout')}</span>
+          </nav>
+
+          <h1 className="text-3xl font-bold text-[#1a1c1e] mb-8" style={{ fontFamily: "'Noto Serif', serif" }}>{t('checkout.breadcrumbCheckout')}</h1>
+
+          <div className="max-w-lg mx-auto">
+            <div className="bg-white rounded-sm shadow-sm p-6">
+              <h2 className="text-lg font-bold text-[#1a1c1e] mb-2">{t('checkout.gateTitle')}</h2>
+              <p className="text-sm text-[#1a1c1e] mb-6">{t('checkout.gateHint')}</p>
+              <div className="space-y-3">
+                <Link
+                  href="/account/login?callbackUrl=/checkout"
+                  className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium flex items-center justify-center gap-2"
+                >
+                  <LogIn className="w-4 h-4" /> {t('checkout.gateLogin')}
+                </Link>
+                <Link
+                  href="/account/login?tab=register&callbackUrl=/checkout"
+                  className="w-full border border-black text-[#1a1c1e] py-3 rounded font-medium hover:bg-[#FFFFFF] flex items-center justify-center gap-2"
+                >
+                  <UserPlus className="w-4 h-4" /> {t('checkout.gateRegister')}
+                </Link>
+                <button
+                  onClick={() => { setGuestMode(true); setStep('contact') }}
+                  className="w-full border border-[#dddbd9] py-3 rounded font-medium text-[#1a1c1e] hover:bg-[#FFFFFF] flex items-center justify-center gap-2"
+                >
+                  <User className="w-4 h-4" /> {t('checkout.gateGuest')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const handlePlaceOrder = async () => {
     if (!b2bMinimumMet) return
+
+    // Placing an order requires an account. The checkout draft is already
+    // persisted, so after login the user lands back on this exact step with
+    // everything they filled in intact.
+    if (isGuest) {
+      router.push('/account/login?callbackUrl=/checkout')
+      return
+    }
 
     setIsSubmitting(true)
     setError('')
@@ -166,10 +260,6 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         notes: notes || undefined,
       }
 
-      if (isGuest) {
-        orderPayload.guestInfo = guestInfo
-      }
-
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -194,6 +284,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         router.push(payRedirect)
       } else {
         clearCart()
+        clearDraft()
         router.push(`/checkout/confirmation?orderNumber=${data.data.orderNumber}`)
       }
     } catch (err) {
@@ -283,12 +374,13 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1">{t('checkout.phoneLabel')} *</label>
-                    <input
-                      type="tel"
+                    {/* Same restricted input as registration: country dial-code
+                        dropdown, digits only, capped length. */}
+                    <PhoneInput
                       value={guestInfo.phone}
-                      onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
-                      placeholder="+381 6x xxx xxxx"
-                      className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
+                      onChange={(v) => setGuestInfo({ ...guestInfo, phone: v })}
+                      placeholder="6x xxx xxxx"
+                      required
                     />
                   </div>
                 </div>
@@ -454,7 +546,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       <button onClick={() => setStep('address')} className="text-xs text-[#edb4bd] hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-[#1a1c1e]">
-                      {shippingAddress?.street}, {shippingAddress?.postalCode} {shippingAddress?.city}
+                      {shippingAddress?.street}, {shippingAddress?.postalCode} {shippingAddress?.city}, {shippingAddress?.country}
                     </p>
                   </div>
 
@@ -472,13 +564,24 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
 
                   {/* Payment summary */}
-                  <div className="p-4 bg-[#FFFFFF] rounded-sm">
+                  <div className="mb-4 p-4 bg-[#FFFFFF] rounded-sm">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-semibold text-[#1a1c1e]">{t('checkout.step4')}</span>
                       <button onClick={() => setStep('payment')} className="text-xs text-[#edb4bd] hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-[#1a1c1e]">
                       {paymentOptions.find((o) => o.key === paymentMethod)?.label}
+                    </p>
+                  </div>
+
+                  {/* Order note summary */}
+                  <div className="p-4 bg-[#FFFFFF] rounded-sm">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-semibold text-[#1a1c1e]">{t('checkout.noteOptional')}</span>
+                      <button onClick={() => setStep('payment')} className="text-xs text-[#edb4bd] hover:underline">{t('checkout.edit')}</button>
+                    </div>
+                    <p className="text-sm text-[#1a1c1e] whitespace-pre-wrap">
+                      {notes.trim() ? notes : '—'}
                     </p>
                   </div>
                 </div>
@@ -502,6 +605,24 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
                 </div>
 
+                {/* Totals */}
+                <div className="bg-white rounded-sm shadow-sm p-6">
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-[#1a1c1e]">{t('checkout.subtotal')} ({items.length} {t('checkout.itemsCount')})</span>
+                      <span className="font-medium">{subtotal.toLocaleString('sr-RS')} RSD</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#1a1c1e]">{t('checkout.step3')}</span>
+                      <span className="font-medium">{shippingCost === 0 ? t('checkout.free') : `${shippingCost} RSD`}</span>
+                    </div>
+                    <div className="pt-3 border-t border-[#dddbd9] flex justify-between text-lg font-bold">
+                      <span>{t('checkout.total')}</span>
+                      <span>{total.toLocaleString('sr-RS')} RSD</span>
+                    </div>
+                  </div>
+                </div>
+
                 {error && (
                   <div className="bg-red-50 border border-red-200 rounded-sm p-3 text-sm text-red-700">
                     <div className="flex items-center gap-2">
@@ -512,7 +633,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                         <Link href="/account/login?callbackUrl=/checkout" className="px-4 py-2 bg-[#edb4bd] text-white text-sm rounded font-medium hover:bg-[#413d3a]">
                           {t('checkout.loginLink')}
                         </Link>
-                        <Link href="/account/register?callbackUrl=/checkout" className="px-4 py-2 border border-black text-[#edb4bd] text-sm rounded font-medium hover:bg-[#FFFFFF]">
+                        <Link href="/account/login?tab=register&callbackUrl=/checkout" className="px-4 py-2 border border-black text-[#edb4bd] text-sm rounded font-medium hover:bg-[#FFFFFF]">
                           {t('checkout.createAccount')}
                         </Link>
                       </div>
@@ -532,7 +653,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
-                    {isSubmitting ? t('checkout.processing') : t('checkout.placeOrderBtn')}
+                    {isSubmitting
+                      ? t('checkout.processing')
+                      : isGuest
+                        ? t('checkout.loginToOrder')
+                        : t('checkout.placeOrderBtn')}
                   </button>
                 </div>
               </div>

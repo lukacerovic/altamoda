@@ -12,6 +12,12 @@ import {
   Play, CheckCircle, X, Link2, AlertCircle,
 } from "lucide-react";
 import DOMPurify from "isomorphic-dompurify";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Thumbs } from "swiper/modules";
+import type { Swiper as SwiperClass } from "swiper/types";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/thumbs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -45,7 +51,7 @@ interface RelatedProduct {
   name: string;
   slug: string;
   brand: { name: string; slug: string } | null;
-  price: number;
+  price: number | null;
   oldPrice: number | null;
   image: string | null;
   isProfessional: boolean;
@@ -56,6 +62,7 @@ interface RelatedProduct {
 interface Product {
   id: string;
   sku: string;
+  barcode?: string | null;
   nameLat: string;
   slug: string;
   brand: { name: string; slug: string } | null;
@@ -74,10 +81,10 @@ interface Product {
   warnings: string | null;
   shelfLife: string | null;
   importerInfo: string | null;
-  priceB2c: number;
+  priceB2c: number | null;
   priceB2b: number | null;
   oldPrice: number | null;
-  price: number;
+  price: number | null;
   stockQuantity: number;
   isProfessional: boolean;
   isNew: boolean;
@@ -136,13 +143,28 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   );
   const [reviewError, setReviewError] = useState("");
   const [canReview, setCanReview] = useState(false);
+  // The SSR payload is cached role-blind (guest view: no B2B prices, professional
+  // products have all prices null). B2B/admin sessions fetch their real prices
+  // client-side and overlay them on the serialized product.
+  const [livePrices, setLivePrices] = useState<{
+    price: number | null;
+    oldPrice: number | null;
+    priceB2b: number | null;
+    promoBadge: string | null;
+  } | null>(null);
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
+  const [mainSwiper, setMainSwiper] = useState<SwiperClass | null>(null);
 
   const { addItem } = useCartStore();
-  const { increment: incWishlist, decrement: decWishlist } = useWishlistStore();
+  const { increment: incWishlist, decrement: decWishlist, toggleGuest } = useWishlistStore();
 
-  // Fetch user-specific data client-side (wishlist + review eligibility)
+  // Fetch user-specific data client-side (wishlist + review eligibility).
+  // Guests seed the heart from the persisted guest wishlist store instead.
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      setLiked(useWishlistStore.getState().guestItems.includes(product.id));
+      return;
+    }
     fetch('/api/wishlist')
       .then(r => r.json())
       .then(data => {
@@ -162,6 +184,32 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
       .catch(() => {});
   }, [session?.user?.id, product.id]);
 
+  // B2B/admin: fetch role-aware prices client-side (the cached SSR payload never
+  // contains them). Guests and B2C keep the serialized guest view.
+  useEffect(() => {
+    if (role !== "b2b" && role !== "admin") return;
+    let cancelled = false;
+    fetch(`/api/products/${product.id}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (cancelled || !data?.success || !data.data) return;
+        setLivePrices({
+          price: typeof data.data.price === "number" ? data.data.price : null,
+          oldPrice: typeof data.data.oldPrice === "number" ? data.data.oldPrice : null,
+          priceB2b: typeof data.data.priceB2b === "number" ? data.data.priceB2b : null,
+          promoBadge: typeof data.data.promoBadge === "string" ? data.data.promoBadge : null,
+        });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [role, product.id]);
+
+  // Displayed prices: live (role-aware) overlay wins over the serialized guest view.
+  const price = livePrices ? livePrices.price : product.price;
+  const oldPrice = livePrices ? livePrices.oldPrice : product.oldPrice;
+  const priceB2b = livePrices ? livePrices.priceB2b : product.priceB2b;
+  const promoBadge = livePrices?.promoBadge ?? null;
+
   // Show sibling images when a color variant is selected, otherwise show product's own images
   const displayImages = selectedSibling && !selectedSibling.isActive && selectedSibling.images.length > 0
     ? selectedSibling.images.map(img => img.url)
@@ -169,6 +217,9 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
       ? product.images.map(img => img.url)
       : [defaultImage];
   const images = displayImages;
+  // Remount both Swipers (back at slide 0) whenever the active image set changes,
+  // e.g. when hovering a color sibling swaps the gallery.
+  const imagesKey = images.join("|");
 
   // Strip color code from name for grouped products
   const activeColor = colorSiblings.find(s => s.isActive);
@@ -176,8 +227,8 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     ? product.nameLat.replace(activeColor.colorCode, '').replace(/\/+/g, ' ').replace(/\s{2,}/g, ' ').trim()
     : product.nameLat;
 
-  const discountPct = product.oldPrice
-    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+  const discountPct = oldPrice && price != null
+    ? Math.round(((oldPrice - price) / oldPrice) * 100)
     : 0;
 
   const hasText = (v: string | null | undefined) => !!(v && v.trim());
@@ -225,12 +276,12 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   const outOfStock = product.stockQuantity <= 0;
 
   const handleAddToCart = () => {
-    if (outOfStock) return;
+    if (outOfStock || price == null) return;
     addItem({
       productId: product.id,
       name: product.nameLat,
       brand: product.brand?.name ?? "",
-      price: product.price,
+      price,
       quantity,
       image: images[0] ?? "",
       sku: product.sku,
@@ -244,7 +295,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     // Prevent the surrounding Link from navigating to the PDP.
     e.preventDefault();
     e.stopPropagation();
-    if (r.stockQuantity <= 0) return;
+    if (r.stockQuantity <= 0 || r.price == null) return;
     addItem({
       productId: r.id,
       name: r.name,
@@ -260,6 +311,13 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   };
 
   const handleToggleWishlist = async () => {
+    // Guests toggle the persisted guest wishlist (merged into the DB on login)
+    // — no API call, no login prompt.
+    if (!session?.user) {
+      setWishlistMessage("");
+      setLiked(toggleGuest(product.id));
+      return;
+    }
     const previousState = liked;
     setLiked(!liked);
     setWishlistMessage("");
@@ -345,6 +403,32 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
     }
   };
 
+  // B2C accounts must never see professional (B2B-only) products, even via a
+  // direct URL — render a not-found style screen instead of the product.
+  // Guests still see the page (with hidden prices).
+  if (product.isProfessional && role === "b2c") {
+    return (
+      <div className="min-h-screen bg-[#FFFFFF]" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
+        <Header />
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-28 md:py-40 text-center">
+          <AlertCircle className="w-10 h-10 text-[#1a1c1e]/25 mx-auto mb-6" />
+          <h1 className="text-3xl md:text-4xl font-light text-[#1a1c1e] leading-[1.05] tracking-tight mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            {t("productDetail.notFoundTitle")}
+          </h1>
+          <p className="text-[13px] text-[#1a1c1e]/60 leading-relaxed mb-10">{t("productDetail.notFoundDesc")}</p>
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#1a1c1e] pb-0.5 hover:opacity-60 transition-opacity"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            {t("productDetail.products")}
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FFFFFF]" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
       <Header />
@@ -378,40 +462,79 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
           {/* On mobile the photo is constrained to roughly a product-card width
               (the /products listing is 2-up); full size returns at lg where the
               2-column PDP layout kicks in. */}
-          <div className="max-w-[60%] mx-auto lg:max-w-none lg:mx-0">
-            <div className="aspect-square overflow-hidden mb-4 relative bg-[#FFFFFF] rounded-[4px]">
-              {/* object-contain so tall/long products (e.g. Shades EQ bottles) show
-                  in full instead of being cropped by object-cover. */}
-              <Image src={images[activeThumb]} alt={product.nameLat} width={900} height={900} className="w-full h-full object-contain" />
-              {product.images[activeThumb]?.type === 'video' && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/30">
-                  <div className="w-16 h-16 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center cursor-pointer hover:bg-[#FFFFFF] transition-colors">
-                    <Play className="w-7 h-7 text-[#1a1c1e] ml-1" />
+          {/* min-w-0 is load-bearing: as a grid item this column defaults to
+              min-width:auto, so Swiper's measured slide widths would feed back
+              into the column width via its ResizeObserver and inflate the layout
+              to the browser's max size. */}
+          <div className="max-w-[85%] mx-auto lg:max-w-none lg:mx-0 min-w-0">
+            {/* Main image: one slide per image, swipeable by touch on all viewports,
+                synced with the thumbnail Swiper below via the Thumbs module. */}
+            <Swiper
+              key={imagesKey}
+              modules={[Thumbs]}
+              thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+              onSwiper={setMainSwiper}
+              onSlideChange={(s) => setActiveThumb(s.activeIndex)}
+              className="w-full max-w-full overflow-hidden mb-4 bg-[#FFFFFF] rounded-[4px]"
+            >
+              {images.map((img, i) => (
+                <SwiperSlide key={i}>
+                  {/* aspect-square lives on the slide CONTENT, never on the Swiper
+                      container: container aspect + slide h-full is a circular sizing
+                      dependency that blows the layout up to the browser's max height.
+                      Mobile uses a FIXED height so every product presents the same
+                      vertical image area (object-contain letterboxes the photo). */}
+                  <div className="relative h-[420px] lg:h-auto lg:aspect-square">
+                    {/* object-contain so tall/long products (e.g. Shades EQ bottles) show
+                        in full instead of being cropped by object-cover. */}
+                    <Image src={img} alt={product.nameLat} width={900} height={900} className="w-full h-full object-contain" />
+                    {product.images[i]?.type === 'video' && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/30">
+                        <div className="w-16 h-16 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center cursor-pointer hover:bg-[#FFFFFF] transition-colors">
+                          <Play className="w-7 h-7 text-[#1a1c1e] ml-1" />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
-            </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
             {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
-                {images.map((img, t) => (
-                  <button key={t} onClick={() => setActiveThumb(t)} className={`aspect-square overflow-hidden transition-all relative bg-[#FFFFFF] rounded-[4px] ${activeThumb === t ? "ring-1 ring-[#1a1c1e]" : "opacity-70 hover:opacity-100"}`}>
-                    <Image src={img} alt={`View ${t + 1}`} width={120} height={120} className="w-full h-full object-contain" />
-                    {product.images[t]?.type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/40"><Play className="w-5 h-5 text-[#FFFFFF]" /></div>
-                    )}
-                    {product.images[t]?.type === 'gif' && (
-                      <span className="absolute top-1 right-1 bg-[#1a1c1e] text-[#FFFFFF] text-[8px] font-medium px-1.5 py-0.5 uppercase tracking-wider">GIF</span>
-                    )}
-                  </button>
+              <Swiper
+                key={`thumbs-${imagesKey}`}
+                modules={[Navigation, Thumbs]}
+                onSwiper={setThumbsSwiper}
+                slidesPerView={4}
+                spaceBetween={12}
+                watchSlidesProgress
+                navigation={images.length > 4}
+                className="w-full max-w-full"
+                style={{ "--swiper-navigation-color": "#1a1c1e", "--swiper-navigation-size": "16px" } as React.CSSProperties}
+              >
+                {images.map((img, i) => (
+                  <SwiperSlide key={i}>
+                    <button
+                      onClick={() => { if (mainSwiper && !mainSwiper.destroyed) mainSwiper.slideTo(i); }}
+                      className={`aspect-square w-full overflow-hidden transition-all relative bg-[#FFFFFF] rounded-[4px] p-1.5 ${activeThumb === i ? "ring-1 ring-[#1a1c1e]" : "opacity-70 hover:opacity-100"}`}
+                    >
+                      <Image src={img} alt={`View ${i + 1}`} width={120} height={120} className="w-full h-full object-contain" />
+                      {product.images[i]?.type === 'video' && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-[#1a1c1e]/40"><Play className="w-5 h-5 text-[#FFFFFF]" /></div>
+                      )}
+                      {product.images[i]?.type === 'gif' && (
+                        <span className="absolute top-1 right-1 bg-[#1a1c1e] text-[#FFFFFF] text-[8px] font-medium px-1.5 py-0.5 uppercase tracking-wider">GIF</span>
+                      )}
+                    </button>
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
             )}
           </div>
 
           {/* PRODUCT INFO */}
           <div className="lg:pt-4">
             {product.brand && (
-              <Link href={`/products?brand=${product.brand.slug}`} className="text-[10px] uppercase tracking-[0.28em] text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors font-medium inline-block mb-3">{product.brand.name}</Link>
+              <Link href={`/products?brand=${product.brand.slug}`} className="text-[12px] uppercase tracking-[0.28em] text-[#1a1c1e] hover:opacity-60 transition-opacity font-bold inline-block mb-3">{product.brand.name}</Link>
             )}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#1a1c1e] leading-[1.05] tracking-tight mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               {displayName}
@@ -425,12 +548,23 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             )}
 
             {/* Imported attributes — shown only when populated */}
-            {(hasText(product.productType) || hasText(product.hairTypes) || hasText(product.tags)) && (
+            {(hasText(product.sku) || hasText(product.barcode) || hasText(product.productType) || hasText(product.hairTypes) || hasText(product.tags)) && (
               <div className="space-y-2.5 mb-5">
+                {(hasText(product.sku) || hasText(product.barcode)) && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px]">{t("productDetail.productCode")}</span>
+                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]">{hasText(product.sku) ? product.sku : product.barcode}</span>
+                  </div>
+                )}
                 {hasText(product.productType) && (
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px]">Tip proizvoda</span>
-                    <span className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]">{product.productType}</span>
+                    <Link
+                      href={`/products?productType=${encodeURIComponent(product.productType!.trim())}`}
+                      className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] hover:bg-[#1a1c1e] hover:text-[#FFFFFF] transition-colors px-2.5 py-1 rounded-sm"
+                    >
+                      {product.productType!.trim()}
+                    </Link>
                   </div>
                 )}
                 {hasText(product.hairTypes) && (
@@ -438,9 +572,9 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 min-w-[110px] pt-1">Tip kose</span>
                     <div className="flex flex-wrap gap-1.5">
                       {product.hairTypes!.split(",").map(s => s.trim()).filter(Boolean).map((v, i) => (
-                        <span key={i} className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] px-2.5 py-1 rounded-sm">
+                        <Link key={i} href={`/products?hairType=${encodeURIComponent(v)}`} className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/80 bg-[#dddbd9] hover:bg-[#1a1c1e] hover:text-[#FFFFFF] transition-colors px-2.5 py-1 rounded-sm">
                           {v}
-                        </span>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -486,16 +620,22 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
               )}
             </div>
 
-            {/* Price */}
-            <div className="flex items-baseline gap-4 mb-6 pb-6 border-b border-[#dddbd9]/60">
-              {product.oldPrice && (
-                <span className="text-[#1a1c1e]/50 line-through text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.oldPrice.toLocaleString("sr-RS")} RSD</span>
-              )}
-              <span className="text-4xl md:text-5xl font-light text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.price.toLocaleString("sr-RS")} <span className="text-xl">RSD</span></span>
-              {discountPct > 0 && (
-                <span className="bg-[#edb4bd] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">-{discountPct}%</span>
-              )}
-            </div>
+            {/* Price — hidden entirely when the viewer isn't allowed to see it
+                (guest viewing a professional product); the B2B hint below shows instead. */}
+            {price != null && (
+              <div className="flex items-baseline gap-4 mb-6 pb-6 border-b border-[#dddbd9]/60">
+                {oldPrice != null && (
+                  <span className="text-[#1a1c1e]/50 line-through text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{oldPrice.toLocaleString("sr-RS")} RSD</span>
+                )}
+                <span className="text-4xl md:text-5xl font-light text-[#1a1c1e]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{price.toLocaleString("sr-RS")} <span className="text-xl">RSD</span></span>
+                {discountPct > 0 && (
+                  <span className="bg-[#edb4bd] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">-{discountPct}%</span>
+                )}
+                {promoBadge && (
+                  <span className="bg-[#1a1c1e] text-[#FFFFFF] text-[10px] uppercase tracking-[0.22em] px-2 py-1 font-medium">{promoBadge}</span>
+                )}
+              </div>
+            )}
 
             {/* B2B Price hint (for guests and B2C) */}
             {role !== 'b2b' && product.isProfessional && (
@@ -511,11 +651,11 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             )}
 
             {/* B2B user sees both prices */}
-            {role === 'b2b' && product.priceB2b && (
+            {role === 'b2b' && priceB2b != null && (
               <div className="border border-green-700 p-4 mb-6 bg-green-50/60">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] uppercase tracking-[0.22em] text-green-800 font-medium">{t("productDetail.yourB2bPrice")}</span>
-                  <span className="text-xl font-light text-green-800" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{product.priceB2b.toLocaleString("sr-RS")} RSD</span>
+                  <span className="text-xl font-light text-green-800" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{priceB2b.toLocaleString("sr-RS")} RSD</span>
                 </div>
               </div>
             )}
@@ -772,6 +912,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               {related.map((p) => {
                 const relOutOfStock = p.stockQuantity <= 0;
+                const relNoPrice = p.price == null;
                 const justAdded = addedRelatedId === p.id;
                 return (
                 <Link key={p.id} href={`/products/${p.slug}`} className="group block">
@@ -782,15 +923,21 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     <span className="text-[10px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium block mb-1.5">{p.brand?.name}</span>
                     <h3 className="text-base text-[#1a1c1e] line-clamp-2 leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{p.name}</h3>
                     <div className="mt-2 flex items-baseline gap-2 text-sm text-[#1a1c1e]">
-                      {p.oldPrice && <span className="text-[#1a1c1e]/60 line-through text-xs">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
-                      <span>{p.price.toLocaleString("sr-RS")} RSD</span>
+                      {p.price != null ? (
+                        <>
+                          {p.oldPrice != null && <span className="text-[#1a1c1e]/60 line-through text-xs">{p.oldPrice.toLocaleString("sr-RS")} RSD</span>}
+                          <span>{p.price.toLocaleString("sr-RS")} RSD</span>
+                        </>
+                      ) : (
+                        <span className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]/60">{t("productDetail.b2bPrice")}</span>
+                      )}
                     </div>
                     <button
                       type="button"
                       onClick={(e) => handleAddRelatedToCart(e, p)}
-                      disabled={relOutOfStock}
+                      disabled={relOutOfStock || relNoPrice}
                       className={`mt-3 w-full py-2 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors flex items-center justify-center gap-2 rounded-[2px] ${
-                        relOutOfStock
+                        relOutOfStock || relNoPrice
                           ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                           : justAdded
                           ? "bg-[#d98fa0] text-[#ffffff]"

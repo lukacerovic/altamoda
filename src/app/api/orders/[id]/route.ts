@@ -58,6 +58,9 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     erpSynced: order.erpSynced,
     createdAt: order.createdAt,
     user: order.user,
+    guest: order.userId
+      ? null
+      : { name: order.guestName, email: order.guestEmail, phone: order.guestPhone },
     items: order.items.map((item) => ({
       id: item.id,
       productId: item.productId,
