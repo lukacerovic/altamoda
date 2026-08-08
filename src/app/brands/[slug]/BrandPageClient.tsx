@@ -6,6 +6,7 @@ import DOMPurify from "isomorphic-dompurify";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { resolveBrandTextKey, getBrandParagraphs, getBrandTitle } from "@/lib/brand-texts";
 
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&h=500&fit=crop";
 
@@ -39,6 +40,11 @@ interface BrandPageClientProps {
 export default function BrandPageClient({ brand, products, totalProducts }: BrandPageClientProps) {
   const { t } = useLanguage();
 
+  // Curated i18n brand text (translatable) wins over the DB description/content.
+  const textKey = resolveBrandTextKey(brand.slug, brand.name);
+  const brandTitle = textKey ? getBrandTitle(t, textKey) : null;
+  const brandParagraphs = textKey ? getBrandParagraphs(t, textKey) : [];
+
   return (
     <>
       <Header />
@@ -62,19 +68,36 @@ export default function BrandPageClient({ brand, products, totalProducts }: Bran
                 {brand.name}
               </h1>
             )}
-            {brand.description && (
+            {brandTitle ? (
+              <p className="mt-4 text-[#1a1c1e] text-lg max-w-2xl mx-auto leading-relaxed">
+                {brandTitle}
+              </p>
+            ) : brand.description ? (
               <p className="mt-4 text-[#1a1c1e] text-lg max-w-2xl mx-auto leading-relaxed">
                 {brand.description}
               </p>
-            )}
+            ) : null}
             <div className="mt-3 flex items-center justify-center gap-6 text-sm text-[#1a1c1e]">
               <span>{totalProducts} {t("brand.productsAvailable")}</span>
             </div>
           </div>
         </section>
 
+        {/* Curated i18n brand text — translatable, replaces DB content when present */}
+        {brandParagraphs.length > 0 && (
+          <section className="max-w-4xl mx-auto px-4 py-16">
+            <div className="space-y-6">
+              {brandParagraphs.map((para, i) => (
+                <p key={i} className="text-[#1a1c1e] leading-relaxed text-lg">
+                  {para}
+                </p>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Content from TipTap editor */}
-        {brand.content && (
+        {brandParagraphs.length === 0 && brand.content && (
           <section className="max-w-4xl mx-auto px-4 py-16">
             <div
               className="prose prose-stone prose-lg max-w-none

@@ -4,38 +4,43 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { GOOGLE_MAPS_URL } from "@/components/Footer";
 
 export default function ContactPage() {
   const { t } = useLanguage();
-  // Instagram comes from the same site setting the footer uses, so the two stay in sync;
-  // YouTube/Facebook are fixed brand profiles.
-  const settings = useSiteSettings(["instagram"]);
+  // Instagram/TikTok come from the same site settings the footer uses, so the
+  // two stay in sync; YouTube/Facebook are fixed brand profiles.
+  const settings = useSiteSettings(["instagram", "tiktok"]);
   const socialLinks = [
-    settings.instagram && { href: settings.instagram, label: "Instagram" },
-    { href: "https://www.youtube.com/user/altamodabg", label: "YouTube" },
+    { href: settings.instagram || "https://www.instagram.com/altamoda.rs", label: "Instagram" },
     { href: "https://www.facebook.com/altamoda.srbija/", label: "Facebook" },
-  ].filter(Boolean) as Array<{ href: string; label: string }>;
+    { href: "https://www.youtube.com/@altamodabg", label: "YouTube" },
+    { href: settings.tiktok || "https://www.tiktok.com/@idhairacademy", label: "TikTok" },
+  ] as Array<{ href: string; label: string }>;
 
   return (
     <>
       <Header />
       <main className="min-h-screen flex flex-col bg-[#FFFFFF] text-[#1a1c1e]">
         {/* Hero */}
-        <section className="w-full h-[563px] relative overflow-hidden flex items-center justify-center">
+        <section className="w-full h-[563px] relative overflow-hidden flex items-end justify-center">
           <div className="absolute inset-0 bg-[#dddbd9]">
             <img
               alt={t("contact.heroImageAlt")}
               className="w-full h-full object-cover grayscale-[0.2] opacity-90"
               src="/kontakt-1.jpg"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FFFFFF]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFFFFF]/70 to-[#FFFFFF]" />
           </div>
-          <div className="relative z-10 text-center px-6">
+          <div className="relative z-10 text-center px-6 pb-10 md:pb-14">
             <h1 className="font-serif italic text-5xl md:text-7xl lg:text-8xl tracking-tighter mb-4">
               {t("contact.heroTitle")}
             </h1>
             <p className="text-lg md:text-xl text-[#1a1c1e] max-w-2xl mx-auto font-light leading-relaxed">
               {t("contact.heroDescription")}
+            </p>
+            <p className="mt-4 text-base md:text-lg text-[#1a1c1e]/80 max-w-2xl mx-auto font-light leading-relaxed">
+              {t("contact.heroDescription2")}
             </p>
           </div>
         </section>
@@ -117,7 +122,9 @@ export default function ContactPage() {
                   <div className="pt-2">
                     <a
                       className="inline-flex items-center gap-2 text-xs tracking-widest text-[#413d3a] uppercase hover:opacity-70 transition-opacity duration-300"
-                      href="#"
+                      href={GOOGLE_MAPS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       {t("contact.viewOnMap")}
                     </a>
@@ -132,8 +139,11 @@ export default function ContactPage() {
         <section className="bg-[#FFFFFF] py-24 border-t border-[#dddbd9]/10">
           <div className="max-w-2xl mx-auto px-8 text-center">
             <h3 className="font-serif text-3xl mb-8">{t("contact.newsletterTitle")}</h3>
-            <p className="text-[#1a1c1e] mb-10 font-light italic">
+            <p className="text-[#1a1c1e] mb-4 font-light">
               {t("contact.newsletterDescription")}
+            </p>
+            <p className="text-[#1a1c1e] mb-10 font-light italic">
+              {t("contact.newsletterDescription2")}
             </p>
             <form className="flex flex-col md:flex-row gap-4">
               <input

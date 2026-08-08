@@ -733,7 +733,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       icon: "/altamoda_svg_icons/suva_i_ostecena.svg",
       title: t("home.hpConcern1Title"),
       desc: t("home.hpConcern1Desc"),
-      href: buildFilterHref({ hairType: ["Suva kosa", "Oštećena kosa"], tag: ["hidratacija", "obnova"] }),
+      href: buildFilterHref({ hairType: ["Suva kosa"], tag: ["hidratacija"] }),
     },
     {
       icon: "/altamoda_svg_icons/tanka_kosa.svg",
@@ -745,7 +745,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       icon: "/altamoda_svg_icons/obojena_kosa.svg",
       title: t("home.hpConcern3Title"),
       desc: t("home.hpConcern3Desc"),
-      href: buildFilterHref({ hairType: ["Hemijski tretirana kosa"] }),
+      href: buildFilterHref({ hairType: ["Bojena kosa", "Hemijski tretirana kosa"] }),
     },
     {
       icon: "/altamoda_svg_icons/frizzy_kosa.svg",
@@ -757,10 +757,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
       icon: "/altamoda_svg_icons/hemijski_ostecena.svg",
       title: t("home.hpConcern5Title"),
       desc: t("home.hpConcern5Desc"),
-      href: buildFilterHref({
-        hairType: ["Oštećena kosa", "Hemijski tretirana kosa", "Zaštita od toplote"],
-        tag: ["zaštita od toplote", "obnova"],
-      }),
+      href: buildFilterHref({ hairType: ["Oštećena kosa"], tag: ["obnova"] }),
     },
     {
       icon: "/altamoda_svg_icons/masna_kosa_skalp.svg",

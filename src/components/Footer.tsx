@@ -4,16 +4,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSiteSettings } from "@/lib/useSiteSettings";
-import { Instagram, Facebook, Music2, AtSign } from "lucide-react";
+import { Instagram, Facebook, Music2, Youtube, AtSign } from "lucide-react";
 import PaymentLogos from "@/components/PaymentLogos";
+
+// Official profiles — used when no site-setting override exists.
+const SOCIAL_DEFAULTS = {
+  instagram: "https://www.instagram.com/altamoda.rs",
+  facebook: "https://www.facebook.com/altamoda.srbija/",
+  youtube: "https://www.youtube.com/@altamodabg",
+  tiktok: "https://www.tiktok.com/@idhairacademy",
+};
+
+export const GOOGLE_MAPS_URL = "https://maps.google.com/?q=Mihizova+9,+Beograd";
 
 export default function Footer() {
   const { t } = useLanguage();
-  const settings = useSiteSettings(["instagram", "facebook", "tiktok", "storeEmail"]);
+  const settings = useSiteSettings(["instagram", "facebook", "tiktok", "youtube", "storeEmail"]);
   const socialLinks = [
-    settings.instagram && { href: settings.instagram, label: "Instagram", Icon: Instagram },
-    settings.facebook && { href: settings.facebook, label: "Facebook", Icon: Facebook },
-    settings.tiktok && { href: settings.tiktok, label: "TikTok", Icon: Music2 },
+    { href: settings.instagram || SOCIAL_DEFAULTS.instagram, label: "Instagram", Icon: Instagram },
+    { href: settings.facebook || SOCIAL_DEFAULTS.facebook, label: "Facebook", Icon: Facebook },
+    { href: settings.youtube || SOCIAL_DEFAULTS.youtube, label: "YouTube", Icon: Youtube },
+    { href: settings.tiktok || SOCIAL_DEFAULTS.tiktok, label: "TikTok", Icon: Music2 },
     settings.storeEmail && { href: `mailto:${settings.storeEmail}`, label: "Email", Icon: AtSign },
   ].filter(Boolean) as Array<{ href: string; label: string; Icon: typeof Instagram }>;
 
@@ -79,11 +90,16 @@ export default function Footer() {
         <h5 className="font-bold text-xs uppercase tracking-[0.2em] mb-2 text-[#FFFFFF]">
           {t("footer.contactTitle")}
         </h5>
-        <p className="text-xs uppercase tracking-wider text-[#FFFFFF]">
+        <a
+          href={GOOGLE_MAPS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity"
+        >
           {t("footer.address")}
           <br />
           {t("footer.city")}
-        </p>
+        </a>
         <a href={`tel:${t("footer.phone").replace(/\s|\(|\)/g, "")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
           {t("footer.phone")}
         </a>

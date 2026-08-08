@@ -17,9 +17,9 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
  * Footer links such as `/faq#dostava` rely on these slugs being unique and
  * URL-safe; do not rename them without updating the Footer too.
  *
- * `q` is the visible heading on the collapsed row, `a` is the body. `a`
- * supports multi-paragraph content via `\n\n` separators and bullet lists
- * via lines starting with `• `.
+ * All copy lives in the i18n JSONs (`faq.*`) so the Help Centre is fully
+ * translatable. Answers support multi-paragraph content via `\n\n`
+ * separators and bullet lists via lines starting with `• `.
  */
 interface FaqItem {
   q: string;
@@ -32,148 +32,25 @@ interface FaqSection {
   items: FaqItem[];
 }
 
+/** Build `{q: "<prefix>.qN", a: "<prefix>.aN"}` key pairs for a section. */
+function qa(prefix: string, count: number): FaqItem[] {
+  return Array.from({ length: count }, (_, i) => ({
+    q: `${prefix}.q${i + 1}`,
+    a: `${prefix}.a${i + 1}`,
+  }));
+}
+
 const faqItemsData: FaqSection[] = [
-  {
-    slug: "porudzbine",
-    titleKey: "faq.catOrders",
-    items: [
-      { q: "Koliko traje dostava?", a: "Standardna dostava traje 1-3 radna dana za teritoriju Srbije. Za Beograd je moguća dostava narednog radnog dana za porudžbine primljene do 14h." },
-      { q: "Koliko košta dostava?", a: "Dostava je besplatna za sve porudžbine iznad 5.000 RSD. Za porudžbine manje vrednosti, cena dostave iznosi 350 RSD." },
-      { q: "Kako mogu pratiti svoju porudžbinu?", a: "Nakon slanja porudžbine, dobićete email sa tracking brojem i linkom za praćenje. Status porudžbine možete pratiti i na svom nalogu u sekciji 'Porudžbine'." },
-      { q: "Mogu li promeniti adresu dostave nakon naručivanja?", a: "Da, ukoliko porudžbina još nije poslata, kontaktirajte nas putem telefona ili emaila i promenićemo adresu dostave." },
-      { q: "Da li vršite dostavu van Srbije?", a: "Trenutno vršimo dostavu samo na teritoriji Republike Srbije. Za porudžbine iz inostranstva, kontaktirajte nas direktno." },
-    ],
-  },
-  {
-    slug: "placanje",
-    titleKey: "faq.catPayment",
-    items: [
-      { q: "Koji načini plaćanja su dostupni?", a: "Prihvatamo platne kartice (Visa, Mastercard, Maestro, Dina), plaćanje pouzećem, kao i plaćanje putem fakture za B2B korisnike." },
-      { q: "Da li je online plaćanje sigurno?", a: "Apsolutno. Koristimo SSL enkripciju i sertifikovane payment gateway sisteme. Vaši podaci o kartici nikada ne prolaze kroz naš server." },
-      { q: "Mogu li platiti na rate?", a: "Da, za porudžbine iznad 10.000 RSD nudimo mogućnost plaćanja na 2-6 rata bez kamate za odabrane kartice." },
-      { q: "Kada se vrši naplata sa kartice?", a: "Naplata se vrši u momentu potvrde porudžbine. U slučaju otkazivanja, refundacija se vrši u roku od 3-5 radnih dana." },
-    ],
-  },
-  {
-    slug: "b2b",
-    titleKey: "faq.catB2B",
-    items: [
-      { q: "Kako se registrovati kao B2B korisnik?", a: "Kliknite na 'B2B Registracija' i popunite formular sa podacima o vašem salonu (PIB, matični broj, adresa). Naš tim će pregledati i odobriti vaš nalog u roku od 24h." },
-      { q: "Koje su prednosti B2B programa?", a: "B2B korisnici imaju pristup posebnim cenama, rabatnim skalama, ekskluzivnim profesionalnim proizvodima, mogućnosti naručivanja po fakturi i loyalty programu." },
-      { q: "Da li postoji minimalan iznos porudžbine za B2B?", a: "Da, minimalan iznos B2B porudžbine je 10.000 RSD. Ovo omogućava optimizaciju logistike i održavanje posebnih cena." },
-      { q: "Kako funkcioniše plaćanje po fakturi?", a: "B2B korisnici sa odobrenim kreditnim limitom mogu naručivati sa odloženim plaćanjem. Rok plaćanja je 15-30 dana u zavisnosti od ugovora." },
-    ],
-  },
-  {
-    slug: "proizvodi",
-    titleKey: "faq.catProducts",
-    items: [
-      { q: "Da li su svi proizvodi originalni?", a: "Da, svi naši proizvodi su 100% originalni i nabavljeni direktno od ovlašćenih distributera. Garantujemo autentičnost svakog proizvoda." },
-      { q: "Koji je rok trajanja proizvoda?", a: "Svi proizvodi imaju minimalno 12 meseci do isteka roka trajanja u momentu isporuke. Rok trajanja je jasno naznačen na pakovanju." },
-      { q: "Kako da odaberem pravi proizvod za svoj tip kose?", a: "Koristite naše filtere za tip kose pri pretrazi proizvoda. Takođe, naš blog sadrži vodiče za odabir proizvoda. Za personalizovane preporuke, kontaktirajte nas." },
-    ],
-  },
-  // ── Policy sections (footer deep-links) ──────────────────────────────
-  {
-    slug: "dostava",
-    titleKey: "faq.catShipping",
-    items: [
-      {
-        q: "Dostava i isporuka",
-        a: "Porudžbine se obrađuju u najkraćem mogućem roku nakon potvrde kupovine. Isporuka se vrši putem kurirske službe na adresu koju ste naveli prilikom poručivanja.",
-      },
-      {
-        q: "Rok isporuke",
-        a: "Rok isporuke je obično od 1 do 3 radna dana, u zavisnosti od lokacije i trenutnog opterećenja kurirske službe.",
-      },
-      {
-        q: "Troškovi dostave",
-        a: "Troškovi dostave prikazani su prilikom završetka kupovine.\n\nZa porudžbine iznad određenog iznosa, dostava može biti besplatna u skladu sa aktuelnim uslovima na sajtu.",
-      },
-      {
-        q: "Napomena",
-        a: "Alta Moda ulaže maksimalan napor da sve porudžbine budu isporučene u predviđenim rokovima.\n\nRokovi isporuke su okvirni i mogu varirati u zavisnosti od rada kurirske službe i okolnosti na koje ne možemo direktno uticati.\n\nU slučaju eventualnih kašnjenja, kupac će biti obavešten u najkraćem mogućem roku.",
-      },
-    ],
-  },
-  {
-    slug: "reklamacije",
-    titleKey: "faq.catComplaints",
-    items: [
-      {
-        q: "Pravo na reklamaciju",
-        a: "Kupac ima pravo na reklamaciju u skladu sa važećim zakonima Republike Srbije.\n\nU slučaju da proizvod ima nedostatak ili ne odgovara opisu, kupac ima pravo da podnese reklamaciju.",
-      },
-      {
-        q: "Način podnošenja reklamacije",
-        a: "Reklamacija se podnosi putem email adrese ili telefona uz dostavljanje:\n• broja porudžbine\n• opisa problema\n• fotografije proizvoda (po potrebi)",
-      },
-      {
-        q: "Rok za odgovor",
-        a: "Na reklamaciju odgovaramo u najkraćem mogućem roku, a najkasnije u zakonskom roku.",
-      },
-      {
-        q: "Povraćaj robe",
-        a: "Kupac ima pravo na odustanak od kupovine u roku od 14 dana od prijema proizvoda, bez navođenja razloga.\n\nProizvod mora biti:\n• nekorišćen\n• neoštećen\n• u originalnom pakovanju\n\nTroškove povraćaja snosi kupac, osim u slučaju opravdane reklamacije.",
-      },
-      {
-        q: "Povraćaj sredstava",
-        a: "U slučaju prihvaćenog povraćaja, sredstva se vraćaju kupcu u zakonskom roku, na isti način na koji je izvršeno plaćanje, osim ako nije drugačije dogovoreno.",
-      },
-    ],
-  },
-  {
-    slug: "privatnost",
-    titleKey: "faq.catPrivacy",
-    items: [
-      {
-        q: "Prikupljanje podataka",
-        a: "Alta Moda doo se obavezuje da štiti privatnost svih korisnika sajta.\n\nPrikupljamo samo neophodne podatke za obradu porudžbine i komunikaciju sa korisnicima, kao što su:\n• ime i prezime\n• email adresa\n• broj telefona\n• adresa za isporuku",
-      },
-      {
-        q: "Svrha obrade",
-        a: "Podaci se koriste isključivo za:\n• realizaciju porudžbine\n• komunikaciju sa korisnicima\n• slanje newsletter komunikacije (uz saglasnost)",
-      },
-      {
-        q: "Zaštita podataka",
-        a: "Vaši podaci su zaštićeni i čuvaju se u skladu sa važećim propisima.",
-      },
-      {
-        q: "Deljenje podataka",
-        a: "Podaci se ne prosleđuju trećim licima, osim u slučaju kada je to neophodno za realizaciju isporuke (kurirske službe).",
-      },
-      {
-        q: "Prava korisnika",
-        a: "Korisnik ima pravo da:\n• zatraži uvid u svoje podatke\n• zatraži ispravku ili brisanje podataka\n• povuče saglasnost za obradu podataka\n\nZa sva pitanja u vezi sa privatnošću, korisnik nas može kontaktirati putem dostupnih kontakt podataka.",
-      },
-    ],
-  },
-  {
-    slug: "uslovi",
-    titleKey: "faq.catTerms",
-    items: [
-      {
-        q: "Opšte odredbe",
-        a: "Korišćenjem ovog sajta prihvatate navedene uslove korišćenja.\n\nSajt altamoda.rs namenjen je kupovini proizvoda i informisanju o uslugama i edukacijama.",
-      },
-      {
-        q: "Tačnost informacija",
-        a: "Alta Moda nastoji da sve informacije na sajtu budu tačne i ažurne, ali ne može garantovati potpunu bezgrešnost sadržaja.",
-      },
-      {
-        q: "Cene i dostupnost",
-        a: "Sve cene prikazane su u dinarima i mogu biti podložne promenama bez prethodne najave.\n\nDostupnost proizvoda može varirati.",
-      },
-      {
-        q: "Odgovornost",
-        a: "Alta Moda ne snosi odgovornost za eventualne tehničke greške, prekide u radu sajta ili druge okolnosti van svoje kontrole.",
-      },
-      {
-        q: "Izmene uslova",
-        a: "Zadržavamo pravo izmene uslova korišćenja u bilo kom trenutku.",
-      },
-    ],
-  },
+  { slug: "porudzbine", titleKey: "faq.catOrders", items: qa("faq.orders", 5) },
+  { slug: "placanje", titleKey: "faq.catPayment", items: qa("faq.payment", 3) },
+  { slug: "dostava", titleKey: "faq.catShipping", items: qa("faq.shipping", 7) },
+  { slug: "reklamacije", titleKey: "faq.catComplaints", items: qa("faq.returns", 5) },
+  { slug: "proizvodi", titleKey: "faq.catProducts", items: qa("faq.productsFaq", 5) },
+  { slug: "garancija", titleKey: "faq.catGuarantee", items: qa("faq.guarantee", 1) },
+  { slug: "b2b", titleKey: "faq.catB2B", items: qa("faq.b2bFaq", 5) },
+  { slug: "kupovina", titleKey: "faq.catShopping", items: qa("faq.shopInfo", 4) },
+  { slug: "privatnost", titleKey: "faq.catPrivacy", items: qa("faq.privacy", 5) },
+  { slug: "uslovi", titleKey: "faq.catTerms", items: qa("faq.terms", 5) },
 ];
 
 /** Render a single answer block, splitting on `\n\n` for paragraphs and on
@@ -227,7 +104,7 @@ export default function FAQPage() {
   const faqSections = faqItemsData.map((section) => ({
     slug: section.slug,
     title: t(section.titleKey),
-    items: section.items,
+    items: section.items.map((item) => ({ q: t(item.q), a: t(item.a) })),
   }));
 
   const toggleItem = (key: string) => {
@@ -247,7 +124,7 @@ export default function FAQPage() {
       const section = faqItemsData.find((s) => s.slug === hash);
       if (!section) return;
       setSearchQuery("");
-      setOpenItems(new Set(section.items.map((_, idx) => `${section.titleKey}-${idx}`)));
+      setOpenItems(new Set(section.items.map((_, idx) => `${section.slug}-${idx}`)));
       // Defer scroll until after expansion paints.
       requestAnimationFrame(() => {
         const el = sectionRefs.current[hash];
@@ -320,7 +197,7 @@ export default function FAQPage() {
               </h2>
               <div className="space-y-2">
                 {section.items.map((item, idx) => {
-                  const key = `${section.title}-${idx}`;
+                  const key = `${section.slug}-${idx}`;
                   const isOpen = openItems.has(key);
                   return (
                     <div key={key} className="bg-white rounded-sm border border-[#dddbd9]/50 overflow-hidden">

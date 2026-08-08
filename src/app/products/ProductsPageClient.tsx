@@ -17,6 +17,7 @@ import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { resolveBrandLogo } from "@/lib/brand-logos";
+import { resolveBrandTextKey, getBrandParagraphs, getBrandTitle } from "@/lib/brand-texts";
 
 /** Sentence-case a display value: first letter uppercase, rest lowercase
  * (Serbian locale). Normalizes inconsistently-cased DB values (e.g. "MAKAZE"
@@ -248,6 +249,12 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
   // Legacy altamoda.rs logo URLs are broken for some brands (Biolage, Framesi);
   // prefer the local override when we have one.
   const logo = resolveBrandLogo(brand.slug, brand.logoUrl);
+  // Curated i18n brand text takes over from the DB content; when present, the
+  // full text renders in the editorial heading below, so this header only
+  // keeps the logo + tagline to avoid showing the same text twice.
+  const textKey = resolveBrandTextKey(brand.slug, brand.name);
+  const brandTitle = textKey ? getBrandTitle(t, textKey) : null;
+  const hasCuratedText = textKey ? getBrandParagraphs(t, textKey).length > 0 : false;
   // Strip old altamoda.rs images but keep the rest of HTML
   const cleanHtml = brand.content
     ? DOMPurify.sanitize(
@@ -265,7 +272,12 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
         ) : (
           <h2 className="text-xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
         )}
-        {cleanHtml && (
+        {brandTitle && (
+          <p className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium">
+            {brandTitle}
+          </p>
+        )}
+        {!hasCuratedText && cleanHtml && (
           <>
             <div
               className={`text-[#1a1c1e]/60 text-[13px] leading-relaxed [&_p]:mb-2 [&_strong]:text-[#1a1c1e] [&_strong]:font-semibold ${expanded ? "" : "max-h-[4.5em] overflow-hidden"}`}
@@ -1493,6 +1505,12 @@ export default function ProductsPageClient({
     </div>
   ) : null;
 
+  // Curated brand text (i18n) replaces the generic editorial description when
+  // browsing a single brand; first paragraph shows, the rest expands.
+  const brandTextKey = activeBrand ? resolveBrandTextKey(activeBrand.slug, activeBrand.name) : null;
+  const brandParagraphs = brandTextKey ? getBrandParagraphs(t, brandTextKey) : [];
+  const [brandTextExpanded, setBrandTextExpanded] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#FFFFFF]" style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif" }}>
       <Header />
@@ -1535,9 +1553,27 @@ export default function ProductsPageClient({
                 <>{t("products.catchphrasePrefix")}, <em className="italic">{t("products.allProductsEm")}</em>.</>
               )}
             </h1>
-            <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-lg">
-              {t("products.editorialDesc")}
-            </p>
+            {brandParagraphs.length > 0 ? (
+              <div className="mt-5 max-w-2xl">
+                {(brandTextExpanded ? brandParagraphs : brandParagraphs.slice(0, 1)).map((para, i) => (
+                  <p key={i} className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mb-3">
+                    {para}
+                  </p>
+                ))}
+                {brandParagraphs.length > 1 && (
+                  <button
+                    onClick={() => setBrandTextExpanded((prev) => !prev)}
+                    className="text-xs font-medium text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors"
+                  >
+                    {brandTextExpanded ? `▲ ${t("products.showLess")}` : `▼ ${t("products.showMore")}`}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <p className="text-[14px] text-[#1a1c1e]/60 leading-relaxed mt-5 max-w-lg">
+                {t("products.editorialDesc")}
+              </p>
+            )}
             <p className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 mt-6">
               {pagination.total} {t("products.productsLabel")}
             </p>

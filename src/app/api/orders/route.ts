@@ -8,7 +8,15 @@ import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 import { VPOS_ENABLED } from '@/lib/payments/vpos-config'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, rewriteAssetUrls } from '@/lib/email'
+import { orderConfirmationTemplate } from '@/lib/email-templates'
+
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  card: 'Platna kartica',
+  bank_transfer: 'Bankovna uplata',
+  cash_on_delivery: 'Plaćanje pouzećem',
+  invoice: 'Plaćanje po fakturi',
+}
 
 // GET /api/orders — list orders (user's own, or admin sees all)
 export const GET = withErrorHandler(async (req: Request) => {
@@ -201,18 +209,33 @@ export const POST = withErrorHandler(async (req: Request) => {
   if (recipientEmail) {
     const escapeHtml = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    const itemsHtml = order.items
-      .map((i) => `<li>${escapeHtml(i.productName)} × ${i.quantity} — ${Number(i.totalPrice).toLocaleString('sr-RS')} RSD</li>`)
-      .join('')
-    sendEmail({
-      to: recipientEmail,
-      subject: `Potvrda porudžbine ${order.orderNumber}`,
-      html: `<p>Hvala na porudžbini!</p>
-<p>Broj porudžbine: <strong>${order.orderNumber}</strong></p>
-<ul>${itemsHtml}</ul>
-<p>Ukupno: <strong>${Number(order.total).toLocaleString('sr-RS')} RSD</strong></p>
-<p>Obavestićemo vas kada porudžbina bude poslata.</p>`,
-    }).catch((err) => console.error('Order confirmation email failed:', err))
+    const sendConfirmation = async () => {
+      const primaryImages = await prisma.productImage.findMany({
+        where: { productId: { in: order.items.map((i) => i.productId) }, isPrimary: true },
+        select: { productId: true, url: true },
+      })
+      const imageByProduct = new Map(primaryImages.map((img) => [img.productId, img.url]))
+      const addr = input.shippingAddress
+      await sendEmail({
+        to: recipientEmail,
+        subject: `Potvrda porudžbine ${order.orderNumber}`,
+        html: rewriteAssetUrls(orderConfirmationTemplate({
+          orderNumber: order.orderNumber,
+          items: order.items.map((i) => ({
+            name: escapeHtml(i.productName),
+            quantity: i.quantity,
+            totalPrice: `${Number(i.totalPrice).toLocaleString('sr-RS')} RSD`,
+            image: imageByProduct.get(i.productId) ?? null,
+          })),
+          total: `${Number(order.total).toLocaleString('sr-RS')} RSD`,
+          paymentMethod: PAYMENT_METHOD_LABELS[input.paymentMethod] ?? input.paymentMethod,
+          paymentConfirmed: order.paymentStatus === 'paid',
+          shippingAddress: escapeHtml(`${addr.street}, ${addr.postalCode} ${addr.city}, ${addr.country}`),
+          notes: input.notes ? escapeHtml(input.notes) : null,
+        })),
+      })
+    }
+    sendConfirmation().catch((err) => console.error('Order confirmation email failed:', err))
   }
 
   // Card orders go through the VPOS hosted payment page (when enabled). The client

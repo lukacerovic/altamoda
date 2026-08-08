@@ -4,7 +4,7 @@ import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-util
 import { registerB2cSchema, registerB2bSchema } from '@/lib/validations/user'
 import { registrationRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { sendTransactional } from '@/lib/email'
-import { b2bSignupAdminTemplate } from '@/lib/email-templates'
+import { b2bSignupAdminTemplate, registrationWelcomeTemplate } from '@/lib/email-templates'
 
 export const POST = withErrorHandler(async (req: Request) => {
   const rateLimitResponse = await applyRateLimit(registrationRateLimiter, `register:${getClientIp(req)}`)
@@ -64,6 +64,13 @@ export const POST = withErrorHandler(async (req: Request) => {
       status: true,
     },
   })
+
+  // Welcome email to the new user — best-effort, never fails the registration.
+  void sendTransactional({
+    to: user.email,
+    subject: 'Dobro došli u ALTA MODA',
+    html: registrationWelcomeTemplate({ isB2bPending: Boolean(isB2b) }),
+  }).catch((err) => console.error('[email] registration welcome failed:', err))
 
   if (isB2b) {
     const adminEmail = process.env.ADMIN_EMAIL

@@ -78,7 +78,7 @@
     "email": "kontakt@altamoda.rs",
     "workHours": "Ponedeljak–petak: 9–17h",
     "pib": "PIB: 101773967",
-    "bankAccount": "Br. računa: 325-9500500002310-56 OTP banka Srbija",
+    "bankAccount": "Br. računa: 170-0030013183000-92 UniCredit banka",
     "copyright": "© 2026 Alta Moda. Sva prava zadržana.",
     "newsletter": "Newsletter",
     "newsletterText": "Prijavite se i budite u toku sa novim proizvodima i akcijama.",
@@ -185,22 +185,22 @@
     "hpStatPodrska": "Podrška",
     "hpB2bCta": "Postani naš partner",
     "hpConcernKicker": "Rešenja za vašu kosu",
-    "hpConcernTitle": "Pronađite rutinu za",
+    "hpConcernTitle": "Pronađite proizvode za",
     "hpConcernTitleEm": "vidljive rezultate",
-    "hpConcernSubtitle": "Od svakodnevne nege do savršenog stilizovanja — izaberite proizvode koji odgovaraju vašem tipu kose i njenim potrebama, kao i željenom izgledu. Hidratacija, obnova, volumen i zaštita boje — sve na jednom mestu.",
-    "hpConcern1Title": "Suva i oštećena",
-    "hpConcern1Desc": "Kosa bez sjaja, sklona lomljenju i ispucalim krajevima.",
-    "hpConcern2Title": "Tanka bez volumena",
-    "hpConcern2Desc": "Kosa koja brzo gubi oblik i nema punoću.",
-    "hpConcern3Title": "Obojena koja bledi",
-    "hpConcern3Desc": "Boja gubi intenzitet i sjaj već nakon nekoliko pranja.",
-    "hpConcern4Title": "Frizz i neposlušna",
-    "hpConcern4Desc": "Kosa koja reaguje na vlagu i teško se oblikuje.",
-    "hpConcern5Title": "Hemijski tretirana",
-    "hpConcern5Desc": "Slaba, lomljiva i bez elastičnosti.",
-    "hpConcern6Title": "Masna i osetljivo teme",
-    "hpConcern6Desc": "Brzo mašćenje i disbalans vlasišta.",
-    "hpConcernCta": "Otkrij proizvode",
+    "hpConcernSubtitle": "Od svakodnevne nege do savršenog stilizovanja — odaberite rutinu koja odgovara vašem tipu kose i njenim potrebama. Hidratacija, obnova, zaštita boje, volumen — sve na jednom mestu za postizanje željenog izgleda.",
+    "hpConcern1Title": "Suva kosa",
+    "hpConcern1Desc": "Kosa je suva, gruba i bez sjaja? Vratite joj hidrataciju, mekoću i prirodan sjaj.",
+    "hpConcern2Title": "Tanka kosa",
+    "hpConcern2Desc": "Kosa je tanka i bez volumena? Pružite joj punoću, volumen i lagan osećaj.",
+    "hpConcern3Title": "Obojena kosa",
+    "hpConcern3Desc": "Boja koja brzo bledi? Sačuvajte intenzitet boje i dugotrajan sjaj.",
+    "hpConcern4Title": "Frizz i neposlušna kosa",
+    "hpConcern4Desc": "Kosa se kovrdža i teško oblikuje? Zagladite vlas i držite frizz pod kontrolom.",
+    "hpConcern5Title": "Oštećena kosa",
+    "hpConcern5Desc": "Kosa se lomi ili ima ispucale krajeve? Obnovite je i vratite joj snagu i elastičnost.",
+    "hpConcern6Title": "Masno teme",
+    "hpConcern6Desc": "Kosa se brzo masti? Očistite teme i produžite osećaj svežine.",
+    "hpConcernCta": "Preporučeni proizvodi",
     "hpEduTitlePre": "Put ka",
     "hpEduTitleEm": "uspešnim",
     "hpEduTitlePost": "profesionalcima.",
@@ -277,7 +277,7 @@
     "collectionLabel": "Kolekcija",
     "catchphrasePrefix": "Svaki ritual",
     "allProductsEm": "svi proizvodi",
-    "editorialDesc": "Pregledaj punu paletu altamoda — šamponi, regeneratori, maske, ulja i alati — ručno biran, kliničko-testiran i slavljen u našim neobeleženim doznačima.",
+    "editorialDesc": "Istražite celu kolekciju profesionalnih proizvoda i pronađite ono što odgovara vašim potrebama.",
     "typeProductTitle": "Tip proizvoda",
     "hairTypeTitle": "Tip kose",
     "functionTitle": "Funkcija",
@@ -1139,21 +1139,133 @@
   "faq": {
     "home": "Početna",
     "backToHome": "Nazad na početnu",
-    "title": "Često Postavljana Pitanja",
-    "subtitle": "Pronađite odgovore na najčešća pitanja",
+    "title": "Centar za pomoć",
+    "subtitle": "Dobro došli u Centar za pomoć Alta Moda webshopa. Na ovoj stranici pronaći ćete sve važne informacije koje će vam pomoći da kupovina bude jednostavna, brza i sigurna — od poručivanja i plaćanja, preko dostave i reklamacija, do odgovora na najčešća pitanja profesionalnih i krajnjih kupaca.",
     "searchPlaceholder": "Pretražite pitanja...",
     "notFoundTitle": "Niste pronašli odgovor?",
     "notFoundDesc": "Naš tim za podršku je tu da vam pomogne",
     "contactSupport": "Kontaktirajte podršku",
-    "catOrders": "Narudžbine i Dostava",
+    "catOrders": "Poručivanje",
     "catPayment": "Plaćanje",
-    "catB2B": "B2B Program",
+    "catB2B": "Profesionalni korisnici (B2B)",
     "catProducts": "Proizvodi",
     "catReturns": "Povrat i Reklamacije",
-    "catShipping": "Dostava i isporuka",
-    "catComplaints": "Reklamacije i povraćaj",
+    "catShipping": "Dostava",
+    "catComplaints": "Povraćaj i reklamacije",
     "catPrivacy": "Politika privatnosti",
-    "catTerms": "Uslovi korišćenja"
+    "catTerms": "Uslovi korišćenja",
+    "catGuarantee": "Garancija originalnosti",
+    "catShopping": "Kupovina i Pro Shop",
+    "orders": {
+      "q1": "Kako mogu da poručim proizvod?",
+      "a1": "Izaberite željeni proizvod, dodajte ga u korpu i pratite korake za završetak kupovine.",
+      "q2": "Da li moram da napravim nalog?",
+      "a2": "Ne. Kupovinu možete obaviti i kao gost. Registrovani korisnici imaju pregled istorije porudžbina, brže naručivanje i pristup profesionalnim pogodnostima ukoliko ispunjavaju uslove za B2B nalog.",
+      "q3": "Kako da znam da je porudžbina uspešno primljena?",
+      "a3": "Nakon uspešne kupovine dobićete potvrdu putem e-maila sa svim detaljima porudžbine.",
+      "q4": "Mogu li da izmenim ili otkažem porudžbinu?",
+      "a4": "Ukoliko porudžbina još nije obrađena ili poslata, kontaktirajte nas što je pre moguće. Potrudićemo se da izvršimo izmenu ili otkazivanje.",
+      "q5": "Kako mogu da pratim svoju porudžbinu?",
+      "a5": "Nakon slanja pošiljke dobićete informacije za praćenje isporuke, ukoliko ih kurirska služba obezbeđuje."
+    },
+    "payment": {
+      "q1": "Koje načine plaćanja prihvatate?",
+      "a1": "• Platne kartice\n• Plaćanje pouzećem\n• Bankovna uplata (ukoliko je dostupna)",
+      "q2": "Da li je online plaćanje bezbedno?",
+      "a2": "Da. Plaćanje se obavlja putem bezbednog i sertifikovanog sistema za obradu platnih kartica.",
+      "q3": "Da li dobijam fiskalni račun?",
+      "a3": "Da. Uz svaku porudžbinu dobijate fiskalni račun u skladu sa važećim propisima Republike Srbije."
+    },
+    "shipping": {
+      "q1": "Na kojim teritorijama vršite dostavu?",
+      "a1": "Trenutno vršimo dostavu na teritoriji Republike Srbije.",
+      "q2": "Koliko traje dostava?",
+      "a2": "Većina porudžbina isporučuje se u roku od 1 do 3 radna dana od potvrde porudžbine.",
+      "q3": "Kolika je cena dostave?",
+      "a3": "Cena dostave prikazuje se prilikom završetka kupovine.",
+      "q4": "Kojom kurirskom službom šaljete pošiljke?",
+      "a4": "Pošiljke isporučuje ovlašćena kurirska služba.",
+      "q5": "Šta ako nisam na adresi prilikom dostave?",
+      "a5": "Kurirska služba će pokušati ponovnu isporuku ili će vas kontaktirati radi dogovora.",
+      "q6": "Mogu li promeniti adresu isporuke?",
+      "a6": "Da, ukoliko porudžbina još nije predata kurirskoj službi.",
+      "q7": "Šta treba da uradim prilikom prijema pošiljke?",
+      "a7": "Pre preuzimanja proverite da li je paket vidljivo oštećen. Ukoliko primetite oštećenje, prijavite ga kuriru i kontaktirajte naš tim."
+    },
+    "returns": {
+      "q1": "Mogu li da vratim proizvod?",
+      "a1": "Da, u skladu sa Zakonom o zaštiti potrošača Republike Srbije.",
+      "q2": "Kako da podnesem reklamaciju?",
+      "a2": "Kontaktirajte nas i dostavite:\n• broj porudžbine\n• opis problema\n• fotografije proizvoda (ukoliko su potrebne)",
+      "q3": "Šta ako dobijem pogrešan proizvod?",
+      "a3": "Kontaktirajte nas odmah po prijemu pošiljke kako bismo organizovali zamenu ili pronašli odgovarajuće rešenje.",
+      "q4": "Šta ako proizvod stigne oštećen?",
+      "a4": "Pošaljite fotografije proizvoda i ambalaže odmah po prijemu pošiljke.",
+      "q5": "Kako se vrši povraćaj novca?",
+      "a5": "U slučaju odobrenog povraćaja, sredstva će biti vraćena na isti način na koji je izvršeno plaćanje, u zakonskom roku."
+    },
+    "productsFaq": {
+      "q1": "Da li su proizvodi originalni?",
+      "a1": "Da. Svi proizvodi u ponudi su 100% originalni i nabavljaju se kroz zvanične kanale snabdevanja. Za pojedine brendove Alta Moda je zvanični uvoznik i distributer, dok se ostali proizvodi nabavljaju i prodaju u skladu sa ugovornim odnosima i ovlašćenjima njihovih nosilaca prava.",
+      "q2": "Da li su proizvodi bezbedni za upotrebu?",
+      "a2": "Da. Svi proizvodi u ponudi ispunjavaju važeće propise Republike Srbije i Evropske unije.",
+      "q3": "Da li proizvodi imaju rok trajanja?",
+      "a3": "Da. Rok trajanja ili period upotrebe nakon otvaranja označeni su na pakovanju proizvoda.",
+      "q4": "Šta znači da proizvod trenutno nije na stanju?",
+      "a4": "Proizvod je privremeno rasprodat. Novi kontingent očekujemo u najkraćem mogućem roku.",
+      "q5": "Mogu li rezervisati proizvod koji trenutno nije dostupan?",
+      "a5": "Kontaktirajte nas i proverićemo mogućnost rezervacije ili vas obavestiti kada proizvod ponovo bude dostupan."
+    },
+    "guarantee": {
+      "q1": "Garancija originalnosti",
+      "a1": "Kupovina profesionalnih proizvoda zahteva poverenje, zbog čega je originalnost svakog proizvoda naš prioritet.\n\nSvi proizvodi u ponudi Alta Moda webshopa su originalni i nabavljaju se isključivo putem zvaničnih kanala snabdevanja. Za pojedine brendove Alta Moda je zvanični uvoznik i distributer, dok se ostali proizvodi nabavljaju i prodaju u skladu sa ugovornim odnosima i ovlašćenjima njihovih nosilaca prava.\n\nSvaki proizvod se skladišti i distribuira u skladu sa preporukama proizvođača kako bi se očuvao njegov kvalitet i bezbednost.\n\nKupovinom u Alta Moda webshopu kupujete proverene i originalne proizvode iza kojih stoji kompanija sa više od 30 godina iskustva u profesionalnoj hair beauty industriji."
+    },
+    "b2bFaq": {
+      "q1": "Kako mogu da postanem profesionalni kupac?",
+      "a1": "Registrujte se kao profesionalni korisnik i dostavite potrebne podatke za verifikaciju.",
+      "q2": "Ko može da koristi B2B nalog?",
+      "a2": "Registrovani frizerski saloni, frizeri i pravna lica koja ispunjavaju uslove za profesionalnu kupovinu.",
+      "q3": "Koliko traje verifikacija?",
+      "a3": "Verifikacija se najčešće završava u roku od jednog radnog dana.",
+      "q4": "Da li su profesionalne cene dostupne svim korisnicima?",
+      "a4": "Ne. Profesionalne cene dostupne su isključivo verifikovanim B2B korisnicima.",
+      "q5": "Zašto su neke cene vidljive tek nakon prijave?",
+      "a5": "Pojedini profesionalni brendovi i proizvodi namenjeni su isključivo registrovanim profesionalnim korisnicima. Nakon uspešne registracije i verifikacije biće vam omogućen pristup profesionalnim cenama i ponudi, u skladu sa uslovima pojedinačnih brendova."
+    },
+    "shopInfo": {
+      "q1": "Kako kupiti na Alta Moda webshopu?",
+      "a1": "• Pronađite željeni proizvod putem pretrage ili kategorija.\n• Dodajte proizvod u korpu.\n• Pregledajte sadržaj korpe.\n• Unesite podatke za isporuku.\n• Izaberite način plaćanja.\n• Potvrdite porudžbinu.\n• Potvrdu kupovine dobićete putem e-maila.\n• Nakon slanja pošiljke bićete obavešteni o statusu isporuke ili o spremnosti porudžbine za preuzimanje.",
+      "q2": "Online ili Pro Shop — izbor je vaš",
+      "a2": "Kupovinu možete obaviti na način koji vam najviše odgovara.\n\nKupovina putem webshopa: Jednostavno poručite željene proizvode online, a mi ćemo ih dostaviti na vašu adresu ili pripremiti za lično preuzimanje.\n\nPreuzimanje u Pro Shop-u: Prilikom poručivanja putem webshopa možete odabrati opciju „Preuzimanje u Pro Shop-u“. Kada porudžbina bude spremna, obavestićemo vas putem e-maila ili telefona.",
+      "q3": "Posetite nas",
+      "a3": "Alta Moda Pro Shop — Mihizova 9, Beograd.\n\nU našem Pro Shop-u možete:\n• kupiti proizvode iz naše ponude\n• preuzeti online porudžbinu\n• pogledati i uporediti proizvode pre kupovine\n• dobiti stručnu preporuku našeg tima\n• upoznati se sa profesionalnim brendovima koje zastupamo\n\nBez obzira na to da li kupujete online ili nas posećujete lično, možete računati na originalne proizvode, stručnu podršku i profesionalnu uslugu.",
+      "q4": "Zašto kupovati u Alta Modi?",
+      "a4": "• 100% originalni proizvodi\n• Zvanični uvoznik i distributer za odabrane profesionalne brendove\n• Saradnja sa vodećim svetskim proizvođačima profesionalne kozmetike\n• Više od 30 godina iskustva u profesionalnoj nezi kose\n• Sigurna online kupovina\n• Brza i pouzdana dostava\n• Stručna korisnička podrška\n• Profesionalni proizvodi za frizerske salone i krajnje korisnike\n• Pažljivo odabran asortiman renomiranih svetskih brendova"
+    },
+    "privacy": {
+      "q1": "Prikupljanje podataka",
+      "a1": "Alta Moda doo se obavezuje da štiti privatnost svih korisnika sajta.\n\nPrikupljamo samo neophodne podatke za obradu porudžbine i komunikaciju sa korisnicima, kao što su:\n• ime i prezime\n• email adresa\n• broj telefona\n• adresa za isporuku",
+      "q2": "Svrha obrade",
+      "a2": "Podaci se koriste isključivo za:\n• realizaciju porudžbine\n• komunikaciju sa korisnicima\n• slanje newsletter komunikacije (uz saglasnost)",
+      "q3": "Zaštita podataka",
+      "a3": "Vaši podaci su zaštićeni i čuvaju se u skladu sa važećim propisima.",
+      "q4": "Deljenje podataka",
+      "a4": "Podaci se ne prosleđuju trećim licima, osim u slučaju kada je to neophodno za realizaciju isporuke (kurirske službe).",
+      "q5": "Prava korisnika",
+      "a5": "Korisnik ima pravo da:\n• zatraži uvid u svoje podatke\n• zatraži ispravku ili brisanje podataka\n• povuče saglasnost za obradu podataka\n\nZa sva pitanja u vezi sa privatnošću, korisnik nas može kontaktirati putem dostupnih kontakt podataka."
+    },
+    "terms": {
+      "q1": "Opšte odredbe",
+      "a1": "Korišćenjem ovog sajta prihvatate navedene uslove korišćenja.\n\nSajt altamoda.rs namenjen je kupovini proizvoda i informisanju o uslugama i edukacijama.",
+      "q2": "Tačnost informacija",
+      "a2": "Alta Moda nastoji da sve informacije na sajtu budu tačne i ažurne, ali ne može garantovati potpunu bezgrešnost sadržaja.",
+      "q3": "Cene i dostupnost",
+      "a3": "Sve cene prikazane su u dinarima i mogu biti podložne promenama bez prethodne najave.\n\nDostupnost proizvoda može varirati.",
+      "q4": "Odgovornost",
+      "a4": "Alta Moda ne snosi odgovornost za eventualne tehničke greške, prekide u radu sajta ili druge okolnosti van svoje kontrole.",
+      "q5": "Izmene uslova",
+      "a5": "Zadržavamo pravo izmene uslova korišćenja u bilo kom trenutku."
+    }
   },
   "colorPage": {
     "natural": "Prirodna",
@@ -1318,17 +1430,81 @@
   },
   "contact": {
     "heroTitle": "Stupite u kontakt",
-    "heroDescription": "Naš atelje je prostor tihog luksuza i kreacija po meri. Obratite nam se za pitanja o kolekcijama, nasleđu i jedinstvenim saradnjama.",
+    "heroDescription": "Naš tim je vaš partner u svetu profesionalne frizerske industrije. Kao uvoznik i distributer vodećih svetskih brendova, povezujemo salone, stiliste i edukatore sa proizvodima i rešenjima koja definišu savremeni standard lepote kose.",
     "connect": "Društvene mreže",
     "inquire": "Upiti",
     "emailLabel": "E-pošta",
     "phoneLabel": "Privatna linija",
     "visit": "Posetite nas",
     "viewOnMap": "Pogledajte na mapi",
-    "newsletterTitle": "Žurnal nasleđa",
-    "newsletterDescription": "Primajte sezonske uvide iz našeg ateljea i obaveštenja o novim kolekcijama.",
+    "newsletterTitle": "Newsletter",
+    "newsletterDescription": "Budite prvi koji saznaju za novitete, profesionalne kolekcije, trendove i ekskluzivne brend kampanje. Prijavite se i dobijajte informacije o aktuelnim akcijama, posebnim ponudama i edukacijama direktno.",
     "emailPlaceholder": "Vaša e-mail adresa",
     "subscribe": "Prijavite se",
-    "heroImageAlt": "Enterijer luksuznog ateljea"
+    "heroImageAlt": "Enterijer luksuznog ateljea",
+    "heroDescription2": "Obratite nam se za informacije o asortimanu, edukacijama, distribuciji i poslovnoj saradnji, i postanite deo mreže profesionalaca koji oblikuju industriju.",
+    "newsletterDescription2": "Ostanite povezani sa industrijom koja se stalno razvija i uvek budite korak ispred."
+  },
+  "brandTexts": {
+    "matrix": {
+      "title": "Profesionalni proizvodi za kosu",
+      "p1": "Matrix je profesionalni brend kojem već više od četiri decenije veruju frizeri širom sveta. Razvijen sa ciljem da profesionalna nega bude dostupna svima, Matrix nudi proizvode koji odgovaraju različitim tipovima, teksturama i potrebama kose. Bilo da želite hidrataciju, obnovu, zaštitu boje, volumen ili negu kovrdžave kose, svaka kolekcija razvijena je kako bi pružila pouzdane rezultate i jednostavnu rutinu nege.",
+      "p2": "Kombinujući inovativne formule, savremene tehnologije i iskustvo profesionalnih frizera, Matrix razvija šampone, regeneratore, maske, tretmane, proizvode za stilizovanje i profesionalne boje koje pomažu da kosa izgleda zdravo, negovano i sjajno. Zahvaljujući širokom asortimanu, lako ćete pronaći proizvode prilagođene upravo potrebama vaše kose — bilo da ste profesionalac ili želite salonske rezultate kod kuće.",
+      "p3": "Matrix je izbor za sve koji žele pouzdanu profesionalnu negu prilagođenu svakodnevnim potrebama različitih tipova kose."
+    },
+    "redken": {
+      "title": "Nauka u službi zdrave i lepe kose",
+      "p1": "Redken je jedan od najpoznatijih profesionalnih brendova za kosu, prepoznatljiv po spoju naučnih istraživanja i salonske ekspertize. Već više od 60 godina razvija inovativne formule koje pomažu u jačanju, obnovi i zaštiti kose, pružajući vidljive rezultate prilagođene različitim tipovima i potrebama kose.",
+      "p2": "U ponudi ćete pronaći šampone, regeneratore, maske, tretmane, proizvode za stilizovanje i profesionalne boje razvijene da odgovore na izazove moderne nege kose. Bilo da je vaša kosa suva, oštećena, farbana ili sklona lomljenju, Redken nudi profesionalna rešenja koja pomažu da kosa bude snažnija, zdravija i negovanija — uz rezultate kojima svakodnevno veruju frizeri širom sveta.",
+      "p3": "Zahvaljujući formulama zasnovanim na nauci, Redken pruža ciljane rezultate i vidljivo unapređuje kvalitet kose već od prvih upotreba."
+    },
+    "biolage": {
+      "title": "Profesionalna nega inspirisana prirodom",
+      "p1": "Biolage već više od 35 godina spaja inspiraciju iz prirode sa profesionalnim znanjem kako bi pružio negu prilagođenu različitim potrebama kose. Razvijen za one koji žele zdravu, negovanu i blistavu kosu, Biolage kombinuje pažljivo odabrane sastojke i savremene formule koje pružaju efikasne rezultate uz prijatan osećaj pri svakodnevnoj upotrebi.",
+      "p2": "U ponudi ćete pronaći šampone, regeneratore, maske, tretmane i proizvode za stilizovanje namenjene hidrataciji, obnovi, zaštiti boje, volumenu i nezi svih tipova kose. Bez obzira na to da li je vaša kosa suva, oštećena, farbana ili tanka, Biolage nudi profesionalna rešenja koja pomažu da kosa bude zdrava, mekana i puna prirodnog sjaja.",
+      "p3": "Biolage je idealan izbor za one koji žele profesionalnu negu inspirisanu prirodom, uz kosu koja izgleda zdravo i negovano iz dana u dan."
+    },
+    "loreal": {
+      "title": "Ekspertiza kojoj veruju profesionalci",
+      "p1": "L'Oréal Professionnel Paris već više od jednog veka postavlja standarde u profesionalnoj nezi i bojenju kose. Razvijen u saradnji sa frizerima širom sveta, brend spaja inovativne tehnologije, naučna istraživanja i dugogodišnje iskustvo kako bi ponudio rešenja prilagođena savremenim potrebama salona i korisnika.",
+      "p2": "U ponudi ćete pronaći profesionalne šampone, regeneratore, maske, tretmane, proizvode za stilizovanje i boje za kosu namenjene različitim tipovima i potrebama kose. Bilo da želite intenzivnu negu, obnovu, zaštitu boje ili dugotrajne profesionalne rezultate, L'Oréal Professionnel Paris nudi proizvode koji pružaju pouzdane performanse i negu kojoj svakodnevno veruju frizeri širom sveta.",
+      "p3": "L'Oréal Professionnel Paris objedinjuje profesionalnu ekspertizu i inovacije kako bi pružio salonske rezultate i dugotrajnu negu."
+    },
+    "kerastase": {
+      "title": "Luksuzna nega bez kompromisa",
+      "p1": "Kérastase već više od 60 godina predstavlja sinonim za luksuznu profesionalnu negu kose. Razvijen u saradnji sa vrhunskim naučnicima i frizerima, brend kreira personalizovana rešenja koja odgovaraju jedinstvenim potrebama svake kose i svakog temena. Spojem naprednih tehnologija, pažljivo odabranih aktivnih sastojaka i sofisticiranih formula, Kérastase pruža izuzetne rezultate koji se vide i osećaju.",
+      "p2": "U ponudi ćete pronaći šampone, regeneratore, maske, serume, ulja i tretmane namenjene hidrataciji, obnovi, zaštiti boje, jačanju i revitalizaciji kose. Bez obzira na to da li želite da rešite konkretan problem ili svojoj kosi pružite vrhunsku negu, Kérastase nudi rituale nege koji pretvaraju svakodnevnu rutinu u jedinstveno salonsko iskustvo.",
+      "p3": "Svaka rutina nege prilagođena je jedinstvenim potrebama kose, pružajući vidljive rezultate i osećaj luksuza pri svakoj upotrebi Kérastase proizvoda."
+    },
+    "framesi": {
+      "title": "Italijanska tradicija profesionalne lepote",
+      "p1": "Framesi je jedan od vodećih italijanskih profesionalnih brendova za kosu, sa tradicijom dužom od 80 godina. Razvijen i proizveden u Italiji, Framesi spaja naučna istraživanja, vrhunsku kozmetičku tehnologiju i inspiraciju savremenim trendovima kako bi ponudio kompletna rešenja za profesionalne frizere i sve koji žele vrhunsku negu kose.",
+      "p2": "U ponudi ćete pronaći profesionalne boje za kosu, šampone, regeneratore, maske, tretmane i proizvode za stilizovanje, razvijene za različite tipove i potrebe kose. Pored prepoznatljivih sistema za koloraciju, Framesi je poznat i po visokokvalitetnim linijama za negu koje pružaju hidrataciju, obnovu, zaštitu i dugotrajnu lepotu kose. Spoj italijanske tradicije, inovacija i profesionalnog znanja čini Framesi pouzdanim izborom za salonsku i kućnu negu.",
+      "p3": "Framesi objedinjuje profesionalnu koloraciju, negu i stilizovanje u kompletnu ponudu namenjenu savremenim frizerima i svima koji očekuju vrhunske rezultate."
+    },
+    "mariaNila": {
+      "title": "Profesionalna nega sa odgovornim pristupom lepoti",
+      "p1": "Maria Nila je švedski premium brend koji spaja profesionalnu negu kose, održivost i savremeni skandinavski dizajn. Razvijen za frizere i sve koji žele vrhunske rezultate, Maria Nila nudi proizvode koji neguju kosu bez kompromisa kada su u pitanju kvalitet, performanse i odgovoran odnos prema prirodi.",
+      "p2": "U ponudi ćete pronaći pažljivo osmišljene kolekcije za različite tipove i potrebe kose — od hidratacije, obnove i zaštite boje do volumena, kontrole neposlušne kose i stilizovanja. Sve formule su 100% veganske i sertifikovane od strane organizacije PETA, bez testiranja na životinjama, uz fokus na održivost u svakom segmentu proizvodnje. Zahvaljujući spoju profesionalnog kvaliteta, efikasnih formulacija i odgovornog pristupa, Maria Nila je izbor onih koji žele zdravu, negovanu kosu i proizvode usklađene sa savremenim vrednostima.",
+      "p3": "Maria Nila dokazuje da profesionalni kvalitet, održivost i vrhunski rezultati čine savršen spoj."
+    },
+    "oliviaGarden": {
+      "title": "Profesionalni alati kojima veruju frizeri",
+      "p1": "Olivia Garden je jedan od najpoznatijih svetskih brendova profesionalnog frizerskog pribora, prepoznatljiv po inovacijama, vrhunskom kvalitetu i ergonomskom dizajnu. Već više od 50 godina razvija četke, češljeve, makaze i profesionalne dodatke koji olakšavaju rad frizerima i pružaju preciznost, udobnost i dugotrajne performanse.",
+      "p2": "U ponudi ćete pronaći širok izbor profesionalnih četki za feniranje i stilizovanje, četki za raščešljavanje, češljeva, makaza i pribora namenjenog svakodnevnom radu u salonu, ali i kućnoj upotrebi. Zahvaljujući pažljivo razvijenim tehnologijama i stalnim inovacijama, Olivia Garden proizvodi omogućavaju lakše oblikovanje, nežnije raščešljavanje i profesionalne rezultate, zbog čega su izbor frizera i ljubitelja kvalitetne nege kose širom sveta.",
+      "p3": "Bez obzira na nivo iskustva, Olivia Garden pribor pruža preciznost, udobnost i kontrolu pri svakom stilizovanju."
+    },
+    "framar": {
+      "title": "Profesionalni pribor za kreativne frizere",
+      "p1": "Framar je kanadski profesionalni brend koji je postao sinonim za inovativan frizerski pribor i kreativna rešenja za koloraciju i stilizovanje. Razvijen od strane frizera za frizere, Framar kombinuje funkcionalnost, moderan dizajn i visok kvalitet kako bi svakodnevni rad u salonu učinio bržim, preciznijim i jednostavnijim.",
+      "p2": "U ponudi ćete pronaći folije za pramenove, četke za farbanje, posude, rukavice, šnale, četke za raščešljavanje i širok izbor profesionalnog pribora koji zadovoljava potrebe savremenih frizera. Zahvaljujući inovativnim proizvodima, prepoznatljivom dizajnu i posvećenosti kvalitetu, Framar je postao jedan od omiljenih brendova profesionalaca širom sveta koji žele pouzdan alat i slobodu da svoju kreativnost pretoče u vrhunske rezultate.",
+      "p3": "Framar pribor osmišljen je da svakodnevni rad učini efikasnijim, urednijim i kreativnijim."
+    },
+    "mizutani": {
+      "title": "Japansko majstorstvo u svakom rezu",
+      "p1": "Mizutani Scissors već više od jednog veka predstavlja vrhunac japanskog zanatstva u izradi profesionalnih frizerskih makaza. Ručno izrađene u Japanu od najkvalitetnijih materijala, Mizutani makaze poznate su po izuzetnoj preciznosti, savršenoj ergonomiji i dugotrajnim performansama. Svaki model razvijen je kako bi frizerima pružio maksimalnu kontrolu, udobnost i sigurnost pri svakom rezu.",
+      "p2": "U ponudi ćete pronaći profesionalne makaze prilagođene različitim tehnikama šišanja i individualnim stilovima rada. Zahvaljujući spoju tradicionalnog japanskog zanatstva, inovativnih tehnologija i beskompromisnog kvaliteta, Mizutani je izbor frizera koji od svog alata očekuju vrhunske performanse, dug vek trajanja i preciznost bez kompromisa.",
+      "p3": "Mizutani je izbor profesionalaca koji u svakom detalju očekuju vrhunsku preciznost, kontrolu i kvalitet izrade."
+    }
   }
 }

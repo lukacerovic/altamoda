@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db'
 import { VPOS_ENABLED, getVposConfig } from '@/lib/payments/vpos-config'
 import { verifyOutcome, toMinorUnits, VPOS_RESULT_SUCCESS } from '@/lib/payments/vpos'
 import { sendEmail } from '@/lib/email'
+import { cardTransactionTemplate } from '@/lib/email-templates'
 
 export const dynamic = 'force-dynamic'
 
@@ -122,8 +123,14 @@ async function handle(req: Request): Promise<Response> {
     try {
       await sendEmail({
         to: notifyEmail,
-        subject: `Potvrda plaćanja — porudžbina ${order.orderNumber}`,
-        html: `<p>Poštovani,</p><p>Vaše plaćanje za porudžbinu <strong>${order.orderNumber}</strong> je uspešno primljeno.</p><p>Hvala na kupovini!</p>`,
+        subject: `Uspešno izvršena kartična transakcija — porudžbina ${order.orderNumber}`,
+        html: cardTransactionTemplate({
+          orderNumber: order.orderNumber,
+          transactionId,
+          authNumber,
+          amount: `${Number(order.total).toLocaleString('sr-RS')} RSD`,
+          dateTime: new Date().toLocaleString('sr-RS', { timeZone: 'Europe/Belgrade' }),
+        }),
       })
     } catch (e) {
       console.error(`[vpos] confirmation email failed for ${order.orderNumber}:`, e)

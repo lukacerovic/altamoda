@@ -78,7 +78,7 @@
     "email": "kontakt@altamoda.rs",
     "workHours": "Mon–Fri: 9AM–5PM",
     "pib": "VAT: 101773967",
-    "bankAccount": "Account No.: 325-9500500002310-56 OTP banka Srbija",
+    "bankAccount": "Account no: 170-0030013183000-92 UniCredit Bank",
     "copyright": "© 2026 Alta Moda. All rights reserved.",
     "newsletter": "Newsletter",
     "newsletterText": "Subscribe to stay up to date with new products and promotions.",
@@ -185,22 +185,22 @@
     "hpStatPodrska": "Support",
     "hpB2bCta": "Become our partner",
     "hpConcernKicker": "Solutions for your hair",
-    "hpConcernTitle": "Find a routine for",
+    "hpConcernTitle": "Find products for",
     "hpConcernTitleEm": "visible results",
-    "hpConcernSubtitle": "From everyday care to perfect styling — choose products that match your hair type, its needs and your desired look. Hydration, repair, volume and color protection — all in one place.",
-    "hpConcern1Title": "Dry & damaged",
-    "hpConcern1Desc": "Dull hair prone to breakage and split ends.",
-    "hpConcern2Title": "Fine, lacking volume",
-    "hpConcern2Desc": "Hair that quickly loses shape and lacks fullness.",
-    "hpConcern3Title": "Color-treated that fades",
-    "hpConcern3Desc": "Color loses intensity and shine after just a few washes.",
-    "hpConcern4Title": "Frizzy & unruly",
-    "hpConcern4Desc": "Hair that reacts to humidity and is hard to style.",
-    "hpConcern5Title": "Chemically treated",
-    "hpConcern5Desc": "Weak, brittle and lacking elasticity.",
-    "hpConcern6Title": "Oily & sensitive scalp",
-    "hpConcern6Desc": "Quick greasiness and scalp imbalance.",
-    "hpConcernCta": "Discover products",
+    "hpConcernSubtitle": "From everyday care to perfect styling — choose a routine that matches your hair type and its needs. Hydration, repair, colour protection, volume — all in one place for the look you want.",
+    "hpConcern1Title": "Dry hair",
+    "hpConcern1Desc": "Hair dry, rough and dull? Bring back hydration, softness and natural shine.",
+    "hpConcern2Title": "Fine hair",
+    "hpConcern2Desc": "Hair fine and flat? Give it fullness, volume and a light feel.",
+    "hpConcern3Title": "Colour-treated hair",
+    "hpConcern3Desc": "Colour fading fast? Preserve colour intensity and long-lasting shine.",
+    "hpConcern4Title": "Frizzy & unruly hair",
+    "hpConcern4Desc": "Hair frizzy and hard to style? Smooth the fibre and keep frizz under control.",
+    "hpConcern5Title": "Damaged hair",
+    "hpConcern5Desc": "Hair breaking or ends splitting? Repair it and restore strength and elasticity.",
+    "hpConcern6Title": "Oily scalp",
+    "hpConcern6Desc": "Hair gets greasy quickly? Cleanse the scalp and prolong the feeling of freshness.",
+    "hpConcernCta": "Recommended products",
     "hpEduTitlePre": "The path to",
     "hpEduTitleEm": "successful",
     "hpEduTitlePost": "professionals.",
@@ -277,7 +277,7 @@
     "collectionLabel": "Collection",
     "catchphrasePrefix": "Every ritual",
     "allProductsEm": "all products",
-    "editorialDesc": "Browse the full altamoda range — shampoos, conditioners, masks, oils and tools — hand-picked, clinically tested and celebrated in our unmarked labels.",
+    "editorialDesc": "Explore the entire collection of professional products and find what suits your needs.",
     "typeProductTitle": "Product type",
     "hairTypeTitle": "Hair type",
     "functionTitle": "Function",
@@ -1139,21 +1139,133 @@
   "faq": {
     "home": "Home",
     "backToHome": "Back to home",
-    "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to the most common questions",
+    "title": "Help Centre",
+    "subtitle": "Welcome to the Alta Moda webshop Help Centre. On this page you will find all the important information to make your purchase simple, fast and secure — from ordering and payment, through delivery and complaints, to answers to the most frequent questions from professional and retail customers.",
     "searchPlaceholder": "Search questions...",
     "notFoundTitle": "Didn't find an answer?",
     "notFoundDesc": "Our support team is here to help you",
     "contactSupport": "Contact Support",
-    "catOrders": "Orders & Delivery",
+    "catOrders": "Ordering",
     "catPayment": "Payment",
-    "catB2B": "B2B Program",
+    "catB2B": "Professional Customers (B2B)",
     "catProducts": "Products",
     "catReturns": "Returns & Claims",
-    "catShipping": "Shipping & Delivery",
-    "catComplaints": "Complaints & Returns",
+    "catShipping": "Delivery",
+    "catComplaints": "Returns & Complaints",
     "catPrivacy": "Privacy Policy",
-    "catTerms": "Terms of Use"
+    "catTerms": "Terms of Use",
+    "catGuarantee": "Authenticity Guarantee",
+    "catShopping": "Shopping & Pro Shop",
+    "orders": {
+      "q1": "How can I order a product?",
+      "a1": "Choose the product you want, add it to the cart and follow the checkout steps.",
+      "q2": "Do I have to create an account?",
+      "a2": "No. You can also shop as a guest. Registered users get order history, faster checkout and access to professional benefits if they qualify for a B2B account.",
+      "q3": "How do I know my order was received successfully?",
+      "a3": "After a successful purchase you will receive an e-mail confirmation with all the order details.",
+      "q4": "Can I change or cancel my order?",
+      "a4": "If the order has not yet been processed or shipped, contact us as soon as possible. We will do our best to make the change or cancellation.",
+      "q5": "How can I track my order?",
+      "a5": "After the parcel is dispatched you will receive tracking information, if the courier service provides it."
+    },
+    "payment": {
+      "q1": "Which payment methods do you accept?",
+      "a1": "• Payment cards\n• Cash on delivery\n• Bank transfer (where available)",
+      "q2": "Is online payment secure?",
+      "a2": "Yes. Payment is processed through a secure, certified card-processing system.",
+      "q3": "Do I get a fiscal receipt?",
+      "a3": "Yes. Every order comes with a fiscal receipt in accordance with the applicable regulations of the Republic of Serbia."
+    },
+    "shipping": {
+      "q1": "Which territories do you deliver to?",
+      "a1": "We currently deliver within the territory of the Republic of Serbia.",
+      "q2": "How long does delivery take?",
+      "a2": "Most orders are delivered within 1 to 3 working days from order confirmation.",
+      "q3": "How much does delivery cost?",
+      "a3": "The delivery cost is shown at checkout.",
+      "q4": "Which courier service do you use?",
+      "a4": "Parcels are delivered by an authorised courier service.",
+      "q5": "What if I am not at the address at the time of delivery?",
+      "a5": "The courier service will attempt redelivery or contact you to arrange it.",
+      "q6": "Can I change the delivery address?",
+      "a6": "Yes, as long as the order has not yet been handed over to the courier service.",
+      "q7": "What should I do when receiving the parcel?",
+      "a7": "Before accepting it, check whether the package is visibly damaged. If you notice damage, report it to the courier and contact our team."
+    },
+    "returns": {
+      "q1": "Can I return a product?",
+      "a1": "Yes, in accordance with the Consumer Protection Act of the Republic of Serbia.",
+      "q2": "How do I file a complaint?",
+      "a2": "Contact us and provide:\n• the order number\n• a description of the problem\n• photos of the product (if needed)",
+      "q3": "What if I receive the wrong product?",
+      "a3": "Contact us immediately upon receiving the parcel so we can organise an exchange or find a suitable solution.",
+      "q4": "What if the product arrives damaged?",
+      "a4": "Send photos of the product and the packaging immediately upon receiving the parcel.",
+      "q5": "How are refunds processed?",
+      "a5": "In the case of an approved return, the funds will be refunded the same way the payment was made, within the legal deadline."
+    },
+    "productsFaq": {
+      "q1": "Are the products original?",
+      "a1": "Yes. All products on offer are 100% original and sourced through official supply channels. For selected brands Alta Moda is the official importer and distributor, while other products are sourced and sold in accordance with contractual relationships and the authorisations of their rights holders.",
+      "q2": "Are the products safe to use?",
+      "a2": "Yes. All products on offer comply with the applicable regulations of the Republic of Serbia and the European Union.",
+      "q3": "Do the products have an expiry date?",
+      "a3": "Yes. The expiry date or period-after-opening is marked on the product packaging.",
+      "q4": "What does it mean when a product is out of stock?",
+      "a4": "The product is temporarily sold out. We expect new stock as soon as possible.",
+      "q5": "Can I reserve a product that is currently unavailable?",
+      "a5": "Contact us and we will check the possibility of a reservation or notify you when the product is available again."
+    },
+    "guarantee": {
+      "q1": "Authenticity Guarantee",
+      "a1": "Buying professional products requires trust, which is why the authenticity of every product is our priority.\n\nAll products offered in the Alta Moda webshop are original and sourced exclusively through official supply channels. For selected brands Alta Moda is the official importer and distributor, while other products are sourced and sold in accordance with contractual relationships and the authorisations of their rights holders.\n\nEvery product is stored and distributed in line with the manufacturer's recommendations to preserve its quality and safety.\n\nBy shopping in the Alta Moda webshop you are buying verified, original products backed by a company with more than 30 years of experience in the professional hair beauty industry."
+    },
+    "b2bFaq": {
+      "q1": "How can I become a professional customer?",
+      "a1": "Register as a professional user and provide the required verification details.",
+      "q2": "Who can use a B2B account?",
+      "a2": "Registered hair salons, hairdressers and legal entities that meet the requirements for professional purchasing.",
+      "q3": "How long does verification take?",
+      "a3": "Verification is usually completed within one working day.",
+      "q4": "Are professional prices available to all users?",
+      "a4": "No. Professional prices are available exclusively to verified B2B users.",
+      "q5": "Why are some prices visible only after signing in?",
+      "a5": "Certain professional brands and products are intended exclusively for registered professional users. After successful registration and verification you will be granted access to professional prices and offers, in accordance with the terms of the individual brands."
+    },
+    "shopInfo": {
+      "q1": "How to shop in the Alta Moda webshop?",
+      "a1": "• Find the product you want via search or categories.\n• Add the product to the cart.\n• Review the contents of your cart.\n• Enter your delivery details.\n• Choose a payment method.\n• Confirm the order.\n• You will receive a purchase confirmation by e-mail.\n• After the parcel is dispatched you will be notified about the delivery status or that the order is ready for pickup.",
+      "q2": "Online or Pro Shop — the choice is yours",
+      "a2": "You can shop in whichever way suits you best.\n\nShopping via the webshop: Simply order the products you want online and we will deliver them to your address or prepare them for personal pickup.\n\nPickup at the Pro Shop: When ordering via the webshop you can choose the \"Pickup at the Pro Shop\" option. When your order is ready, we will notify you by e-mail or phone.",
+      "q3": "Visit us",
+      "a3": "Alta Moda Pro Shop — Mihizova 9, Belgrade.\n\nIn our Pro Shop you can:\n• buy products from our range\n• pick up an online order\n• see and compare products before buying\n• get expert recommendations from our team\n• get to know the professional brands we represent\n\nWhether you shop online or visit us in person, you can count on original products, expert support and professional service.",
+      "q4": "Why shop at Alta Moda?",
+      "a4": "• 100% original products\n• Official importer and distributor for selected professional brands\n• Cooperation with the world's leading manufacturers of professional cosmetics\n• More than 30 years of experience in professional hair care\n• Secure online shopping\n• Fast and reliable delivery\n• Expert customer support\n• Professional products for hair salons and retail customers\n• A carefully selected range of renowned global brands"
+    },
+    "privacy": {
+      "q1": "Data collection",
+      "a1": "Alta Moda doo is committed to protecting the privacy of all users of the site.\n\nWe collect only the data necessary to process orders and communicate with users, such as:\n• first and last name\n• e-mail address\n• phone number\n• delivery address",
+      "q2": "Purpose of processing",
+      "a2": "The data is used exclusively for:\n• fulfilling orders\n• communicating with users\n• sending newsletter communication (with consent)",
+      "q3": "Data protection",
+      "a3": "Your data is protected and stored in accordance with the applicable regulations.",
+      "q4": "Data sharing",
+      "a4": "Data is not shared with third parties, except where necessary for delivery (courier services).",
+      "q5": "User rights",
+      "a5": "Users have the right to:\n• request access to their data\n• request correction or deletion of their data\n• withdraw consent to data processing\n\nFor any privacy-related questions, users can contact us via the available contact details."
+    },
+    "terms": {
+      "q1": "General provisions",
+      "a1": "By using this site you accept these terms of use.\n\nThe altamoda.rs site is intended for purchasing products and for information about services and education.",
+      "q2": "Accuracy of information",
+      "a2": "Alta Moda strives to keep all information on the site accurate and up to date, but cannot guarantee that the content is completely error-free.",
+      "q3": "Prices and availability",
+      "a3": "All prices are shown in dinars and may be subject to change without prior notice.\n\nProduct availability may vary.",
+      "q4": "Liability",
+      "a4": "Alta Moda is not liable for any technical errors, site outages or other circumstances beyond its control.",
+      "q5": "Changes to the terms",
+      "a5": "We reserve the right to change the terms of use at any time."
+    }
   },
   "colorPage": {
     "natural": "Natural",
@@ -1317,18 +1429,82 @@
     "ctaButton": "BECOME OUR PARTNER"
   },
   "contact": {
-    "heroTitle": "Get in Touch",
-    "heroDescription": "Our atelier is a space of silent luxury and bespoke creation. Connect with us for inquiries regarding collections, heritage, and unique partnerships.",
+    "heroTitle": "Get in touch",
+    "heroDescription": "Our team is your partner in the world of the professional hairdressing industry. As the importer and distributor of leading global brands, we connect salons, stylists and educators with the products and solutions that define the modern standard of hair beauty.",
     "connect": "Connect",
     "inquire": "Inquire",
     "emailLabel": "Email",
     "phoneLabel": "Private Line",
     "visit": "Visit",
-    "viewOnMap": "View on Map",
-    "newsletterTitle": "The Heritage Journal",
-    "newsletterDescription": "Receive seasonal insights from our atelier and updates on new heritage collections.",
+    "viewOnMap": "View on map",
+    "newsletterTitle": "Newsletter",
+    "newsletterDescription": "Be the first to know about new arrivals, professional collections, trends and exclusive brand campaigns. Sign up and receive information about current promotions, special offers and education directly.",
     "emailPlaceholder": "Your email address",
     "subscribe": "Subscribe",
-    "heroImageAlt": "Luxury atelier interior"
+    "heroImageAlt": "Luxury atelier interior",
+    "heroDescription2": "Contact us for information about our range, education, distribution and business partnership — and become part of the network of professionals shaping the industry.",
+    "newsletterDescription2": "Stay connected with an industry that never stops evolving — and always be a step ahead."
+  },
+  "brandTexts": {
+    "matrix": {
+      "title": "Professional hair products",
+      "p1": "Matrix is a professional brand trusted by hairdressers around the world for more than four decades. Created to make professional care accessible to everyone, Matrix offers products suited to different hair types, textures and needs. Whether you are looking for hydration, repair, colour protection, volume or curly-hair care, every collection is developed to deliver reliable results and a simple care routine.",
+      "p2": "Combining innovative formulas, modern technologies and the experience of professional hairdressers, Matrix develops shampoos, conditioners, masks, treatments, styling products and professional colour that help hair look healthy, nourished and shiny. Thanks to the wide range, you will easily find products tailored to the exact needs of your hair — whether you are a professional or want salon results at home.",
+      "p3": "Matrix is the choice for everyone who wants reliable professional care adapted to the everyday needs of different hair types."
+    },
+    "redken": {
+      "title": "Science in the service of healthy, beautiful hair",
+      "p1": "Redken is one of the best-known professional hair brands, recognised for combining scientific research with salon expertise. For more than 60 years it has been developing innovative formulas that help strengthen, repair and protect hair, delivering visible results tailored to different hair types and needs.",
+      "p2": "The range includes shampoos, conditioners, masks, treatments, styling products and professional colour developed to answer the challenges of modern hair care. Whether your hair is dry, damaged, colour-treated or prone to breakage, Redken offers professional solutions that help hair become stronger, healthier and better cared for — with results hairdressers around the world trust every day.",
+      "p3": "Thanks to science-based formulas, Redken delivers targeted results and visibly improves hair quality from the very first uses."
+    },
+    "biolage": {
+      "title": "Professional care inspired by nature",
+      "p1": "For more than 35 years Biolage has combined inspiration from nature with professional expertise to provide care tailored to different hair needs. Created for those who want healthy, nourished and radiant hair, Biolage blends carefully selected ingredients with modern formulas that deliver effective results and a pleasant feel in everyday use.",
+      "p2": "The range includes shampoos, conditioners, masks, treatments and styling products for hydration, repair, colour protection, volume and the care of all hair types. Whether your hair is dry, damaged, colour-treated or fine, Biolage offers professional solutions that help hair stay healthy, soft and full of natural shine.",
+      "p3": "Biolage is the ideal choice for those who want professional care inspired by nature, with hair that looks healthy and cared for day after day."
+    },
+    "loreal": {
+      "title": "Expertise professionals trust",
+      "p1": "For more than a century L'Oréal Professionnel Paris has set the standards in professional hair care and colour. Developed in collaboration with hairdressers around the world, the brand combines innovative technologies, scientific research and decades of experience to offer solutions adapted to the modern needs of salons and clients.",
+      "p2": "The range includes professional shampoos, conditioners, masks, treatments, styling products and hair colour for different hair types and needs. Whether you are looking for intensive care, repair, colour protection or long-lasting professional results, L'Oréal Professionnel Paris offers products with reliable performance and care that hairdressers around the world trust every day.",
+      "p3": "L'Oréal Professionnel Paris unites professional expertise and innovation to deliver salon results and long-lasting care."
+    },
+    "kerastase": {
+      "title": "Luxury care without compromise",
+      "p1": "For more than 60 years Kérastase has been synonymous with luxurious professional hair care. Developed in collaboration with leading scientists and hairdressers, the brand creates personalised solutions that answer the unique needs of every head of hair and every scalp. Combining advanced technologies, carefully selected active ingredients and sophisticated formulas, Kérastase delivers exceptional results you can see and feel.",
+      "p2": "The range includes shampoos, conditioners, masks, serums, oils and treatments for hydration, repair, colour protection, strengthening and revitalisation. Whether you want to solve a specific concern or give your hair the finest care, Kérastase offers care rituals that turn an everyday routine into a unique salon experience.",
+      "p3": "Every care ritual is tailored to the unique needs of your hair, delivering visible results and a feeling of luxury with every use of Kérastase products."
+    },
+    "framesi": {
+      "title": "The Italian tradition of professional beauty",
+      "p1": "Framesi is one of Italy's leading professional hair brands, with a tradition of more than 80 years. Developed and made in Italy, Framesi combines scientific research, state-of-the-art cosmetic technology and inspiration from contemporary trends to offer complete solutions for professional hairdressers and everyone who wants premium hair care.",
+      "p2": "The range includes professional hair colour, shampoos, conditioners, masks, treatments and styling products developed for different hair types and needs. Alongside its renowned colour systems, Framesi is known for high-quality care lines that provide hydration, repair, protection and long-lasting hair beauty. The blend of Italian tradition, innovation and professional expertise makes Framesi a reliable choice for salon and home care.",
+      "p3": "Framesi unites professional colour, care and styling in a complete offer for modern hairdressers and everyone who expects premium results."
+    },
+    "mariaNila": {
+      "title": "Professional care with a responsible approach to beauty",
+      "p1": "Maria Nila is a Swedish premium brand that combines professional hair care, sustainability and modern Scandinavian design. Created for hairdressers and everyone who wants premium results, Maria Nila offers products that care for hair without compromise on quality, performance or a responsible relationship with nature.",
+      "p2": "The range includes thoughtfully designed collections for different hair types and needs — from hydration, repair and colour protection to volume, control of unruly hair and styling. All formulas are 100% vegan and PETA-certified, cruelty-free, with a focus on sustainability in every part of production. Thanks to the combination of professional quality, effective formulations and a responsible approach, Maria Nila is the choice of those who want healthy, well-cared-for hair and products aligned with modern values.",
+      "p3": "Maria Nila proves that professional quality, sustainability and premium results make a perfect match."
+    },
+    "oliviaGarden": {
+      "title": "Professional tools hairdressers trust",
+      "p1": "Olivia Garden is one of the world's best-known brands of professional hairdressing tools, recognised for innovation, premium quality and ergonomic design. For more than 50 years it has been developing brushes, combs, scissors and professional accessories that make hairdressers' work easier and provide precision, comfort and long-lasting performance.",
+      "p2": "The range includes a wide selection of professional blow-dry and styling brushes, detangling brushes, combs, scissors and accessories for everyday salon work as well as home use. Thanks to carefully developed technologies and constant innovation, Olivia Garden tools enable easier styling, gentler detangling and professional results, which is why they are the choice of hairdressers and lovers of quality hair care around the world.",
+      "p3": "Whatever your level of experience, Olivia Garden tools provide precision, comfort and control with every styling."
+    },
+    "framar": {
+      "title": "Professional tools for creative hairdressers",
+      "p1": "Framar is a Canadian professional brand that has become synonymous with innovative hairdressing tools and creative solutions for colouring and styling. Developed by hairdressers for hairdressers, Framar combines functionality, modern design and high quality to make everyday salon work faster, more precise and simpler.",
+      "p2": "The range includes highlighting foils, colour brushes, bowls, gloves, clips, detangling brushes and a wide selection of professional accessories that meet the needs of modern hairdressers. With innovative products, distinctive design and a commitment to quality, Framar has become one of the favourite brands of professionals around the world who want reliable tools and the freedom to turn their creativity into premium results.",
+      "p3": "Framar tools are designed to make everyday work more efficient, tidier and more creative."
+    },
+    "mizutani": {
+      "title": "Japanese craftsmanship in every cut",
+      "p1": "For more than a century Mizutani Scissors has represented the pinnacle of Japanese craftsmanship in professional hairdressing scissors. Handmade in Japan from the finest materials, Mizutani scissors are known for exceptional precision, perfect ergonomics and long-lasting performance. Every model is developed to give hairdressers maximum control, comfort and confidence with every cut.",
+      "p2": "The range includes professional scissors adapted to different cutting techniques and individual working styles. Thanks to the combination of traditional Japanese craftsmanship, innovative technologies and uncompromising quality, Mizutani is the choice of hairdressers who expect premium performance, longevity and precision without compromise from their tools.",
+      "p3": "Mizutani is the choice of professionals who expect premium precision, control and build quality in every detail."
+    }
   }
 }

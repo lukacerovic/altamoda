@@ -228,3 +228,225 @@ export function promoTemplate(
   `
   return baseLayout(content, { email, showUnsubscribe: true })
 }
+
+// ──────────────────────────────────────────────────────────
+// Transactional templates — registration & order lifecycle
+// (copy per "zamena tekstova, nov sajt 2026" document)
+// ──────────────────────────────────────────────────────────
+
+const CONTACT_BLOCK = `
+  <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.7; color: #413d3a;">
+    Potrebna Vam je pomoć?<br />
+    📧 <a href="mailto:kontakt@altamoda.rs" style="color: #413d3a;">kontakt@altamoda.rs</a><br />
+    📞 <a href="tel:+381113088388" style="color: #413d3a;">+381 (0)11 3088388</a>
+  </p>`
+
+function ctaButton(url: string, label: string): string {
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0 0;">
+      <tr>
+        <td align="center">
+          <a href="${url}" style="display: inline-block; padding: 14px 36px; background-color: ${BRAND_PRIMARY}; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px; letter-spacing: 1px;">
+            ${label}
+          </a>
+        </td>
+      </tr>
+    </table>`
+}
+
+function detailRow(label: string, value?: string | null): string {
+  return value
+    ? `<tr><td style="padding: 8px 0; font-size: 14px; color: #413d3a; width: 180px; vertical-align: top;">${label}</td><td style="padding: 8px 0; font-size: 14px; color: ${BRAND_TEXT};"><strong>${value}</strong></td></tr>`
+    : ''
+}
+
+export function registrationWelcomeTemplate(opts: { isB2bPending?: boolean } = {}): string {
+  const site = getSiteUrl()
+  const b2bNote = opts.isB2bPending
+    ? `
+      <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">
+        <strong>Poslovni korisnici:</strong> Vaš poslovni nalog zahteva proveru podataka.
+        Obavestićemo Vas čim nalog bude odobren.
+      </p>`
+    : ''
+
+  const content = `
+    <div style="padding: 40px;">
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Dobro došli u ALTA MODA</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Hvala Vam što ste kreirali nalog na ALTA MODA webshopu. Vaš korisnički nalog je uspešno
+        registrovan i sada možete jednostavno pregledati proizvode, kupovati, pratiti svoje
+        porudžbine i upravljati svojim korisničkim podacima.
+      </p>
+      <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Kao registrovani korisnik možete:</p>
+      <p style="margin: 0; font-size: 15px; line-height: 1.9; color: ${BRAND_TEXT};">
+        ✔ brže završiti kupovinu<br />
+        ✔ pratiti status porudžbina<br />
+        ✔ pregledati istoriju kupovina<br />
+        ✔ sačuvati više adresa za dostavu<br />
+        ✔ sačuvati omiljene proizvode<br />
+        ✔ biti među prvima obavešteni o novim kolekcijama i posebnim ponudama
+      </p>
+      ${b2bNote}
+      ${ctaButton(`${site}/account/login`, 'Prijavite se na svoj nalog')}
+      ${ctaButton(`${site}/products`, 'Započnite kupovinu')}
+      ${CONTACT_BLOCK}
+      <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Hvala što ste postali deo ALTA MODA zajednice.<br />
+        Vaš ALTA MODA tim
+      </p>
+    </div>
+  `
+  return baseLayout(content)
+}
+
+export interface CardTransactionDetails {
+  orderNumber: string
+  transactionId?: string | null
+  authNumber?: string | null
+  amount: string
+  dateTime: string
+  paymentMethod?: string
+}
+
+export function cardTransactionTemplate(d: CardTransactionDetails): string {
+  const site = getSiteUrl()
+  const content = `
+    <div style="padding: 40px;">
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Uspešno izvršena kartična transakcija</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Obaveštavamo Vas da je Vaša kartična transakcija uspešno izvršena putem ALTA MODA webshopa.
+      </p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
+        ${detailRow('Internet prodajno mesto', 'ALTA MODA')}
+        ${detailRow('Broj transakcije', d.transactionId)}
+        ${detailRow('Broj porudžbine', d.orderNumber)}
+        ${detailRow('Datum i vreme', d.dateTime)}
+        ${detailRow('Način plaćanja', d.paymentMethod || 'Platna kartica')}
+        ${detailRow('Broj autorizacije', d.authNumber)}
+        ${detailRow('Ukupan iznos', d.amount)}
+      </table>
+      <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.6; color: #413d3a;">
+        Ovaj imejl predstavlja potvrdu uspešno izvršene kartične transakcije.
+        Potvrdu o prijemu i obradi porudžbine dobićete u posebnom imejlu.
+        Molimo Vas da sačuvate ovaj imejl kao potvrdu o izvršenoj transakciji.
+      </p>
+      ${ctaButton(`${site}`, 'Posetite ALTA MODA webshop')}
+    </div>
+  `
+  return baseLayout(content)
+}
+
+export interface OrderEmailItem {
+  name: string
+  quantity: number
+  totalPrice: string
+  image?: string | null
+}
+
+export interface OrderConfirmationDetails {
+  orderNumber: string
+  items: OrderEmailItem[]
+  total: string
+  paymentMethod: string
+  paymentConfirmed: boolean
+  shippingAddress?: string | null
+  notes?: string | null
+}
+
+export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
+  const site = getSiteUrl()
+  const itemRows = d.items
+    .map(
+      (i) => `
+        <tr>
+          <td style="padding: 10px 12px 10px 0; width: 56px; vertical-align: top;">
+            ${i.image ? `<img src="${i.image}" alt="" width="48" height="48" style="display: block; width: 48px; height: 48px; object-fit: cover; border-radius: 4px; background: #eee;" />` : ''}
+          </td>
+          <td style="padding: 10px 0; font-size: 14px; color: ${BRAND_TEXT}; vertical-align: top;">
+            ${i.name}
+            <br /><span style="color: #413d3a; font-size: 13px;">Količina: ${i.quantity}</span>
+          </td>
+          <td align="right" style="padding: 10px 0; font-size: 14px; color: ${BRAND_TEXT}; white-space: nowrap; vertical-align: top;"><strong>${i.totalPrice}</strong></td>
+        </tr>`
+    )
+    .join('')
+
+  const content = `
+    <div style="padding: 40px;">
+      <h2 style="margin: 0 0 4px; font-size: 22px; color: ${BRAND_PRIMARY};">Hvala na kupovini!</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Uspešno smo primili Vašu porudžbinu i započeli njenu obradu.
+        Naš tim će je pažljivo pripremiti i poslati u najkraćem mogućem roku.
+      </p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
+        ${detailRow('Broj porudžbine', d.orderNumber)}
+        ${detailRow('Status plaćanja', d.paymentConfirmed ? 'Plaćeno ✔' : 'U obradi')}
+        ${detailRow('Status porudžbine', 'U obradi')}
+        ${detailRow('Način plaćanja', d.paymentMethod)}
+        ${detailRow('Adresa za isporuku', d.shippingAddress)}
+        ${detailRow('Napomena', d.notes)}
+      </table>
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Naručeni proizvodi</h3>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
+        ${itemRows}
+        <tr>
+          <td colspan="2" style="padding: 14px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9;"><strong>Ukupan iznos</strong></td>
+          <td align="right" style="padding: 14px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9; white-space: nowrap;"><strong>${d.total}</strong></td>
+        </tr>
+      </table>
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Šta dalje?</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.9; color: ${BRAND_TEXT};">
+        📦 Obrada porudžbine<br />
+        📦 Pakovanje<br />
+        🚚 Predaja kuriru<br />
+        📧 Obaveštenje o slanju
+      </p>
+      ${ctaButton(`${site}/account`, 'Pregledajte svoju porudžbinu')}
+      ${ctaButton(`${site}/products`, 'Nastavite kupovinu')}
+      <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Hvala na ukazanom poverenju.<br />
+        Vaš ALTA MODA tim
+      </p>
+    </div>
+  `
+  return baseLayout(content)
+}
+
+export interface OrderShippedDetails {
+  orderNumber: string
+  shippedDate: string
+}
+
+export function orderShippedTemplate(d: OrderShippedDetails): string {
+  const content = `
+    <div style="padding: 40px;">
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Vaša porudžbina je poslata</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Vaša porudžbina je pripremljena i predata kurirskoj službi.
+        U nastavku možete pronaći informacije o isporuci.
+      </p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
+        ${detailRow('Broj porudžbine', d.orderNumber)}
+        ${detailRow('Kurirska služba', 'Ovlašćena kurirska služba')}
+        ${detailRow('Datum slanja', d.shippedDate)}
+        ${detailRow('Procenjeni rok isporuke', '1–3 radna dana')}
+      </table>
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Korisne informacije</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.9; color: ${BRAND_TEXT};">
+        ✔ Pripremite se za preuzimanje pošiljke.<br />
+        ✔ Proverite stanje paketa prilikom prijema.<br />
+        ✔ Ukoliko Vam je potrebna pomoć, kontaktirajte naš tim.
+      </p>
+      ${CONTACT_BLOCK}
+      <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">
+        ALTA MODA tim
+      </p>
+    </div>
+  `
+  return baseLayout(content)
+}
