@@ -19,6 +19,7 @@ import {
   Zap,
   Home,
   Tags,
+  RefreshCw,
 } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -63,6 +64,7 @@ export default function AdminLayout({
       title: t("admin.system"),
       items: [
         { href: "/admin/newsletter", label: t("admin.newsletter"), icon: Mail },
+        { href: "/admin/erp", label: t("admin.erp"), icon: RefreshCw },
         { href: "/admin/settings", label: t("admin.settings"), icon: Settings },
       ],
     },

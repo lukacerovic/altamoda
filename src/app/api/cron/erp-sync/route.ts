@@ -17,10 +17,15 @@ import { processQueue } from '@/lib/pantheon/sync-outbound'
  *   - orders    : every 5 min (drains the outbound queue)
  */
 export async function GET(req: Request) {
-  const secret = process.env.ERP_CRON_SECRET
-  if (!secret) {
+  // Accept either our own secret (cPanel/external cron — passed as ?secret= or
+  // a manually-set Bearer header) or Vercel's own `CRON_SECRET` convention
+  // (Vercel Cron auto-attaches `Authorization: Bearer $CRON_SECRET` to every
+  // cron-triggered request when a project env var of that exact name exists —
+  // so a Vercel deployment needs no secret embedded in vercel.json at all).
+  const secrets = [process.env.ERP_CRON_SECRET, process.env.CRON_SECRET].filter(Boolean) as string[]
+  if (secrets.length === 0) {
     return NextResponse.json(
-      { success: false, error: 'ERP_CRON_SECRET not configured' },
+      { success: false, error: 'ERP_CRON_SECRET (or CRON_SECRET) not configured' },
       { status: 500 },
     )
   }
@@ -32,7 +37,7 @@ export async function GET(req: Request) {
       ? auth.slice(7).trim()
       : (url.searchParams.get('secret') ?? '')
 
-  if (presented !== secret) {
+  if (!secrets.includes(presented)) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -44,7 +44,11 @@ export class PantheonClient {
   constructor(config?: Partial<PantheonClientConfig>) {
     const apiUrl = config?.apiUrl ?? process.env.PANTHEON_API_URL
     const apiUser = config?.apiUser ?? process.env.PANTHEON_API_USER
-    const apiPass = config?.apiPass ?? process.env.PANTHEON_API_PASS
+    // URL-encoded at rest in .env (see the comment there): Next.js's own env
+    // loader (@next/env) truncates any value at its first "#" regardless of
+    // quoting, and this password contains "#$". Decode after reading.
+    const rawApiPass = config?.apiPass ?? process.env.PANTHEON_API_PASS
+    const apiPass = rawApiPass ? decodeURIComponent(rawApiPass) : rawApiPass
     const timeoutMs =
       config?.timeoutMs ??
       (process.env.PANTHEON_API_TIMEOUT_MS

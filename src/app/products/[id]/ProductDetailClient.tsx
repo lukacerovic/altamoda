@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -141,6 +141,22 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   const [selectedSibling, setSelectedSibling] = useState<ColorSibling | null>(
     colorSiblings.find(s => s.isActive) || null
   );
+  // Debounce the color-swatch hover preview: swatch lists can run into the
+  // dozens (e.g. Matrix SoColor has ~90 shades), so a mouse sweep across the
+  // row fires onMouseEnter on every swatch it crosses. Without this, a fast
+  // sweep would flicker the gallery through every shade it passed over —
+  // only swap it once the pointer actually settles on one.
+  const siblingHoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewSibling = (sibling: ColorSibling) => {
+    if (siblingHoverTimer.current) clearTimeout(siblingHoverTimer.current);
+    siblingHoverTimer.current = setTimeout(() => {
+      setSelectedSibling(sibling);
+      setActiveThumb(0);
+    }, 150);
+  };
+  useEffect(() => () => {
+    if (siblingHoverTimer.current) clearTimeout(siblingHoverTimer.current);
+  }, []);
   const [reviewError, setReviewError] = useState("");
   const [canReview, setCanReview] = useState(false);
   // The SSR payload is cached role-blind (guest view: no B2B prices, professional
@@ -217,9 +233,24 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
       ? product.images.map(img => img.url)
       : [defaultImage];
   const images = displayImages;
-  // Remount both Swipers (back at slide 0) whenever the active image set changes,
-  // e.g. when hovering a color sibling swaps the gallery.
+  // Identifies the active image set (e.g. when hovering a color sibling swaps
+  // the gallery) so the effect below can snap both Swipers back to slide 0.
+  // Deliberately NOT used as a React `key`: keying the <Swiper> elements on
+  // this forced a full destroy+recreate of both the main and thumbnail
+  // instances on every change, and doing that to two Thumbs-module-linked
+  // Swipers at once is unreliable — the thumbs instance from BEFORE the
+  // change can still be in the middle of tearing down (or its replacement
+  // not yet reported back via onSwiper) when the new main instance reads
+  // `thumbsSwiper` from React state, crashing deep inside swiper's Thumbs
+  // module ("Cannot read properties of undefined (reading 'classList')").
+  // Letting Swiper's React wrapper update the existing instances' slides in
+  // place avoids the teardown/setup race entirely.
   const imagesKey = images.join("|");
+  useEffect(() => {
+    if (mainSwiper && !mainSwiper.destroyed) mainSwiper.slideTo(0, 0);
+    if (thumbsSwiper && !thumbsSwiper.destroyed) thumbsSwiper.slideTo(0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imagesKey]);
 
   // Strip color code from name for grouped products
   const activeColor = colorSiblings.find(s => s.isActive);
@@ -470,7 +501,6 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             {/* Main image: one slide per image, swipeable by touch on all viewports,
                 synced with the thumbnail Swiper below via the Thumbs module. */}
             <Swiper
-              key={imagesKey}
               modules={[Thumbs]}
               thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
               onSwiper={setMainSwiper}
@@ -501,13 +531,17 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
             </Swiper>
             {images.length > 1 && (
               <Swiper
-                key={`thumbs-${imagesKey}`}
                 modules={[Navigation, Thumbs]}
                 onSwiper={setThumbsSwiper}
                 slidesPerView={4}
                 spaceBetween={12}
                 watchSlidesProgress
-                navigation={images.length > 4}
+                // Object form (vs. a raw boolean) so toggling this on/off as
+                // the image count changes updates Swiper's nav buttons in
+                // place instead of tearing them down and rebuilding — Swiper
+                // only supports safely re-enabling/disabling navigation via
+                // `enabled`, not by flipping the params between true/false.
+                navigation={{ enabled: images.length > 4 }}
                 className="w-full max-w-full"
                 style={{ "--swiper-navigation-color": "#1a1c1e", "--swiper-navigation-size": "16px" } as React.CSSProperties}
               >
@@ -671,10 +705,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     <Link
                       key={sibling.id}
                       href={`/products/${sibling.slug}`}
-                      onMouseEnter={() => {
-                        setSelectedSibling(sibling);
-                        setActiveThumb(0);
-                      }}
+                      onMouseEnter={() => previewSibling(sibling)}
                       className={`px-3 py-2 text-[10px] uppercase tracking-[0.18em] font-medium border transition-all ${
                         sibling.isActive
                           ? "bg-[#1a1c1e] text-[#FFFFFF] border-[#1a1c1e]"

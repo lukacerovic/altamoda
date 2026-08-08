@@ -72,13 +72,12 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                     </span>
                   ); })()}
                 </div>
-                <h3 className="text-lg font-semibold text-[#1a1c1e] text-center">{brand.name}</h3>
-                {(() => {
+                {/* {(() => {
                   const desc = brand.description ? toPlainText(brand.description) : "";
                   return desc ? (
                     <p className="text-sm text-[#1a1c1e] text-center mt-2 line-clamp-2">{desc}</p>
                   ) : null;
-                })()}
+                })()} */}
                 <div className="flex items-center justify-center gap-2 mt-4 text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors">
                   <span>{brand._count.products} {t("admin.productsCount")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />

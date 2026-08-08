@@ -40,6 +40,8 @@ export const GET = async () => {
     priceB2c: Number(p.priceB2c),
     priceB2b: p.priceB2b != null ? Number(p.priceB2b) : null,
     gender: p.gender,
+    colorCode: p.colorCode,
+    groupSlug: p.groupSlug,
   }))
 
   const buffer = await buildAmsExportBuffer(rows)

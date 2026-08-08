@@ -1023,7 +1023,8 @@
     "shadeCodeHint": "Format zavisi od brenda, npr. 7.0, 8/1, 6-44",
     "linkToProduct": "Poveži sa proizvodom",
     "selectProduct": "Izaberi proizvod...",
-    "setMainImage": "Postavi kao glavnu sliku"
+    "setMainImage": "Postavi kao glavnu sliku",
+    "erp": "ERP / Pantheon"
   },
   "colors": {
     "title": "Paleta Boja za Kosu",

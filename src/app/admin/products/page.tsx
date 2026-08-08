@@ -636,6 +636,23 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
 
+  // Products missing brand, category, or a photo — mainly catches rows
+  // created via the "Novi proizvodi iz Pantheon-a" import on /admin/erp,
+  // which deliberately only writes name/price/stock (Pantheon has no
+  // brand/category/images to send). Surfaced here so admin has one place to
+  // find and finish them, instead of them silently sitting incomplete.
+  const incompleteProducts = useMemo(() => {
+    return products
+      .map((p) => {
+        const missing: string[] = [];
+        if (!p.brand) missing.push("Brend");
+        if (!p.category) missing.push("Kategorija");
+        if (p.images.length === 0) missing.push("Slika");
+        return { product: p, missing };
+      })
+      .filter((r) => r.missing.length > 0);
+  }, [products]);
+
   /* ── Form helpers ── */
   const updateForm = useCallback(<K extends keyof Omit<Product, "id">>(key: K, value: Omit<Product, "id">[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -1271,6 +1288,71 @@ export default function ProductsPage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* ────────────────── INCOMPLETE PRODUCTS ────────────────── */}
+      <div>
+        <h2 className="text-sm font-semibold text-black mb-3 flex items-center gap-2">
+          Proizvodi sa nedostacima
+          {incompleteProducts.length > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
+              {incompleteProducts.length}
+            </span>
+          )}
+        </h2>
+        <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
+          {incompleteProducts.length === 0 ? (
+            <p className="px-4 py-8 text-center text-sm text-[#1a1c1e]/60">
+              {loadingProducts ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin text-[#edb4bd]" />
+                  Učitavanje proizvoda...
+                </span>
+              ) : (
+                "Svi proizvodi su kompletni."
+              )}
+            </p>
+          ) : (
+            <div className="overflow-x-auto max-h-80 overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-stone-100">
+                  <tr className="border-b border-stone-200">
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">Proizvod</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">Šifra</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">Nedostaje</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1a1c1e] uppercase tracking-wider">Akcije</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {incompleteProducts.map(({ product, missing }) => (
+                    <tr key={product.id} className="hover:bg-stone-50 transition-colors">
+                      <td className="px-4 py-2.5 text-sm text-black max-w-xs truncate">{product.name}</td>
+                      <td className="px-4 py-2.5 text-xs font-mono text-[#1a1c1e]">{product.sku}</td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          {missing.map((m) => (
+                            <span key={m} className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-800">
+                              {m}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <button
+                          onClick={() => openEditPanel(product)}
+                          className="p-1.5 text-[#1a1c1e] hover:text-[#edb4bd] hover:bg-black/10 rounded-sm transition-colors"
+                          title={t("admin.editProduct")}
+                        >
+                          <Edit3 size={15} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ────────────────── SLIDE-OVER PANEL ────────────────── */}

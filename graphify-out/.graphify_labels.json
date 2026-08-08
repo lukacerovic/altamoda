@@ -139,7 +139,7 @@
   "137": "remigrate-product-categories2",
   "138": "update-db-cloudinary-urls",
   "139": "route",
-  "140": "route",
+  "140": "cleanup-orphan-brands.ts",
   "141": "Phase 1: Foundation (auth + schema)",
   "142": "next-auth.d",
   "143": "VPOS_TEST_RESULTS",
@@ -388,12 +388,12 @@
   "386": "route.ts",
   "387": "page.tsx",
   "388": "validation-perf.test.ts",
-  "389": "page.tsx",
+  "389": "vercel.json",
   "390": "page.tsx",
-  "391": "populate-product-lines.mjs",
-  "392": "route.ts",
-  "393": "validations.test.ts",
-  "394": "sanitize-rich-text.ts",
-  "395": "cleanup-orphan-brands.ts",
-  "396": "cleanup-orphan-categories.ts"
+  "391": "page.tsx",
+  "392": "phase3-api.test.ts",
+  "393": "route.ts",
+  "394": "route.ts",
+  "395": "route.ts",
+  "396": "route.ts"
 }

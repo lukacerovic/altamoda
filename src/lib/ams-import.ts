@@ -37,11 +37,14 @@ export interface HeaderCheck {
   unexpected: string[]   // columns present that aren't part of the schema
 }
 
+// The 2026/08 catalog renamed GENDER -> POL; both spellings satisfy the schema.
+const headerAlias = (h: string) => (norm(h) === 'POL' ? 'GENDER' : norm(h))
+
 export function validateAmsHeaders(headers: string[]): HeaderCheck {
-  const present = new Set(headers.map(norm).filter(Boolean))
+  const present = new Set(headers.map(headerAlias).filter(Boolean))
   const expectedNorm = new Set(AMS_COLUMNS.map(norm))
   const missing = AMS_COLUMNS.filter((c) => !present.has(norm(c)))
-  const unexpected = headers.filter((h) => h.trim() && !expectedNorm.has(norm(h)))
+  const unexpected = headers.filter((h) => h.trim() && !expectedNorm.has(headerAlias(h)))
   return { ok: missing.length === 0, missing, unexpected }
 }
 
@@ -71,7 +74,7 @@ function openAmsSheet(buffer: ArrayBuffer): AmsSheet {
   for (let c = ref.s.c; c <= ref.e.c; c++) {
     const cell = ws[XLSX.utils.encode_cell({ r: 0, c })]
     const v = cell ? String(cell.v).trim() : ''
-    if (v) { headers.push(v); colOf[norm(v)] = c }
+    if (v) { headers.push(v); colOf[headerAlias(v)] = c }
   }
   return { ws, ref, headers, colOf }
 }
@@ -174,6 +177,23 @@ export interface AmsRow {
   priceB2c: number
   priceB2b: number | null
   isProfessional: boolean
+  /** Color-variant grouping (2026/08 catalog): shade rows sit under a base
+   *  header row (no IDENT) and carry only the shade code as NAZIV. */
+  colorCode: string | null
+  colorName: string | null
+  groupSlug: string | null
+}
+
+// "500ml" / "1000 ml" / lowercase "500g" — a volume token inside a shade name
+// means the row is its own product (different size), not a swatch of the base.
+// Grams must stay lowercase-only: uppercase "6G"/"505G" are gold shade codes.
+const isVolumeName = (s: string) => /\d+\s*ml\b/i.test(s) || /\d+\s*(g|gr|kg)\b/.test(s)
+
+/** Prefix the (title-cased) brand unless the base name already contains it. */
+function brandedName(brand: string, base: string): string {
+  const b = titleCase(brand.trim())
+  if (!b || base.toLowerCase().includes(brand.trim().toLowerCase())) return base
+  return `${b} ${base}`
 }
 
 /** Extract product rows from the AMS sheet (rich text preserved + sanitized). */
@@ -196,16 +216,58 @@ export function extractAmsRows(buffer: ArrayBuffer): AmsRow[] {
 
   const rows: AmsRow[] = []
   const seen = new Set<string>()
+  // Open shade block: set by a base header row (NAZIV without IDENT), closed
+  // when a following row's LINIJA no longer matches the block's LINIJA.
+  let block: { base: string; line: string | null } | null = null
   for (let r = 1; r <= ref.e.r; r++) {
     const idCell = ws[XLSX.utils.encode_cell({ r, c: idc })]
     const sku = idCell ? String(idCell.v).trim() : ''
-    if (!sku) continue
     const rawName = w(r, 'NAZIV')
+    if (!sku) {
+      // A NAZIV-only row (no IDENT, no LINIJA) is a color-block header like
+      // "SoColor" or "Shades EQ 60ml"; anything else without IDENT is noise.
+      block = rawName && !w(r, 'LINIJA') ? { base: rawName, line: null } : null
+      continue
+    }
     if (!rawName) continue
+    const rowLine = w(r, 'LINIJA')
+    // First row after a header pins the block's LINIJA; a different LINIJA ends it.
+    if (block) {
+      if (block.line === null) block.line = rowLine || null
+      if (!block.line || rowLine !== block.line) block = null
+    }
     // EAN codes must never live in the product name — strip "(8606...)" style
     // codes and keep them as a barcode fallback (the PDP shows them as
     // "Šifra proizvoda").
-    const { name, ean: eanFromName } = extractEanFromName(rawName, sku)
+    const extracted = extractEanFromName(rawName, sku)
+    const eanFromName = extracted.ean
+    let name = extracted.name.replace(/\s+/g, ' ').trim()
+    const brand = w(r, 'BREND')
+    let colorCode: string | null = null
+    let groupSlug: string | null = null
+    if (block) {
+      // "4V/4.6 ML.60" — a shade with the base's own volume restated; drop it.
+      name = name.replace(/\s*ML\.?\s*\d+\s*$/i, '').trim() || name
+      if (!isVolumeName(name)) {
+        colorCode = name
+        const grouped = brandedName(brand, block.base)
+        groupSlug = slugify(grouped) || null
+        name = `${grouped} ${colorCode}`.trim()
+      } else if (/^\d/.test(name)) {
+        // Shade code with its own size (e.g. "000 Crystal Clear 500ml") —
+        // standalone product named after the base line without its volume.
+        const baseNoVol = block.base.replace(/\s*\d+\s*(ml|l|g|gr|kg)\b\.?\s*$/i, '').trim()
+        name = `${brandedName(brand, baseNoVol)} ${name}`.trim()
+      } else {
+        // Full product name that merely sits inside the block (e.g. an
+        // activator) — treated like any regular row.
+        name = brandedName(brand, name)
+      }
+    } else {
+      // The 2026/08 catalog dropped brand prefixes from NAZIV; the storefront
+      // has always displayed them, so restore the prefix on every product.
+      name = brandedName(brand, name)
+    }
     if (seen.has(sku)) continue // first occurrence wins
     seen.add(sku)
 
@@ -236,6 +298,9 @@ export function extractAmsRows(buffer: ArrayBuffer): AmsRow[] {
       priceB2c: mp ?? vp ?? 0,   // NOT NULL; B2B-only mirrors the wholesale price
       priceB2b: vp,
       isProfessional,
+      colorCode,
+      colorName: colorCode,
+      groupSlug,
     })
   }
   return rows
@@ -275,6 +340,9 @@ export interface AmsExportProduct {
   priceB2c: number
   priceB2b: number | null
   gender: string | null
+  /** Color-variant grouping — round-tripped through the block format (see extractAmsRows) so a backup export can be re-imported without losing shade grouping. */
+  colorCode: string | null
+  groupSlug: string | null
 }
 
 // Column display config for the styled export: width + which columns wrap long
@@ -333,10 +401,44 @@ function amsExportRecord(p: AmsExportProduct): Record<string, string | number> {
   }
 }
 
+// Order rows for export: color-grouped products are moved so every member of
+// a group sits contiguously (preceded by a synthetic block-header row), since
+// extractAmsRows() only recognizes a block as an unbroken run — the natural
+// sku-ascending order doesn't guarantee that. Ungrouped rows keep their
+// original relative order.
+function orderForExport(products: AmsExportProduct[]): AmsExportProduct[] {
+  const grouped = new Map<string, AmsExportProduct[]>()
+  const ordered: AmsExportProduct[] = []
+  for (const p of products) {
+    if (!p.groupSlug || !p.colorCode) { ordered.push(p); continue }
+    if (!grouped.has(p.groupSlug)) { grouped.set(p.groupSlug, []); ordered.push(p) } // placeholder marks first-seen position
+    grouped.get(p.groupSlug)!.push(p)
+  }
+  const result: AmsExportProduct[] = []
+  const emitted = new Set<string>()
+  for (const p of ordered) {
+    if (!p.groupSlug || !p.colorCode) { result.push(p); continue }
+    if (emitted.has(p.groupSlug)) continue // already flushed as part of its group
+    emitted.add(p.groupSlug)
+    result.push(...grouped.get(p.groupSlug)!)
+  }
+  return result
+}
+
+/** Strip a trailing " <colorCode>" from the display name to recover the block's base name. */
+function stripColorSuffix(nameLat: string, colorCode: string): string {
+  return nameLat.endsWith(` ${colorCode}`) ? nameLat.slice(0, -(colorCode.length + 1)) : nameLat
+}
+
 /**
  * Build a re-importable AND presentable AMS .xlsx (same schema the import
  * validates) — sized columns, wrapped rich-text cells, a styled + frozen
  * header row, and an auto-filter, mirroring the client's original file.
+ *
+ * Color-grouped products are re-emitted in the vendor's block format (a
+ * NAZIV-only header row, then shade rows whose NAZIV is just the color code)
+ * so that exporting and re-importing this file preserves colorCode/groupSlug
+ * instead of flattening every shade back into a standalone product.
  */
 export async function buildAmsExportBuffer(products: AmsExportProduct[]): Promise<Buffer> {
   const wb = new ExcelJS.Workbook()
@@ -344,7 +446,19 @@ export async function buildAmsExportBuffer(products: AmsExportProduct[]): Promis
 
   ws.columns = AMS_COLUMNS.map((c) => ({ header: c, key: c, width: AMS_COL_CONFIG[c]?.width ?? 16 }))
 
-  for (const p of products) ws.addRow(amsExportRecord(p))
+  let openGroup: string | null = null
+  for (const p of orderForExport(products)) {
+    const isShade = Boolean(p.groupSlug && p.colorCode)
+    if (isShade && p.groupSlug !== openGroup) {
+      ws.addRow({ NAZIV: stripColorSuffix(p.nameLat, p.colorCode!) })
+      openGroup = p.groupSlug
+    } else if (!isShade) {
+      openGroup = null
+    }
+    const record = amsExportRecord(p)
+    if (isShade) record.NAZIV = p.colorCode!
+    ws.addRow(record)
+  }
 
   // Per-column body alignment (top-align, wrap long text, right-align numbers).
   AMS_COLUMNS.forEach((c, i) => {
@@ -491,6 +605,12 @@ export async function importAmsProducts(prisma: PrismaClient, buffer: ArrayBuffe
           priceB2c: row.priceB2c,
           priceB2b: row.priceB2b,
           isProfessional: row.isProfessional,
+          // Color grouping is normalized on every import: shade rows get their
+          // block's group + shade code, everything else is explicitly cleared
+          // so stale groups from older imports can't linger.
+          colorCode: row.colorCode,
+          colorName: row.colorName,
+          groupSlug: row.groupSlug,
           isActive: true,
         }
 

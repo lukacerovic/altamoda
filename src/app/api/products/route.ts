@@ -287,6 +287,38 @@ export const GET = withErrorHandler(async (req: Request) => {
     ? { ...where, NOT: { id: { in: Array.from(excludeIds) } } }
     : where
 
+  // Session-seeded catalog shuffle for the default ("popular") view. The client
+  // generates a seed once per visit and sends it along; we rank the FULL
+  // filtered catalog with a deterministic per-id hash so pagination stays
+  // stable within a visit while every new visit sees a different order. The
+  // default view's tiers are preserved (retail before professional, in-stock
+  // before out-of-stock) — only the order inside each tier is randomized,
+  // replacing the raw stockQuantity sort that always surfaced the same
+  // high-stock products on page 1.
+  const seedParam = Number(searchParams.get('seed'))
+  const useSeededOrder = !hasExplicitSort && Number.isInteger(seedParam) && seedParam > 0
+  let seededPageIds: string[] | null = null
+  if (useSeededOrder) {
+    const rank = (id: string) => {
+      let h = seedParam >>> 0
+      for (let i = 0; i < id.length; i++) {
+        h = Math.imul(h ^ id.charCodeAt(i), 2654435761)
+        h = (h << 13) | (h >>> 19)
+      }
+      return h >>> 0
+    }
+    const candidates = await prisma.product.findMany({
+      where: finalWhere,
+      select: { id: true, isProfessional: true, stockQuantity: true },
+    })
+    candidates.sort((a, b) =>
+      Number(a.isProfessional) - Number(b.isProfessional) ||
+      Number(b.stockQuantity > 0) - Number(a.stockQuantity > 0) ||
+      rank(a.id) - rank(b.id)
+    )
+    seededPageIds = candidates.slice(skip, skip + limit).map(c => c.id)
+  }
+
   // Query — count against finalWhere (same filter as the list) so totalPages never
   // exceeds the number of pages that actually have products. Previously this counted
   // against `where` and subtracted duplicates, which could drift and leave an empty
@@ -299,7 +331,9 @@ export const GET = withErrorHandler(async (req: Request) => {
 
   const [products, total, brandFacetRows] = await Promise.all([
     prisma.product.findMany({
-      where: finalWhere,
+      // Seeded order: the page window was already computed above, so fetch
+      // exactly those ids (re-sorted below — `in` has no inherent order).
+      where: seededPageIds ? { id: { in: seededPageIds } } : finalWhere,
       include: {
         brand: { select: { id: true, name: true, slug: true } },
         productLine: { select: { id: true, name: true, slug: true } },
@@ -309,8 +343,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         _count: { select: { reviews: true } },
       },
       orderBy,
-      skip,
-      take: limit,
+      ...(seededPageIds ? {} : { skip, take: limit }),
     }),
     prisma.product.count({ where: finalWhere }),
     prisma.product.groupBy({
@@ -318,6 +351,10 @@ export const GET = withErrorHandler(async (req: Request) => {
       where: { ...brandFacetWhere, brandId: { not: null } },
     }),
   ])
+  if (seededPageIds) {
+    const pos = new Map(seededPageIds.map((id, i) => [id, i]))
+    products.sort((a, b) => (pos.get(a.id) ?? 0) - (pos.get(b.id) ?? 0))
+  }
   const availableBrandIds = brandFacetRows
     .map(r => r.brandId)
     .filter((id): id is string => Boolean(id))

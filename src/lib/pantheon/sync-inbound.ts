@@ -78,7 +78,7 @@ async function finishLog(
 
 // ─── Slug generation for newly-created products ──────────────────────────────
 
-async function ensureUniqueSlug(base: string, erpId: string): Promise<string> {
+export async function ensureUniqueSlug(base: string, erpId: string): Promise<string> {
   const candidate = base ? `${base}-${erpId}` : `product-${erpId}`
   const taken = await prisma.product.findUnique({
     where: { slug: candidate },
@@ -90,6 +90,15 @@ async function ensureUniqueSlug(base: string, erpId: string): Promise<string> {
 }
 
 // ─── Product sync (creates new, updates only isActive on existing) ───────────
+//
+// ⚠️ NOT wired into any cron or the /admin/erp dashboard (2026-08-08). This
+// catalog's sole source of truth for which products exist is the AMS Excel
+// import (/admin/import) — running this created ~1,950 junk products in one
+// test run (Pantheon's raw abbreviated names, e.g. "RK CG 7RO MARIGOLD", no
+// brand/category) for every Pantheon code without a matching erpId. Only
+// call this if you specifically intend to bulk-create products from
+// Pantheon and are prepared to clean up/curate the result afterward — see
+// scripts/cleanup-erroneous-pantheon-products.ts for the last cleanup.
 
 export async function syncProducts(): Promise<SyncResult> {
   const startedAt = Date.now()

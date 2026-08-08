@@ -740,17 +740,6 @@ export default function ProductsPageClient({
     }
   }, [listSignature, visibility, products, currentPage, pagination, shuffleSeed]);
 
-  // The SSR/ISR page render is generic and cacheable — it ignores the URL's
-  // filter params and always returns an unfiltered first chunk. So when we land
-  // directly on a filtered URL (e.g. /products?brand=olaplex from the nav brand
-  // dropdown, which redirects here), the initial products must be re-fetched
-  // with the filter applied; otherwise every product would show.
-  const hasUrlFilters = Boolean(
-    categoryParam || genderParam || brandParam || searchParam ||
-    productLineParams.length || productTypeParams.length ||
-    hairTypeParams.length || tagParams.length
-  );
-
   // Generate a fresh shuffle seed once per mount (post-hydration to keep SSR
   // markup stable). Each refresh / fresh navigation to /products gets a new
   // order; within the same mount the seed is stable so pagination & filter
@@ -811,22 +800,17 @@ export default function ProductsPageClient({
     const seed = getFreshSeed();
     setShuffleSeed(seed);
 
-    // Landed on a filtered URL: replace the unfiltered SSR chunk with the
-    // correctly filtered first page. The refetch effect below is skipped on this
-    // initial mount, so we trigger the fetch here. (state is already seeded from
-    // the URL params, so buildQueryString picks up the filters.)
-    // Guests also refetch: the cacheable SSR chunk is unfiltered ("all") while
-    // their default tab is now "b2c", so the first page must be re-fetched with
-    // visibility applied.
-    if (hasUrlFilters || !userRole) {
-      fetchProducts(1, false);
-      return;
-    }
-
-    // Shuffle the server-rendered first chunk once, post-hydration. Subsequent
-    // chunks are shuffled at fetch time before being appended, so the displayed
-    // order is stable across "load more" clicks (no re-ordering of seen items).
+    // Shuffle the server-rendered first chunk locally for an instant visual
+    // change while the seeded first page is in flight.
     setProducts((prev) => applyDefaultShuffle(prev, sortBy, seed));
+
+    // Always re-fetch page 1 with the fresh seed (passed explicitly — the
+    // shuffleSeed state set above isn't visible to this closure yet): the
+    // server ranks the whole catalog with it, so page 1 shows a different
+    // slice of products each visit instead of the same high-stock set. This
+    // also covers landing on a filtered URL (SSR chunk is unfiltered) and
+    // guests (SSR chunk is visibility "all", their default tab is "b2c").
+    fetchProducts(1, false, seed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -853,12 +837,20 @@ export default function ProductsPageClient({
       .catch(() => {});
   }, [session?.user?.id, guestWishlistItems]);
 
-  // Build query string from current filters
-  const buildQueryString = useCallback((page: number) => {
+  // Build query string from current filters. `seedOverride` exists for the
+  // mount-time fetch, which runs in the same tick as setShuffleSeed — the
+  // state (and this closure) still holds the initial 0 there.
+  const buildQueryString = useCallback((page: number, seedOverride?: number) => {
     const params = new URLSearchParams();
     params.set("page", String(page));
     params.set("limit", "20");
     params.set("sort", sortBy);
+
+    // Session shuffle seed for the default sort — the server ranks the whole
+    // catalog with it, so page 1 differs between visits instead of always
+    // opening with the same high-stock products.
+    const seed = seedOverride ?? shuffleSeed;
+    if (sortBy === "popular" && seed !== 0) params.set("seed", String(seed));
 
     if (!userRole) {
       params.set("visibility", visibility);
@@ -902,22 +894,23 @@ export default function ProductsPageClient({
     if (filterUndertone) params.set("colorUndertone", filterUndertone);
 
     return params.toString();
-  }, [sortBy, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
+  }, [sortBy, shuffleSeed, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
 
   // Fetch products from API. `append` accumulates the next chunk (load more);
   // otherwise the list is replaced (initial load / filter / sort change).
-  const fetchProducts = useCallback(async (page: number, append = false) => {
+  const fetchProducts = useCallback(async (page: number, append = false, seedOverride?: number) => {
     if (append) setLoadingMore(true);
     else setLoading(true);
     setFetchError("");
     try {
-      const qs = buildQueryString(page);
+      const qs = buildQueryString(page, seedOverride);
       const res = await fetch(`/api/products?${qs}`);
       const json = await res.json();
       if (json.success) {
-        // Shuffle each chunk as it arrives so "popular" stays randomized without
-        // re-ordering chunks already on screen.
-        const chunk = applyDefaultShuffle(json.data.products as Product[], sortBy, shuffleSeed);
+        // The server ranks the default view with our session seed (see
+        // buildQueryString), so chunks arrive already shuffled across the
+        // whole catalog — no client-side reordering needed.
+        const chunk = json.data.products as Product[];
         setProducts((prev) => (append ? [...prev, ...chunk] : chunk));
         setPagination(json.data.pagination);
         // Brand facet: brands with ≥1 product under the current filters/search
@@ -935,7 +928,7 @@ export default function ProductsPageClient({
       if (append) setLoadingMore(false);
       else setLoading(false);
     }
-  }, [buildQueryString, sortBy, shuffleSeed, t]);
+  }, [buildQueryString, t]);
 
   // Load the next page and append it to the current list.
   const loadMore = useCallback(() => {
