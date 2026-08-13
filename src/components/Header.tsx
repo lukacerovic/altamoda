@@ -9,7 +9,6 @@ import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { resolveBrandLogo } from "@/lib/brand-logos";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import {
   Search,
@@ -370,16 +369,9 @@ export default function Header() {
                                   key={brand.id}
                                   href={`/brands/${brand.slug}`}
                                   onClick={() => setDesktopNavOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-[#FFFFFF] transition-colors group"
+                                  className="block px-3 py-2 rounded-sm hover:bg-[#FFFFFF] transition-colors group"
                                 >
-                                  {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
-                                    <Image src={logo} alt={brand.name} width={200} height={200} className="w-8 h-8 object-contain flex-shrink-0" />
-                                  ) : (
-                                    <div className="w-8 h-8 bg-[#FFFFFF] rounded-sm flex items-center justify-center flex-shrink-0">
-                                      <span className="text-xs font-bold text-[#dddbd9]">{brand.name.charAt(0)}</span>
-                                    </div>
-                                  ); })()}
-                                  <span className="text-sm text-[#1a1c1e] group-hover:text-[#1a1c1e] transition-colors whitespace-nowrap">
+                                  <span className="text-sm text-[#1a1c1e] group-hover:text-[#edb4bd] transition-colors whitespace-nowrap">
                                     {brand.name}
                                   </span>
                                 </Link>
@@ -572,15 +564,8 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="flex items-center gap-3 py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
+                            className="block py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
                           >
-                            {(() => { const logo = resolveBrandLogo(brand.slug, brand.logoUrl); return logo ? (
-                              <Image src={logo} alt={brand.name} width={200} height={200} className="w-6 h-6 object-contain" />
-                            ) : (
-                              <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-[#dddbd9]">{brand.name.charAt(0)}</span>
-                              </div>
-                            ); })()}
                             {brand.name}
                           </Link>
                         ))}
