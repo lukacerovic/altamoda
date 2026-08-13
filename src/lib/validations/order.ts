@@ -22,6 +22,9 @@ export const createOrderSchema = z.object({
   paymentMethod: z.enum(['card', 'bank_transfer', 'cash_on_delivery', 'invoice']),
   shippingMethod: z.string().optional(),
   notes: z.string().optional(),
+  guestName: z.string().min(1).optional(),
+  guestEmail: z.string().email().optional(),
+  guestPhone: z.string().min(5).optional(),
 })
 
 export const updateStatusSchema = z.object({

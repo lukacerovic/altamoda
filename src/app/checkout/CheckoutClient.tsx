@@ -217,14 +217,6 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   const handlePlaceOrder = async () => {
     if (!b2bMinimumMet) return
 
-    // Placing an order requires an account. The checkout draft is already
-    // persisted, so after login the user lands back on this exact step with
-    // everything they filled in intact.
-    if (isGuest) {
-      router.push('/account/login?callbackUrl=/checkout')
-      return
-    }
-
     setIsSubmitting(true)
     setError('')
 
@@ -258,6 +250,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         paymentMethod,
         shippingMethod,
         notes: notes || undefined,
+        ...(isGuest && {
+          guestName: guestInfo.name,
+          guestEmail: guestInfo.email,
+          guestPhone: guestInfo.phone,
+        }),
       }
 
       const res = await fetch('/api/orders', {
@@ -268,11 +265,6 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
       const data = await res.json()
       if (!data.success) {
-        // If auth required, redirect to login
-        if (res.status === 401) {
-          setError(t('checkout.mustBeLoggedIn'))
-          return
-        }
         setError(data.error || t('checkout.orderError'))
         return
       }

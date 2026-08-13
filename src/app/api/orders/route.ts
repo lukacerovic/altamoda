@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError, getPaginationParams } from '@/lib/api-utils'
-import { requireAuth } from '@/lib/auth-helpers'
+import { requireAuth, getCurrentUser } from '@/lib/auth-helpers'
 import { createOrderSchema } from '@/lib/validations/order'
 import { generateOrderNumber } from '@/lib/utils'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
@@ -69,14 +69,20 @@ export const POST = withErrorHandler(async (req: Request) => {
   const rateLimitResponse = await applyRateLimit(orderRateLimiter, `order:${getClientIp(req)}`)
   if (rateLimitResponse) return rateLimitResponse as never
 
-  // Placing an order requires an account: the viewer's role decides which
-  // products they may order and at which price, so guests are sent to login
-  // (the checkout draft brings them back to the same step afterwards).
-  const user = await requireAuth()
+  // Guests may place B2C orders without an account (guest checkout).
+  // Logged-in users get role-based pricing (B2B/B2C).
+  const user = await getCurrentUser()
   const body = await req.json()
   const input = createOrderSchema.parse(body)
 
-  const role = user.role
+  // Guests must provide contact info
+  if (!user) {
+    if (!input.guestName || !input.guestEmail || !input.guestPhone) {
+      throw new ApiError(400, 'Ime, email i telefon su obavezni za guest porudžbine')
+    }
+  }
+
+  const role = user?.role ?? 'b2c'
   const productIds = input.items.map((i) => i.productId)
   const isB2b = role === 'b2b'
 
@@ -160,7 +166,10 @@ export const POST = withErrorHandler(async (req: Request) => {
     const createdOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
-        userId: user.id,
+        userId: user?.id ?? null,
+        guestName: user ? null : input.guestName,
+        guestEmail: user ? null : input.guestEmail,
+        guestPhone: user ? null : input.guestPhone,
         status: 'novi',
         subtotal,
         discountAmount: 0,
@@ -178,18 +187,20 @@ export const POST = withErrorHandler(async (req: Request) => {
         statusHistory: {
           create: {
             status: 'novi',
-            changedBy: user.id,
-            note: 'Porudžbina kreirana',
+            changedBy: user?.id,
+            note: user ? 'Porudžbina kreirana' : 'Porudžbina kreirana (guest)',
           },
         },
       },
       include: { items: true },
     })
 
-    // 7. Clear user's cart
-    const cart = await tx.cart.findFirst({ where: { userId: user.id } })
-    if (cart) {
-      await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
+    // 7. Clear user's DB cart (guests use localStorage cart, cleared client-side)
+    if (user) {
+      const cart = await tx.cart.findFirst({ where: { userId: user.id } })
+      if (cart) {
+        await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
+      }
     }
 
     // 8. Enqueue outbound Pantheon sync. Same transaction so the queue row and
@@ -205,7 +216,7 @@ export const POST = withErrorHandler(async (req: Request) => {
   })
 
   // Best-effort confirmation email — failure must not fail the request.
-  const recipientEmail = user.email
+  const recipientEmail = user?.email ?? input.guestEmail ?? null
   if (recipientEmail) {
     const escapeHtml = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
