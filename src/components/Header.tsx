@@ -352,8 +352,7 @@ export default function Header() {
             {/* Brands Dropdown */}
             {activeMenu === "brands" && brands.length > 0 && (
               <div
-                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 max-w-[calc(100vw-1rem)] animate-slideDown"
-                style={{ minWidth: "480px" }}
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 max-w-[calc(100vw-1rem)] animate-slideDown w-max"
                 onMouseEnter={() => handleMenuEnter("brands")}
                 onMouseLeave={handleMenuLeave}
               >
