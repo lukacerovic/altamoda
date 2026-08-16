@@ -180,7 +180,7 @@ function PantheonImportModal({ onClose }: { onClose: () => void }) {
             <Info size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-blue-800">
               Uvoz upisuje samo <strong>naziv, cenu i lager</strong> iz Pantheon-a — Pantheon ne šalje brend, kategoriju ni slike.
-              Nakon uvoza proizvod je vidljiv u administraciji, ali nedovršen; dopunite ga kroz izmenu proizvoda.
+              Uvezeni proizvod je <strong>odmah vidljiv i na sajtu</strong>, iako je nedovršen; dopunite ga kroz izmenu proizvoda.
               Nedovršeni proizvodi se prikazuju u panelu &bdquo;Proizvodi sa nedostacima&ldquo; na stranici Proizvodi.
             </p>
           </div>

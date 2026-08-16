@@ -268,7 +268,7 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
     <section className="bg-[#FFFFFF] border-b border-[#dddbd9]">
       <div className="max-w-4xl mx-auto px-4 py-6 text-center">
         {logo ? (
-          <Image src={logo} alt={brand.name} width={80} height={40} className="h-10 mx-auto object-contain mb-3" />
+          <Image src={logo} alt={brand.name} width={128} height={64} className="h-16 mx-auto object-contain mb-3" />
         ) : (
           <h2 className="text-xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
         )}

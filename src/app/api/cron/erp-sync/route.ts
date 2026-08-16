@@ -1,20 +1,27 @@
 import { NextResponse } from 'next/server'
 
-import { syncProducts, syncPrices, syncStock } from '@/lib/pantheon/sync-inbound'
+import { syncPrices, syncStock } from '@/lib/pantheon/sync-inbound'
 import { processQueue } from '@/lib/pantheon/sync-outbound'
 
 /**
  * Cron-triggered Pantheon sync.
  *
- *   GET /api/cron/erp-sync?type=stock|prices|products|orders
+ *   GET /api/cron/erp-sync?type=stock|prices|orders
  *   Authorization: Bearer <ERP_CRON_SECRET>
  *     (or  ?secret=<ERP_CRON_SECRET>  for schedulers that can't set headers)
  *
  * Suggested schedule (configure externally — Vercel Cron, cron-job.org, etc.):
  *   - stock     : every 15 min
  *   - prices    : every 1 hour
- *   - products  : every 6 hours
  *   - orders    : every 5 min (drains the outbound queue)
+ *
+ * No `products` type here on purpose — bulk-creating every unlinked Pantheon
+ * product once flooded the catalog with ~1,950 junk rows (raw abbreviated
+ * names, no brand/category). The curated alternative is the "review before
+ * import" modal on /admin/erp (POST /api/admin/erp/pantheon-import), where an
+ * admin hand-picks exactly which Pantheon products to bring in. Don't add a
+ * `products` case back here — see the warning comment on `syncProducts()` in
+ * src/lib/pantheon/sync-inbound.ts.
  */
 export async function GET(req: Request) {
   // Accept either our own secret (cPanel/external cron — passed as ?secret= or
@@ -45,10 +52,6 @@ export async function GET(req: Request) {
 
   try {
     switch (type) {
-      case 'products': {
-        const r = await syncProducts()
-        return NextResponse.json({ success: true, type, ...r })
-      }
       case 'prices': {
         const r = await syncPrices()
         return NextResponse.json({ success: true, type, ...r })
@@ -63,7 +66,7 @@ export async function GET(req: Request) {
       }
       default:
         return NextResponse.json(
-          { success: false, error: 'Missing or invalid ?type= (products|prices|stock|orders)' },
+          { success: false, error: 'Missing or invalid ?type= (prices|stock|orders)' },
           { status: 400 },
         )
     }

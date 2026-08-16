@@ -1057,7 +1057,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             {/* Right — image */}
             <div className="order-1 md:order-2 relative aspect-[5/6] md:aspect-[4/5] bg-[#1a1c1e] overflow-hidden rounded-[4px]">
               <Image
-                src="/idhair-academy-home.jpg"
+                src="/idhair-academy-sign.jpg"
                 alt="ID Hair Academy edukacija"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"

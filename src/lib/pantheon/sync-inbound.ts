@@ -91,12 +91,15 @@ export async function ensureUniqueSlug(base: string, erpId: string): Promise<str
 
 // ─── Product sync (creates new, updates only isActive on existing) ───────────
 //
-// ⚠️ NOT wired into any cron or the /admin/erp dashboard (2026-08-08). This
+// ⚠️ Not reachable from any route (2026-08-08) — deliberately not called by
+// /api/cron/erp-sync, /api/admin/erp/sync, or the /admin/erp dashboard. This
 // catalog's sole source of truth for which products exist is the AMS Excel
 // import (/admin/import) — running this created ~1,950 junk products in one
 // test run (Pantheon's raw abbreviated names, e.g. "RK CG 7RO MARIGOLD", no
-// brand/category) for every Pantheon code without a matching erpId. Only
-// call this if you specifically intend to bulk-create products from
+// brand/category) for every Pantheon code without a matching erpId. Do not
+// re-wire this into a route; the curated alternative is the "review before
+// import" modal (POST /api/admin/erp/pantheon-import). Only call this if you
+// specifically intend to bulk-create products from
 // Pantheon and are prepared to clean up/curate the result afterward — see
 // scripts/cleanup-erroneous-pantheon-products.ts for the last cleanup.
 

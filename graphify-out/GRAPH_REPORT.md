@@ -1,16 +1,16 @@
 # Graph Report - altamoda  (2026-08-08)
 
 ## Corpus Check
-- 345 files · ~836,869 words
+- 345 files · ~836,958 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2643 nodes · 3681 edges · 397 communities (157 shown, 240 thin omitted)
+- 2643 nodes · 3678 edges · 397 communities (157 shown, 240 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 21 edges (avg confidence: 0.71)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bbadbd4e`
+- Built from commit: `56a2c495`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -617,7 +617,7 @@ Cohesion: 0.06
 Nodes (32): 10. Risk Mitigation, 1. Payment Service Provider (PSP) — Recommendation, 2. D Express Shipping Integration, 3. Email Notifications (Resend + React Email), 4. B2B Invoice PDF Generation, 5. Implementation Steps (Execution Order), 6. Environment Variables Required, 7. Database Changes (+24 more)
 
 ### Community 51 - "Admin Product Editor"
-Cohesion: 0.19
+Cohesion: 0.18
 Nodes (21): bad(), info(), main(), ok(), warn(), APPLY, main(), GET() (+13 more)
 
 ### Community 52 - "SKU Delta Import"
