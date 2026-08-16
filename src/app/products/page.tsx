@@ -122,9 +122,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     brandsData,
     flatCategories,
     productLinesData,
-    productTypeRows,
-    hairTypeRows,
-    tagRows,
+    filterRows,
     attributes,
     colorProducts,
     activeBrand,
@@ -171,34 +169,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       },
       orderBy: { name: "asc" },
     }),
-    // Distinct product types (single value per row)
-    prisma.$queryRaw<Array<{ value: string }>>`
-      SELECT DISTINCT TRIM(product_type) AS value FROM products
-      WHERE is_active = true
-        AND product_type IS NOT NULL AND TRIM(product_type) != ''
-      ORDER BY value
-    `,
-    // Distinct hair types — comma-split, unnested, then re-filtered to drop
-    // empty fragments produced by trailing/double commas (e.g. "hidratacija,").
-    prisma.$queryRaw<Array<{ value: string }>>`
-      SELECT DISTINCT v AS value FROM (
-        SELECT TRIM(unnest(string_to_array(hair_types, ','))) AS v FROM products
-        WHERE is_active = true
-          AND hair_types IS NOT NULL AND TRIM(hair_types) != ''
-      ) sub
-      WHERE v <> ''
-      ORDER BY v
-    `,
-    // Distinct tags — same anti-empty-fragment guard as hair_types above.
-    prisma.$queryRaw<Array<{ value: string }>>`
-      SELECT DISTINCT v AS value FROM (
-        SELECT TRIM(unnest(string_to_array(tags, ','))) AS v FROM products
-        WHERE is_active = true
-          AND tags IS NOT NULL AND TRIM(tags) != ''
-      ) sub
-      WHERE v <> ''
-      ORDER BY v
-    `,
+    // Raw filter values — split + dedup happens in JS below
+    prisma.product.findMany({
+      where: { isActive: true, OR: [
+        { productType: { not: null } },
+        { hairTypes: { not: null } },
+        { tags: { not: null } },
+      ]},
+      select: { productType: true, hairTypes: true, tags: true },
+    }),
     // Dynamic attributes
     prisma.dynamicAttribute.findMany({
       where: { showInFilters: true },
@@ -376,6 +355,23 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([code, data]) => ({ code, name: data.name, count: data.count, hexSamples: data.hexSamples }));
 
+  // Split comma-delimited filter fields and deduplicate (data is pre-normalized in DB)
+  const splitDedup = (rows: typeof filterRows, key: 'productType' | 'hairTypes' | 'tags') => {
+    const seen = new Set<string>();
+    for (const row of rows) {
+      const raw = row[key];
+      if (!raw) continue;
+      for (const v of raw.split(',')) {
+        const trimmed = v.trim();
+        if (trimmed) seen.add(trimmed);
+      }
+    }
+    return [...seen].sort();
+  };
+  const productTypes = splitDedup(filterRows, 'productType');
+  const hairTypes = splitDedup(filterRows, 'hairTypes');
+  const tags = splitDedup(filterRows, 'tags');
+
   // Wishlist IDs and user role resolved client-side via useSession()
   return (
     <ProductsPageClient
@@ -384,9 +380,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       brands={brands}
       categories={categories}
       productLines={productLinesData}
-      productTypes={productTypeRows.map(r => r.value).filter(Boolean)}
-      hairTypes={hairTypeRows.map(r => r.value).filter(Boolean)}
-      tags={tagRows.map(r => r.value).filter(Boolean)}
+      productTypes={productTypes}
+      hairTypes={hairTypes}
+      tags={tags}
       attributes={attributes}
       userRole={null}
       wishlistedProductIds={[]}

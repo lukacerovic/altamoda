@@ -96,15 +96,19 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
   }
 
-  // Product type filter (exact value match, multi-select)
+  // Comma-separated field filters (productType, hairType, tags) — multi-select with OR
+  const additionalAnd: Prisma.ProductWhereInput[] = []
+
+  // Product type filter — stored as comma-separated strings
   const productTypeValues = searchParams.getAll('productType')
   if (productTypeValues.length > 0) {
-    where.productType = { in: productTypeValues }
+    additionalAnd.push({
+      OR: productTypeValues.map(v => ({ productType: { contains: v, mode: 'insensitive' as const } })),
+    })
   }
 
   // hairType / tag filters: stored as comma-separated strings, multi-select with OR
   // (e.g. "Tanka kosa" + "Suva kosa" → products containing either)
-  const additionalAnd: Prisma.ProductWhereInput[] = []
   const hairTypeValues = searchParams.getAll('hairType')
   if (hairTypeValues.length > 0) {
     additionalAnd.push({
