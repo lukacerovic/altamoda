@@ -197,7 +197,7 @@ export default function EducationPage() {
               </div>
               <div className="aspect-[4/5] bg-[#1a1c1e] relative overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80"
+                  src="/edukacija-6.jpg"
                   alt="Edukacija"
                   fill
                   className="object-cover"
