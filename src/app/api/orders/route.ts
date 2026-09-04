@@ -9,7 +9,7 @@ import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 import { VPOS_ENABLED } from '@/lib/payments/vpos-config'
 import { sendEmail, rewriteAssetUrls } from '@/lib/email'
-import { orderConfirmationTemplate } from '@/lib/email-templates'
+import { orderConfirmationTemplate, newOrderAdminTemplate } from '@/lib/email-templates'
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   card: 'Platna kartica',
@@ -215,38 +215,67 @@ export const POST = withErrorHandler(async (req: Request) => {
     timeout: 20_000,
   })
 
-  // Best-effort confirmation email — failure must not fail the request.
+  // Best-effort confirmation/notification emails — failure must not fail the request.
   const recipientEmail = user?.email ?? input.guestEmail ?? null
-  if (recipientEmail) {
+  const adminOrderEmail = process.env.ADMIN_ORDER_EMAIL
+  if (recipientEmail || adminOrderEmail) {
     const escapeHtml = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    const sendConfirmation = async () => {
+    const sendOrderEmails = async () => {
       const primaryImages = await prisma.productImage.findMany({
         where: { productId: { in: order.items.map((i) => i.productId) }, isPrimary: true },
         select: { productId: true, url: true },
       })
       const imageByProduct = new Map(primaryImages.map((img) => [img.productId, img.url]))
       const addr = input.shippingAddress
-      await sendEmail({
-        to: recipientEmail,
-        subject: `Potvrda porudžbine ${order.orderNumber}`,
-        html: rewriteAssetUrls(orderConfirmationTemplate({
-          orderNumber: order.orderNumber,
-          items: order.items.map((i) => ({
-            name: escapeHtml(i.productName),
-            quantity: i.quantity,
-            totalPrice: `${Number(i.totalPrice).toLocaleString('sr-RS')} RSD`,
-            image: imageByProduct.get(i.productId) ?? null,
+      const items = order.items.map((i) => ({
+        name: escapeHtml(i.productName),
+        quantity: i.quantity,
+        totalPrice: `${Number(i.totalPrice).toLocaleString('sr-RS')} RSD`,
+        image: imageByProduct.get(i.productId) ?? null,
+      }))
+      const total = `${Number(order.total).toLocaleString('sr-RS')} RSD`
+      const paymentMethod = PAYMENT_METHOD_LABELS[input.paymentMethod] ?? input.paymentMethod
+      const paymentConfirmed = order.paymentStatus === 'paid'
+      const shippingAddress = escapeHtml(`${addr.street}, ${addr.postalCode} ${addr.city}, ${addr.country}`)
+      const notes = input.notes ? escapeHtml(input.notes) : null
+
+      if (recipientEmail) {
+        await sendEmail({
+          to: recipientEmail,
+          subject: `Potvrda porudžbine ${order.orderNumber}`,
+          html: rewriteAssetUrls(orderConfirmationTemplate({
+            orderNumber: order.orderNumber,
+            items,
+            total,
+            paymentMethod,
+            paymentConfirmed,
+            shippingAddress,
+            notes,
           })),
-          total: `${Number(order.total).toLocaleString('sr-RS')} RSD`,
-          paymentMethod: PAYMENT_METHOD_LABELS[input.paymentMethod] ?? input.paymentMethod,
-          paymentConfirmed: order.paymentStatus === 'paid',
-          shippingAddress: escapeHtml(`${addr.street}, ${addr.postalCode} ${addr.city}, ${addr.country}`),
-          notes: input.notes ? escapeHtml(input.notes) : null,
-        })),
-      })
+        })
+      }
+
+      if (adminOrderEmail) {
+        await sendEmail({
+          to: adminOrderEmail,
+          subject: `Nova porudžbina ${order.orderNumber}`,
+          html: rewriteAssetUrls(newOrderAdminTemplate({
+            orderNumber: order.orderNumber,
+            customerName: escapeHtml(user?.name ?? input.guestName ?? ''),
+            customerEmail: recipientEmail ?? '',
+            customerPhone: input.guestPhone ?? null,
+            items,
+            total,
+            paymentMethod,
+            paymentConfirmed,
+            shippingAddress,
+            notes,
+          })),
+        })
+      }
     }
-    sendConfirmation().catch((err) => console.error('Order confirmation email failed:', err))
+    sendOrderEmails().catch((err) => console.error('Order email(s) failed:', err))
   }
 
   // Card orders go through the VPOS hosted payment page (when enabled). The client

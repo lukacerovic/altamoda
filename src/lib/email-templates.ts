@@ -416,6 +416,63 @@ export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
   return baseLayout(content)
 }
 
+export interface NewOrderAdminDetails {
+  orderNumber: string
+  customerName: string
+  customerEmail: string
+  customerPhone?: string | null
+  items: OrderEmailItem[]
+  total: string
+  paymentMethod: string
+  paymentConfirmed: boolean
+  shippingAddress?: string | null
+  notes?: string | null
+}
+
+export function newOrderAdminTemplate(d: NewOrderAdminDetails): string {
+  const adminUrl = `${getSiteUrl()}/admin/orders`
+  const itemRows = d.items
+    .map(
+      (i) => `
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: ${BRAND_TEXT};">
+            ${i.name} <span style="color: #413d3a; font-size: 13px;">&times; ${i.quantity}</span>
+          </td>
+          <td align="right" style="padding: 8px 0; font-size: 14px; color: ${BRAND_TEXT}; white-space: nowrap;"><strong>${i.totalPrice}</strong></td>
+        </tr>`
+    )
+    .join('')
+
+  const content = `
+    <div style="padding: 40px;">
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Nova porudžbina — ${d.orderNumber}</h2>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
+        Kupac je poslao novu porudžbinu. Pregledajte je i prihvatite ili odbijte u admin panelu.
+      </p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; border-top: 1px solid #dddbd9;">
+        ${detailRow('Broj porudžbine', d.orderNumber)}
+        ${detailRow('Kupac', d.customerName)}
+        ${detailRow('Email', d.customerEmail)}
+        ${detailRow('Telefon', d.customerPhone)}
+        ${detailRow('Status plaćanja', d.paymentConfirmed ? 'Plaćeno ✔' : 'U obradi')}
+        ${detailRow('Način plaćanja', d.paymentMethod)}
+        ${detailRow('Adresa za isporuku', d.shippingAddress)}
+        ${detailRow('Napomena', d.notes)}
+      </table>
+      <h3 style="margin: 0 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Naručeni proizvodi</h3>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
+        ${itemRows}
+        <tr>
+          <td style="padding: 12px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9;"><strong>Ukupan iznos</strong></td>
+          <td align="right" style="padding: 12px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9; white-space: nowrap;"><strong>${d.total}</strong></td>
+        </tr>
+      </table>
+      ${ctaButton(adminUrl, 'Prihvati ili odbij porudžbinu')}
+    </div>
+  `
+  return baseLayout(content)
+}
+
 export interface OrderShippedDetails {
   orderNumber: string
   shippedDate: string

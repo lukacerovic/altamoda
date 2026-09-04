@@ -287,9 +287,7 @@ export default function Header() {
 
           {/* Icons */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="hidden xl:block">
-              <LanguageToggle />
-            </div>
+            <LanguageToggle />
             <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#edb4bd] transition-colors">
               <User className="w-5 h-5 text-[#FFFFFF]" />
             </Link>
