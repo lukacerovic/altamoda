@@ -145,6 +145,12 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
+  // The toggle button lives in the header bar, outside the overlay. Without its
+  // own ref the close-on-outside handler fired on its mousedown and the ensuing
+  // click re-opened the overlay, so the icon appeared dead.
+  const searchToggleRef = useRef<HTMLButtonElement>(null);
+  // The input + close button row; presses on the surrounding white band close.
+  const searchRowRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [brands, setBrands] = useState<BrandItem[]>(cachedBrands);
@@ -218,15 +224,24 @@ export default function Header() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Close search on click outside
+  // Close search on click outside, or on Escape.
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (searchToggleRef.current?.contains(target)) return; // let the toggle toggle
+      if (searchRef.current && !searchRef.current.contains(target)) {
         setSearchOpen(false);
       }
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSearchOpen(false);
+    };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", onKey);
+    };
   }, []);
 
   const handleSearchSubmit = () => {
@@ -291,10 +306,18 @@ export default function Header() {
             <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#edb4bd] transition-colors">
               <User className="w-5 h-5 text-[#FFFFFF]" />
             </Link>
-            <button onClick={() => setSearchOpen(!searchOpen)} className="hover:text-[#edb4bd] transition-colors">
-              <Search className="w-5 h-5 text-[#FFFFFF]" />
+            <button
+              ref={searchToggleRef}
+              onClick={() => setSearchOpen((v) => !v)}
+              aria-expanded={searchOpen}
+              aria-label={t("nav.searchPlaceholder")}
+              className="hover:text-[#edb4bd] transition-colors"
+            >
+              {searchOpen ? <X className="w-5 h-5 text-[#FFFFFF]" /> : <Search className="w-5 h-5 text-[#FFFFFF]" />}
             </button>
-            <Link href="/wishlist" className="relative hidden xl:block hover:text-[#edb4bd] transition-colors">
+            {/* Shown at every breakpoint, immediately left of the cart — on mobile
+                the wishlist was previously reachable only through the drawer. */}
+            <Link href="/wishlist" className="relative hover:text-[#edb4bd] transition-colors">
               <Heart className="w-5 h-5 text-[#FFFFFF]" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-[#edb4bd] text-white text-[10px] rounded-full flex items-center justify-center">
@@ -368,7 +391,10 @@ export default function Header() {
                                   onClick={() => setDesktopNavOpen(false)}
                                   className="block px-3 py-2 rounded-sm hover:bg-[#FFFFFF] transition-colors group"
                                 >
-                                  <span className="text-sm text-[#1a1c1e] group-hover:text-[#edb4bd] transition-colors whitespace-nowrap">
+                                  {/* Uppercased at render: brand names are stored with
+                                      whatever casing the import supplied ("Matrix" vs
+                                      "REDKEN"), and the nav should read consistently. */}
+                                  <span className="text-sm uppercase text-[#1a1c1e] group-hover:text-[#edb4bd] transition-colors whitespace-nowrap">
                                     {brand.name}
                                   </span>
                                 </Link>
@@ -461,9 +487,18 @@ export default function Header() {
 
         {/* Search overlay */}
         {searchOpen && (
-          <div ref={searchRef} className="absolute top-full left-0 right-0 bg-white border-b border-[#dddbd9] animate-slideDown z-50">
+          <div
+            ref={searchRef}
+            className="absolute top-full left-0 right-0 bg-white border-b border-[#dddbd9] animate-slideDown z-50"
+            // The overlay is a full-width band, so "clicking beside the field" is
+            // still inside it and the document-level outside handler never fires.
+            // Close whenever the press lands on the band rather than on the row.
+            onMouseDown={(e) => {
+              if (!searchRowRef.current?.contains(e.target as Node)) setSearchOpen(false);
+            }}
+          >
             <div className="max-w-7xl mx-auto px-4 py-4">
-              <div className="relative max-w-xl mx-auto">
+              <div ref={searchRowRef} className="relative max-w-xl mx-auto flex items-center gap-2">
                 <input
                   type="text"
                   placeholder={t("nav.searchPlaceholder")}
@@ -471,9 +506,21 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
-                  className="w-full border border-[#dddbd9] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
+                  /* QA asked for no visible text caret in the search bar: the
+                     blinking black bar reads as a stray artefact rather than a
+                     cursor. Typing and selection still work normally. */
+                  style={{ caretColor: "transparent" }}
+                  className="flex-1 min-w-0 border border-[#dddbd9] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#dddbd9]" />
+                <Search className="absolute right-16 top-1/2 -translate-y-1/2 w-4 h-4 text-[#dddbd9]" />
+                <button
+                  type="button"
+                  onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
+                  aria-label={t("nav.closeSearch")}
+                  className="flex-shrink-0 p-2 text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
               {searchResults.length > 0 && (
                 <div className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-[#dddbd9] shadow-xl overflow-hidden">
@@ -561,7 +608,7 @@ export default function Header() {
                             key={brand.id}
                             href={`/brands/${brand.slug}`}
                             onClick={() => setMobileMenu(false)}
-                            className="block py-2 px-2 text-sm text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
+                            className="block py-2 px-2 text-sm uppercase text-[#1a1c1e] hover:text-[#edb4bd] transition-colors"
                           >
                             {brand.name}
                           </Link>

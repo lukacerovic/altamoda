@@ -120,7 +120,8 @@ export default function EducationPage() {
                   alt="ID Hair Academy"
                   width={626}
                   height={201}
-                  className="h-14 md:h-16 w-auto mb-6"
+                  /* 20% smaller than the original h-14/h-16 (3.5rem/4rem). */
+                  className="h-[2.8rem] md:h-[3.2rem] w-auto mb-6"
                   priority
                 />
                 <h1

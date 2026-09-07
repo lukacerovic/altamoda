@@ -422,7 +422,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#413d3a]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-3 transition-colors flex items-center justify-center gap-2 ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#edb4bd] text-[#1a1c1e]" : "bg-[#1a1c1e] text-[#ffffff] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e]"}`}
             >
               {hasColors ? <><Palette className="w-3.5 h-3.5" /> {t("products.chooseColor")}</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -455,7 +455,7 @@ function ProductCard({ product, isWishlisted, onNavigate }: { product: Product; 
             <button
               onClick={hasColors ? undefined : handleAddToCart}
               disabled={!hasColors && outOfStock}
-              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#1a1c1e]" : "bg-[#edb4bd] text-[#1a1c1e] active:bg-[#1a1c1e] active:text-[#ffffff]"}`}
+              className={`w-full text-[10px] uppercase tracking-[0.22em] font-medium py-2.5 transition-colors flex items-center justify-center gap-1.5 rounded-[2px] ${!hasColors && outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : addedToCart ? "bg-[#edb4bd] text-[#1a1c1e]" : "bg-[#1a1c1e] text-[#ffffff] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e]"}`}
             >
               {hasColors ? <><Palette className="w-3 h-3" /> {t("products.chooseColor")}</>
                 : outOfStock ? <>{t("products.outOfStock")}</>
@@ -669,14 +669,19 @@ export default function ProductsPageClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryParam, genderParam, brandParam, productLineParams.join(","), productTypeParams.join(","), hairTypeParams.join(","), tagParams.join(",")]);
 
-  // Sync search from URL (e.g. from header search) and auto-submit
-  useEffect(() => {
-    if (searchParam !== null) {
-      setSearchQuery(searchParam);
-      setShowSearch(false);
-      setCurrentPage(1);
-    }
-  }, [searchParam]);
+  // Adopt a changed `?search=` (e.g. coming from the header search) during
+  // render rather than in an effect. As an effect this landed one commit too
+  // late: the refetch effect below keys off `searchParam`, so it ran while
+  // `buildQueryString` still held the previous term — and never re-ran, because
+  // `searchQuery` is deliberately not one of its dependencies. Assigning during
+  // render re-renders immediately, before any effect sees the new value.
+  const lastSearchParam = useRef(searchParam);
+  if (searchParam !== lastSearchParam.current) {
+    lastSearchParam.current = searchParam;
+    setSearchQuery(searchParam ?? "");
+    setShowSearch(false);
+    setCurrentPage(1);
+  }
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [activeToggles, setActiveToggles] = useState<string[]>([]);
@@ -945,7 +950,16 @@ export default function ProductsPageClient({
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      return;
+      // The SSR chunk is rendered without these filters (page.tsx only honours
+      // `brand` and `page`), so a URL that already carries one — a header search
+      // landing on /products?search=..., a category link from the nav — still
+      // needs a single client fetch to apply it.
+      const hasUrlFilter = Boolean(
+        searchParam || categoryParam || genderParam ||
+        productLineParams.length || productTypeParams.length ||
+        hairTypeParams.length || tagParams.length
+      );
+      if (!hasUrlFilter) return;
     }
     if (restoredSignatureRef.current === listSignature) {
       // The displayed list was restored from a snapshot for exactly these

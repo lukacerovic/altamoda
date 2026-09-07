@@ -247,16 +247,22 @@ body {
   color: var(--color-on-surface);
 }
 
-/* Prevent a stray blinking text caret / accidental text selection when
-   clicking non-editable UI chrome (nav links, buttons, dropdown options,
-   headings, product cards). Body copy stays selectable; editable fields
-   opt back in below. */
+/* Prevent a stray blinking text caret anywhere outside a real editable field.
+   Scoped to the whole document (caret-color inherits) because the caret can
+   surface on any clicked text node -- paragraphs, list items, spans -- not just
+   interactive chrome. Editable fields opt back in below. */
+body {
+  caret-color: transparent;
+}
+
+/* Prevent accidental text selection when clicking non-editable UI chrome
+   (nav links, buttons, dropdown options, headings, product cards).
+   Body copy stays selectable. */
 a, button, label, summary, nav,
 h1, h2, h3, h4, h5, h6,
 [role="button"], [role="option"], [role="tab"], [role="menuitem"] {
   -webkit-user-select: none;
   user-select: none;
-  caret-color: transparent;
 }
 
 input, textarea, select,

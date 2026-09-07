@@ -736,7 +736,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                   <button
                     onClick={handleAddToCart}
                     disabled={disabled}
-                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : professionalBlocked ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#d98fa0] text-[#ffffff]" : "bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff]"}`}
+                    className={`flex-1 py-[14px] text-[10px] uppercase tracking-[0.22em] font-medium transition-all flex items-center justify-center gap-2 ${outOfStock ? "bg-[#301d16] text-[#ffffff] cursor-not-allowed" : professionalBlocked ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed" : addedToCart ? "bg-[#edb4bd] text-[#1a1c1e]" : "bg-[#1a1c1e] text-[#ffffff] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e]"}`}
                   >
                     {professionalBlocked ? (
                       <>B2B - samo za salone</>
@@ -971,8 +971,8 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                         relOutOfStock || relNoPrice
                           ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                           : justAdded
-                          ? "bg-[#d98fa0] text-[#ffffff]"
-                          : "bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff]"
+                          ? "bg-[#edb4bd] text-[#1a1c1e]"
+                          : "bg-[#1a1c1e] text-[#ffffff] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e]"
                       }`}
                     >
                       {relOutOfStock ? (

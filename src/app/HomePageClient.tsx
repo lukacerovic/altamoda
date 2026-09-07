@@ -217,8 +217,8 @@ function ProductCard({ product, badge, isWishlisted }: { product: ProductData; b
                 !hasColors && outOfStock
                   ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                   : addedToCart
-                  ? "bg-[#d98fa0] text-[#ffffff]"
-                  : "bg-[#edb4bd] text-[#ffffff] hover:bg-[#413d3a]"
+                  ? "bg-[#edb4bd] text-[#1a1c1e]"
+                  : "bg-[#1a1c1e] text-[#ffffff] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e]"
               }`}
             >
               {hasColors ? (
@@ -271,8 +271,8 @@ function ProductCard({ product, badge, isWishlisted }: { product: ProductData; b
                 !hasColors && outOfStock
                   ? "bg-[#dddbd9] text-[#1a1c1e]/60 cursor-not-allowed"
                   : addedToCart
-                  ? "bg-[#d98fa0] text-[#ffffff]"
-                  : "bg-[#edb4bd] text-[#ffffff] active:bg-[#d98fa0]"
+                  ? "bg-[#edb4bd] text-[#1a1c1e]"
+                  : "bg-[#1a1c1e] text-[#ffffff] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e]"
               }`}
             >
               {hasColors ? (

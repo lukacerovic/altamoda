@@ -14,6 +14,11 @@ import {
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import PaymentLogos from '@/components/PaymentLogos'
 import PhoneInput from '@/components/PhoneInput'
+import {
+  sanitizeStreet, sanitizeHouseNumber, sanitizeCity, sanitizePostalCode,
+  isValidStreet, isValidHouseNumber, isValidCity, isValidPostalCode,
+} from '@/lib/validation/address'
+import { isValidEmail } from '@/lib/validation/email'
 
 interface Address {
   id: string
@@ -131,20 +136,49 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
       : 350
   const total = subtotal + shippingCost
 
+  // `houseNumber` is absent from drafts persisted before street/number were
+  // split into two inputs.
+  const houseNumber = newAddress.houseNumber ?? ''
+
+  // Per-field validity for the new-address form. Errors render only once a
+  // field has content, so an untouched form is not covered in red.
+  const addressErrors = {
+    street: newAddress.street !== '' && !isValidStreet(newAddress.street),
+    houseNumber: houseNumber !== '' && !isValidHouseNumber(houseNumber),
+    city: newAddress.city !== '' && !isValidCity(newAddress.city),
+    postalCode: newAddress.postalCode !== '' && !isValidPostalCode(newAddress.postalCode),
+  }
+  const newAddressValid =
+    isValidStreet(newAddress.street) &&
+    isValidHouseNumber(houseNumber) &&
+    isValidCity(newAddress.city) &&
+    isValidPostalCode(newAddress.postalCode)
+
+  // The API and every downstream view still take a single `street` line.
   const shippingAddress = useNewAddress
-    ? newAddress
+    ? {
+        street: [newAddress.street.trim(), houseNumber.trim()].filter(Boolean).join(' '),
+        city: newAddress.city.trim(),
+        postalCode: newAddress.postalCode.trim(),
+        country: newAddress.country || 'Srbija',
+      }
     : addresses.find((a) => a.id === selectedAddressId)
 
+  // A non-empty string is not enough — the address is what the order
+  // confirmation is sent to, so it has to actually parse.
+  const emailValid = isValidEmail(guestInfo.email)
+  const emailError = guestInfo.email.trim() !== '' && !emailValid
+
   const canProceedContact = isGuest
-    ? guestInfo.name.trim() &&
-      guestInfo.email.trim() &&
-      // dial code + local number: a real phone has at least 8 digits total
-      guestInfo.phone.replace(/\D/g, '').length >= 8
+    ? Boolean(
+        guestInfo.name.trim() &&
+        emailValid &&
+        // dial code + local number: a real phone has at least 8 digits total
+        guestInfo.phone.replace(/\D/g, '').length >= 8
+      )
     : true
 
-  const canProceedAddress = useNewAddress
-    ? newAddress.street && newAddress.city && newAddress.postalCode
-    : !!selectedAddressId
+  const canProceedAddress = useNewAddress ? newAddressValid : !!selectedAddressId
 
   const b2bMinimumMet = !isB2b || subtotal >= MIN_B2B_ORDER
 
@@ -358,11 +392,15 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1">{t('checkout.emailLabel')} *</label>
                     <input
                       type="email"
+                      inputMode="email"
+                      autoComplete="email"
                       value={guestInfo.email}
-                      onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
+                      onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value.replace(/\s/g, '') })}
                       placeholder={t('checkout.emailPlaceholder')}
-                      className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm focus:border-black focus:outline-none"
+                      aria-invalid={emailError}
+                      className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${emailError ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
                     />
+                    {emailError && <p className="mt-1 text-xs text-red-600">{t('checkout.errEmail')}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1a1c1e] mb-1">{t('checkout.phoneLabel')} *</label>
@@ -420,10 +458,63 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
                 {useNewAddress && (
                   <div className="space-y-3">
-                    <input type="text" placeholder={t('checkout.streetAndNumber')} value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="w-full border border-[#dddbd9] rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
+                    {/* Each field filters disallowed characters on every keystroke
+                        (see lib/validation/address) and shows its own hint once
+                        the value is present but still malformed. */}
+                    <div className="grid grid-cols-[1fr_7rem] gap-3">
+                      <div>
+                        <input
+                          type="text"
+                          inputMode="text"
+                          autoComplete="address-line1"
+                          placeholder={t('checkout.street')}
+                          value={newAddress.street}
+                          onChange={(e) => setNewAddress({ ...newAddress, street: sanitizeStreet(e.target.value) })}
+                          aria-invalid={addressErrors.street}
+                          className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.street ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
+                        />
+                        {addressErrors.street && <p className="mt-1 text-xs text-red-600">{t('checkout.errStreet')}</p>}
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="address-line2"
+                          placeholder={t('checkout.houseNumber')}
+                          value={houseNumber}
+                          onChange={(e) => setNewAddress({ ...newAddress, houseNumber: sanitizeHouseNumber(e.target.value) })}
+                          aria-invalid={addressErrors.houseNumber}
+                          className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.houseNumber ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
+                        />
+                        {addressErrors.houseNumber && <p className="mt-1 text-xs text-red-600">{t('checkout.errHouseNumber')}</p>}
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" placeholder={t('checkout.city')} value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="border border-[#dddbd9] rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
-                      <input type="text" placeholder={t('checkout.postalCode')} value={newAddress.postalCode} onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })} className="border border-[#dddbd9] rounded px-4 py-3 text-sm focus:border-black focus:outline-none" />
+                      <div>
+                        <input
+                          type="text"
+                          autoComplete="address-level2"
+                          placeholder={t('checkout.city')}
+                          value={newAddress.city}
+                          onChange={(e) => setNewAddress({ ...newAddress, city: sanitizeCity(e.target.value) })}
+                          aria-invalid={addressErrors.city}
+                          className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.city ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
+                        />
+                        {addressErrors.city && <p className="mt-1 text-xs text-red-600">{t('checkout.errCity')}</p>}
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="postal-code"
+                          placeholder={t('checkout.postalCode')}
+                          value={newAddress.postalCode}
+                          onChange={(e) => setNewAddress({ ...newAddress, postalCode: sanitizePostalCode(e.target.value) })}
+                          aria-invalid={addressErrors.postalCode}
+                          className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.postalCode ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
+                        />
+                        {addressErrors.postalCode && <p className="mt-1 text-xs text-red-600">{t('checkout.errPostalCode')}</p>}
+                      </div>
                     </div>
                   </div>
                 )}

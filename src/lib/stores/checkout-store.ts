@@ -9,6 +9,10 @@ export interface CheckoutGuestInfo {
 
 export interface CheckoutNewAddress {
   street: string
+  /** House number, kept separate from `street` so each can be validated with
+   *  its own character rules. Joined back into one line when the order is sent.
+   *  Optional: drafts persisted before the split have no value for it. */
+  houseNumber?: string
   city: string
   postalCode: string
   country: string
@@ -45,7 +49,7 @@ const initialDraft = {
   step: null as string | null,
   guestInfo: { name: '', email: '', phone: '' },
   selectedAddressId: '',
-  newAddress: { street: '', city: '', postalCode: '', country: 'Srbija' },
+  newAddress: { street: '', houseNumber: '', city: '', postalCode: '', country: 'Srbija' },
   useNewAddress: null as boolean | null,
   shippingMethod: 'standard',
   paymentMethod: null as string | null,

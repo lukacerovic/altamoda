@@ -1,4 +1,15 @@
 import { z } from 'zod'
+import { isAcceptableStreet, isAcceptableCity, isAcceptablePostalCode } from '@/lib/validation/address'
+
+/** Mirror of the checkout form's field rules, but with looser bounds so
+ *  addresses customers already have saved (including foreign ones) still pass.
+ *  The client filters input as it is typed; this is the non-bypassable copy. */
+const addressSchema = z.object({
+  street: z.string().min(1).max(120).refine(isAcceptableStreet, 'invalid street'),
+  city: z.string().min(1).max(60).refine(isAcceptableCity, 'invalid city'),
+  postalCode: z.string().min(1).max(10).refine(isAcceptablePostalCode, 'invalid postal code'),
+  country: z.string().default('Srbija'),
+})
 
 export const createOrderSchema = z.object({
   items: z.array(
@@ -7,18 +18,8 @@ export const createOrderSchema = z.object({
       quantity: z.coerce.number().int().min(1),
     })
   ).min(1),
-  shippingAddress: z.object({
-    street: z.string().min(1),
-    city: z.string().min(1),
-    postalCode: z.string().min(1),
-    country: z.string().default('Srbija'),
-  }),
-  billingAddress: z.object({
-    street: z.string().min(1),
-    city: z.string().min(1),
-    postalCode: z.string().min(1),
-    country: z.string().default('Srbija'),
-  }).optional(),
+  shippingAddress: addressSchema,
+  billingAddress: addressSchema.optional(),
   paymentMethod: z.enum(['card', 'bank_transfer', 'cash_on_delivery', 'invoice']),
   shippingMethod: z.string().optional(),
   notes: z.string().optional(),

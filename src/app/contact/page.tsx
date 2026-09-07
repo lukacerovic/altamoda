@@ -23,7 +23,10 @@ export default function ContactPage() {
       <Header />
       <main className="min-h-screen flex flex-col bg-[#FFFFFF] text-[#1a1c1e]">
         {/* Hero */}
-        <section className="w-full h-[563px] relative overflow-hidden flex items-end justify-center">
+        {/* Height is fixed only from md up. On a phone the heading plus both
+            paragraphs are taller than 563px, so a fixed height pushed the copy up
+            over the photo (and clipped it). Let the section grow instead. */}
+        <section className="w-full min-h-[460px] md:h-[563px] relative overflow-hidden flex items-end justify-center">
           <div className="absolute inset-0 bg-[#dddbd9]">
             <img
               alt={t("contact.heroImageAlt")}
@@ -32,8 +35,8 @@ export default function ContactPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFFFFF]/70 to-[#FFFFFF]" />
           </div>
-          <div className="relative z-10 text-center px-6 pb-10 md:pb-14">
-            <h1 className="font-serif italic text-5xl md:text-7xl lg:text-8xl tracking-tighter mb-4">
+          <div className="relative z-10 text-center px-6 pt-24 pb-10 md:pt-0 md:pb-14">
+            <h1 className="font-serif italic text-4xl sm:text-5xl md:text-7xl lg:text-8xl tracking-tighter mb-4">
               {t("contact.heroTitle")}
             </h1>
             <p className="text-lg md:text-xl text-[#1a1c1e] max-w-2xl mx-auto font-light leading-relaxed">

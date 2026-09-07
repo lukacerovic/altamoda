@@ -45,6 +45,8 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
 
   const [removeError, setRemoveError] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // Toast headline; defaults to the add-to-cart wording, overridden by share.
+  const [toastTitle, setToastTitle] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
@@ -76,7 +78,32 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
       .finally(() => setGuestLoading(false));
   }, [isGuest]);
 
-  const showToast = (message: string) => {
+  /** Share the list as plain text (name + product link per item). Uses the
+   *  native share sheet where the browser has one (mobile), otherwise copies to
+   *  the clipboard. The /wishlist URL itself is per-account, so it is not what
+   *  gets shared. */
+  const shareList = async () => {
+    if (items.length === 0) return;
+    const origin = window.location.origin;
+    const body = items
+      .map((i) => `\u2022 ${i.brand ? `${i.brand} ` : ""}${i.name} - ${origin}/products/${i.slug}`)
+      .join("\n");
+    const text = `${t("wishlist.heading")}\n\n${body}`;
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title: t("wishlist.heading"), text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      showToast(`${items.length} \u00d7 ${t("wishlist.itemCount")}`, t("wishlist.shareCopied"));
+    } catch {
+      // The user dismissed the share sheet, or the clipboard is unavailable
+      // (insecure context / permission denied) — nothing to report either way.
+    }
+  };
+
+  const showToast = (message: string, title?: string) => {
+    setToastTitle(title ?? null);
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToastMessage(message);
     toastTimerRef.current = setTimeout(() => setToastMessage(null), 2500);
@@ -171,7 +198,10 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
                 <span className="text-sm text-[#1a1c1e]">({items.length} {t("wishlist.itemCount")})</span>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 border border-[#dddbd9] text-[#1a1c1e] text-sm rounded-sm hover:bg-[#FFFFFF] transition-colors">
+                <button
+                  onClick={shareList}
+                  className="flex items-center gap-2 px-4 py-2 border border-[#dddbd9] text-[#1a1c1e] text-sm rounded-sm hover:bg-[#FFFFFF] hover:border-black transition-colors"
+                >
                   <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
                 <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#edb4bd] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors">
@@ -270,7 +300,7 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
         >
           <CheckCircle className="w-5 h-5 text-[#edb4bd] flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium">{t("wishlist.addedToast")}</p>
+            <p className="text-sm font-medium">{toastTitle ?? t("wishlist.addedToast")}</p>
             <p className="text-xs text-white/70 truncate mt-0.5">{toastMessage}</p>
           </div>
           <button
