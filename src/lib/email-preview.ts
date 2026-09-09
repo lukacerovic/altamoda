@@ -106,6 +106,10 @@ export interface EmailTemplateOptions {
   bodyBgImage?: string
   footerText?: string
   footerCopyright?: string
+  /** Footer background colour. Defaults to `bodyBg` (no colour break). Set it
+   *  to draw a distinct coloured bar under the footer text, as in the
+   *  "brand bar" letterhead variants. */
+  footerBg?: string
 
   // ── Letterhead scheme fields (altamoda wordmark stationery) ──
   /** Page (outer) background behind the 600px card. */
@@ -126,6 +130,8 @@ export interface EmailTemplateOptions {
   taglineColor?: string
   /** Faint "d" watermark shown bottom-right of the body. */
   watermarkSrc?: string
+  /** Thin rule under the header tagline (letterhead variants only). */
+  headerDivider?: boolean
 }
 
 export const defaultEmailOptions: EmailTemplateOptions = {
@@ -152,15 +158,20 @@ export function wrapInEmailTemplate(
   const hBg = o.headerBg || HEADER_BG
   const pageBg = o.pageBg || PAGE_BG
   const bodyBg = o.bodyBg || CONTENT_BG
+  const footerBg = o.footerBg || bodyBg
   const muted = o.mutedColor || TEXT_MUTED
   const accent = o.accentColor || ACCENT
   const tagColor = o.taglineColor || 'rgba(255,255,255,0.55)'
   const unsubHref = unsubscribeUrl || '#preview-unsubscribe'
 
   // Header content — wordmark (letterhead) wins, then a header image, then text.
+  const headerDividerRule = o.headerDivider
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto 0;"><tr><td style="width:32px;height:2px;background-color:${tagColor};font-size:0;line-height:0;">&nbsp;</td></tr></table>`
+    : ''
   const headerContent = o.wordmarkSrc
     ? [
         `<img src="${o.wordmarkSrc}" alt="${o.headerTitle || 'altamoda'}" style="display:block;margin:0 auto;width:210px;max-width:64%;height:auto;" />`,
+        headerDividerRule,
         o.tagline
           ? `<p style="margin:14px 0 0;font-size:11px;color:${tagColor};letter-spacing:4px;text-transform:uppercase;${FONT}">${o.tagline}</p>`
           : '',
@@ -210,11 +221,13 @@ h2{font-size:20px!important}
 /* Re-assert palette for clients that still swap colours in dark mode. */
 @media (prefers-color-scheme:dark){
 .ep-page{background-color:${pageBg}!important}
-.ep-card,.eb,.ef{background-color:${bodyBg}!important}
+.ep-card,.eb{background-color:${bodyBg}!important}
+.ef{background-color:${footerBg}!important}
 .eh{background-color:${hBg}!important}
 }
 [data-ogsc] .ep-page{background-color:${pageBg}!important}
-[data-ogsc] .ep-card,[data-ogsc] .eb,[data-ogsc] .ef{background-color:${bodyBg}!important}
+[data-ogsc] .ep-card,[data-ogsc] .eb{background-color:${bodyBg}!important}
+[data-ogsc] .ef{background-color:${footerBg}!important}
 [data-ogsc] .eh{background-color:${hBg}!important}
 </style>
 </head>
@@ -251,7 +264,7 @@ ${styledBody}
 
 <!-- Footer -->
 <tr>
-<td class="ef" bgcolor="${bodyBg}" style="padding:28px 48px;background-color:${bodyBg};border-top:1px solid ${accent}22;">
+<td class="ef" bgcolor="${footerBg}" style="padding:28px 48px;background-color:${footerBg};${footerBg === bodyBg ? `border-top:1px solid ${accent}22;` : ''}">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
 <td align="center">

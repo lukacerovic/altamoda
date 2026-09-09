@@ -204,7 +204,7 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
                 >
                   <Share2 className="w-4 h-4" /> {t("wishlist.shareList")}
                 </button>
-                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#edb4bd] hover:bg-[#413d3a] text-white text-sm font-medium rounded-sm transition-colors">
+                <button onClick={addAllToCart} className="flex items-center gap-2 px-5 py-2 bg-[#1a1c1e] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e] text-white text-sm font-medium rounded-sm transition-colors">
                   <ShoppingCart className="w-4 h-4" /> {t("wishlist.addAllToCart")}
                 </button>
               </div>
@@ -267,7 +267,7 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
                         onClick={() => addToCart(item)}
                         className={`w-full py-2.5 text-sm font-medium rounded-sm transition-colors ${
                           item.inStock
-                            ? "bg-[#edb4bd] hover:bg-[#413d3a] text-[#ffffff]"
+                            ? "bg-[#1a1c1e] hover:bg-[#413d3a] active:bg-[#edb4bd] active:text-[#1a1c1e] text-[#ffffff]"
                             : "bg-[#dddbd9] text-[#1a1c1e] cursor-not-allowed"
                         }`}
                       >

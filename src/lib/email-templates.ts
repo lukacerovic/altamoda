@@ -15,13 +15,22 @@ interface BaseLayoutOptions {
   email?: string
   /** Show "Odjavi se" link in footer (newsletter sends only, not transactional) */
   showUnsubscribe?: boolean
+  /** Footer background colour. Defaults to the cream card colour. Set it to
+   *  draw a distinct coloured bar under the footer, as in the letterhead
+   *  "brand bar" variant used by the welcome email. */
+  footerBg?: string
+  /** Thin rule under the header tagline (welcome email variant). */
+  headerDivider?: boolean
 }
 
 function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
-  const { email, showUnsubscribe = false } = opts
+  const { email, showUnsubscribe = false, footerBg = CARD_BG, headerDivider = false } = opts
   const site = getSiteUrl().replace(/\/$/, '')
   const wordmark = `${site}/email/wordmark-brown.png`
   const watermark = `${site}/email/watermark-d-blush.png`
+  const headerDividerRule = headerDivider
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto 0;"><tr><td style="width:32px;height:2px;background-color:${BRAND_PRIMARY};font-size:0;line-height:0;">&nbsp;</td></tr></table>`
+    : ''
   const footerUnsub =
     showUnsubscribe && email
       ? `<p style="margin: 8px 0 0; font-size: 12px; color: ${MUTED}; text-align: center;">
@@ -42,11 +51,13 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
     :root{color-scheme:light only;supported-color-schemes:light only;}
     @media (prefers-color-scheme:dark){
       .al-page{background-color:${PAGE_BG}!important}
-      .al-card,.al-body,.al-footer{background-color:${CARD_BG}!important}
+      .al-card,.al-body{background-color:${CARD_BG}!important}
+      .al-footer{background-color:${footerBg}!important}
       .al-header{background-color:${HEADER_BG}!important}
     }
     [data-ogsc] .al-page{background-color:${PAGE_BG}!important}
-    [data-ogsc] .al-card,[data-ogsc] .al-body,[data-ogsc] .al-footer{background-color:${CARD_BG}!important}
+    [data-ogsc] .al-card,[data-ogsc] .al-body{background-color:${CARD_BG}!important}
+    [data-ogsc] .al-footer{background-color:${footerBg}!important}
     [data-ogsc] .al-header{background-color:${HEADER_BG}!important}
   </style>
 </head>
@@ -58,6 +69,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
           <tr>
             <td align="center" bgcolor="${HEADER_BG}" class="al-header" style="padding: 40px 40px 32px; background-color: ${HEADER_BG};">
               <img src="${wordmark}" alt="altamoda" style="display: block; margin: 0 auto; width: 200px; max-width: 62%; height: auto;" />
+              ${headerDividerRule}
               <p style="margin: 14px 0 0; font-size: 11px; color: ${BRAND_PRIMARY}; letter-spacing: 4px; text-transform: uppercase;">
                 ${TAGLINE}
               </p>
@@ -67,7 +79,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
             <td valign="top" bgcolor="${CARD_BG}" class="al-body" style="padding: 0; background-color: ${CARD_BG}; background-image: url('${watermark}'); background-repeat: no-repeat; background-position: bottom right; background-size: auto 50%;">${content}</td>
           </tr>
           <tr>
-            <td bgcolor="${CARD_BG}" class="al-footer" style="padding: 24px 40px; background-color: ${CARD_BG}; border-top: 1px solid rgba(44,22,11,0.12);">
+            <td bgcolor="${footerBg}" class="al-footer" style="padding: 24px 40px; background-color: ${footerBg};${footerBg === CARD_BG ? ' border-top: 1px solid rgba(44,22,11,0.12);' : ''}">
               <p style="margin: 0; font-size: 11px; color: ${MUTED}; text-align: center; letter-spacing: 1px; text-transform: uppercase;">
                 ALTAMODA · ${TAGLINE}
               </p>
@@ -109,7 +121,7 @@ export function welcomeTemplate(email: string): string {
     </p>
     </div>
   `
-  return baseLayout(content, { email, showUnsubscribe: true })
+  return baseLayout(content, { email, showUnsubscribe: true, footerBg: HEADER_BG, headerDivider: true })
 }
 
 export function campaignTemplate(_subject: string, content: string, email: string): string {

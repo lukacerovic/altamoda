@@ -18,7 +18,6 @@ const TAGLINE = 'BEAUTY DISTRIBUTION & EDUCATION'
 // Brand ink colours
 const BROWN = '#2c160b'
 const BLACK = '#141414'
-const PINK = '#edb4bd'
 
 // Wordmark assets (transparent PNGs in /public/email)
 const WM = {
@@ -54,28 +53,30 @@ export const letterheadSchemes: LetterheadScheme[] = [
     },
   },
   {
-    name: 'Nežno roze',
+    name: 'Roze traka',
     subject: 'Altamoda — novosti',
-    description: 'Jednobojno nežno roze, crni logo. Memorandum stil.',
+    description: 'Roze zaglavlje, bela pozadina, roze traka u podnožju sa pravima i odjavom. Memorandum stil.',
     body: blankBody,
     options: {
       headerTitle: 'altamoda', tagline: TAGLINE,
-      pageBg: '#f1c7ce', headerBg: '#f8e2e4', bodyBg: '#f8e2e4',
+      pageBg: '#f1c7ce', headerBg: '#f9e1e1', bodyBg: '#ffffff',
+      footerBg: '#f9e1e1',
       wordmarkSrc: WM.black, taglineColor: BLACK,
-      textColor: '#2a1a1c', mutedColor: '#a87f86', accentColor: '#d9aeb5',
+      textColor: '#1a1c1e', mutedColor: '#a87f86', accentColor: '#d9aeb5',
       footerText: 'ALTAMODA · ' + TAGLINE,
     },
   },
   {
-    name: 'Crno zaglavlje',
+    name: 'Roze traka s linijom',
     subject: 'Altamoda — novosti',
-    description: 'Crno zaglavlje sa roze logom, krem telo. Memorandum stil.',
+    description: 'Roze zaglavlje sa linijom ispod loga, krem pozadina, roze traka u podnožju. Memorandum stil.',
     body: blankBody,
     options: {
       headerTitle: 'altamoda', tagline: TAGLINE,
-      pageBg: '#101010', headerBg: '#101010', bodyBg: '#f8f3ef',
-      wordmarkSrc: WM.pink, taglineColor: PINK,
-      textColor: '#1a1c1e', mutedColor: '#9a8f88', accentColor: '#cdbfb6',
+      pageBg: '#f1c7ce', headerBg: '#fee1e3', bodyBg: '#fbf6f2',
+      footerBg: '#fee1e3', headerDivider: true,
+      wordmarkSrc: WM.brown, taglineColor: BROWN,
+      textColor: BROWN, mutedColor: '#a87f86', accentColor: '#d9aeb5',
       footerText: 'ALTAMODA · ' + TAGLINE,
     },
   },
@@ -93,13 +94,14 @@ export const letterheadSchemes: LetterheadScheme[] = [
     },
   },
   {
-    name: 'Roze & braon',
+    name: 'Roze memorandum',
     subject: 'Altamoda — novosti',
-    description: 'Jednobojno roze, braon logo. Memorandum stil.',
+    description: 'Roze zaglavlje sa linijom, bela pozadina, roze traka u podnožju. Memorandum stil.',
     body: blankBody,
     options: {
       headerTitle: 'altamoda', tagline: TAGLINE,
-      pageBg: '#f1c7ce', headerBg: '#fee1e3', bodyBg: '#fee1e3',
+      pageBg: '#f6dfe1', headerBg: '#fbc9d1', bodyBg: '#ffffff',
+      footerBg: '#fbc9d1', headerDivider: true,
       wordmarkSrc: WM.brown, taglineColor: BROWN,
       textColor: BROWN, mutedColor: '#a87f86', accentColor: '#d9aeb5',
       footerText: 'ALTAMODA · ' + TAGLINE,

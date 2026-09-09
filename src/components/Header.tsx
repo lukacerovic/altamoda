@@ -302,7 +302,6 @@ export default function Header() {
 
           {/* Icons */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            <LanguageToggle />
             <Link href={session ? "/account" : "/account/login"} className="hidden xl:block hover:text-[#edb4bd] transition-colors">
               <User className="w-5 h-5 text-[#FFFFFF]" />
             </Link>
@@ -342,7 +341,7 @@ export default function Header() {
             ref={desktopNavRef}
             className="hidden xl:block absolute top-full left-0 right-0 bg-[#1a1c1e] border-t border-[rgba(255,255,255,0.08)] animate-slideDown z-40"
           >
-            <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-10 h-14">
+            <div className="max-w-7xl mx-auto px-4 relative flex items-center justify-center gap-10 h-14">
               {navLinks.map((l) => {
                 const hasMega = l.hasMega && (megaMenus[l.menuKey] !== undefined || l.menuKey === "brands");
                 return (
@@ -364,6 +363,9 @@ export default function Header() {
                   </div>
                 );
               })}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <LanguageToggle />
+              </div>
             </div>
 
             {/* Dropdown panels are anchored to this full-width bar (not to the
@@ -641,7 +643,7 @@ export default function Header() {
                 );
               })}
 
-              {/* Account & Wishlist in mobile menu */}
+              {/* Account in mobile menu */}
               <div className="pt-4 space-y-1">
                 <Link
                   href={session ? "/account" : "/account/login"}
@@ -651,22 +653,11 @@ export default function Header() {
                   <User className="w-5 h-5" />
                   {session ? t("nav.account") || "Account" : t("nav.login") || "Login"}
                 </Link>
-                <Link
-                  href="/wishlist"
-                  onClick={() => setMobileMenu(false)}
-                  className="flex items-center gap-3 py-3 px-2 text-[#1a1c1e] hover:text-[#edb4bd] text-sm"
-                >
-                  <Heart className="w-5 h-5" />
-                  {t("nav.wishlist") || "Wishlist"}
-                  {wishlistCount > 0 && (
-                    <span className="ml-auto px-2 py-0.5 rounded-full bg-[#edb4bd] text-white text-[10px]">{wishlistCount}</span>
-                  )}
-                </Link>
               </div>
 
               {/* Language selector in mobile menu */}
-              <div className="pt-4 border-t border-[#dddbd9] mt-2">
-                <LanguageToggle alignLeft />
+              <div className="pt-4 px-2 border-t border-[#dddbd9] mt-2">
+                <LanguageToggle alignLeft dark />
               </div>
             </div>
           </div>

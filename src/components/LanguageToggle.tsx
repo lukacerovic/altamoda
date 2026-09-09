@@ -6,7 +6,7 @@ import { useLanguage, languageLabels, languageFlags, type Language } from "@/lib
 
 const languages: Language[] = ["sr", "en", "ru"];
 
-export function LanguageToggle({ alignLeft = false }: { alignLeft?: boolean }) {
+export function LanguageToggle({ alignLeft = false, dark = false }: { alignLeft?: boolean; dark?: boolean }) {
   const { language, setLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -25,10 +25,10 @@ export function LanguageToggle({ alignLeft = false }: { alignLeft?: boolean }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 hover:opacity-70 transition-opacity text-xs uppercase tracking-widest text-[#FFFFFF]"
+        className={`flex items-center gap-1.5 hover:opacity-70 transition-opacity text-xs uppercase tracking-widest ${dark ? "text-[#1a1c1e]" : "text-[#FFFFFF]"}`}
       >
         <Globe className="w-3.5 h-3.5" />
-        <span className="hidden sm:inline">{language.toUpperCase()}</span>
+        <span>{language.toUpperCase()}</span>
       </button>
 
       {open && (

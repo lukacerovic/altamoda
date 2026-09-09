@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 interface NavSection {
   title?: string;
@@ -40,6 +41,8 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const siteSettings = useSiteSettings(["logoUrl"]);
+  const logoSrc = siteSettings.logoUrl || "/altamoda-logoes/altamoda-pink.png";
 
   const userName = session?.user?.name || "Admin";
   const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -85,7 +88,8 @@ export default function AdminLayout({
           {sidebarOpen ? (
             <Link href="/" aria-label="Altamoda početna" className="block">
               <Image
-                src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
+                src={logoSrc}
+                unoptimized
                 alt="Altamoda"
                 width={626}
                 height={201}
@@ -97,7 +101,8 @@ export default function AdminLayout({
           ) : (
             <Link href="/" aria-label="Altamoda početna" className="mx-auto block">
               <Image
-                src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
+                src={logoSrc}
+                unoptimized
                 alt="Altamoda"
                 width={626}
                 height={201}
@@ -184,7 +189,8 @@ export default function AdminLayout({
         <div className="p-8 border-b border-stone-200 flex items-center justify-between">
           <Link href="/" aria-label="Altamoda početna" className="block" onClick={() => setMobileMenuOpen(false)}>
             <Image
-              src="/altamoda-logoes/ALTAMODA LOGO BLACK.png"
+              src={logoSrc}
+                unoptimized
               alt="Altamoda"
               width={626}
               height={201}
@@ -263,7 +269,7 @@ export default function AdminLayout({
 
           <div className="flex items-center gap-2">
             {/* Language */}
-            <LanguageToggle />
+            <LanguageToggle dark />
 
             {/* User dropdown */}
             <div className="relative">
