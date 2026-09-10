@@ -132,6 +132,31 @@ export interface EmailTemplateOptions {
   watermarkSrc?: string
   /** Thin rule under the header tagline (letterhead variants only). */
   headerDivider?: boolean
+  /** Header content arrangement.
+   *  - "center" (default): wordmark, divider, tagline stacked and centered.
+   *  - "split": wordmark left, divider + tagline right (two columns). */
+  headerLayout?: 'center' | 'split'
+
+  // ── New "brand bar" footer variants (mascot / stacked-logo / signoff) ──
+  /** Skip the header row entirely — used by templates whose branding lives
+   *  in the footer instead (the wordmark/mascot signs off at the bottom). */
+  hideHeader?: boolean
+  /** Full-width decorative image (e.g. the mascot illustration) shown at
+   *  the top of the footer, above the legal row. */
+  footerImage?: string
+  /** Wordmark image shown inside the footer (signoff style), separate from
+   *  the header wordmark. */
+  footerWordmarkSrc?: string
+  /** Full-width rule drawn above the footer content (signoff style). */
+  footerDivider?: boolean
+  /** Lines of footer sign-off copy (e.g. ["Beauty","distribution","and education"]),
+   *  used by the "split" footer layout. */
+  footerTaglineLines?: string[]
+  /** Footer content layout.
+   *  - "stacked" (default): footerText / footerCopyright / unsubscribe, centered — back-compat.
+   *  - "columns": one row — year | "Sva prava zadržana" | bold "Odjava" link.
+   *  - "split": two columns — footerTaglineLines (left) | year/rights/Odjava stacked (right). */
+  footerLayout?: 'stacked' | 'columns' | 'split'
 }
 
 export const defaultEmailOptions: EmailTemplateOptions = {
@@ -162,13 +187,27 @@ export function wrapInEmailTemplate(
   const muted = o.mutedColor || TEXT_MUTED
   const accent = o.accentColor || ACCENT
   const tagColor = o.taglineColor || 'rgba(255,255,255,0.55)'
+  const textColor = o.textColor || TEXT_BODY
   const unsubHref = unsubscribeUrl || '#preview-unsubscribe'
+  const currentYear = new Date().getFullYear()
 
   // Header content — wordmark (letterhead) wins, then a header image, then text.
   const headerDividerRule = o.headerDivider
     ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto 0;"><tr><td style="width:32px;height:2px;background-color:${tagColor};font-size:0;line-height:0;">&nbsp;</td></tr></table>`
     : ''
-  const headerContent = o.wordmarkSrc
+  const headerDividerRuleRight = o.headerDivider
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 8px auto;"><tr><td style="width:32px;height:2px;background-color:${tagColor};font-size:0;line-height:0;">&nbsp;</td></tr></table>`
+    : ''
+  const withLineBreaks = (text: string) => text.split('\n').join('<br/>')
+  const headerContent = o.wordmarkSrc && o.headerLayout === 'split'
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+        <td align="left" valign="middle"><img src="${o.wordmarkSrc}" alt="${o.headerTitle || 'altamoda'}" style="display:block;width:180px;max-width:90%;height:auto;" /></td>
+        <td align="right" valign="middle">
+          ${headerDividerRuleRight}
+          ${o.tagline ? `<p style="margin:0;font-size:11px;color:${tagColor};letter-spacing:1px;line-height:1.5;text-align:right;${FONT}">${withLineBreaks(o.tagline)}</p>` : ''}
+        </td>
+      </tr></table>`
+    : o.wordmarkSrc
     ? [
         `<img src="${o.wordmarkSrc}" alt="${o.headerTitle || 'altamoda'}" style="display:block;margin:0 auto;width:210px;max-width:64%;height:auto;" />`,
         headerDividerRule,
@@ -188,12 +227,58 @@ export function wrapInEmailTemplate(
 
   // The letterhead look (wordmark) drops the accent rule and gives the body a
   // tall min-height so the corner watermark reads on near-empty stationery.
-  const isLetterhead = !!o.wordmarkSrc
+  const isLetterhead = !!o.wordmarkSrc || !!o.hideHeader
   const bodyWatermark = o.watermarkSrc
     ? `background-image:url('${o.watermarkSrc}');background-repeat:no-repeat;background-position:bottom right;background-size:auto 58%;`
     : o.bodyBgImage
     ? `background-image:url('${o.bodyBgImage}');background-size:cover;background-position:center;background-repeat:no-repeat;`
     : ''
+
+  // Footer — decorative image (mascot signoff) sits full-bleed above the text.
+  const footerImageRow = o.footerImage
+    ? `<img src="${o.footerImage}" alt="" style="display:block;width:100%;height:auto;" />`
+    : ''
+  const footerDividerRule = o.footerDivider
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;"><tr><td style="height:3px;background-color:${textColor};font-size:0;line-height:0;">&nbsp;</td></tr></table>`
+    : ''
+  const footerWordmarkRow = o.footerWordmarkSrc
+    ? `<img src="${o.footerWordmarkSrc}" alt="${o.headerTitle || 'altamoda'}" style="display:block;width:220px;max-width:70%;height:auto;margin:0 auto 20px;" />`
+    : ''
+
+  let footerBody: string
+  if (o.footerLayout === 'columns') {
+    footerBody = `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="left" style="font-size:13px;color:${textColor};${FONT}">${currentYear}</td>
+          <td align="center" style="font-size:13px;color:${textColor};${FONT}">Sva prava zadržana</td>
+          <td align="right" style="font-size:13px;font-weight:700;color:${textColor};${FONT}"><a href="${unsubHref}" style="color:${textColor};text-decoration:none;">Odjava</a></td>
+        </tr>
+      </table>`
+  } else if (o.footerLayout === 'split') {
+    const taglineHtml = (o.footerTaglineLines || []).map((l) => `${l}<br/>`).join('')
+    footerBody = `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="left" valign="top" style="font-size:15px;line-height:1.5;color:${textColor};${FONT}">${taglineHtml}</td>
+          <td align="right" valign="top" style="font-size:13px;line-height:1.5;color:${textColor};${FONT}">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 8px auto;"><tr><td style="width:32px;height:2px;background-color:${textColor};font-size:0;line-height:0;">&nbsp;</td></tr></table>
+            ${currentYear}<br/>Sva prava<br/>zadržana<br/><strong><a href="${unsubHref}" style="color:${textColor};text-decoration:none;">Odjava</a></strong>
+          </td>
+        </tr>
+      </table>`
+  } else {
+    footerBody = `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <p style="margin:0 0 6px;font-size:11px;color:${muted};letter-spacing:1px;text-transform:uppercase;${FONT}">${o.footerText}</p>
+            <p style="margin:0 0 12px;font-size:11px;color:${muted};${FONT}">${o.footerCopyright}</p>
+            <p style="margin:0;font-size:11px;${FONT}"><a href="${unsubHref}" style="color:${muted};text-decoration:none;border-bottom:1px solid ${accent}33;">Odjavi se</a></p>
+          </td>
+        </tr>
+      </table>`
+  }
 
   return `<!DOCTYPE html>
 <html lang="sr">
@@ -238,11 +323,11 @@ h2{font-size:20px!important}
 <table class="ec ep-card" role="presentation" width="600" cellpadding="0" cellspacing="0" bgcolor="${bodyBg}" style="max-width:600px;width:100%;background-color:${bodyBg};border-radius:2px;overflow:hidden;">
 
 <!-- Header -->
-<tr>
+${o.hideHeader ? '' : `<tr>
 <td class="eh" align="center" bgcolor="${hBg}" style="padding:${o.headerBgImage ? '60px 40px 52px' : isLetterhead ? '42px 40px 34px' : '36px 40px 28px'};background-color:${hBg};${o.headerBgImage ? `background-image:url('${o.headerBgImage}');background-size:cover;background-position:center;` : ''}">
 ${headerContent}
 </td>
-</tr>
+</tr>`}
 ${isLetterhead ? '' : `
 <!-- Accent line -->
 <tr>
@@ -264,13 +349,14 @@ ${styledBody}
 
 <!-- Footer -->
 <tr>
-<td class="ef" bgcolor="${footerBg}" style="padding:28px 48px;background-color:${footerBg};${footerBg === bodyBg ? `border-top:1px solid ${accent}22;` : ''}">
+<td class="ef" bgcolor="${footerBg}" style="padding:${o.footerImage ? '0 0 28px' : '28px 48px'};background-color:${footerBg};${footerBg === bodyBg && !o.footerDivider && !o.footerImage ? `border-top:1px solid ${accent}22;` : ''}">
+${footerImageRow}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td align="center">
-<p style="margin:0 0 6px;font-size:11px;color:${muted};letter-spacing:1px;text-transform:uppercase;${FONT}">${o.footerText}</p>
-<p style="margin:0 0 12px;font-size:11px;color:${muted};${FONT}">${o.footerCopyright}</p>
-<p style="margin:0;font-size:11px;${FONT}"><a href="${unsubHref}" style="color:${muted};text-decoration:none;border-bottom:1px solid ${accent}33;">Odjavi se</a></p>
+<td style="padding:${o.footerImage ? '20px 48px 0' : '0'};">
+${footerWordmarkRow}
+${footerDividerRule}
+${footerBody}
 </td>
 </tr>
 </table>

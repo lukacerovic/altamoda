@@ -1,11 +1,11 @@
 # Graph Report - altamoda  (2026-09-10)
 
 ## Corpus Check
-- 349 files · ~826,091 words
+- 349 files · ~825,991 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2686 nodes · 3755 edges · 402 communities (164 shown, 238 thin omitted)
+- 2686 nodes · 3755 edges · 403 communities (164 shown, 239 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 22 edges (avg confidence: 0.72)
 - Token cost: 0 input · 0 output
 
@@ -397,6 +397,7 @@
 - [[_COMMUNITY_seed.ts|seed.ts]]
 - [[_COMMUNITY_headerAlias|headerAlias]]
 - [[_COMMUNITY_next-auth.d.ts|next-auth.d.ts]]
+- [[_COMMUNITY_route.ts|route.ts]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `useLanguage()` - 71 edges
@@ -430,15 +431,15 @@
 - **Incremental Update Flow** — claude_skills_graphify_references_update_incremental_update, claude_skills_graphify_references_update_build_merge, claude_skills_graphify_references_update_prune_deleted, claude_skills_graphify_references_update_code_only_fast_path, claude_skills_graphify_skill_manifest [EXTRACTED 1.00]
 - **Graph Query Interface** — claude_skills_graphify_references_query_query_expansion, claude_skills_graphify_references_query_bfs_dfs_traversal, claude_skills_graphify_references_query_shortest_path, claude_skills_graphify_references_query_explain, claude_skills_graphify_references_query_save_result [EXTRACTED 1.00]
 
-## Communities (402 total, 238 thin omitted)
+## Communities (403 total, 239 thin omitted)
 
 ### Community 0 - "Product Data Models"
 Cohesion: 0.02
 Nodes (114): AccountOrder, accountRecentOrders, AccountStat, accountStats, adminAllOrders, AdminBanner, adminBanners, AdminLowStock (+106 more)
 
 ### Community 1 - "Pantheon ERP Backfill"
-Cohesion: 0.07
-Nodes (34): PUT, DELETE, PUT, GET, POST, GET, GET, GET (+26 more)
+Cohesion: 0.08
+Nodes (28): PUT, DELETE, PUT, GET, POST, GET, GET, POST (+20 more)
 
 ### Community 2 - "Zod Validation Schemas"
 Cohesion: 0.12
@@ -514,7 +515,7 @@ Nodes (16): APPLY, main(), POST, triggerSchema, GET(), getPantheonClient(), norm
 
 ### Community 21 - "Products Listing UI"
 Cohesion: 0.10
-Nodes (17): DELETE, PUT, DELETE, GET, POST, DELETE, GET, PUT (+9 more)
+Nodes (19): DELETE, PUT, DELETE, GET, POST, DELETE, GET, PUT (+11 more)
 
 ### Community 22 - "Order Retry API"
 Cohesion: 0.08
@@ -621,8 +622,8 @@ Cohesion: 0.06
 Nodes (32): 10. Risk Mitigation, 1. Payment Service Provider (PSP) — Recommendation, 2. D Express Shipping Integration, 3. Email Notifications (Resend + React Email), 4. B2B Invoice PDF Generation, 5. Implementation Steps (Execution Order), 6. Environment Variables Required, 7. Database Changes (+24 more)
 
 ### Community 51 - "Admin Product Editor"
-Cohesion: 0.13
-Nodes (21): AMS_COL_CONFIG, AmsExportProduct, AmsImportResult, AmsRow, AmsSheet, brandedName(), extractAmsRows(), headerAlias() (+13 more)
+Cohesion: 0.12
+Nodes (22): AMS_COL_CONFIG, AmsExportProduct, amsExportRecord(), AmsImportResult, AmsRow, AmsSheet, brandedName(), buildAmsExportBuffer() (+14 more)
 
 ### Community 52 - "SKU Delta Import"
 Cohesion: 0.43
@@ -641,8 +642,8 @@ Cohesion: 0.16
 Nodes (20): Address, CheckoutClient(), Props, Step, CITY_DISALLOWED, isAcceptableCity(), isAcceptableStreet(), isValidCity() (+12 more)
 
 ### Community 58 - "Hair Colors UI"
-Cohesion: 0.12
-Nodes (23): main(), main(), ExcelRow, main(), readRows(), UpdateAction, DELETE, GET (+15 more)
+Cohesion: 0.15
+Nodes (19): main(), main(), ExcelRow, main(), readRows(), UpdateAction, DELETE, GET (+11 more)
 
 ### Community 59 - "Payment Terms Page"
 Cohesion: 0.47
@@ -757,8 +758,8 @@ Cohesion: 0.18
 Nodes (12): brandNames, brandProductLines, categoryHierarchy, categoryNeedsHairType(), defaultFormData(), initialProducts, Product, ProductImage (+4 more)
 
 ### Community 91 - "page"
-Cohesion: 0.08
-Nodes (24): DELETE, PUT, mergeSchema, POST, GET, GET, GET, PUT (+16 more)
+Cohesion: 0.07
+Nodes (28): DELETE, PUT, mergeSchema, POST, GET, GET, GET, PUT (+20 more)
 
 ### Community 92 - "/api/newsletter route (subscribe/unsubsc"
 Cohesion: 0.22
@@ -897,8 +898,8 @@ Cohesion: 0.50
 Nodes (3): name, private, version
 
 ### Community 132 - "route.ts"
-Cohesion: 0.13
-Nodes (18): POST, DELETE, GET, POST, POST, PATCH, VALID_TRANSITIONS, BulkEmail (+10 more)
+Cohesion: 0.19
+Nodes (14): POST, POST, PATCH, VALID_TRANSITIONS, BulkEmail, BulkSendResult, getEmailFrom(), getNewsletterFrom() (+6 more)
 
 ### Community 133 - "README"
 Cohesion: 0.50
@@ -929,8 +930,8 @@ Cohesion: 0.32
 Nodes (6): AddToCartInput, addToCartSchema, UpdateCartItemInput, updateCartItemSchema, CreateReviewInput, createReviewSchema
 
 ### Community 151 - "route.ts"
-Cohesion: 0.12
-Nodes (9): GET, POST, addWishlistSchema, DELETE, GET, POST, UnsubscribePageProps, globalForPrisma (+1 more)
+Cohesion: 0.14
+Nodes (9): GET, POST, GET, UnsubscribePageProps, globalForPrisma, expandDiacritics(), findFuzzyProductIds(), tokenize() (+1 more)
 
 ### Community 152 - "graphify reference: add a URL and watch a folder"
 Cohesion: 0.50
@@ -953,8 +954,8 @@ Cohesion: 0.67
 Nodes (3): The Big Picture, What is Pantheon and How Does It Relate to Alta Moda?, Why Pantheon Integration Matters
 
 ### Community 158 - "loading"
-Cohesion: 0.12
-Nodes (12): POST, retrySchema, DELETE, GET, PUT, DELETE, GET, PUT (+4 more)
+Cohesion: 0.08
+Nodes (18): bodySchema, itemSchema, POST, GET, PUT, GET, POST, GET (+10 more)
 
 ### Community 160 - "cloudinary-loader"
 Cohesion: 0.33
@@ -994,15 +995,15 @@ Nodes (5): APPLY, BACKUP, __dirname, main(), targetDbUrl()
 
 ### Community 387 - "route.ts"
 Cohesion: 0.40
-Nodes (4): bodySchema, itemSchema, POST, ensureUniqueSlug()
+Nodes (4): DELETE, GET, POST, newsletterRateLimiter
 
 ### Community 388 - "validation-perf.test.ts"
 Cohesion: 0.13
 Nodes (12): allCodes, APPLY, byBarcode, byCode, bySku, matched, newMap, oldMap (+4 more)
 
 ### Community 400 - "headerAlias"
-Cohesion: 0.40
-Nodes (5): amsExportRecord(), buildAmsExportBuffer(), htmlToText(), orderForExport(), stripColorSuffix()
+Cohesion: 0.67
+Nodes (4): headerAlias(), isAmsFile(), norm(), validateAmsHeaders()
 
 ### Community 401 - "next-auth.d.ts"
 Cohesion: 0.50
@@ -1011,7 +1012,7 @@ Nodes (3): JWT, Session, User
 ## Knowledge Gaps
 - **1588 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+1583 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **238 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **239 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -1027,6 +1028,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Product Data Models` be split into smaller, more focused modules?**
   _Cohesion score 0.017094017094017096 - nodes in this community are weakly interconnected._
 - **Should `Pantheon ERP Backfill` be split into smaller, more focused modules?**
-  _Cohesion score 0.06779661016949153 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07529411764705882 - nodes in this community are weakly interconnected._
 - **Should `Zod Validation Schemas` be split into smaller, more focused modules?**
   _Cohesion score 0.12280701754385964 - nodes in this community are weakly interconnected._

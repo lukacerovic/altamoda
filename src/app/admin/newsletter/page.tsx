@@ -251,6 +251,17 @@ export default function NewsletterPage() {
     return generateEmailPreview(editorBodyContent, emailOptions);
   }, [editorBodyContent, emailOptions]);
 
+  // The preview iframe sizes itself to the actual rendered card height
+  // instead of a fixed box, so short templates don't leave a stretched,
+  // wrongly-coloured gap below the footer.
+  const previewIframeRef = useRef<HTMLIFrameElement>(null);
+  const [previewHeight, setPreviewHeight] = useState(600);
+  const handlePreviewLoad = useCallback(() => {
+    const doc = previewIframeRef.current?.contentDocument;
+    const height = doc?.body?.scrollHeight;
+    if (height) setPreviewHeight(height);
+  }, []);
+
   // Subscriber count for selected send segment
   const sendRecipientCount = useMemo(() => {
     if (sendSegment === "all") return stats.totalActive;
@@ -894,9 +905,11 @@ export default function NewsletterPage() {
               <div className="p-4 bg-stone-50/50">
                 <div className="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm mx-auto" style={{ maxWidth: 620 }}>
                   <iframe
+                    ref={previewIframeRef}
                     srcDoc={emailPreviewHtml}
-                    className="w-full border-0"
-                    style={{ minHeight: 1000 }}
+                    onLoad={handlePreviewLoad}
+                    className="w-full border-0 block"
+                    style={{ height: previewHeight }}
                     title="Email Preview"
                     sandbox="allow-same-origin"
                   />

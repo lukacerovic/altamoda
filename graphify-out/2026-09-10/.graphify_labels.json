@@ -400,5 +400,6 @@
   "398": "Community 398",
   "399": "seed.ts",
   "400": "headerAlias",
-  "401": "next-auth.d.ts"
+  "401": "next-auth.d.ts",
+  "402": "route.ts"
 }

@@ -17,14 +17,21 @@ const TAGLINE = 'BEAUTY DISTRIBUTION & EDUCATION'
 
 // Brand ink colours
 const BROWN = '#2c160b'
-const BLACK = '#141414'
 
 // Wordmark assets (transparent PNGs in /public/email)
 const WM = {
   brown: '/email/wordmark-brown.png',
   black: '/email/wordmark-black.png',
   pink: '/email/wordmark-pink.png',
+  stackedBrown: '/email/wordmark-stacked-brown.png',
 }
+
+// Footer signoff assets
+const FOOTER_ART = {
+  mascot: '/email/mascot-wordmark.png',
+}
+
+const BRAND_PINK = '#ecb3bc'
 
 /** Faint placeholder body — admin replaces this with real content per send. */
 const blankBody =
@@ -55,29 +62,30 @@ export const letterheadSchemes: LetterheadScheme[] = [
   {
     name: 'Roze traka',
     subject: 'Altamoda — novosti',
-    description: 'Roze zaglavlje, bela pozadina, roze traka u podnožju sa pravima i odjavom. Memorandum stil.',
+    description: 'Belo telo, ilustrovani roze potpis (maskota + logo) u podnožju sa godinom, pravima i odjavom.',
     body: blankBody,
     options: {
-      headerTitle: 'altamoda', tagline: TAGLINE,
-      pageBg: '#f1c7ce', headerBg: '#f9e1e1', bodyBg: '#ffffff',
-      footerBg: '#f9e1e1',
-      wordmarkSrc: WM.black, taglineColor: BLACK,
-      textColor: '#1a1c1e', mutedColor: '#a87f86', accentColor: '#d9aeb5',
-      footerText: 'ALTAMODA · ' + TAGLINE,
+      headerTitle: 'altamoda',
+      hideHeader: true,
+      pageBg: '#ffffff', bodyBg: '#ffffff',
+      footerBg: BRAND_PINK, footerImage: FOOTER_ART.mascot,
+      footerLayout: 'split', footerTaglineLines: ['Beauty', 'distribution', 'and education'],
+      textColor: BROWN, mutedColor: '#a87f86', accentColor: '#d9aeb5',
     },
   },
   {
     name: 'Roze traka s linijom',
     subject: 'Altamoda — novosti',
-    description: 'Roze zaglavlje sa linijom ispod loga, krem pozadina, roze traka u podnožju. Memorandum stil.',
+    description: 'Roze zaglavlje sa uspravnim logom i linijom, bela pozadina, roze traka u podnožju sa pravima i odjavom.',
     body: blankBody,
     options: {
-      headerTitle: 'altamoda', tagline: TAGLINE,
-      pageBg: '#f1c7ce', headerBg: '#fee1e3', bodyBg: '#fbf6f2',
-      footerBg: '#fee1e3', headerDivider: true,
-      wordmarkSrc: WM.brown, taglineColor: BROWN,
+      headerTitle: 'alta moda', tagline: 'Beauty\ndistribution\nand education',
+      headerLayout: 'split', headerDivider: true,
+      pageBg: BRAND_PINK, headerBg: BRAND_PINK, bodyBg: '#ffffff',
+      footerBg: BRAND_PINK,
+      wordmarkSrc: WM.stackedBrown, taglineColor: BROWN,
       textColor: BROWN, mutedColor: '#a87f86', accentColor: '#d9aeb5',
-      footerText: 'ALTAMODA · ' + TAGLINE,
+      footerLayout: 'columns',
     },
   },
   {
@@ -96,15 +104,16 @@ export const letterheadSchemes: LetterheadScheme[] = [
   {
     name: 'Roze memorandum',
     subject: 'Altamoda — novosti',
-    description: 'Roze zaglavlje sa linijom, bela pozadina, roze traka u podnožju. Memorandum stil.',
+    description: 'Belo telo, logo i podebljana linija u podnožju, tagline i pravni red uz odjavu. Memorandum stil.',
     body: blankBody,
     options: {
-      headerTitle: 'altamoda', tagline: TAGLINE,
-      pageBg: '#f6dfe1', headerBg: '#fbc9d1', bodyBg: '#ffffff',
-      footerBg: '#fbc9d1', headerDivider: true,
-      wordmarkSrc: WM.brown, taglineColor: BROWN,
+      headerTitle: 'altamoda',
+      hideHeader: true,
+      pageBg: '#ffffff', bodyBg: '#ffffff',
+      footerBg: '#ffffff',
+      footerWordmarkSrc: WM.brown, footerDivider: true,
+      footerLayout: 'split', footerTaglineLines: ['Beauty', 'distribution', 'and education'],
       textColor: BROWN, mutedColor: '#a87f86', accentColor: '#d9aeb5',
-      footerText: 'ALTAMODA · ' + TAGLINE,
     },
   },
   {

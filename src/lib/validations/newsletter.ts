@@ -53,6 +53,7 @@ export const emailTemplateOptionsSchema = z
     bodyBgImage: safeImageUrl.optional().or(z.literal('')),
     footerText: safeText.optional(),
     footerCopyright: safeText.optional(),
+    footerBg: safeColor.optional(),
     // Letterhead scheme fields (altamoda wordmark stationery)
     pageBg: safeColor.optional(),
     bodyBg: safeColor.optional(),
@@ -63,6 +64,15 @@ export const emailTemplateOptionsSchema = z
     tagline: safeText.optional(),
     taglineColor: safeColor.optional(),
     watermarkSrc: safeImageUrl.optional().or(z.literal('')),
+    headerDivider: z.boolean().optional(),
+    headerLayout: z.enum(['center', 'split']).optional(),
+    // "Brand bar" footer variants (mascot / stacked-logo / signoff)
+    hideHeader: z.boolean().optional(),
+    footerImage: safeImageUrl.optional().or(z.literal('')),
+    footerWordmarkSrc: safeImageUrl.optional().or(z.literal('')),
+    footerDivider: z.boolean().optional(),
+    footerTaglineLines: z.array(safeText).max(10).optional(),
+    footerLayout: z.enum(['stacked', 'columns', 'split']).optional(),
   })
   .strict()
 
