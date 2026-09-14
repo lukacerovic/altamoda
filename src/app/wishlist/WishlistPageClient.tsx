@@ -86,7 +86,7 @@ export default function WishlistPageClient({ items: initialItems, isGuest = fals
     if (items.length === 0) return;
     const origin = window.location.origin;
     const body = items
-      .map((i) => `\u2022 ${i.brand ? `${i.brand} ` : ""}${i.name} - ${origin}/products/${i.slug}`)
+      .map((i) => `\u2022 ${i.brand ? `${i.brand.toUpperCase()} ` : ""}${i.name} - ${origin}/products/${i.slug}`)
       .join("\n");
     const text = `${t("wishlist.heading")}\n\n${body}`;
     try {

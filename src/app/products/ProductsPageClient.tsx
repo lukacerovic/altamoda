@@ -270,7 +270,7 @@ function BrandHeader({ brand }: { brand: { name: string; slug: string; logoUrl: 
         {logo ? (
           <Image src={logo} alt={brand.name} width={128} height={64} className="h-16 mx-auto object-contain mb-3" />
         ) : (
-          <h2 className="text-xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
+          <h2 className="text-xl font-bold uppercase text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{brand.name}</h2>
         )}
         {brandTitle && (
           <p className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 font-medium">
@@ -1569,7 +1569,7 @@ export default function ProductsPageClient({
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {activeBrand ? (
-                <>{activeBrand.name}, <em className="italic">{t("products.allProductsEm")}</em>.</>
+                <><span className="uppercase">{activeBrand.name}</span>, <em className="italic">{t("products.allProductsEm")}</em>.</>
               ) : (
                 <>{t("products.catchphrasePrefix")}, <em className="italic">{t("products.allProductsEm")}</em>.</>
               )}
@@ -1723,7 +1723,7 @@ export default function ProductsPageClient({
                       // Multi-select: clicking toggles a brand in/out of the set;
                       // clicking the active brand again removes it.
                       onClick={() => setSelectedBrands((prev) => (prev.includes(b.slug) ? prev.filter((s) => s !== b.slug) : [...prev, b.slug]))}
-                      className={`px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 ${
+                      className={`px-5 py-2 rounded-full text-[13px] font-medium uppercase transition-all duration-200 ${
                         isActive
                           ? "bg-[#edb4bd] text-white shadow-sm"
                           : "bg-[#dddbd9]/50 text-[#1a1c1e]/70 hover:bg-[#dddbd9] hover:text-[#1a1c1e]"

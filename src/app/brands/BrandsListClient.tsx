@@ -65,7 +65,7 @@ export default function BrandsListClient({ brands }: { brands: BrandItem[] }) {
                     />
                   ) : (
                     <span
-                      className="text-3xl font-bold text-[#dddbd9] group-hover:text-[#1a1c1e] transition-colors"
+                      className="text-3xl font-bold uppercase text-[#dddbd9] group-hover:text-[#1a1c1e] transition-colors"
                       style={{ fontFamily: "'Noto Serif', serif" }}
                     >
                       {brand.name}

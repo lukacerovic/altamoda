@@ -244,7 +244,7 @@ function WishlistSection() {
                 )}
               </div>
               <div className="p-4">
-                <span className="text-xs text-[#1a1c1e]">{item.brand}</span>
+                <span className="text-xs uppercase text-[#1a1c1e]">{item.brand}</span>
                 <h4 className="text-sm font-medium text-[#1a1c1e] mt-1">{item.name}</h4>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm font-bold text-[#edb4bd]">{item.price.toLocaleString("sr-RS")} RSD</span>

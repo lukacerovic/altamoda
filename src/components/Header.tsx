@@ -549,7 +549,7 @@ export default function Header() {
                           <Image src={p.image || PLACEHOLDER_IMG} alt={p.name} width={200} height={200} className="w-10 h-10 rounded-sm object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-[#1a1c1e] truncate">{p.name}</p>
-                            <p className="text-[11px] text-[#1a1c1e] font-medium">{p.brand}</p>
+                            <p className="text-[11px] uppercase text-[#1a1c1e] font-medium">{p.brand}</p>
                           </div>
                           <span className="flex items-baseline gap-2 text-sm font-bold text-[#1a1c1e] whitespace-nowrap">
                             {/* Professional-only products come back with price: null for
