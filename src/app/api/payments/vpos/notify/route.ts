@@ -10,7 +10,13 @@ import { prisma } from '@/lib/db'
 import { VPOS_ENABLED, getVposConfig } from '@/lib/payments/vpos-config'
 import { verifyOutcome, toMinorUnits, VPOS_RESULT_SUCCESS } from '@/lib/payments/vpos'
 import { sendEmail } from '@/lib/email'
-import { cardTransactionTemplate } from '@/lib/email-templates'
+import { cardTransactionTemplate, type EmailLang } from '@/lib/email-templates'
+
+const CARD_TX_SUBJECT: Record<EmailLang, (orderNumber: string) => string> = {
+  sr: (n) => `Uspešno izvršena kartična transakcija — porudžbina ${n}`,
+  en: (n) => `Card transaction completed — order ${n}`,
+  ru: (n) => `Транзакция по карте выполнена — заказ ${n}`,
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -121,15 +127,17 @@ async function handle(req: Request): Promise<Response> {
   const notifyEmail = order.user?.email ?? order.guestEmail
   if (isSuccess && notifyEmail) {
     try {
+      const language = (order.language as EmailLang) ?? 'sr'
       await sendEmail({
         to: notifyEmail,
-        subject: `Uspešno izvršena kartična transakcija — porudžbina ${order.orderNumber}`,
+        subject: CARD_TX_SUBJECT[language](order.orderNumber),
         html: cardTransactionTemplate({
           orderNumber: order.orderNumber,
           transactionId,
           authNumber,
           amount: `${Number(order.total).toLocaleString('sr-RS')} RSD`,
           dateTime: new Date().toLocaleString('sr-RS', { timeZone: 'Europe/Belgrade' }),
+          language,
         }),
       })
     } catch (e) {

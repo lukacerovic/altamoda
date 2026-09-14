@@ -26,6 +26,9 @@ export const createOrderSchema = z.object({
   guestName: z.string().min(1).optional(),
   guestEmail: z.string().email().optional(),
   guestPhone: z.string().min(5).optional(),
+  // Site language the customer had selected at checkout, so later async emails
+  // (VPOS webhook, shipped notice) can match it. Defaults to Serbian.
+  language: z.enum(['sr', 'en', 'ru']).optional(),
 })
 
 export const updateStatusSchema = z.object({

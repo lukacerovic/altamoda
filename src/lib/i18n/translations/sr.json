@@ -423,7 +423,17 @@
     "gateRegister": "Registruj se",
     "gateGuest": "Nastavi kao gost",
     "gateHint": "Podatke možete popuniti i kao gost — za potvrdu porudžbine biće potrebna prijava.",
-    "loginToOrder": "Prijavi se i poruči"
+    "loginToOrder": "Prijavi se i poruči",
+    "confirmSuccessTitle": "Porudžbina primljena!",
+    "confirmSuccessDesc": "Hvala vam na kupovini. Vaša porudžbina je uspešno kreirana.",
+    "confirmPendingTitle": "Plaćanje se obrađuje",
+    "confirmPendingDesc": "Potvrda plaćanja je u toku. Stranica će se automatski osvežiti za nekoliko trenutaka.",
+    "confirmFailedTitle": "Plaćanje nije uspelo",
+    "confirmFailedDesc": "Vaše plaćanje nije moglo biti obrađeno. Možete pokušati ponovo — artikli su i dalje u korpi.",
+    "orderNumberLabel": "Broj porudžbine",
+    "confirmEmailSentNote": "Poslali smo vam email sa potvrdom porudžbine i detaljima o dostavi.",
+    "tryAgain": "Pokušaj ponovo",
+    "backToCart": "Nazad na korpu"
   },
   "auth": {
     "home": "Početna",

@@ -10,6 +10,17 @@ const BRAND_TEXT = '#1a1c1e' // body text
 const MUTED = '#9a8f88'
 const TAGLINE = 'BEAUTY DISTRIBUTION &amp; EDUCATION'
 
+/** Order-lifecycle emails are sent in whatever language the customer had
+ *  selected at checkout (captured on `Order.language`). Every other
+ *  transactional/marketing email stays Serbian-only, unchanged. */
+export type EmailLang = 'sr' | 'en' | 'ru'
+
+const COPYRIGHT: Record<EmailLang, string> = {
+  sr: 'Sva prava zadržana.',
+  en: 'All rights reserved.',
+  ru: 'Все права защищены.',
+}
+
 interface BaseLayoutOptions {
   /** Recipient email — required when showUnsubscribe is true */
   email?: string
@@ -21,10 +32,12 @@ interface BaseLayoutOptions {
   footerBg?: string
   /** Thin rule under the header tagline (welcome email variant). */
   headerDivider?: boolean
+  /** Defaults to Serbian — only order-lifecycle emails pass a customer language. */
+  lang?: EmailLang
 }
 
 function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
-  const { email, showUnsubscribe = false, footerBg = CARD_BG, headerDivider = false } = opts
+  const { email, showUnsubscribe = false, footerBg = CARD_BG, headerDivider = false, lang = 'sr' } = opts
   const site = getSiteUrl().replace(/\/$/, '')
   const wordmark = `${site}/email/wordmark-brown.png`
   const watermark = `${site}/email/watermark-d-blush.png`
@@ -39,7 +52,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
       : ''
 
   return `<!DOCTYPE html>
-<html lang="sr">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -84,7 +97,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
                 ALTAMODA · ${TAGLINE}
               </p>
               <p style="margin: 6px 0 0; font-size: 11px; color: ${MUTED}; text-align: center;">
-                &copy; ${new Date().getFullYear()} Altamoda. Sva prava zadržana.
+                &copy; ${new Date().getFullYear()} Altamoda. ${COPYRIGHT[lang]}
               </p>
               ${footerUnsub}
             </td>
@@ -246,12 +259,27 @@ export function promoTemplate(
 // (copy per "zamena tekstova, nov sajt 2026" document)
 // ──────────────────────────────────────────────────────────
 
+const NEED_HELP: Record<EmailLang, string> = {
+  sr: 'Potrebna Vam je pomoć?',
+  en: 'Need help?',
+  ru: 'Нужна помощь?',
+}
+
 const CONTACT_BLOCK = `
   <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.7; color: #413d3a;">
     Potrebna Vam je pomoć?<br />
     📧 <a href="mailto:kontakt@altamoda.rs" style="color: #413d3a;">kontakt@altamoda.rs</a><br />
     📞 <a href="tel:+381113088388" style="color: #413d3a;">+381 (0)11 3088388</a>
   </p>`
+
+function contactBlock(lang: EmailLang): string {
+  return `
+  <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.7; color: #413d3a;">
+    ${NEED_HELP[lang]}<br />
+    📧 <a href="mailto:kontakt@altamoda.rs" style="color: #413d3a;">kontakt@altamoda.rs</a><br />
+    📞 <a href="tel:+381113088388" style="color: #413d3a;">+381 (0)11 3088388</a>
+  </p>`
+}
 
 function ctaButton(url: string, label: string): string {
   return `
@@ -320,35 +348,74 @@ export interface CardTransactionDetails {
   amount: string
   dateTime: string
   paymentMethod?: string
+  language?: EmailLang
+}
+
+const CARD_TX_TEXT: Record<EmailLang, {
+  title: string; greeting: string; intro: string
+  merchant: string; txId: string; orderNo: string; dateTime: string
+  paymentMethod: string; paymentMethodDefault: string; authNumber: string; amount: string
+  footerNote: string; cta: string
+}> = {
+  sr: {
+    title: 'Uspešno izvršena kartična transakcija',
+    greeting: 'Poštovani,',
+    intro: 'Obaveštavamo Vas da je Vaša kartična transakcija uspešno izvršena putem ALTA MODA webshopa.',
+    merchant: 'Internet prodajno mesto', txId: 'Broj transakcije', orderNo: 'Broj porudžbine',
+    dateTime: 'Datum i vreme', paymentMethod: 'Način plaćanja', paymentMethodDefault: 'Platna kartica',
+    authNumber: 'Broj autorizacije', amount: 'Ukupan iznos',
+    footerNote: 'Ovaj imejl predstavlja potvrdu uspešno izvršene kartične transakcije. Potvrdu o prijemu i obradi porudžbine dobićete u posebnom imejlu. Molimo Vas da sačuvate ovaj imejl kao potvrdu o izvršenoj transakciji.',
+    cta: 'Posetite ALTA MODA webshop',
+  },
+  en: {
+    title: 'Card transaction completed successfully',
+    greeting: 'Dear Customer,',
+    intro: 'We are informing you that your card transaction was successfully completed via the ALTA MODA webshop.',
+    merchant: 'Merchant', txId: 'Transaction number', orderNo: 'Order number',
+    dateTime: 'Date and time', paymentMethod: 'Payment method', paymentMethodDefault: 'Payment card',
+    authNumber: 'Authorization number', amount: 'Total amount',
+    footerNote: 'This email confirms a successfully completed card transaction. You will receive the order confirmation in a separate email. Please keep this email as proof of the completed transaction.',
+    cta: 'Visit the ALTA MODA webshop',
+  },
+  ru: {
+    title: 'Транзакция по карте успешно выполнена',
+    greeting: 'Уважаемый клиент,',
+    intro: 'Сообщаем вам, что ваша транзакция по карте была успешно выполнена через интернет-магазин ALTA MODA.',
+    merchant: 'Интернет-магазин', txId: 'Номер транзакции', orderNo: 'Номер заказа',
+    dateTime: 'Дата и время', paymentMethod: 'Способ оплаты', paymentMethodDefault: 'Банковская карта',
+    authNumber: 'Номер авторизации', amount: 'Общая сумма',
+    footerNote: 'Это письмо подтверждает успешно выполненную транзакцию по карте. Подтверждение получения и обработки заказа вы получите отдельным письмом. Пожалуйста, сохраните это письмо как подтверждение совершенной транзакции.',
+    cta: 'Посетить интернет-магазин ALTA MODA',
+  },
 }
 
 export function cardTransactionTemplate(d: CardTransactionDetails): string {
+  const lang = d.language ?? 'sr'
+  const T = CARD_TX_TEXT[lang]
   const site = getSiteUrl()
   const content = `
     <div style="padding: 40px;">
-      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Uspešno izvršena kartična transakcija</h2>
-      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">${T.title}</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">${T.greeting}</p>
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
-        Obaveštavamo Vas da je Vaša kartična transakcija uspešno izvršena putem ALTA MODA webshopa.
+        ${T.intro}
       </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
-        ${detailRow('Internet prodajno mesto', 'ALTA MODA')}
-        ${detailRow('Broj transakcije', d.transactionId)}
-        ${detailRow('Broj porudžbine', d.orderNumber)}
-        ${detailRow('Datum i vreme', d.dateTime)}
-        ${detailRow('Način plaćanja', d.paymentMethod || 'Platna kartica')}
-        ${detailRow('Broj autorizacije', d.authNumber)}
-        ${detailRow('Ukupan iznos', d.amount)}
+        ${detailRow(T.merchant, 'ALTA MODA')}
+        ${detailRow(T.txId, d.transactionId)}
+        ${detailRow(T.orderNo, d.orderNumber)}
+        ${detailRow(T.dateTime, d.dateTime)}
+        ${detailRow(T.paymentMethod, d.paymentMethod || T.paymentMethodDefault)}
+        ${detailRow(T.authNumber, d.authNumber)}
+        ${detailRow(T.amount, d.amount)}
       </table>
       <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.6; color: #413d3a;">
-        Ovaj imejl predstavlja potvrdu uspešno izvršene kartične transakcije.
-        Potvrdu o prijemu i obradi porudžbine dobićete u posebnom imejlu.
-        Molimo Vas da sačuvate ovaj imejl kao potvrdu o izvršenoj transakciji.
+        ${T.footerNote}
       </p>
-      ${ctaButton(`${site}`, 'Posetite ALTA MODA webshop')}
+      ${ctaButton(`${site}`, T.cta)}
     </div>
   `
-  return baseLayout(content)
+  return baseLayout(content, { lang })
 }
 
 export interface OrderEmailItem {
@@ -366,9 +433,72 @@ export interface OrderConfirmationDetails {
   paymentConfirmed: boolean
   shippingAddress?: string | null
   notes?: string | null
+  language?: EmailLang
+}
+
+const ORDER_CONFIRM_TEXT: Record<EmailLang, {
+  title: string; greeting: string; intro: string
+  orderNo: string; paymentStatus: string; orderStatus: string; paymentMethod: string
+  shippingAddress: string; notes: string; paid: string; processing: string
+  itemsHeading: string; qty: string; total: string
+  whatsNextHeading: string; whatsNextList: string
+  cta1: string; cta2: string; closing: string
+}> = {
+  sr: {
+    title: 'Hvala na kupovini!', greeting: 'Poštovani,',
+    intro: 'Uspešno smo primili Vašu porudžbinu i započeli njenu obradu. Naš tim će je pažljivo pripremiti i poslati u najkraćem mogućem roku.',
+    orderNo: 'Broj porudžbine', paymentStatus: 'Status plaćanja', orderStatus: 'Status porudžbine',
+    paymentMethod: 'Način plaćanja', shippingAddress: 'Adresa za isporuku', notes: 'Napomena',
+    paid: 'Plaćeno ✔', processing: 'U obradi',
+    itemsHeading: 'Naručeni proizvodi', qty: 'Količina', total: 'Ukupan iznos',
+    whatsNextHeading: 'Šta dalje?',
+    whatsNextList: '📦 Obrada porudžbine<br />📦 Pakovanje<br />🚚 Predaja kuriru<br />📧 Obaveštenje o slanju',
+    cta1: 'Pregledajte svoju porudžbinu', cta2: 'Nastavite kupovinu',
+    closing: 'Hvala na ukazanom poverenju.<br />Vaš ALTA MODA tim',
+  },
+  en: {
+    title: 'Thank you for your order!', greeting: 'Dear Customer,',
+    intro: 'We have successfully received your order and started processing it. Our team will carefully prepare it and ship it as soon as possible.',
+    orderNo: 'Order number', paymentStatus: 'Payment status', orderStatus: 'Order status',
+    paymentMethod: 'Payment method', shippingAddress: 'Delivery address', notes: 'Note',
+    paid: 'Paid ✔', processing: 'Processing',
+    itemsHeading: 'Ordered products', qty: 'Quantity', total: 'Total amount',
+    whatsNextHeading: "What's next?",
+    whatsNextList: '📦 Order processing<br />📦 Packing<br />🚚 Handover to courier<br />📧 Shipping notification',
+    cta1: 'View your order', cta2: 'Continue shopping',
+    closing: 'Thank you for your trust.<br />Your ALTA MODA team',
+  },
+  ru: {
+    title: 'Спасибо за покупку!', greeting: 'Уважаемый клиент,',
+    intro: 'Мы успешно получили ваш заказ и начали его обработку. Наша команда тщательно подготовит его и отправит в кратчайшие сроки.',
+    orderNo: 'Номер заказа', paymentStatus: 'Статус оплаты', orderStatus: 'Статус заказа',
+    paymentMethod: 'Способ оплаты', shippingAddress: 'Адрес доставки', notes: 'Примечание',
+    paid: 'Оплачено ✔', processing: 'В обработке',
+    itemsHeading: 'Заказанные товары', qty: 'Количество', total: 'Общая сумма',
+    whatsNextHeading: 'Что дальше?',
+    whatsNextList: '📦 Обработка заказа<br />📦 Упаковка<br />🚚 Передача курьеру<br />📧 Уведомление об отправке',
+    cta1: 'Просмотреть заказ', cta2: 'Продолжить покупки',
+    closing: 'Благодарим за доверие.<br />Ваша команда ALTA MODA',
+  },
+}
+
+const ORDER_PAYMENT_METHOD_LABELS: Record<EmailLang, Record<string, string>> = {
+  sr: { card: 'Platna kartica', bank_transfer: 'Bankovna uplata', cash_on_delivery: 'Plaćanje pouzećem', invoice: 'Plaćanje po fakturi' },
+  en: { card: 'Payment card', bank_transfer: 'Bank transfer', cash_on_delivery: 'Cash on delivery', invoice: 'Invoice payment' },
+  ru: { card: 'Банковская карта', bank_transfer: 'Банковский перевод', cash_on_delivery: 'Оплата при получении', invoice: 'Оплата по счету' },
+}
+
+/** `paymentMethod` on the details is the raw code ('card' | 'bank_transfer' |
+ *  'cash_on_delivery' | 'invoice') so this template can render it in the
+ *  customer's language — never a pre-localized label from the caller. */
+export function orderPaymentMethodLabel(code: string, language?: EmailLang): string {
+  const lang = language ?? 'sr'
+  return ORDER_PAYMENT_METHOD_LABELS[lang][code] ?? code
 }
 
 export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
+  const lang = d.language ?? 'sr'
+  const T = ORDER_CONFIRM_TEXT[lang]
   const site = getSiteUrl()
   const itemRows = d.items
     .map(
@@ -379,7 +509,7 @@ export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
           </td>
           <td style="padding: 10px 0; font-size: 14px; color: ${BRAND_TEXT}; vertical-align: top;">
             ${i.name}
-            <br /><span style="color: #413d3a; font-size: 13px;">Količina: ${i.quantity}</span>
+            <br /><span style="color: #413d3a; font-size: 13px;">${T.qty}: ${i.quantity}</span>
           </td>
           <td align="right" style="padding: 10px 0; font-size: 14px; color: ${BRAND_TEXT}; white-space: nowrap; vertical-align: top;"><strong>${i.totalPrice}</strong></td>
         </tr>`
@@ -388,44 +518,39 @@ export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
 
   const content = `
     <div style="padding: 40px;">
-      <h2 style="margin: 0 0 4px; font-size: 22px; color: ${BRAND_PRIMARY};">Hvala na kupovini!</h2>
-      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <h2 style="margin: 0 0 4px; font-size: 22px; color: ${BRAND_PRIMARY};">${T.title}</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">${T.greeting}</p>
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
-        Uspešno smo primili Vašu porudžbinu i započeli njenu obradu.
-        Naš tim će je pažljivo pripremiti i poslati u najkraćem mogućem roku.
+        ${T.intro}
       </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
-        ${detailRow('Broj porudžbine', d.orderNumber)}
-        ${detailRow('Status plaćanja', d.paymentConfirmed ? 'Plaćeno ✔' : 'U obradi')}
-        ${detailRow('Status porudžbine', 'U obradi')}
-        ${detailRow('Način plaćanja', d.paymentMethod)}
-        ${detailRow('Adresa za isporuku', d.shippingAddress)}
-        ${detailRow('Napomena', d.notes)}
+        ${detailRow(T.orderNo, d.orderNumber)}
+        ${detailRow(T.paymentStatus, d.paymentConfirmed ? T.paid : T.processing)}
+        ${detailRow(T.orderStatus, T.processing)}
+        ${detailRow(T.paymentMethod, d.paymentMethod)}
+        ${detailRow(T.shippingAddress, d.shippingAddress)}
+        ${detailRow(T.notes, d.notes)}
       </table>
-      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Naručeni proizvodi</h3>
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">${T.itemsHeading}</h3>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
         ${itemRows}
         <tr>
-          <td colspan="2" style="padding: 14px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9;"><strong>Ukupan iznos</strong></td>
+          <td colspan="2" style="padding: 14px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9;"><strong>${T.total}</strong></td>
           <td align="right" style="padding: 14px 0 0; font-size: 15px; color: ${BRAND_TEXT}; border-top: 1px solid #dddbd9; white-space: nowrap;"><strong>${d.total}</strong></td>
         </tr>
       </table>
-      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Šta dalje?</h3>
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">${T.whatsNextHeading}</h3>
       <p style="margin: 0; font-size: 15px; line-height: 1.9; color: ${BRAND_TEXT};">
-        📦 Obrada porudžbine<br />
-        📦 Pakovanje<br />
-        🚚 Predaja kuriru<br />
-        📧 Obaveštenje o slanju
+        ${T.whatsNextList}
       </p>
-      ${ctaButton(`${site}/account`, 'Pregledajte svoju porudžbinu')}
-      ${ctaButton(`${site}/products`, 'Nastavite kupovinu')}
+      ${ctaButton(`${site}/account`, T.cta1)}
+      ${ctaButton(`${site}/products`, T.cta2)}
       <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">
-        Hvala na ukazanom poverenju.<br />
-        Vaš ALTA MODA tim
+        ${T.closing}
       </p>
     </div>
   `
-  return baseLayout(content)
+  return baseLayout(content, { lang })
 }
 
 export interface NewOrderAdminDetails {
@@ -488,34 +613,68 @@ export function newOrderAdminTemplate(d: NewOrderAdminDetails): string {
 export interface OrderShippedDetails {
   orderNumber: string
   shippedDate: string
+  language?: EmailLang
+}
+
+const ORDER_SHIPPED_TEXT: Record<EmailLang, {
+  title: string; greeting: string; intro: string
+  orderNo: string; courier: string; courierValue: string; shippedDate: string; eta: string; etaValue: string
+  infoHeading: string; infoList: string; closing: string
+}> = {
+  sr: {
+    title: 'Vaša porudžbina je poslata', greeting: 'Poštovani,',
+    intro: 'Vaša porudžbina je pripremljena i predata kurirskoj službi. U nastavku možete pronaći informacije o isporuci.',
+    orderNo: 'Broj porudžbine', courier: 'Kurirska služba', courierValue: 'Ovlašćena kurirska služba',
+    shippedDate: 'Datum slanja', eta: 'Procenjeni rok isporuke', etaValue: '1–3 radna dana',
+    infoHeading: 'Korisne informacije',
+    infoList: '✔ Pripremite se za preuzimanje pošiljke.<br />✔ Proverite stanje paketa prilikom prijema.<br />✔ Ukoliko Vam je potrebna pomoć, kontaktirajte naš tim.',
+    closing: 'ALTA MODA tim',
+  },
+  en: {
+    title: 'Your order has shipped', greeting: 'Dear Customer,',
+    intro: 'Your order has been prepared and handed over to the courier service. You can find the delivery details below.',
+    orderNo: 'Order number', courier: 'Courier service', courierValue: 'Authorized courier service',
+    shippedDate: 'Shipping date', eta: 'Estimated delivery time', etaValue: '1–3 business days',
+    infoHeading: 'Useful information',
+    infoList: '✔ Please be ready to receive the parcel.<br />✔ Check the condition of the package upon receipt.<br />✔ If you need help, contact our team.',
+    closing: 'The ALTA MODA team',
+  },
+  ru: {
+    title: 'Ваш заказ отправлен', greeting: 'Уважаемый клиент,',
+    intro: 'Ваш заказ подготовлен и передан курьерской службе. Ниже вы найдете информацию о доставке.',
+    orderNo: 'Номер заказа', courier: 'Курьерская служба', courierValue: 'Авторизованная курьерская служба',
+    shippedDate: 'Дата отправки', eta: 'Ориентировочный срок доставки', etaValue: '1–3 рабочих дня',
+    infoHeading: 'Полезная информация',
+    infoList: '✔ Приготовьтесь к получению посылки.<br />✔ Проверьте состояние упаковки при получении.<br />✔ Если вам нужна помощь, свяжитесь с нашей командой.',
+    closing: 'Команда ALTA MODA',
+  },
 }
 
 export function orderShippedTemplate(d: OrderShippedDetails): string {
+  const lang = d.language ?? 'sr'
+  const T = ORDER_SHIPPED_TEXT[lang]
   const content = `
     <div style="padding: 40px;">
-      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Vaša porudžbina je poslata</h2>
-      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">Poštovani,</p>
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">${T.title}</h2>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">${T.greeting}</p>
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
-        Vaša porudžbina je pripremljena i predata kurirskoj službi.
-        U nastavku možete pronaći informacije o isporuci.
+        ${T.intro}
       </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
-        ${detailRow('Broj porudžbine', d.orderNumber)}
-        ${detailRow('Kurirska služba', 'Ovlašćena kurirska služba')}
-        ${detailRow('Datum slanja', d.shippedDate)}
-        ${detailRow('Procenjeni rok isporuke', '1–3 radna dana')}
+        ${detailRow(T.orderNo, d.orderNumber)}
+        ${detailRow(T.courier, T.courierValue)}
+        ${detailRow(T.shippedDate, d.shippedDate)}
+        ${detailRow(T.eta, T.etaValue)}
       </table>
-      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">Korisne informacije</h3>
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">${T.infoHeading}</h3>
       <p style="margin: 0; font-size: 15px; line-height: 1.9; color: ${BRAND_TEXT};">
-        ✔ Pripremite se za preuzimanje pošiljke.<br />
-        ✔ Proverite stanje paketa prilikom prijema.<br />
-        ✔ Ukoliko Vam je potrebna pomoć, kontaktirajte naš tim.
+        ${T.infoList}
       </p>
-      ${CONTACT_BLOCK}
+      ${contactBlock(lang)}
       <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">
-        ALTA MODA tim
+        ${T.closing}
       </p>
     </div>
   `
-  return baseLayout(content)
+  return baseLayout(content, { lang })
 }

@@ -3,7 +3,13 @@ import { withErrorHandler, successResponse, ApiError } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { updateStatusSchema } from '@/lib/validations/order'
 import { sendTransactional } from '@/lib/email'
-import { orderShippedTemplate } from '@/lib/email-templates'
+import { orderShippedTemplate, type EmailLang } from '@/lib/email-templates'
+
+const ORDER_SHIPPED_SUBJECT: Record<EmailLang, (orderNumber: string) => string> = {
+  sr: (n) => `Vaša porudžbina ${n} je poslata`,
+  en: (n) => `Your order ${n} has shipped`,
+  ru: (n) => `Ваш заказ ${n} отправлен`,
+}
 
 // Valid status transitions (state machine)
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -57,12 +63,14 @@ export const PATCH = withErrorHandler(async (req: Request, context: unknown) => 
   if (status === 'isporuceno') {
     const notifyEmail = order.user?.email ?? order.guestEmail
     if (notifyEmail) {
+      const language = (order.language as EmailLang) ?? 'sr'
       void sendTransactional({
         to: notifyEmail,
-        subject: `Vaša porudžbina ${order.orderNumber} je poslata`,
+        subject: ORDER_SHIPPED_SUBJECT[language](order.orderNumber),
         html: orderShippedTemplate({
           orderNumber: order.orderNumber,
           shippedDate: new Date().toLocaleDateString('sr-RS', { timeZone: 'Europe/Belgrade' }),
+          language,
         }),
       }).catch((err) => console.error('[email] order shipped notification failed:', err))
     }

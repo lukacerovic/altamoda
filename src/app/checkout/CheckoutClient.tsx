@@ -40,7 +40,7 @@ type Step = 'contact' | 'address' | 'shipping' | 'payment' | 'review'
 
 export default function CheckoutClient({ userRole, isGuest, addresses }: Props) {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { items, getTotal, clearCart } = useCartStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -284,6 +284,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
         paymentMethod,
         shippingMethod,
         notes: notes || undefined,
+        language,
         ...(isGuest && {
           guestName: guestInfo.name,
           guestEmail: guestInfo.email,
@@ -471,6 +472,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                           value={newAddress.street}
                           onChange={(e) => setNewAddress({ ...newAddress, street: sanitizeStreet(e.target.value) })}
                           aria-invalid={addressErrors.street}
+                          /* Same caret treatment as the header search bar: the
+                             blinking bar reads as a stray artefact at this field's
+                             left edge rather than a cursor. Typing still works. */
+                          style={{ caretColor: 'transparent' }}
                           className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.street ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
                         />
                         {addressErrors.street && <p className="mt-1 text-xs text-red-600">{t('checkout.errStreet')}</p>}
@@ -484,6 +489,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                           value={houseNumber}
                           onChange={(e) => setNewAddress({ ...newAddress, houseNumber: sanitizeHouseNumber(e.target.value) })}
                           aria-invalid={addressErrors.houseNumber}
+                          style={{ caretColor: 'transparent' }}
                           className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.houseNumber ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
                         />
                         {addressErrors.houseNumber && <p className="mt-1 text-xs text-red-600">{t('checkout.errHouseNumber')}</p>}
@@ -498,6 +504,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                           value={newAddress.city}
                           onChange={(e) => setNewAddress({ ...newAddress, city: sanitizeCity(e.target.value) })}
                           aria-invalid={addressErrors.city}
+                          style={{ caretColor: 'transparent' }}
                           className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.city ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
                         />
                         {addressErrors.city && <p className="mt-1 text-xs text-red-600">{t('checkout.errCity')}</p>}
@@ -511,6 +518,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                           value={newAddress.postalCode}
                           onChange={(e) => setNewAddress({ ...newAddress, postalCode: sanitizePostalCode(e.target.value) })}
                           aria-invalid={addressErrors.postalCode}
+                          style={{ caretColor: 'transparent' }}
                           className={`w-full border rounded px-4 py-3 text-sm focus:outline-none ${addressErrors.postalCode ? 'border-red-500 focus:border-red-500' : 'border-[#dddbd9] focus:border-black'}`}
                         />
                         {addressErrors.postalCode && <p className="mt-1 text-xs text-red-600">{t('checkout.errPostalCode')}</p>}
@@ -736,11 +744,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                     <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
                   <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
-                    {isSubmitting
-                      ? t('checkout.processing')
-                      : isGuest
-                        ? t('checkout.loginToOrder')
-                        : t('checkout.placeOrderBtn')}
+                    {/* By the time this step renders, guests have already passed the
+                        login gate above (isGuest && !guestMode returns early), so the
+                        button always places the order — it must never show the login
+                        prompt here even though isGuest is still true for guest orders. */}
+                    {isSubmitting ? t('checkout.processing') : t('checkout.placeOrderBtn')}
                   </button>
                 </div>
               </div>

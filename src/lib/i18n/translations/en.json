@@ -423,7 +423,17 @@
     "gateRegister": "Register",
     "gateGuest": "Continue as guest",
     "gateHint": "You can fill in your details as a guest — signing in is required to place the order.",
-    "loginToOrder": "Log in to place the order"
+    "loginToOrder": "Log in to place the order",
+    "confirmSuccessTitle": "Order received!",
+    "confirmSuccessDesc": "Thank you for your purchase. Your order has been successfully created.",
+    "confirmPendingTitle": "Payment is processing",
+    "confirmPendingDesc": "Payment confirmation is in progress. The page will refresh automatically in a few moments.",
+    "confirmFailedTitle": "Payment failed",
+    "confirmFailedDesc": "Your payment could not be processed. You can try again — the items are still in your cart.",
+    "orderNumberLabel": "Order number",
+    "confirmEmailSentNote": "We've sent you an email with the order confirmation and delivery details.",
+    "tryAgain": "Try again",
+    "backToCart": "Back to cart"
   },
   "auth": {
     "home": "Home",

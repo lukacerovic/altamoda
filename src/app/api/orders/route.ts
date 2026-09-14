@@ -9,13 +9,20 @@ import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 import { VPOS_ENABLED } from '@/lib/payments/vpos-config'
 import { sendEmail, rewriteAssetUrls } from '@/lib/email'
-import { orderConfirmationTemplate, newOrderAdminTemplate } from '@/lib/email-templates'
+import { orderConfirmationTemplate, newOrderAdminTemplate, orderPaymentMethodLabel, type EmailLang } from '@/lib/email-templates'
 
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
+// Admin notification stays Serbian regardless of the customer's language.
+const ADMIN_PAYMENT_METHOD_LABELS: Record<string, string> = {
   card: 'Platna kartica',
   bank_transfer: 'Bankovna uplata',
   cash_on_delivery: 'Plaćanje pouzećem',
   invoice: 'Plaćanje po fakturi',
+}
+
+const ORDER_CONFIRM_SUBJECT: Record<EmailLang, (orderNumber: string) => string> = {
+  sr: (n) => `Potvrda porudžbine ${n}`,
+  en: (n) => `Order confirmation ${n}`,
+  ru: (n) => `Подтверждение заказа ${n}`,
 }
 
 // GET /api/orders — list orders (user's own, or admin sees all)
@@ -85,6 +92,7 @@ export const POST = withErrorHandler(async (req: Request) => {
   const role = user?.role ?? 'b2c'
   const productIds = input.items.map((i) => i.productId)
   const isB2b = role === 'b2b'
+  const language: EmailLang = input.language ?? 'sr'
 
   // All validation, stock checks, and order creation inside a single transaction
   // to prevent TOCTOU race conditions on stock
@@ -170,6 +178,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         guestName: user ? null : input.guestName,
         guestEmail: user ? null : input.guestEmail,
         guestPhone: user ? null : input.guestPhone,
+        language,
         status: 'novi',
         subtotal,
         discountAmount: 0,
@@ -235,7 +244,6 @@ export const POST = withErrorHandler(async (req: Request) => {
         image: imageByProduct.get(i.productId) ?? null,
       }))
       const total = `${Number(order.total).toLocaleString('sr-RS')} RSD`
-      const paymentMethod = PAYMENT_METHOD_LABELS[input.paymentMethod] ?? input.paymentMethod
       const paymentConfirmed = order.paymentStatus === 'paid'
       const shippingAddress = escapeHtml(`${addr.street}, ${addr.postalCode} ${addr.city}, ${addr.country}`)
       const notes = input.notes ? escapeHtml(input.notes) : null
@@ -243,15 +251,16 @@ export const POST = withErrorHandler(async (req: Request) => {
       if (recipientEmail) {
         await sendEmail({
           to: recipientEmail,
-          subject: `Potvrda porudžbine ${order.orderNumber}`,
+          subject: ORDER_CONFIRM_SUBJECT[language](order.orderNumber),
           html: rewriteAssetUrls(orderConfirmationTemplate({
             orderNumber: order.orderNumber,
             items,
             total,
-            paymentMethod,
+            paymentMethod: orderPaymentMethodLabel(input.paymentMethod, language),
             paymentConfirmed,
             shippingAddress,
             notes,
+            language,
           })),
         })
       }
@@ -267,7 +276,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             customerPhone: input.guestPhone ?? null,
             items,
             total,
-            paymentMethod,
+            paymentMethod: ADMIN_PAYMENT_METHOD_LABELS[input.paymentMethod] ?? input.paymentMethod,
             paymentConfirmed,
             shippingAddress,
             notes,

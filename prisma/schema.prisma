@@ -436,6 +436,11 @@ model Order {
   guestName       String?       @map("guest_name")
   guestEmail      String?       @map("guest_email")
   guestPhone      String?       @map("guest_phone")
+  // Site language the customer had selected at checkout ("sr" | "en" | "ru").
+  // Captured so later async emails (VPOS webhook, shipped notice) can still
+  // match the on-site confirmation page's language — the server has no other
+  // way to know it (language is client-only, see i18n-server-error-pattern).
+  language        String        @default("sr")
   status          OrderStatus   @default(novi)
   subtotal        Decimal       @db.Decimal(10, 2)
   discountAmount  Decimal       @default(0) @map("discount_amount") @db.Decimal(10, 2)

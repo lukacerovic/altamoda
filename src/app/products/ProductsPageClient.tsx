@@ -632,9 +632,15 @@ export default function ProductsPageClient({
   // Highest page currently loaded into the accumulated `products` list. The
   // "load more" button advances this; filter/sort changes reset it to 1.
   const [currentPage, setCurrentPage] = useState(initialPagination.page || 1);
-  const [searchQuery, setSearchQuery] = useState(searchParam || "");
+  // `searchQuery` is only the live text in the toolbar search box (typing +
+  // autocomplete). The actually-applied filter lives in `appliedSearch`,
+  // committed on submit — kept separate so the box can go back to empty/blurred
+  // once a search has run instead of continuing to display the searched term.
+  const [searchQuery, setSearchQuery] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState(searchParam || "");
   const [showSearch, setShowSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filters
   const [selectedBrands, setSelectedBrands] = useState<string[]>(brandParam ? [brandParam] : []);
@@ -678,7 +684,10 @@ export default function ProductsPageClient({
   const lastSearchParam = useRef(searchParam);
   if (searchParam !== lastSearchParam.current) {
     lastSearchParam.current = searchParam;
-    setSearchQuery(searchParam ?? "");
+    setAppliedSearch(searchParam ?? "");
+    // Landing here from the header search (or any other ?search= navigation)
+    // must not leave the toolbar box showing/focused with that term.
+    setSearchQuery("");
     setShowSearch(false);
     setCurrentPage(1);
   }
@@ -704,7 +713,7 @@ export default function ProductsPageClient({
   // Signature of the current filter / sort / search set. A saved list snapshot
   // is only restored when its signature still matches what's being viewed.
   const listSignature = [
-    sortBy, visibility, searchQuery.trim(), selectedCategory ?? "", selectedGender ?? "",
+    sortBy, visibility, appliedSearch.trim(), selectedCategory ?? "", selectedGender ?? "",
     selectedBrands.join(","), selectedProductLines.join(","), selectedProductTypes.join(","),
     selectedHairTypes.join(","), selectedTags.join(","), priceMin, priceMax,
     activeToggles.join(","), filterColorLevel ?? "", filterUndertone ?? "", filterHasColor ? "1" : "",
@@ -889,8 +898,8 @@ export default function ProductsPageClient({
       else params.set(`attr_${key}`, "true");
     });
 
-    if (searchQuery.trim()) {
-      params.set("search", searchQuery.trim());
+    if (appliedSearch.trim()) {
+      params.set("search", appliedSearch.trim());
     }
 
     // Color filters
@@ -899,7 +908,7 @@ export default function ProductsPageClient({
     if (filterUndertone) params.set("colorUndertone", filterUndertone);
 
     return params.toString();
-  }, [sortBy, shuffleSeed, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, priceMin, priceMax, activeToggles, searchQuery, filterHasColor, filterColorLevel, filterUndertone]);
+  }, [sortBy, shuffleSeed, visibility, userRole, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, priceMin, priceMax, activeToggles, appliedSearch, filterHasColor, filterColorLevel, filterUndertone]);
 
   // Fetch products from API. `append` accumulates the next chunk (load more);
   // otherwise the list is replaced (initial load / filter / sort change).
@@ -972,7 +981,7 @@ export default function ProductsPageClient({
     setCurrentPage(1);
     fetchProducts(1, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userRole, sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, filterColorLevel, filterUndertone, filterHasColor]);
+  }, [userRole, sortBy, visibility, selectedCategory, selectedGender, selectedBrands, selectedProductLines, selectedProductTypes, selectedHairTypes, selectedTags, activeToggles, searchParam, appliedSearch, filterColorLevel, filterUndertone, filterHasColor]);
 
   // Close search dropdown on outside click
   useEffect(() => {
@@ -1008,9 +1017,14 @@ export default function ProductsPageClient({
   }, [searchQuery]);
 
   const handleSearchSubmit = () => {
+    // Commit the typed term as the applied filter (the refetch effect below
+    // reacts to `appliedSearch`), then clear and blur the box itself — per
+    // design, the search field never keeps showing/focusing the searched text.
+    setAppliedSearch(searchQuery.trim());
+    setSearchQuery("");
     setShowSearch(false);
-    setCurrentPage(1);
-    fetchProducts(1);
+    setSearchResults([]);
+    searchInputRef.current?.blur();
   };
 
   const handlePriceApply = () => {
@@ -1581,8 +1595,16 @@ export default function ProductsPageClient({
                 {t("products.editorialDesc")}
               </p>
             )}
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 mt-6">
-              {pagination.total} {t("products.productsLabel")}
+            <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-[#1a1c1e]/60 mt-6">
+              {/* The count settles across a few background fetches on load
+                  (fresh shuffle seed, then session/role resolving) — showing
+                  each intermediate total read as the number randomly changing,
+                  so a small spinner stands in until it's final. */}
+              {loading ? (
+                <span className="w-3 h-3 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+              ) : (
+                <>{pagination.total} {t("products.productsLabel")}</>
+              )}
             </p>
           </div>
 
@@ -1596,6 +1618,7 @@ export default function ProductsPageClient({
             <div className="hidden md:block flex-1 max-w-sm" ref={searchRef}>
               <div className="relative">
                 <input
+                  ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -1604,7 +1627,14 @@ export default function ProductsPageClient({
                   placeholder={t("nav.searchPlaceholder")}
                   className="w-full border-b border-[#dddbd9] pl-0 pr-10 py-2.5 text-sm text-[#1a1c1e] placeholder-[#1a1c1e]/40 focus:border-[#1a1c1e] focus:ring-0 focus:outline-none transition-colors bg-transparent"
                 />
-                <Search className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1c1e]/60" />
+                <button
+                  type="button"
+                  onClick={handleSearchSubmit}
+                  aria-label={t("nav.searchPlaceholder")}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
               </div>
 
               {/* Autocomplete */}

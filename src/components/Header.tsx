@@ -26,7 +26,7 @@ interface SearchResult {
   name: string;
   slug: string;
   brand: string | null;
-  price: number;
+  price: number | null;
   oldPrice: number | null;
   image: string | null;
 }
@@ -144,6 +144,7 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   // The toggle button lives in the header bar, outside the overlay. Without its
   // own ref the close-on-outside handler fired on its mousedown and the ensuing
@@ -503,10 +504,12 @@ export default function Header() {
               <div ref={searchRowRef} className="relative max-w-xl mx-auto flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder={t("nav.searchPlaceholder")}
+                  placeholder={searchFocused ? "" : t("nav.searchPlaceholder")}
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
                   /* QA asked for no visible text caret in the search bar: the
                      blinking black bar reads as a stray artefact rather than a
@@ -514,7 +517,14 @@ export default function Header() {
                   style={{ caretColor: "transparent" }}
                   className="flex-1 min-w-0 border border-[#dddbd9] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
-                <Search className="absolute right-16 top-1/2 -translate-y-1/2 w-4 h-4 text-[#dddbd9]" />
+                <button
+                  type="button"
+                  onClick={handleSearchSubmit}
+                  aria-label={t("nav.searchPlaceholder")}
+                  className="absolute right-16 top-1/2 -translate-y-1/2 p-1 text-[#dddbd9] hover:text-[#1a1c1e] transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
                 <button
                   type="button"
                   onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
@@ -542,14 +552,22 @@ export default function Header() {
                             <p className="text-[11px] text-[#1a1c1e] font-medium">{p.brand}</p>
                           </div>
                           <span className="flex items-baseline gap-2 text-sm font-bold text-[#1a1c1e] whitespace-nowrap">
-                            {p.oldPrice && p.oldPrice > p.price && (
-                              <span className="text-[11px] font-medium text-[#1a1c1e]/50 line-through">
-                                {p.oldPrice.toLocaleString("sr-RS")}
-                              </span>
+                            {/* Professional-only products come back with price: null for
+                                non-B2B viewers (same masking as the main product list). */}
+                            {p.price == null ? (
+                              <span className="text-[10px] uppercase tracking-[0.18em] text-[#1a1c1e]">{t("products.b2bOnlyPrice")}</span>
+                            ) : (
+                              <>
+                                {p.oldPrice && p.oldPrice > p.price && (
+                                  <span className="text-[11px] font-medium text-[#1a1c1e]/50 line-through">
+                                    {p.oldPrice.toLocaleString("sr-RS")}
+                                  </span>
+                                )}
+                                <span>
+                                  {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#dddbd9]">RSD</span>
+                                </span>
+                              </>
                             )}
-                            <span>
-                              {p.price.toLocaleString("sr-RS")} <span className="text-[10px] font-semibold text-[#dddbd9]">RSD</span>
-                            </span>
                           </span>
                         </Link>
                       ))}
