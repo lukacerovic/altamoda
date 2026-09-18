@@ -63,7 +63,7 @@ describe('Phase 3 — Input Validation Security', () => {
     })
 
     it('accepts all valid payment methods', () => {
-      for (const method of ['card', 'bank_transfer', 'cash_on_delivery', 'invoice'] as const) {
+      for (const method of ['card', 'cash_on_delivery'] as const) {
         const result = createOrderSchema.safeParse({ ...baseOrder, paymentMethod: method })
         expect(result.success).toBe(true)
       }

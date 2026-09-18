@@ -5,7 +5,9 @@ import { PAGINATION_DEFAULT_LIMIT, PAGINATION_DEFAULT_PAGE, PAGINATION_MAX_LIMIT
 export class ApiError extends Error {
   constructor(
     public statusCode: number,
-    message: string
+    message: string,
+    /** Optional translation key the client resolves with t(code). */
+    public code?: string
   ) {
     super(message)
     this.name = 'ApiError'
@@ -43,7 +45,7 @@ export function withErrorHandler(
       return await handler(req, context)
     } catch (error) {
       if (error instanceof ApiError) {
-        return errorResponse(error.message, error.statusCode)
+        return errorResponse(error.message, error.statusCode, error.code)
       }
       if (error instanceof ZodError) {
         const issues = error.issues ?? (error as unknown as { errors?: { message: string }[] }).errors ?? []

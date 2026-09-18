@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/stores/cart-store'
 import { useCheckoutStore } from '@/lib/stores/checkout-store'
-import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from '@/lib/constants'
+import { SHIPPING_COST, getShippingCost } from '@/lib/constants'
 import {
   ChevronRight, MapPin, Truck, CreditCard, CheckCircle,
   AlertCircle, ChevronLeft, Shield, User, LogIn, UserPlus,
@@ -69,7 +69,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
     selectedAddressId: draftSelectedAddressId,
     newAddress,
     useNewAddress: draftUseNewAddress,
-    shippingMethod,
+    shippingMethod: draftShippingMethod,
     paymentMethod: draftPaymentMethod,
     notes,
     guestMode,
@@ -104,36 +104,23 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
       : defaultAddr?.id ?? ''
   const useNewAddress = draftUseNewAddress ?? addresses.length === 0
 
-  // Payment — guests can't use invoice
   const isB2b = userRole === 'b2b'
-  const paymentOptions = isB2b
-    ? [
-        { key: 'invoice', label: t('checkout.invoicePreinvoice') },
-        { key: 'card', label: t('checkout.card') },
-      ]
-    : [
-        { key: 'card', label: t('checkout.cardVisaMaster') },
-        { key: 'bank_transfer', label: t('checkout.bankTransfer') },
-        { key: 'cash_on_delivery', label: t('checkout.cashOnDelivery') },
-      ]
-  // A persisted method that is not offered to this user (e.g. a guest draft
-  // holding 'invoice') falls back to the role default.
+  const paymentOptions = [
+    { key: 'card', label: t('checkout.cardVisaMaster') },
+    { key: 'cash_on_delivery', label: t('checkout.cashOnDelivery') },
+  ]
+  // A persisted method no longer offered (e.g. a draft holding the removed
+  // 'invoice' or 'bank_transfer' options) falls back to card.
   const paymentMethod =
     draftPaymentMethod && paymentOptions.some((o) => o.key === draftPaymentMethod)
       ? draftPaymentMethod
-      : isB2b
-      ? 'invoice'
       : 'card'
 
   const subtotal = getTotal()
-  const shippingCost =
-    shippingMethod === 'express'
-      ? 690
-      : shippingMethod === 'pickup'
-      ? 0
-      : subtotal >= FREE_SHIPPING_THRESHOLD
-      ? 0
-      : 350
+  // Drafts persisted before express delivery was removed may still hold 'express'.
+  const shippingMethod = draftShippingMethod === 'pickup' ? 'pickup' : 'standard'
+  const shippingCost = getShippingCost(shippingMethod, subtotal, isB2b)
+  const freeShippingNote = t(isB2b ? 'checkout.freeShippingOverB2b' : 'checkout.freeShippingOverB2c')
   const total = subtotal + shippingCost
 
   // `houseNumber` is absent from drafts persisted before street/number were
@@ -180,7 +167,6 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
 
   const canProceedAddress = useNewAddress ? newAddressValid : !!selectedAddressId
 
-  const b2bMinimumMet = !isB2b || subtotal >= MIN_B2B_ORDER
 
   // Avoid a server/client mismatch while the persisted draft hydrates.
   if (!mounted) {
@@ -249,8 +235,6 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   }
 
   const handlePlaceOrder = async () => {
-    if (!b2bMinimumMet) return
-
     setIsSubmitting(true)
     setError('')
 
@@ -546,14 +530,20 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                 <h2 className="text-lg font-bold text-[#1a1c1e] mb-4">{t('checkout.shippingMethod')}</h2>
                 <div className="space-y-3">
                   {[
-                    { key: 'standard', label: t('checkout.standardShipping'), price: subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350 },
-                    { key: 'express', label: t('checkout.expressShipping'), price: 690 },
-                    { key: 'pickup', label: t('checkout.storePickup'), price: 0 },
+                    { key: 'standard', label: t('checkout.standardShipping'), note: freeShippingNote, price: getShippingCost('standard', subtotal, isB2b) },
+                    { key: 'pickup', label: t('checkout.storePickup'), note: null, price: 0 },
                   ].map((opt) => (
                     <label key={opt.key} className={`flex items-center justify-between gap-3 p-4 rounded-sm border-2 cursor-pointer transition-colors ${shippingMethod === opt.key ? 'border-black bg-[#FFFFFF]' : 'border-[#dddbd9] hover:border-[#dddbd9]'}`}>
                       <div className="flex items-center gap-3">
                         <input type="radio" name="shipping" checked={shippingMethod === opt.key} onChange={() => setShippingMethod(opt.key)} className="text-[#edb4bd]" />
-                        <span className="text-sm font-medium">{opt.label}</span>
+                        <div>
+                          <span className="text-sm font-medium">{opt.label}</span>
+                          {opt.note && (
+                            <p className="text-xs text-[#1a1c1e]/70 mt-0.5">
+                              {SHIPPING_COST} RSD · {opt.note}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <span className={`text-sm font-semibold ${opt.price === 0 ? 'text-green-600' : ''}`}>
                         {opt.price === 0 ? t('checkout.free') : `${opt.price} RSD`}
@@ -648,7 +638,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       <button onClick={() => setStep('shipping')} className="text-xs text-[#edb4bd] hover:underline">{t('checkout.edit')}</button>
                     </div>
                     <p className="text-sm text-[#1a1c1e]">
-                      {shippingMethod === 'standard' ? t('checkout.standardShort') : shippingMethod === 'express' ? t('checkout.expressShort') : t('checkout.pickupShort')}
+                      {shippingMethod === 'standard' ? t('checkout.standardShort') : t('checkout.pickupShort')}
                       {' — '}
                       {shippingCost === 0 ? t('checkout.free') : `${shippingCost} RSD`}
                     </p>
@@ -732,18 +722,11 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                   </div>
                 )}
 
-                {!b2bMinimumMet && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-sm p-3 flex items-center gap-2 text-sm text-orange-700">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    {t('checkout.b2bMinimum')} {MIN_B2B_ORDER.toLocaleString('sr-RS')} RSD
-                  </div>
-                )}
-
                 <div className="flex gap-3">
                   <button onClick={goPrev} className="flex-1 border border-[#dddbd9] py-3 rounded font-medium text-[#1a1c1e] hover:bg-[#FFFFFF] flex items-center justify-center gap-2">
                     <ChevronLeft className="w-4 h-4" /> {t('checkout.back')}
                   </button>
-                  <button onClick={handlePlaceOrder} disabled={isSubmitting || !b2bMinimumMet} className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
+                  <button onClick={handlePlaceOrder} disabled={isSubmitting} className="flex-1 bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3.5 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2">
                     {/* By the time this step renders, guests have already passed the
                         login gate above (isGuest && !guestMode returns early), so the
                         button always places the order — it must never show the login
@@ -775,7 +758,7 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
               </div>
               <div className="mt-4 pt-4 border-t border-[#dddbd9] space-y-2 text-xs text-[#1a1c1e]">
                 <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#edb4bd]" /> {t('checkout.securePayment')}</div>
-                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#edb4bd]" /> {t('checkout.freeShippingOver')}</div>
+                <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#edb4bd]" /> {freeShippingNote}</div>
               </div>
             </div>
           </div>

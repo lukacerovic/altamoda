@@ -27,7 +27,7 @@ interface CheckoutDraftState {
   /** null = not yet decided, so the "no saved addresses" default still applies. */
   useNewAddress: boolean | null
   shippingMethod: string
-  /** null = use the role-based default (b2b → invoice, otherwise card). */
+  /** null = use the default (card). */
   paymentMethod: string | null
   notes: string
   /** True once a guest explicitly chose "continue as guest". */

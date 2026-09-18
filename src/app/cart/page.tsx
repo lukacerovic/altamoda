@@ -8,11 +8,10 @@ import { useSession } from "next-auth/react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
-import { FREE_SHIPPING_THRESHOLD, MIN_B2B_ORDER } from "@/lib/constants";
 import {
   ShoppingBag, Trash2, Minus, Plus, ChevronRight,
   Truck, Shield, Star, AlertCircle,
-  FileText, Store, Sparkles, ImageOff,
+  ImageOff,
   Heart, CheckCircle, Palette,
 } from "lucide-react";
 
@@ -187,8 +186,6 @@ export default function CartPage() {
   const { data: session } = useSession();
   const { t } = useLanguage();
   const { items, updateQuantity, removeItem, getTotal, setItems } = useCartStore();
-  const [b2bNoOnlinePayment, setB2bNoOnlinePayment] = useState(false);
-  const [b2bInvoice, setB2bInvoice] = useState(false);
 
   const [stockChecked, setStockChecked] = useState(false);
 
@@ -379,29 +376,6 @@ export default function CartPage() {
                 );
               })}
 
-              {/* B2B Options Box — only for B2B users */}
-              {isB2b && (
-                <div className="bg-white rounded-sm shadow-sm p-6 border-2 border-black">
-                  <h3 className="text-sm font-semibold text-[#edb4bd] mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4" /> {t("cart.b2bOptions")}</h3>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" checked={b2bNoOnlinePayment} onChange={(e) => setB2bNoOnlinePayment(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#edb4bd] focus:ring-[#1a1c1e]" />
-                      <span className="text-sm text-[#1a1c1e]">{t("cart.orderWithoutOnlinePayment")}</span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" checked={b2bInvoice} onChange={(e) => setB2bInvoice(e.target.checked)} className="w-4 h-4 rounded border-[#dddbd9] text-[#edb4bd] focus:ring-[#1a1c1e]" />
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#1a1c1e]" />
-                        <span className="text-sm text-[#1a1c1e]">{t("cart.invoicePayment")}</span>
-                      </div>
-                    </label>
-                    <div className="bg-[#FFFFFF] rounded p-3 text-xs text-[#1a1c1e] flex items-start gap-2">
-                      <Store className="w-4 h-4 text-[#edb4bd] flex-shrink-0 mt-0.5" />
-                      <span>{t("cart.minB2bOrder")}: <strong className="text-[#1a1c1e]">{MIN_B2B_ORDER.toLocaleString("sr-RS")} RSD</strong></span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* ORDER SUMMARY */}
@@ -432,12 +406,12 @@ export default function CartPage() {
                 </button>
 
                 <div className="mt-4 space-y-2 text-xs text-[#1a1c1e]">
-                  <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#edb4bd]" /> {t("cart.freeShippingOver")}</div>
+                  <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-[#edb4bd]" /> {t(isB2b ? "cart.freeShippingOverB2b" : "cart.freeShippingOverB2c")}</div>
                   <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#edb4bd]" /> {t("cart.securePayment")}</div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#dddbd9]">
-                  {["Visa", "Mastercard", "PayPal", "Pouzece"].map((p) => (
+                  {["Visa", "Mastercard", t("checkout.cashOnDelivery")].map((p) => (
                     <span key={p} className="px-2 py-1 bg-[#FFFFFF] rounded text-[10px] text-[#1a1c1e] font-medium">{p}</span>
                   ))}
                 </div>

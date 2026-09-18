@@ -21,7 +21,7 @@ describe('Order Validations', () => {
     })
 
     it('accepts order with all payment methods', () => {
-      const methods = ['card', 'bank_transfer', 'cash_on_delivery', 'invoice'] as const
+      const methods = ['card', 'cash_on_delivery'] as const
       for (const method of methods) {
         const result = createOrderSchema.parse({ ...validOrder, paymentMethod: method })
         expect(result.paymentMethod).toBe(method)

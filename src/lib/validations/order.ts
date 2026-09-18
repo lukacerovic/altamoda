@@ -20,7 +20,7 @@ export const createOrderSchema = z.object({
   ).min(1),
   shippingAddress: addressSchema,
   billingAddress: addressSchema.optional(),
-  paymentMethod: z.enum(['card', 'bank_transfer', 'cash_on_delivery', 'invoice']),
+  paymentMethod: z.enum(['card', 'cash_on_delivery']),
   shippingMethod: z.string().optional(),
   notes: z.string().optional(),
   guestName: z.string().min(1).optional(),

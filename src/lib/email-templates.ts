@@ -114,23 +114,8 @@ export function welcomeTemplate(email: string): string {
   const content = `
     <div style="padding: 40px;">
     <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">Dobrodosli u Altamoda!</h2>
-    <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
+    <p style="margin: 0; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
       Hvala vam sto ste se prijavili na nas newsletter. Od sada cete prvi saznati o novim proizvodima, ekskluzivnim ponudama i profesionalnim savetima za negu kose.
-    </p>
-    <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
-      Kao poklon dobrodoslice, koristite kod ispod za <strong>10% popusta</strong> na vasu prvu narudzbu:
-    </p>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="center" style="padding: 20px; background-color: ${BRAND_BG}; border-radius: 8px; border: 2px dashed ${BRAND_PRIMARY};">
-          <p style="margin: 0; font-size: 28px; font-weight: 700; color: ${BRAND_PRIMARY}; letter-spacing: 4px;">
-            WELCOME10
-          </p>
-        </td>
-      </tr>
-    </table>
-    <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.5; color: #413d3a;">
-      Kod vazi 30 dana od danas. Minimalna vrednost narudzbe: 3.000 RSD.
     </p>
     </div>
   `

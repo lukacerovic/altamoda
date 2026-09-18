@@ -5,33 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
-import {
-  Package, Heart, ChevronRight, LogOut,
-  CreditCard, TrendingUp, Award, Percent, CheckCircle,
-  BarChart3, AlertTriangle, Globe,
-} from "lucide-react";
+import { Package, Heart, ChevronRight, LogOut, Globe } from "lucide-react";
 import { useLanguage, languageLabels, languageFlags, type Language } from "@/lib/i18n/LanguageContext";
 
 // wishlist items are now fetched from API dynamically
 
-// Real-data placeholders. Demo numbers were removed so the B2B sections render
-// empty states instead of misleading balances/rabats to a user with no orders.
-// Replace these with live endpoints (per-user debt, rabat tier, points, etc.)
-// when the backing data model exists.
+// ─── Sidebar config (same for B2B and B2C) ───
 
-// ─── Sidebar configs per role ───
-
-const b2cNavKeys = [
+const navKeys = [
   { key: "orders", labelKey: "account.orders", icon: Package },
   { key: "wishlist", labelKey: "account.wishlistNav", icon: Heart },
-];
-
-const b2bNavKeys = [
-  { key: "orders", labelKey: "account.orders", icon: Package },
-  { key: "wishlist", labelKey: "account.wishlistNav", icon: Heart },
-  { key: "prices", labelKey: "account.b2bPricesNav", icon: Percent },
-  { key: "balance", labelKey: "account.balanceDebtsNav", icon: TrendingUp },
-  { key: "loyalty", labelKey: "account.loyaltyNav", icon: Award },
 ];
 
 // ─── Sub-components ───
@@ -107,13 +90,13 @@ function OrdersSection() {
   };
 
   const handleCancel = async (id: string) => {
-    if (!confirm("Da li ste sigurni da želite da otkažete ovu porudžbinu?")) return;
+    if (!confirm(t("account.cancelConfirm"))) return;
     setCancellingId(id);
     try {
       const res = await fetch(`/api/orders/${id}/cancel`, { method: "POST" });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        alert(data.error || "Nije moguće otkazati porudžbinu");
+        alert(data.code ? t(data.code) : t("account.cancelErrGeneric"));
         return;
       }
       setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status: "otkazano" } : o));
@@ -169,7 +152,7 @@ function OrdersSection() {
                           disabled={cancellingId === order.id}
                           className="text-xs text-red-600 hover:text-red-700 font-medium disabled:opacity-40"
                         >
-                          {cancellingId === order.id ? "…" : "Otkaži"}
+                          {cancellingId === order.id ? "…" : t("account.cancelOrder")}
                         </button>
                       )}
                     </td>
@@ -259,54 +242,6 @@ function WishlistSection() {
   );
 }
 
-function B2bPricesSection() {
-  const { t } = useLanguage();
-  return (
-    <>
-      <h1 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("accountPage.b2bPricesTitle")}</h1>
-
-      <div className="bg-white rounded-sm shadow-sm p-10 text-center">
-        <Percent className="w-8 h-8 text-[#1a1c1e]/50 mx-auto mb-3" />
-        <p className="text-sm text-[#1a1c1e]">
-          Podaci o rabatima i mesečnoj potrošnji biće dostupni nakon obavljenih porudžbina.
-        </p>
-      </div>
-    </>
-  );
-}
-
-function B2bBalanceSection() {
-  const { t } = useLanguage();
-  return (
-    <>
-      <h1 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.balanceDebts")}</h1>
-
-      <div className="bg-white rounded-sm shadow-sm p-10 text-center">
-        <AlertTriangle className="w-8 h-8 text-[#1a1c1e]/50 mx-auto mb-3" />
-        <p className="text-sm text-[#1a1c1e]">
-          Pregled zaduženja i uplata biće prikazan nakon prvih faktura.
-        </p>
-      </div>
-    </>
-  );
-}
-
-function B2bLoyaltySection() {
-  const { t } = useLanguage();
-  return (
-    <>
-      <h1 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("account.loyaltyProgram")}</h1>
-
-      <div className="bg-white rounded-sm shadow-sm p-10 text-center">
-        <Award className="w-8 h-8 text-[#1a1c1e]/50 mx-auto mb-3" />
-        <p className="text-sm text-[#1a1c1e]">
-          Program lojalnosti uskoro. Poeni se skupljaju po završenoj porudžbini.
-        </p>
-      </div>
-    </>
-  );
-}
-
 // ─── Main Page ───
 
 export default function AccountPage() {
@@ -322,7 +257,6 @@ export default function AccountPage() {
   }
 
   const isB2b = role === "b2b";
-  const sidebarNavKeys = isB2b ? b2bNavKeys : b2cNavKeys;
 
   const userName = session?.user?.name || t("accountPage.user");
   const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -352,7 +286,7 @@ export default function AccountPage() {
                 </div>
               </div>
               <nav className="space-y-1">
-                {sidebarNavKeys.map((item) => {
+                {navKeys.map((item) => {
                   const Icon = item.icon;
                   return (
                     <button key={item.key} onClick={() => setActiveSection(item.key)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors ${activeSection === item.key ? "bg-[#FFFFFF] text-[#edb4bd]" : "text-[#1a1c1e] hover:bg-[#FFFFFF] hover:text-[#1a1c1e]"}`}>
@@ -398,7 +332,7 @@ export default function AccountPage() {
           <div className="flex-1 min-w-0">
             {/* Mobile nav */}
             <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 mb-6">
-              {sidebarNavKeys.map((item) => {
+              {navKeys.map((item) => {
                 const Icon = item.icon;
                 return (
                   <button key={item.key} onClick={() => setActiveSection(item.key)} className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeSection === item.key ? "bg-[#edb4bd] text-white" : "bg-white text-[#1a1c1e] border border-[#dddbd9]"}`}>
@@ -417,9 +351,6 @@ export default function AccountPage() {
             {/* Sections */}
             {activeSection === "orders" && <OrdersSection />}
             {activeSection === "wishlist" && <WishlistSection />}
-            {isB2b && activeSection === "prices" && <B2bPricesSection />}
-            {isB2b && activeSection === "balance" && <B2bBalanceSection />}
-            {isB2b && activeSection === "loyalty" && <B2bLoyaltySection />}
           </div>
         </div>
       </div>

@@ -1,11 +1,24 @@
 export const CURRENCY = 'RSD'
 export const CURRENCY_SYMBOL = 'RSD'
-export const FREE_SHIPPING_THRESHOLD = 5000
+// Delivery terms differ by customer type. Pickup at the Pro Shop (Mihizova 9)
+// is always free.
+export const SHIPPING_COST = 500
+export const FREE_SHIPPING_THRESHOLD_B2C = 6000
+export const FREE_SHIPPING_THRESHOLD_B2B = 12000
+
+export function getFreeShippingThreshold(isB2b: boolean): number {
+  return isB2b ? FREE_SHIPPING_THRESHOLD_B2B : FREE_SHIPPING_THRESHOLD_B2C
+}
+
+export function getShippingCost(method: string | undefined, subtotal: number, isB2b: boolean): number {
+  if (method === 'pickup') return 0
+  return subtotal >= getFreeShippingThreshold(isB2b) ? 0 : SHIPPING_COST
+}
+
 export const ORDER_PREFIX = 'ALT'
 export const PAGINATION_DEFAULT_PAGE = 1
 export const PAGINATION_DEFAULT_LIMIT = 12
 export const PAGINATION_MAX_LIMIT = 100
-export const MIN_B2B_ORDER = 10000
 export const B2B_BULK_DISCOUNT = 15
 
 // ERP / Pantheon sync constants

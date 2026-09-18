@@ -207,9 +207,10 @@ describe('createOrderSchema', () => {
     expect(createOrderSchema.safeParse(order).success).toBe(false)
   })
 
-  it('accepts invoice payment (B2B)', () => {
-    const order = { ...validOrder, paymentMethod: 'invoice' }
-    expect(createOrderSchema.safeParse(order).success).toBe(true)
+  it('rejects removed payment methods (invoice, bank transfer)', () => {
+    for (const paymentMethod of ['invoice', 'bank_transfer']) {
+      expect(createOrderSchema.safeParse({ ...validOrder, paymentMethod }).success).toBe(false)
+    }
   })
 
   it('rejects invalid payment method', () => {

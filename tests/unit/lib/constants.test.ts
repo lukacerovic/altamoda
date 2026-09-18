@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import {
-  CURRENCY, CURRENCY_SYMBOL, FREE_SHIPPING_THRESHOLD,
+  CURRENCY, CURRENCY_SYMBOL,
+  SHIPPING_COST, FREE_SHIPPING_THRESHOLD_B2C, FREE_SHIPPING_THRESHOLD_B2B,
+  getFreeShippingThreshold, getShippingCost,
   ORDER_PREFIX, PAGINATION_DEFAULT_PAGE, PAGINATION_DEFAULT_LIMIT,
-  PAGINATION_MAX_LIMIT, MIN_B2B_ORDER, B2B_BULK_DISCOUNT,
+  PAGINATION_MAX_LIMIT, B2B_BULK_DISCOUNT,
   ERP_DEFAULT_VAT_RATE, ERP_VAT_CODES, ERP_WEB_ORDER_SOURCE,
   ERP_DOC_TYPE_SALES_ORDER, ERP_SYNC_MAX_RETRIES, ERP_SYNC_RETRY_DELAYS_MS,
 } from '@/lib/constants'
@@ -13,9 +15,24 @@ describe('Constants', () => {
     expect(CURRENCY_SYMBOL).toBe('RSD')
   })
 
-  it('has correct shipping threshold', () => {
-    expect(FREE_SHIPPING_THRESHOLD).toBe(5000)
-    expect(FREE_SHIPPING_THRESHOLD).toBeGreaterThan(0)
+  it('has correct shipping terms', () => {
+    expect(SHIPPING_COST).toBe(500)
+    expect(FREE_SHIPPING_THRESHOLD_B2C).toBe(6000)
+    expect(FREE_SHIPPING_THRESHOLD_B2B).toBe(12000)
+    expect(getFreeShippingThreshold(false)).toBe(6000)
+    expect(getFreeShippingThreshold(true)).toBe(12000)
+  })
+
+  it('charges delivery below the role threshold and free at/above it', () => {
+    expect(getShippingCost('standard', 5999, false)).toBe(500)
+    expect(getShippingCost('standard', 6000, false)).toBe(0)
+    expect(getShippingCost('standard', 11999, true)).toBe(500)
+    expect(getShippingCost('standard', 12000, true)).toBe(0)
+  })
+
+  it('pickup is always free', () => {
+    expect(getShippingCost('pickup', 100, false)).toBe(0)
+    expect(getShippingCost('pickup', 100, true)).toBe(0)
   })
 
   it('has correct order prefix', () => {
@@ -30,7 +47,6 @@ describe('Constants', () => {
   })
 
   it('has B2B settings', () => {
-    expect(MIN_B2B_ORDER).toBe(10000)
     expect(B2B_BULK_DISCOUNT).toBe(15)
     expect(B2B_BULK_DISCOUNT).toBeGreaterThan(0)
     expect(B2B_BULK_DISCOUNT).toBeLessThanOrEqual(100)

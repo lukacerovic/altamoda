@@ -21,12 +21,12 @@ export const POST = withErrorHandler(async (_req: Request, context: unknown) => 
     },
   })
 
-  if (!order) throw new ApiError(404, 'Porudžbina nije pronađena')
+  if (!order) throw new ApiError(404, 'Porudžbina nije pronađena', 'account.cancelErrNotFound')
   if (order.userId !== user.id && user.role !== 'admin') {
-    throw new ApiError(403, 'Ne možete otkazati tuđu porudžbinu')
+    throw new ApiError(403, 'Ne možete otkazati tuđu porudžbinu', 'account.cancelErrForbidden')
   }
   if (!CANCELLABLE_STATES.has(order.status)) {
-    throw new ApiError(409, 'Ovu porudžbinu više nije moguće otkazati')
+    throw new ApiError(409, 'Ovu porudžbinu više nije moguće otkazati', 'account.cancelErrNotCancellable')
   }
 
   await prisma.$transaction(async (tx) => {

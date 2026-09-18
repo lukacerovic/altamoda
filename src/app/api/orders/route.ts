@@ -3,7 +3,7 @@ import { withErrorHandler, successResponse, ApiError, getPaginationParams } from
 import { requireAuth, getCurrentUser } from '@/lib/auth-helpers'
 import { createOrderSchema } from '@/lib/validations/order'
 import { generateOrderNumber } from '@/lib/utils'
-import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants'
+import { getShippingCost } from '@/lib/constants'
 import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
 import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
@@ -146,12 +146,7 @@ export const POST = withErrorHandler(async (req: Request) => {
     const subtotal = orderItems.reduce((sum, i) => sum + i.totalPrice, 0)
 
     // 4. Shipping cost
-    let shippingCost = 0
-    if (input.shippingMethod === 'express') {
-      shippingCost = 690
-    } else if (input.shippingMethod !== 'pickup') {
-      shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 350
-    }
+    const shippingCost = getShippingCost(input.shippingMethod, subtotal, isB2b)
 
     const total = subtotal + shippingCost
     const paymentStatus = 'pending'

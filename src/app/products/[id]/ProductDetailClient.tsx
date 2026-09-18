@@ -8,7 +8,7 @@ import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
   ShoppingBag, Heart, Star, ChevronRight, ChevronLeft, Minus, Plus, Truck,
-  RotateCcw, Shield, Sparkles,
+  Shield, Sparkles,
   Play, CheckCircle, X, Link2, AlertCircle,
 } from "lucide-react";
 import DOMPurify from "isomorphic-dompurify";
@@ -774,8 +774,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
 
             {/* Delivery info */}
             <div className="border-t border-[#dddbd9]/60 pt-6 space-y-4">
-              <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><Truck className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.freeShipping")}</strong> — {t("productDetail.freeShippingNote")}</span></div>
-              <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><RotateCcw className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.returnPolicy")}</strong> — {t("productDetail.returnPolicyNote")}</span></div>
+              <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><Truck className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.freeShipping")}</strong> — {t(role === "b2b" ? "productDetail.freeShippingNoteB2b" : "productDetail.freeShippingNote")}</span></div>
               <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><Shield className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.originalProducts")}</strong> — {t("productDetail.originalProductsNote")}</span></div>
             </div>
 
