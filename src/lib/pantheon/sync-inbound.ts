@@ -8,6 +8,9 @@
  *     `isActive`. Policy chosen by the owners (Option C / Hybrid): the website
  *     decides its own visibility; `erpIsActive` is informational for admin.
  *   - prices sync:   updates priceB2c + costPrice for existing products.
+ *                    priceB2c = retail price (`e`) for the B2C assortment,
+ *                    wholesale with VAT (`c`) for professional products. A
+ *                    B2C product without a retail price keeps its priceB2c.
  *   - stock sync:    updates stockQuantity for existing products.
  *
  * Match key is always `Product.erpId` (= Pantheon acIdent), trimmed.
@@ -24,6 +27,7 @@ import {
   normalizeProduct,
   normalizeStock,
   PantheonError,
+  shopPriceFor,
 } from './client'
 import type {
   NormalizedPantheonProduct,
@@ -156,7 +160,7 @@ export async function syncProducts(): Promise<SyncResult> {
                 sku: item.code,
                 nameLat: item.name,
                 slug,
-                priceB2c: new Prisma.Decimal(item.priceWithVat),
+                priceB2c: new Prisma.Decimal(shopPriceFor(item, false) ?? item.priceWithVat),
                 costPrice: new Prisma.Decimal(item.priceWithoutVat),
                 stockQuantity: item.stock,
                 isActive: item.isActive,
@@ -217,28 +221,31 @@ export async function syncPrices(): Promise<SyncResult> {
     const codes = normalized.map((p) => p.code)
     const existing = await prisma.product.findMany({
       where: { erpId: { in: codes } },
-      select: { id: true, erpId: true },
+      select: { id: true, erpId: true, isProfessional: true },
     })
-    const idByErpId = new Map(
-      existing.filter((p): p is typeof p & { erpId: string } => !!p.erpId).map((p) => [p.erpId, p.id]),
+    const byErpId = new Map(
+      existing.filter((p): p is typeof p & { erpId: string } => !!p.erpId).map((p) => [p.erpId, p]),
     )
 
     let updated = 0
     let skipped = 0
+    const missingRetailPrice: string[] = []
 
     for (let i = 0; i < normalized.length; i += BATCH_SIZE) {
       const batch = normalized.slice(i, i + BATCH_SIZE)
       await Promise.all(
         batch.map(async (item) => {
-          const id = idByErpId.get(item.code)
-          if (!id) {
+          const found = byErpId.get(item.code)
+          if (!found) {
             skipped++
             return
           }
+          const shopPrice = shopPriceFor(item, found.isProfessional)
+          if (shopPrice === null) missingRetailPrice.push(item.code)
           await prisma.product.update({
-            where: { id },
+            where: { id: found.id },
             data: {
-              priceB2c: new Prisma.Decimal(item.priceWithVat),
+              ...(shopPrice !== null && { priceB2c: new Prisma.Decimal(shopPrice) }),
               costPrice: new Prisma.Decimal(item.priceWithoutVat),
             },
           })
@@ -250,7 +257,7 @@ export async function syncPrices(): Promise<SyncResult> {
     await finishLog(log.id, {
       status: 'success',
       itemsSynced: updated,
-      details: { updated, skipped, total: normalized.length },
+      details: { updated, skipped, total: normalized.length, missingRetailPrice },
     })
 
     return {

@@ -61,6 +61,7 @@ interface PantheonUnlinkedProduct {
   name: string;
   priceWithVat: number;
   priceWithoutVat: number;
+  retailPrice: number;
   stock: number;
   isActive: boolean;
 }
@@ -257,7 +258,7 @@ function PantheonImportModal({ onClose }: { onClose: () => void }) {
                     </td>
                     <td className="py-2 pr-2 text-[#1a1c1e] max-w-xs truncate">{p.name}</td>
                     <td className="py-2 pr-2 font-mono text-xs text-[#1a1c1e]/70">{p.code}</td>
-                    <td className="py-2 pr-2 text-right text-[#1a1c1e] whitespace-nowrap">{p.priceWithVat.toLocaleString("sr-RS")} RSD</td>
+                    <td className="py-2 pr-2 text-right text-[#1a1c1e] whitespace-nowrap">{(p.retailPrice > 0 ? p.retailPrice : p.priceWithVat).toLocaleString("sr-RS")} RSD</td>
                     <td className="py-2 pr-2 text-right text-[#1a1c1e]/70">{p.stock}</td>
                   </tr>
                 ))}

@@ -6,15 +6,17 @@
  * Actions: products | stock | altaorder
  *
  * The response uses single-letter keys to keep payloads small. Field meanings
- * below were verified against a live response on 2026-05-16 — they do NOT
- * match the legacy PHP comments (the legacy code was silently broken; it
- * mapped `e` as the retail price, but `e` is always 0).
+ * below were verified against a live response on 2026-05-16 and corrected
+ * on 2026-09-19: `e` was 0 for every article in May, which is why `c` was
+ * used as the shop price — but `c` turned out to be the WHOLESALE price.
+ * `e` is the retail price (verified: SKU 2723 c=2275.20, e=3720.00, and all
+ * 272 priced products on the legacy site equal `e`).
  *
  *   a = product code (acIdent), may have trailing whitespace
  *   b = name (Serbian)
- *   c = price WITH VAT (retail)
- *   d = price WITHOUT VAT (cost / pre-VAT)
- *   e = always 0.0 (purpose unknown, possibly promo placeholder)
+ *   c = wholesale price WITH VAT
+ *   d = wholesale price WITHOUT VAT (cost / pre-VAT)
+ *   e = retail price WITH VAT (0 when not set in Pantheon)
  *   f = stock quantity (string with decimals, e.g. "4.00")
  *   g = active flag ("T" / "F")
  *   h = always 0.0 (purpose unknown)
@@ -26,9 +28,9 @@ export type PantheonAction = 'products' | 'stock' | 'altaorder'
 export interface PantheonRawProduct {
   a: string | number // product code
   b: string // name
-  c: number | string // price WITH VAT (retail)
-  d?: number | string // price WITHOUT VAT (cost)
-  e?: number | string // always 0.0 — kept for forward compat
+  c: number | string // wholesale price WITH VAT
+  d?: number | string // wholesale price WITHOUT VAT (cost)
+  e?: number | string // retail price WITH VAT (0 = not set)
   f: number | string // stock
   g: string // "T" / "F"
   h?: number | string // always 0.0 — kept for forward compat
@@ -103,6 +105,8 @@ export interface NormalizedPantheonProduct {
   name: string
   priceWithoutVat: number
   priceWithVat: number
+  /** Retail price with VAT (`e`); 0 when Pantheon has none. */
+  retailPrice: number
   stock: number
   isActive: boolean
 }

@@ -6,6 +6,7 @@ import { withErrorHandler, successResponse } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
 import { ERP_DEFAULT_VAT_RATE } from '@/lib/constants'
 import { slugify } from '@/lib/utils'
+import { shopPriceFor } from '@/lib/pantheon/client'
 import { ensureUniqueSlug } from '@/lib/pantheon/sync-inbound'
 
 const itemSchema = z.object({
@@ -13,6 +14,7 @@ const itemSchema = z.object({
   name: z.string().min(1),
   priceWithVat: z.number(),
   priceWithoutVat: z.number(),
+  retailPrice: z.number().default(0),
   stock: z.number(),
   isActive: z.boolean(),
 })
@@ -60,7 +62,8 @@ export const POST = withErrorHandler(async (req: Request) => {
           erpId: item.code,
           nameLat: item.name,
           slug,
-          priceB2c: new Prisma.Decimal(item.priceWithVat),
+          // New products default to the B2C assortment → retail price when Pantheon has one.
+          priceB2c: new Prisma.Decimal(shopPriceFor(item, false) ?? item.priceWithVat),
           costPrice: new Prisma.Decimal(item.priceWithoutVat),
           stockQuantity: Math.max(0, Math.floor(item.stock)),
           isActive: item.isActive,

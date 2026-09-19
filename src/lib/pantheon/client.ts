@@ -169,12 +169,10 @@ export class PantheonClient {
 /**
  * Coerce + trim a raw product row.
  *
- * Field mapping verified against live Pantheon response (2026-05-16):
- *   c = price WITH VAT (retail) — what we sell at
- *   d = price WITHOUT VAT (cost) — pre-VAT amount
- *
- * The legacy PHP got this wrong and used `e` (always 0) as the main price.
- * We use `c`/`d` here, which matches reality.
+ * Field mapping (see types.ts, corrected 2026-09-19):
+ *   c = wholesale price WITH VAT — shop price for the professional assortment
+ *   d = wholesale price WITHOUT VAT (cost)
+ *   e = retail price WITH VAT — shop price for the B2C assortment
  *
  * Per legacy PHP (`Synchronization_model::update_product`), the product code
  * may have trailing whitespace — `trim()` is mandatory.
@@ -194,6 +192,7 @@ export function normalizeProduct(
     name: String(raw.b ?? '').trim(),
     priceWithVat: toNumber(raw.c),
     priceWithoutVat: toNumber(raw.d),
+    retailPrice: toNumber(raw.e),
     stock: Math.max(0, Math.floor(toNumber(raw.f))),
     isActive: String(raw.g ?? '').trim().toUpperCase() === 'T',
   }
@@ -216,6 +215,20 @@ function toNumber(v: unknown): number {
     return Number.isFinite(n) ? n : 0
   }
   return 0
+}
+
+/**
+ * The price to store as `Product.priceB2c`: retail (`e`) for the B2C
+ * assortment, wholesale with VAT (`c`) for professional products.
+ * Returns null when a B2C product has no retail price in Pantheon — callers
+ * must then keep the current price rather than fall back to wholesale.
+ */
+export function shopPriceFor(
+  item: Pick<NormalizedPantheonProduct, 'priceWithVat' | 'retailPrice'>,
+  isProfessional: boolean,
+): number | null {
+  if (isProfessional) return item.priceWithVat
+  return item.retailPrice > 0 ? item.retailPrice : null
 }
 
 // ─── Lazy singleton ──────────────────────────────────────────────────────────

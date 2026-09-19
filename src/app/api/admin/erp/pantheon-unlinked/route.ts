@@ -35,6 +35,7 @@ export const GET = withErrorHandler(async () => {
       name: p.name,
       priceWithVat: p.priceWithVat,
       priceWithoutVat: p.priceWithoutVat,
+      retailPrice: p.retailPrice,
       stock: p.stock,
       isActive: p.isActive,
     }))
