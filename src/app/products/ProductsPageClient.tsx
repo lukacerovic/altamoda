@@ -1570,6 +1570,8 @@ export default function ProductsPageClient({
             >
               {activeBrand ? (
                 <><span className="uppercase">{activeBrand.name}</span>, <em className="italic">{t("products.allProductsEm")}</em>.</>
+              ) : appliedSearch.trim() ? (
+                <>{t("products.searchResultsPrefix")} <em className="italic">{`„${appliedSearch.trim()}“`}</em></>
               ) : (
                 <>{t("products.catchphrasePrefix")}, <em className="italic">{t("products.allProductsEm")}</em>.</>
               )}

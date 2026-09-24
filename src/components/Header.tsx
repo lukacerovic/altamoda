@@ -144,7 +144,6 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   // The toggle button lives in the header bar, outside the overlay. Without its
   // own ref the close-on-outside handler fired on its mousedown and the ensuing
@@ -246,8 +245,13 @@ export default function Header() {
   }, []);
 
   const handleSearchSubmit = () => {
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    const q = searchQuery.trim();
+    if (q) {
+      // A query that is exactly a brand name (e.g. "redken") opens that brand's
+      // page instead of a generic full-text results list.
+      const norm = (v: string) => v.toLowerCase().replace(/\s+/g, " ");
+      const brand = brands.find((b) => norm(b.name) === norm(q) || b.slug === norm(q).replace(/ /g, "-"));
+      router.push(brand ? `/brands/${brand.slug}` : `/products?search=${encodeURIComponent(q)}`);
       setSearchOpen(false);
       setSearchQuery("");
       setSearchResults([]);
@@ -504,17 +508,11 @@ export default function Header() {
               <div ref={searchRowRef} className="relative max-w-xl mx-auto flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder={searchFocused ? "" : t("nav.searchPlaceholder")}
+                  placeholder={t("nav.searchPlaceholder")}
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
-                  /* QA asked for no visible text caret in the search bar: the
-                     blinking black bar reads as a stray artefact rather than a
-                     cursor. Typing and selection still work normally. */
-                  style={{ caretColor: "transparent" }}
                   className="flex-1 min-w-0 border border-[#dddbd9] rounded-full pl-5 pr-12 py-3 text-sm focus:border-black focus:ring-0 transition-colors bg-transparent"
                 />
                 <button
