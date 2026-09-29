@@ -1,3 +1,4 @@
+import { after } from 'next/server'
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError, getPaginationParams } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
@@ -29,7 +30,7 @@ export const POST = withErrorHandler(async (req: Request) => {
       },
     })
 
-    void (async () => {
+    after(() => (async () => {
       const { sendTransactional, getNewsletterFrom } = await import('@/lib/email')
       const { welcomeTemplate } = await import('@/lib/email-templates')
       return sendTransactional({
@@ -38,7 +39,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         subject: 'Dobrodošli u Altamoda porodicu! 🎉',
         html: welcomeTemplate(email),
       })
-    })().catch((err) => console.error('[newsletter] welcome email failed:', err))
+    })().catch((err) => console.error('[newsletter] welcome email failed:', err)))
 
     return successResponse({ message: 'Uspešno ste se ponovo prijavili na newsletter' }, 201)
   }

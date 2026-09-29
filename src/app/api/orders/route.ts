@@ -1,3 +1,4 @@
+import { after } from 'next/server'
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError, getPaginationParams } from '@/lib/api-utils'
 import { requireAuth, getCurrentUser } from '@/lib/auth-helpers'
@@ -221,7 +222,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
   // Best-effort confirmation/notification emails — failure must not fail the request.
   const recipientEmail = user?.email ?? input.guestEmail ?? null
-  const adminOrderEmail = process.env.ADMIN_ORDER_EMAIL
+  const adminOrderEmail = process.env.ADMIN_ORDER_EMAIL || process.env.ADMIN_EMAIL
   if (recipientEmail || adminOrderEmail) {
     const escapeHtml = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -279,7 +280,9 @@ export const POST = withErrorHandler(async (req: Request) => {
         })
       }
     }
-    sendOrderEmails().catch((err) => console.error('Order email(s) failed:', err))
+    // after() keeps the serverless function alive until the emails are sent;
+    // a bare fire-and-forget promise gets frozen on Vercel once the response is out.
+    after(() => sendOrderEmails().catch((err) => console.error('Order email(s) failed:', err)))
   }
 
   // Card orders go through the VPOS hosted payment page (when enabled). The client

@@ -1,4 +1,5 @@
 import { hash } from 'bcryptjs'
+import { after } from 'next/server'
 import { prisma } from '@/lib/db'
 import { successResponse, errorResponse, withErrorHandler } from '@/lib/api-utils'
 import { registerB2cSchema, registerB2bSchema } from '@/lib/validations/user'
@@ -66,16 +67,16 @@ export const POST = withErrorHandler(async (req: Request) => {
   })
 
   // Welcome email to the new user — best-effort, never fails the registration.
-  void sendTransactional({
+  after(() => sendTransactional({
     to: user.email,
     subject: 'Dobro došli u ALTA MODA',
     html: registrationWelcomeTemplate({ isB2bPending: Boolean(isB2b) }),
-  }).catch((err) => console.error('[email] registration welcome failed:', err))
+  }).catch((err) => console.error('[email] registration welcome failed:', err)))
 
   if (isB2b) {
     const adminEmail = process.env.ADMIN_EMAIL
     if (adminEmail) {
-      void sendTransactional({
+      after(() => sendTransactional({
         to: adminEmail,
         subject: 'Nova B2B prijava ceka odobrenje',
         html: b2bSignupAdminTemplate({
@@ -87,7 +88,7 @@ export const POST = withErrorHandler(async (req: Request) => {
           maticniBroj: data.maticniBroj,
           address: data.address,
         }),
-      }).catch((err) => console.error('[email] B2B admin alert failed:', err))
+      }).catch((err) => console.error('[email] B2B admin alert failed:', err)))
     }
   }
 

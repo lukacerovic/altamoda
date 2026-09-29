@@ -1,3 +1,4 @@
+import { after } from 'next/server'
 import { prisma } from '@/lib/db'
 import { withErrorHandler, successResponse, ApiError } from '@/lib/api-utils'
 import { requireAdmin } from '@/lib/auth-helpers'
@@ -64,7 +65,7 @@ export const PATCH = withErrorHandler(async (req: Request, context: unknown) => 
     const notifyEmail = order.user?.email ?? order.guestEmail
     if (notifyEmail) {
       const language = (order.language as EmailLang) ?? 'sr'
-      void sendTransactional({
+      after(() => sendTransactional({
         to: notifyEmail,
         subject: ORDER_SHIPPED_SUBJECT[language](order.orderNumber),
         html: orderShippedTemplate({
@@ -72,7 +73,7 @@ export const PATCH = withErrorHandler(async (req: Request, context: unknown) => 
           shippedDate: new Date().toLocaleDateString('sr-RS', { timeZone: 'Europe/Belgrade' }),
           language,
         }),
-      }).catch((err) => console.error('[email] order shipped notification failed:', err))
+      }).catch((err) => console.error('[email] order shipped notification failed:', err)))
     }
   }
 
