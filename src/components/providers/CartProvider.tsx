@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/lib/stores/cart-store'
 import { useWishlistStore } from '@/lib/stores/wishlist-store'
+import { useCheckoutStore } from '@/lib/stores/checkout-store'
 
 /**
  * Tracks which userId the localStorage cart belongs to.
@@ -28,6 +29,9 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   const { data: session, status } = useSession()
   const { setItems, clearCart, setLoading, setHydrated } = useCartStore()
   const setWishlistCount = useWishlistStore((s) => s.setCount)
+  // The checkout draft (address, contact, notes) is personal data in
+  // localStorage too, so it is wiped together with the previous user's cart.
+  const clearCheckoutDraft = useCheckoutStore((s) => s.clearDraft)
   const hasMergedRef = useRef(false)
 
   useEffect(() => {
@@ -45,6 +49,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
         // wishlist was never in local state, so the badge falls back to
         // whatever the guest has locally.
         clearCart()
+        clearCheckoutDraft()
         setWishlistCount(useWishlistStore.getState().guestItems.length)
         setCartOwner(null)
       }
@@ -55,6 +60,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     // User is logged in but cart belongs to a different user — clear stale data
     if (cartOwner && cartOwner !== currentUserId) {
       clearCart()
+      clearCheckoutDraft()
       setWishlistCount(useWishlistStore.getState().guestItems.length)
       hasMergedRef.current = false
     }
