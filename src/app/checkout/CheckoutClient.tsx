@@ -108,9 +108,10 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
   const paymentOptions = [
     { key: 'card', label: t('checkout.cardVisaMaster') },
     { key: 'cash_on_delivery', label: t('checkout.cashOnDelivery') },
+    { key: 'bank_transfer', label: t('checkout.bankTransfer') },
   ]
   // A persisted method no longer offered (e.g. a draft holding the removed
-  // 'invoice' or 'bank_transfer' options) falls back to card.
+  // 'invoice' option) falls back to card.
   const paymentMethod =
     draftPaymentMethod && paymentOptions.some((o) => o.key === draftPaymentMethod)
       ? draftPaymentMethod
@@ -583,6 +584,12 @@ export default function CheckoutClient({ userRole, isGuest, addresses }: Props) 
                       {t('checkout.securePayment')}
                     </p>
                     <PaymentLogos />
+                  </div>
+                )}
+
+                {paymentMethod === 'bank_transfer' && (
+                  <div className="mt-4 p-4 bg-[#FFFFFF] rounded-sm border border-[#dddbd9]">
+                    <p className="text-xs text-[#1a1c1e] leading-relaxed">{t('checkout.bankTransferInfo')}</p>
                   </div>
                 )}
 

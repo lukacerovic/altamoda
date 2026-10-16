@@ -44,6 +44,11 @@ export const PATCH = withErrorHandler(async (req: Request, context: unknown) => 
     throw new ApiError(400, `Nije moguća promena statusa iz "${order.status}" u "${status}"`)
   }
 
+  // "Uplatnicom" orders ship only once the payment is on the account.
+  if (status === 'isporuceno' && order.paymentMethod === 'bank_transfer' && order.paymentStatus !== 'paid') {
+    throw new ApiError(400, 'Uplata još nije potvrđena — porudžbina plaćena uplatnicom ne može biti poslata pre potvrde uplate')
+  }
+
   await prisma.$transaction([
     prisma.order.update({
       where: { id },

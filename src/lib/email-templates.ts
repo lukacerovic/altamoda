@@ -1,4 +1,5 @@
 import { getUnsubscribeUrl, getSiteUrl } from './email'
+import { BANK_TRANSFER_PAYEE, BANK_TRANSFER_DEADLINE_HOURS, formatSlipAmount } from './payments/bank-transfer'
 
 // Altamoda letterhead palette (matches the newsletter stationery).
 const PAGE_BG = '#f6dfe1' // soft pink page behind the card
@@ -419,6 +420,103 @@ export interface OrderConfirmationDetails {
   shippingAddress?: string | null
   notes?: string | null
   language?: EmailLang
+  /** Set for "Uplatnicom" orders: the email then carries the filled-in payment
+   *  slip and says the order ships only once the payment is recorded.
+   *  payerName/payerAddress must already be HTML-escaped. */
+  bankTransfer?: { payerName: string; payerAddress: string; amount: number } | null
+}
+
+const BANK_TRANSFER_TEXT: Record<EmailLang, {
+  intro: string; awaiting: string; instructions: string; referenceWarning: string
+  slipTitle: string; payer: string; purpose: string; purposeValue: string; payee: string
+  paymentCode: string; currency: string; amount: string; account: string
+  model: string; reference: string; signature: string; placeDate: string; valueDate: string
+  sellerHeading: string; sellerName: string; address: string; accountNo: string
+  pib: string; mb: string; whatsNextList: string
+}> = {
+  sr: {
+    intro: 'Uspešno smo primili Vašu porudžbinu. Proizvode šaljemo čim uplata bude evidentirana na našem računu.',
+    awaiting: 'Čeka se uplata',
+    instructions: `U nastavku ovog mejla nalazi se popunjena uplatnica sa iznosom koji je potrebno da uplatite u narednih ${BANK_TRANSFER_DEADLINE_HOURS} časa kako bi Vaša porudžbina bila realizovana.`,
+    referenceWarning: 'Molimo Vas da prilikom uplate obavezno popunite polje <strong>poziv na broj</strong>, u suprotnom nećemo biti u mogućnosti da uplatu povežemo sa Vašom porudžbinom.',
+    slipTitle: 'NALOG ZA UPLATU', payer: 'Uplatilac', purpose: 'Svrha uplate', purposeValue: 'Online porudžbina',
+    payee: 'Primalac', paymentCode: 'Šifra plaćanja', currency: 'Valuta', amount: 'Iznos',
+    account: 'Račun primaoca', model: 'Broj modela', reference: 'Poziv na broj (odobrenje)',
+    signature: 'Pečat i potpis uplatioca', placeDate: 'Mesto i datum prijema', valueDate: 'Datum valute',
+    sellerHeading: 'Podaci o prodavcu', sellerName: 'Naziv', address: 'Adresa', accountNo: 'Broj računa',
+    pib: 'PIB', mb: 'Matični broj',
+    whatsNextList: '💳 Evidentiranje uplate<br />📦 Obrada i pakovanje<br />🚚 Predaja kuriru<br />📧 Obaveštenje o slanju',
+  },
+  en: {
+    intro: 'We have successfully received your order. We will ship your products as soon as the payment is recorded on our account.',
+    awaiting: 'Awaiting payment',
+    instructions: `Below you will find a filled-in payment slip with the amount to be paid within the next ${BANK_TRANSFER_DEADLINE_HOURS} hours for your order to be processed.`,
+    referenceWarning: 'When paying, please be sure to fill in the <strong>reference number</strong> (poziv na broj) field, otherwise we will not be able to match the payment to your order.',
+    slipTitle: 'PAYMENT SLIP', payer: 'Payer', purpose: 'Purpose of payment', purposeValue: 'Online porudžbina',
+    payee: 'Payee', paymentCode: 'Payment code', currency: 'Currency', amount: 'Amount',
+    account: 'Payee account', model: 'Model', reference: 'Reference number',
+    signature: 'Payer stamp and signature', placeDate: 'Place and date of receipt', valueDate: 'Value date',
+    sellerHeading: 'Seller details', sellerName: 'Name', address: 'Address', accountNo: 'Account number',
+    pib: 'Tax ID (PIB)', mb: 'Company ID (MB)',
+    whatsNextList: '💳 Payment recorded<br />📦 Processing and packing<br />🚚 Handover to courier<br />📧 Shipping notification',
+  },
+  ru: {
+    intro: 'Мы успешно получили ваш заказ. Мы отправим товары, как только оплата поступит на наш счет.',
+    awaiting: 'Ожидается оплата',
+    instructions: `Ниже вы найдете заполненную платежную квитанцию с суммой, которую необходимо оплатить в течение ${BANK_TRANSFER_DEADLINE_HOURS} часов, чтобы ваш заказ был выполнен.`,
+    referenceWarning: 'При оплате обязательно заполните поле <strong>номер ссылки</strong> (poziv na broj), иначе мы не сможем связать платеж с вашим заказом.',
+    slipTitle: 'ПЛАТЕЖНОЕ ПОРУЧЕНИЕ', payer: 'Плательщик', purpose: 'Назначение платежа', purposeValue: 'Online porudžbina',
+    payee: 'Получатель', paymentCode: 'Код платежа', currency: 'Валюта', amount: 'Сумма',
+    account: 'Счет получателя', model: 'Модель', reference: 'Номер ссылки',
+    signature: 'Печать и подпись плательщика', placeDate: 'Место и дата приема', valueDate: 'Дата валютирования',
+    sellerHeading: 'Данные продавца', sellerName: 'Название', address: 'Адрес', accountNo: 'Номер счета',
+    pib: 'ИНН (PIB)', mb: 'Рег. номер (MB)',
+    whatsNextList: '💳 Поступление оплаты<br />📦 Обработка и упаковка<br />🚚 Передача курьеру<br />📧 Уведомление об отправке',
+  },
+}
+
+/** HTML replica of the Serbian "nalog za uplatu", filled in as on the legacy site. */
+function paymentSlip(T: (typeof BANK_TRANSFER_TEXT)[EmailLang], orderNumber: string, bt: NonNullable<OrderConfirmationDetails['bankTransfer']>): string {
+  const P = BANK_TRANSFER_PAYEE
+  const label = (text: string) =>
+    `<div style="font-size: 11px; color: #413d3a; margin: 10px 0 3px;">${text}</div>`
+  const box = (value: string, opts: { align?: 'left' | 'right'; minHeight?: number } = {}) =>
+    `<div style="border: 1px solid #413d3a; padding: 6px 8px; font-size: 12px; line-height: 1.4; color: ${BRAND_TEXT}; background: #ffffff; text-align: ${opts.align ?? 'left'}; min-height: ${opts.minHeight ?? 16}px;"><strong>${value || '&nbsp;'}</strong></div>`
+  const signLine = (text: string) =>
+    `<div style="border-top: 1px solid #413d3a; margin-top: 26px; padding-top: 3px; font-size: 10px; color: #413d3a;">${text}</div>`
+
+  return `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 0; border: 1px solid #413d3a; background: #ffffff;">
+        <tr>
+          <td colspan="2" align="right" style="padding: 10px 12px 0; font-size: 13px; font-weight: 700; color: ${BRAND_TEXT}; letter-spacing: 0.5px;">${T.slipTitle}</td>
+        </tr>
+        <tr>
+          <td width="50%" style="padding: 0 10px 14px 12px; vertical-align: top; border-right: 1px solid #413d3a;">
+            ${label(T.payer)}${box(`${bt.payerName}<br />${bt.payerAddress}`, { minHeight: 34 })}
+            ${label(T.purpose)}${box(T.purposeValue, { minHeight: 34 })}
+            ${label(T.payee)}${box(`${P.name}<br />${P.street}, ${P.city}, ${P.country}`, { minHeight: 34 })}
+            ${signLine(T.signature)}
+            ${signLine(T.placeDate)}
+          </td>
+          <td width="50%" style="padding: 0 12px 14px 10px; vertical-align: top;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="24%" style="vertical-align: bottom; padding-right: 4px;">${label(T.paymentCode)}${box('')}</td>
+                <td width="20%" style="vertical-align: bottom; padding-right: 4px;">${label(T.currency)}${box('')}</td>
+                <td style="vertical-align: bottom;">${label(T.amount)}${box(`=${formatSlipAmount(bt.amount)}`, { align: 'right' })}</td>
+              </tr>
+            </table>
+            ${label(T.account)}${box(P.account)}
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="24%" style="vertical-align: bottom; padding-right: 4px;">${label(T.model)}${box('')}</td>
+                <td style="vertical-align: bottom;">${label(T.reference)}${box(orderNumber)}</td>
+              </tr>
+            </table>
+            ${signLine(T.valueDate)}
+          </td>
+        </tr>
+      </table>`
 }
 
 const ORDER_CONFIRM_TEXT: Record<EmailLang, {
@@ -468,9 +566,9 @@ const ORDER_CONFIRM_TEXT: Record<EmailLang, {
 }
 
 const ORDER_PAYMENT_METHOD_LABELS: Record<EmailLang, Record<string, string>> = {
-  sr: { card: 'Platna kartica', bank_transfer: 'Bankovna uplata', cash_on_delivery: 'Plaćanje pouzećem', invoice: 'Plaćanje po fakturi' },
-  en: { card: 'Payment card', bank_transfer: 'Bank transfer', cash_on_delivery: 'Cash on delivery', invoice: 'Invoice payment' },
-  ru: { card: 'Банковская карта', bank_transfer: 'Банковский перевод', cash_on_delivery: 'Оплата при получении', invoice: 'Оплата по счету' },
+  sr: { card: 'Platna kartica', bank_transfer: 'Uplatnica / E-banking', cash_on_delivery: 'Plaćanje pouzećem', invoice: 'Plaćanje po fakturi' },
+  en: { card: 'Payment card', bank_transfer: 'Payment slip / E-banking', cash_on_delivery: 'Cash on delivery', invoice: 'Invoice payment' },
+  ru: { card: 'Банковская карта', bank_transfer: 'Платежная квитанция / E-banking', cash_on_delivery: 'Оплата при получении', invoice: 'Оплата по счету' },
 }
 
 /** `paymentMethod` on the details is the raw code ('card' | 'bank_transfer' |
@@ -501,21 +599,40 @@ export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
     )
     .join('')
 
+  const bt = d.bankTransfer ?? null
+  const BT = BANK_TRANSFER_TEXT[lang]
+  const P = BANK_TRANSFER_PAYEE
+  const bankTransferSection = bt
+    ? `
+      <p style="margin: 28px 0 12px; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">${BT.instructions}</p>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">${BT.referenceWarning}</p>
+      ${paymentSlip(BT, d.orderNumber, bt)}
+      <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">${BT.sellerHeading}</h3>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
+        ${detailRow(BT.sellerName, P.name)}
+        ${detailRow(BT.address, `${P.street}, ${P.city}`)}
+        ${detailRow(BT.accountNo, `${P.account}, ${P.bank}`)}
+        ${detailRow(BT.pib, P.pib)}
+        ${detailRow(BT.mb, P.maticniBroj)}
+      </table>`
+    : ''
+
   const content = `
     <div style="padding: 40px;">
       <h2 style="margin: 0 0 4px; font-size: 22px; color: ${BRAND_PRIMARY};">${T.title}</h2>
       <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">${T.greeting}</p>
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};">
-        ${T.intro}
+        ${bt ? BT.intro : T.intro}
       </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
         ${detailRow(T.orderNo, d.orderNumber)}
-        ${detailRow(T.paymentStatus, d.paymentConfirmed ? T.paid : T.processing)}
+        ${detailRow(T.paymentStatus, d.paymentConfirmed ? T.paid : bt ? BT.awaiting : T.processing)}
         ${detailRow(T.orderStatus, T.processing)}
         ${detailRow(T.paymentMethod, d.paymentMethod)}
         ${detailRow(T.shippingAddress, d.shippingAddress)}
         ${detailRow(T.notes, d.notes)}
       </table>
+      ${bankTransferSection}
       <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">${T.itemsHeading}</h3>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px solid #dddbd9;">
         ${itemRows}
@@ -526,7 +643,7 @@ export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
       </table>
       <h3 style="margin: 28px 0 8px; font-size: 16px; color: ${BRAND_PRIMARY};">${T.whatsNextHeading}</h3>
       <p style="margin: 0; font-size: 15px; line-height: 1.9; color: ${BRAND_TEXT};">
-        ${T.whatsNextList}
+        ${bt ? BT.whatsNextList : T.whatsNextList}
       </p>
       ${ctaButton(`${site}/account`, T.cta1)}
       ${ctaButton(`${site}/products`, T.cta2)}
@@ -547,6 +664,8 @@ export interface NewOrderAdminDetails {
   total: string
   paymentMethod: string
   paymentConfirmed: boolean
+  /** "Uplatnicom" order: must not ship until the payment shows on the statement. */
+  awaitingBankTransfer?: boolean
   shippingAddress?: string | null
   notes?: string | null
 }
@@ -576,7 +695,7 @@ export function newOrderAdminTemplate(d: NewOrderAdminDetails): string {
         ${detailRow('Kupac', d.customerName)}
         ${detailRow('Email', d.customerEmail)}
         ${detailRow('Telefon', d.customerPhone)}
-        ${detailRow('Status plaćanja', d.paymentConfirmed ? 'Plaćeno ✔' : 'U obradi')}
+        ${detailRow('Status plaćanja', d.paymentConfirmed ? 'Plaćeno ✔' : d.awaitingBankTransfer ? 'Čeka se uplata — poslati tek kada uplata legne na račun' : 'U obradi')}
         ${detailRow('Način plaćanja', d.paymentMethod)}
         ${detailRow('Adresa za isporuku', d.shippingAddress)}
         ${detailRow('Napomena', d.notes)}

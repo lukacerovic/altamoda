@@ -15,7 +15,7 @@ import { orderConfirmationTemplate, newOrderAdminTemplate, orderPaymentMethodLab
 // Admin notification stays Serbian regardless of the customer's language.
 const ADMIN_PAYMENT_METHOD_LABELS: Record<string, string> = {
   card: 'Platna kartica',
-  bank_transfer: 'Bankovna uplata',
+  bank_transfer: 'Uplatnica / E-banking',
   cash_on_delivery: 'Plaćanje pouzećem',
   invoice: 'Plaćanje po fakturi',
 }
@@ -257,6 +257,13 @@ export const POST = withErrorHandler(async (req: Request) => {
             shippingAddress,
             notes,
             language,
+            bankTransfer: input.paymentMethod === 'bank_transfer'
+              ? {
+                  payerName: escapeHtml(user?.name ?? input.guestName ?? ''),
+                  payerAddress: escapeHtml(`${addr.street}, ${addr.postalCode} ${addr.city}`),
+                  amount: Number(order.total),
+                }
+              : null,
           })),
         })
       }
@@ -274,6 +281,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             total,
             paymentMethod: ADMIN_PAYMENT_METHOD_LABELS[input.paymentMethod] ?? input.paymentMethod,
             paymentConfirmed,
+            awaitingBankTransfer: input.paymentMethod === 'bank_transfer',
             shippingAddress,
             notes,
           })),

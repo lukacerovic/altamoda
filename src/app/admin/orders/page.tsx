@@ -82,7 +82,7 @@ const statusColors: Record<string, string> = {
 
 const paymentMethodLabels: Record<string, string> = {
   card: "Kartica",
-  bank_transfer: "Virman",
+  bank_transfer: "Uplatnica",
   cash_on_delivery: "Pouzeće",
   invoice: "Faktura",
 };
@@ -93,6 +93,14 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   isporuceno: [],
   otkazano: [],
 };
+
+/** "Uplatnicom" order whose payment hasn't been confirmed from the bank statement yet. */
+const awaitsBankTransfer = (o: { paymentMethod: string; paymentStatus: string }) =>
+  o.paymentMethod === "bank_transfer" && o.paymentStatus === "pending";
+
+// Such an order can't be marked shipped until the payment is confirmed.
+const nextStatuses = (o: { status: string; paymentMethod: string; paymentStatus: string }) =>
+  (VALID_TRANSITIONS[o.status] ?? []).filter((s) => !(s === "isporuceno" && awaitsBankTransfer(o)));
 
 export default function OrdersPage() {
   const { t } = useLanguage();
@@ -213,6 +221,30 @@ export default function OrdersPage() {
       // ignore
     } finally {
       setStatusUpdating(null);
+    }
+  };
+
+  /* ── Confirm a bank-transfer ("Uplatnicom") payment ── */
+  const [paymentConfirming, setPaymentConfirming] = useState<string | null>(null);
+  const [paymentConfirmStep, setPaymentConfirmStep] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const confirmPayment = async (orderId: string) => {
+    setPaymentConfirming(orderId);
+    setPaymentError(null);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/payment`, { method: "POST" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setPaymentError(data?.error || "Potvrda uplate nije uspela");
+        return;
+      }
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, paymentStatus: "paid" } : o)));
+      if (expandedOrder === orderId) fetchOrderDetail(orderId);
+    } catch {
+      setPaymentError("Potvrda uplate nije uspela");
+    } finally {
+      setPaymentConfirming(null);
+      setPaymentConfirmStep(null);
     }
   };
 
@@ -391,29 +423,34 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-[#1a1c1e] ">
                         {paymentMethodLabels[order.paymentMethod] || order.paymentMethod}
+                        {awaitsBankTransfer(order) && order.status !== "otkazano" && (
+                          <span className="block mt-1 w-fit text-[10px] font-semibold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
+                            Čeka uplatu
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="relative" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => {
-                              if (VALID_TRANSITIONS[order.status]?.length > 0) {
+                              if (nextStatuses(order).length > 0) {
                                 setStatusDropdown(statusDropdown === order.id ? null : order.id);
                               }
                             }}
                             disabled={statusUpdating === order.id}
-                            className={`px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 ${statusColors[order.status]} ${statusUpdating === order.id ? "opacity-50" : ""} ${VALID_TRANSITIONS[order.status]?.length > 0 ? "cursor-pointer" : ""}`}
+                            className={`px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 ${statusColors[order.status]} ${statusUpdating === order.id ? "opacity-50" : ""} ${nextStatuses(order).length > 0 ? "cursor-pointer" : ""}`}
                           >
                             {statusUpdating === order.id ? (
                               <div className="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent" />
                             ) : null}
                             {statusLabel(order.status)}
-                            {VALID_TRANSITIONS[order.status]?.length > 0 && (
+                            {nextStatuses(order).length > 0 && (
                               <ChevronDown size={12} />
                             )}
                           </button>
-                          {statusDropdown === order.id && VALID_TRANSITIONS[order.status]?.length > 0 && (
+                          {statusDropdown === order.id && nextStatuses(order).length > 0 && (
                             <div className="absolute right-0 top-full mt-1 bg-white border border-stone-200 rounded-lg shadow-lg z-50 min-w-[160px] py-1">
-                              {VALID_TRANSITIONS[order.status].map((s) => (
+                              {nextStatuses(order).map((s) => (
                                 <button
                                   key={s}
                                   onClick={() => {
@@ -661,13 +698,13 @@ export default function OrdersPage() {
                                 </div>
 
                                 {/* Status Actions */}
-                                {VALID_TRANSITIONS[orderDetail.status]?.length > 0 && (
+                                {nextStatuses(orderDetail).length > 0 && (
                                   <>
                                     <h3 className="text-sm font-semibold text-black mt-4 mb-3">
                                       Promeni status
                                     </h3>
                                     <div className="bg-white rounded-sm border border-stone-200 p-4 flex flex-col gap-2">
-                                      {VALID_TRANSITIONS[orderDetail.status].map((s) => (
+                                      {nextStatuses(orderDetail).map((s) => (
                                         <button
                                           key={s}
                                           onClick={() => changeStatus(order.id, s)}
@@ -729,6 +766,43 @@ export default function OrdersPage() {
                                             : "Na čekanju"}
                                     </span>
                                   </div>
+                                  {awaitsBankTransfer(orderDetail) && orderDetail.status !== "otkazano" && (
+                                    <div className="pt-2 border-t border-stone-100">
+                                      <p className="text-xs text-[#1a1c1e] mb-2">
+                                        Plaćanje uplatnicom (poziv na broj: <strong>{orderDetail.orderNumber}</strong>). Porudžbinu poslati tek kada uplata legne na račun.
+                                      </p>
+                                      {paymentConfirmStep === order.id ? (
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => confirmPayment(order.id)}
+                                            disabled={paymentConfirming === order.id}
+                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                                          >
+                                            {paymentConfirming === order.id && (
+                                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+                                            )}
+                                            Da, uplata je legla
+                                          </button>
+                                          <button
+                                            onClick={() => setPaymentConfirmStep(null)}
+                                            disabled={paymentConfirming === order.id}
+                                            className="px-4 py-2.5 rounded-lg text-sm font-medium border border-stone-200 text-[#1a1c1e] hover:bg-stone-50"
+                                          >
+                                            Odustani
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={() => { setPaymentError(null); setPaymentConfirmStep(order.id); }}
+                                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                                        >
+                                          <CheckCircle size={16} />
+                                          Potvrdi uplatu
+                                        </button>
+                                      )}
+                                      {paymentError && <p className="text-xs text-red-600 mt-2">{paymentError}</p>}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>

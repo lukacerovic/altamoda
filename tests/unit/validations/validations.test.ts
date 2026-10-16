@@ -207,10 +207,12 @@ describe('createOrderSchema', () => {
     expect(createOrderSchema.safeParse(order).success).toBe(false)
   })
 
-  it('rejects removed payment methods (invoice, bank transfer)', () => {
-    for (const paymentMethod of ['invoice', 'bank_transfer']) {
-      expect(createOrderSchema.safeParse({ ...validOrder, paymentMethod }).success).toBe(false)
-    }
+  it('accepts bank transfer (payment slip)', () => {
+    expect(createOrderSchema.safeParse({ ...validOrder, paymentMethod: 'bank_transfer' }).success).toBe(true)
+  })
+
+  it('rejects removed payment method (invoice)', () => {
+    expect(createOrderSchema.safeParse({ ...validOrder, paymentMethod: 'invoice' }).success).toBe(false)
   })
 
   it('rejects invalid payment method', () => {

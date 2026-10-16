@@ -9,13 +9,21 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export type ConfirmationState = 'success' | 'pending' | 'failed'
 
+/** Payment-slip details shown for an unpaid "Uplatnicom" order. */
+export interface BankTransferInfo {
+  payee: string
+  account: string
+  amount: string
+}
+
 interface Props {
   orderNumber: string
   state: ConfirmationState
   payUrl: string
+  bankTransfer?: BankTransferInfo | null
 }
 
-export default function ConfirmationClient({ orderNumber, state, payUrl }: Props) {
+export default function ConfirmationClient({ orderNumber, state, payUrl, bankTransfer }: Props) {
   const { clearCart } = useCartStore()
   const { clearDraft } = useCheckoutStore()
   const { t } = useLanguage()
@@ -92,7 +100,29 @@ export default function ConfirmationClient({ orderNumber, state, payUrl }: Props
             </div>
           )}
 
-          {state === 'success' && (
+          {state === 'success' && bankTransfer && (
+            <div className="text-left border border-[#dddbd9] rounded-sm p-4 mb-6">
+              <p className="text-sm font-semibold text-[#1a1c1e] mb-1">{t('checkout.confirmBankTransferTitle')}</p>
+              <p className="text-xs text-[#1a1c1e] mb-3">{t('checkout.confirmBankTransferDesc')}</p>
+              <dl className="text-sm space-y-2">
+                {[
+                  [t('checkout.bankTransferPayee'), bankTransfer.payee],
+                  [t('checkout.bankTransferAccount'), bankTransfer.account],
+                  [t('checkout.bankTransferAmount'), bankTransfer.amount],
+                  [t('checkout.bankTransferPurpose'), 'Online porudžbina'],
+                  [t('checkout.bankTransferReference'), orderNumber],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <dt className="text-xs text-[#1a1c1e]/70">{label}</dt>
+                    <dd className="font-medium text-[#1a1c1e] break-words">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="text-xs text-[#1a1c1e] mt-3">{t('checkout.bankTransferReferenceWarning')}</p>
+            </div>
+          )}
+
+          {state === 'success' && !bankTransfer && (
             <p className="text-sm text-[#1a1c1e] mb-6">
               {t('checkout.confirmEmailSentNote')}
             </p>
