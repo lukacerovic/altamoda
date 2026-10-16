@@ -56,7 +56,7 @@ export default function AboutPage() {
                 </p>
                 <div className="flex items-center gap-3.5 flex-wrap">
                   <a
-                    href="#partner"
+                    href="/account/login?tab=register&type=b2b"
                     className="inline-flex items-center gap-2.5 bg-[#edb4bd] text-white px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full hover:bg-[#413d3a] hover:-translate-y-px transition-all"
                   >
                     {t("about.ctaButton")} <ArrowRight className="w-3 h-3" />
@@ -221,7 +221,7 @@ export default function AboutPage() {
                 </p>
                 <div className="flex items-center gap-3.5 flex-wrap">
                   <Link
-                    href="/account/login"
+                    href="/account/login?tab=register&type=b2b"
                     className="inline-flex items-center gap-2.5 bg-white text-[#1a1c1e] px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium rounded-full border border-white hover:bg-[#1a1c1e] hover:text-white hover:border-white transition-colors"
                   >
                     {t("about.ctaButton")} <ArrowRight className="w-3 h-3" />

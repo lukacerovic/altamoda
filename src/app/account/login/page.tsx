@@ -32,7 +32,10 @@ function LoginContent() {
     searchParams.get("tab") === "register" ? "register" : "login"
   );
   const [showPassword, setShowPassword] = useState(false);
-  const [registerType, setRegisterType] = useState<"b2c" | "b2b">("b2c");
+  // `?tab=register&type=b2b` opens salon (B2B) registration directly.
+  const [registerType, setRegisterType] = useState<"b2c" | "b2b">(
+    searchParams.get("type") === "b2b" ? "b2b" : "b2c"
+  );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -559,7 +562,7 @@ function LoginContent() {
                         className={`w-4 h-4 rounded text-[#edb4bd] focus:ring-[#1a1c1e] mt-0.5 ${fieldErrors.terms ? "border-red-500" : "border-[#dddbd9]"}`}
                         aria-invalid={!!fieldErrors.terms}
                       />
-                      <span>{t("auth.agreeTerms")} <a href="#" className="text-[#edb4bd] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="#" className="text-[#edb4bd] hover:underline">{t("auth.privacyPolicy")}</a></span>
+                      <span>{t("auth.agreeTerms")} <a href="/faq#uslovi" target="_blank" rel="noopener noreferrer" className="text-[#edb4bd] hover:underline">{t("auth.termsOfUse")}</a> {t("auth.and")} <a href="/faq#privatnost" target="_blank" rel="noopener noreferrer" className="text-[#edb4bd] hover:underline">{t("auth.privacyPolicy")}</a></span>
                     </label>
                     {fieldErrors.terms && <p className="mt-1 text-xs text-red-600">{fieldErrors.terms}</p>}
                   </div>

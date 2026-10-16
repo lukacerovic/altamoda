@@ -410,8 +410,8 @@ export default function CartPage() {
                   <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#edb4bd]" /> {t("cart.securePayment")}</div>
                 </div>
 
-                <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#dddbd9]">
-                  {["Visa", "Mastercard", t("checkout.cashOnDelivery")].map((p) => (
+                <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-[#dddbd9]">
+                  {["Visa", "Mastercard", t("checkout.cashOnDelivery"), t("checkout.bankTransfer")].map((p) => (
                     <span key={p} className="px-2 py-1 bg-[#FFFFFF] rounded text-[10px] text-[#1a1c1e] font-medium">{p}</span>
                   ))}
                 </div>

@@ -924,7 +924,7 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
 
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <Link
-                  href="/account/login"
+                  href="/account/login?tab=register&type=b2b"
                   className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] font-medium text-[#ffffff] bg-[#edb4bd] px-8 py-4 rounded-full hover:bg-[#1a1c1e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#edb4bd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#dddbd9]"
                 >
                   {t("home.hpB2bCta")} <ArrowRight className="w-3.5 h-3.5" />

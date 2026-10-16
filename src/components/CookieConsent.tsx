@@ -60,7 +60,7 @@ export default function CookieConsent() {
               </div>
               <p className="text-xs text-[#1a1c1e] leading-relaxed tracking-wide">
                 {t("cookie.text")}{" "}
-                <a href="#" className="text-[#1a1c1e] hover:underline font-medium">
+                <a href="/faq#privatnost" className="text-[#1a1c1e] hover:underline font-medium">
                   {t("cookie.cookiePolicy")}
                 </a>
                 .

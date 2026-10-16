@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 import {
@@ -121,6 +122,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   const { t } = useLanguage();
   const { data: session } = useSession();
   const role = (session?.user as { role?: string } | undefined)?.role || _serverRole;
+  const pathname = usePathname();
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(userExistingRating !== null);
   const [currentUserRating, setCurrentUserRating] = useState(userExistingRating);
   const [reviews, setReviews] = useState<Review[]>(product.reviews);
@@ -681,6 +683,16 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
                     <p className="text-[11px] text-[#1a1c1e]/60 mt-0.5">{t("productDetail.b2bPriceHint")}</p>
                   </div>
                 </div>
+                {!role && (
+                  <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3 pl-7">
+                    <Link href={`/account/login?callbackUrl=${encodeURIComponent(pathname)}`} className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#1a1c1e] pb-0.5 hover:opacity-60">
+                      {t("productDetail.loginLink")}
+                    </Link>
+                    <Link href="/account/login?tab=register&type=b2b" className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#1a1c1e] border-b border-[#1a1c1e] pb-0.5 hover:opacity-60">
+                      {t("productDetail.requestB2bAccount")}
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
@@ -774,7 +786,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
 
             {/* Delivery info */}
             <div className="border-t border-[#dddbd9]/60 pt-6 space-y-4">
-              <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><Truck className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.freeShipping")}</strong> — {t(role === "b2b" ? "productDetail.freeShippingNoteB2b" : "productDetail.freeShippingNote")}</span></div>
+              <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><Truck className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.freeShipping")}</strong> — {t(role === "b2b" || product.isProfessional ? "productDetail.freeShippingNoteB2b" : "productDetail.freeShippingNote")}</span></div>
               <div className="flex items-start gap-3 text-[12px] text-[#1a1c1e]/80"><Shield className="w-4 h-4 text-[#1a1c1e] flex-shrink-0 mt-0.5" /><span><strong className="text-[#1a1c1e] font-medium">{t("productDetail.originalProducts")}</strong> — {t("productDetail.originalProductsNote")}</span></div>
             </div>
 
