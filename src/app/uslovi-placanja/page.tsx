@@ -65,24 +65,24 @@ export default function UsloviPlacanjaPage() {
             <li>Matični broj: 17222783</li>
           </ul>
           <ul className="list-none space-y-1">
-            <li><strong>Ogranak Beograd – Pro shop</strong></li>
-            <li>Mihizova 9/L3, Beograd</li>
+            <li><strong>Ogranak Alta Moda DOO</strong></li>
+            <li>Mihizova 9/L3, 11000 Beograd, Srbija</li>
             <li>
               Specijalizovana prodavnica profesionalnih proizvoda za kosu, namenjena frizerskim
-              salonima i krajnjim kupcima. Veleprodaja za salone i maloprodaja za kupce.
+              salonima i krajnjim kupcima.
             </li>
-            <li>Lično preuzimanje porudžbina: Mihizova 9/L3, Beograd</li>
+            <li>Lično preuzimanje porudžbina: Mihizova 9/L3, 11000 Beograd, Srbija</li>
           </ul>
           <ul className="list-none space-y-1">
             <li><strong>Porudžbine, pitanja i reklamacije</strong></li>
             <li>
               Telefon:{" "}
-              <a href="tel:+381646473145" className="text-[#edb4bd] hover:underline">
-                064 647 3145
-              </a>
-              {" | "}
               <a href="tel:+381113088388" className="text-[#edb4bd] hover:underline">
                 011 308 8388
+              </a>
+              {" | "}
+              <a href="tel:+381646473145" className="text-[#edb4bd] hover:underline">
+                064 647 3145
               </a>
             </li>
             <li>
@@ -91,7 +91,7 @@ export default function UsloviPlacanjaPage() {
                 kontakt@altamoda.rs
               </a>
             </li>
-            <li>Adresa za reklamacije: Mihizova 9/L3, Beograd</li>
+            <li>Adresa za reklamacije: Mihizova 9/L3, 11000 Beograd, Srbija</li>
           </ul>
           <ul className="list-none space-y-1">
             <li><strong>Podaci za uplatu</strong></li>

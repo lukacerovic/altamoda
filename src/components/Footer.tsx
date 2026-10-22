@@ -18,15 +18,19 @@ const SOCIAL_DEFAULTS = {
 
 export const GOOGLE_MAPS_URL = "https://maps.google.com/?q=Mihizova+9,+Beograd";
 
+/** "011 308 8388" → "tel:+381113088388" */
+export const telHref = (display: string) => `tel:+381${display.replace(/\D/g, "").replace(/^0/, "")}`;
+
 export default function Footer() {
   const { t } = useLanguage();
-  const settings = useSiteSettings(["instagram", "facebook", "tiktok", "youtube", "storeEmail"]);
+  const settings = useSiteSettings(["instagram", "facebook", "tiktok", "youtube"]);
   const socialLinks = [
     { href: settings.instagram || SOCIAL_DEFAULTS.instagram, label: "Instagram", Icon: Instagram },
     { href: settings.facebook || SOCIAL_DEFAULTS.facebook, label: "Facebook", Icon: Facebook },
     { href: settings.youtube || SOCIAL_DEFAULTS.youtube, label: "YouTube", Icon: Youtube },
     { href: settings.tiktok || SOCIAL_DEFAULTS.tiktok, label: "TikTok", Icon: Music2 },
-    settings.storeEmail && { href: `mailto:${settings.storeEmail}`, label: "Email", Icon: AtSign },
+    // Always the public contact address — the client wants kontakt@ as the only contact e-mail.
+    { href: `mailto:${t("footer.email")}`, label: "Email", Icon: AtSign },
   ].filter(Boolean) as Array<{ href: string; label: string; Icon: typeof Instagram }>;
 
   return (
@@ -103,16 +107,21 @@ export default function Footer() {
           rel="noopener noreferrer"
           className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity"
         >
+          {t("footer.branch")}
+          <br />
           {t("footer.address")}
           <br />
           {t("footer.city")}
         </a>
-        <a href={`tel:${t("footer.phone").replace(/\s|\(|\)/g, "")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
-          {t("footer.phone")}
-        </a>
-        <a href={`tel:${t("footer.phone2").replace(/\s|\(|\)/g, "")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
-          {t("footer.phone2")}
-        </a>
+        <p className="text-xs uppercase tracking-wider text-[#FFFFFF]">
+          <a href={telHref(t("footer.phone"))} className="hover:opacity-70 transition-opacity">
+            {t("footer.phone")}
+          </a>
+          {" | "}
+          <a href={telHref(t("footer.phone2"))} className="hover:opacity-70 transition-opacity">
+            {t("footer.phone2")}
+          </a>
+        </p>
         <a href={`mailto:${t("footer.email")}`} className="text-xs uppercase tracking-wider text-[#FFFFFF] hover:opacity-70 transition-opacity">
           {t("footer.email")}
         </a>

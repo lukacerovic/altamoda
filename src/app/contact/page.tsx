@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSiteSettings } from "@/lib/useSiteSettings";
-import { GOOGLE_MAPS_URL } from "@/components/Footer";
+import { GOOGLE_MAPS_URL, telHref } from "@/components/Footer";
 
 export default function ContactPage() {
   const { t } = useLanguage();
@@ -93,18 +93,15 @@ export default function ContactPage() {
                     <p className="text-[10px] tracking-widest text-[#1a1c1e] uppercase mb-2">
                       {t("contact.phoneLabel")}
                     </p>
-                    <a
-                      className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300"
-                      href={`tel:${t("footer.phone").replace(/\s|\(|\)/g, "")}`}
-                    >
-                      {t("footer.phone")}
-                    </a>
-                    <a
-                      className="block font-serif text-2xl hover:text-[#413d3a] transition-colors duration-300"
-                      href={`tel:${t("footer.phone2").replace(/\s|\(|\)/g, "")}`}
-                    >
-                      {t("footer.phone2")}
-                    </a>
+                    <p className="font-serif text-2xl">
+                      <a className="hover:text-[#413d3a] transition-colors duration-300" href={telHref(t("footer.phone"))}>
+                        {t("footer.phone")}
+                      </a>
+                      {" | "}
+                      <a className="hover:text-[#413d3a] transition-colors duration-300" href={telHref(t("footer.phone2"))}>
+                        {t("footer.phone2")}
+                      </a>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -117,6 +114,8 @@ export default function ContactPage() {
                 <div className="space-y-6">
                   <address className="not-italic space-y-4">
                     <p className="font-serif text-2xl leading-snug italic">
+                      {t("footer.branch")}
+                      <br />
                       {t("footer.address")}
                       <br />
                       {t("footer.city")}

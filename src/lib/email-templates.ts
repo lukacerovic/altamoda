@@ -255,7 +255,7 @@ const CONTACT_BLOCK = `
   <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.7; color: #413d3a;">
     Potrebna Vam je pomoć?<br />
     📧 <a href="mailto:kontakt@altamoda.rs" style="color: #413d3a;">kontakt@altamoda.rs</a><br />
-    📞 <a href="tel:+381646473145" style="color: #413d3a;">+381 (0)64 6473145</a> | <a href="tel:+381113088388" style="color: #413d3a;">+381 (0)11 3088388</a>
+    📞 <a href="tel:+381113088388" style="color: #413d3a;">011 308 8388</a> | <a href="tel:+381646473145" style="color: #413d3a;">064 647 3145</a>
   </p>`
 
 function contactBlock(lang: EmailLang): string {
@@ -263,7 +263,7 @@ function contactBlock(lang: EmailLang): string {
   <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.7; color: #413d3a;">
     ${NEED_HELP[lang]}<br />
     📧 <a href="mailto:kontakt@altamoda.rs" style="color: #413d3a;">kontakt@altamoda.rs</a><br />
-    📞 <a href="tel:+381646473145" style="color: #413d3a;">+381 (0)64 6473145</a> | <a href="tel:+381113088388" style="color: #413d3a;">+381 (0)11 3088388</a>
+    📞 <a href="tel:+381113088388" style="color: #413d3a;">011 308 8388</a> | <a href="tel:+381646473145" style="color: #413d3a;">064 647 3145</a>
   </p>`
 }
 

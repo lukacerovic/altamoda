@@ -10,10 +10,11 @@ export const metadata: Metadata = {
 
 /**
  * "Politika kolačića" — text supplied by the client (Oct 2026). The cookie
- * list reflects what the site actually sets today: NextAuth session cookies
- * plus localStorage keys. No analytics or marketing tools are active yet; when
- * GA / Meta Pixel are added, add their cookies to COOKIES and gate them behind
- * the matching consent category in CookieConsent.
+ * list reflects what the site actually sets: NextAuth session cookies plus
+ * localStorage keys. The CSP (next.config.ts) allows no third-party scripts,
+ * frames or connections, so nothing else can set cookies on altamoda.rs. If an
+ * optional tool is ever added, list it here and gate it behind the matching
+ * consent category in CookieConsent.
  */
 
 const LAST_UPDATED = "22. oktobar 2026.";
@@ -118,9 +119,9 @@ export default function PolitikaKolacicaPage() {
 
         <Section icon={Info} title="O ovoj politici">
           <p>
-            Ova politika objašnjava kako Alta Moda d.o.o., Cara Dušana 45, lokal J, 36000 Kraljevo,
-            Srbija (ogranak Beograd: Mihizova 9/L3, 11000 Beograd), koristi kolačiće i slične
-            tehnologije na internet stranici <strong>www.altamoda.rs</strong> i kako možete upravljati
+            Ova politika objašnjava kako Alta Moda d.o.o., sa sedištem na adresi Cara Dušana 45,
+            lokal J, 36000 Kraljevo, Srbija, i Ogranak Alta Moda DOO, Mihizova 9/L3, 11000 Beograd,
+            Srbija, koriste kolačiće i slične tehnologije na internet stranici <strong>www.altamoda.rs</strong> i kako možete upravljati
             svojim izborima.
           </p>
         </Section>
@@ -227,15 +228,27 @@ export default function PolitikaKolacicaPage() {
 
         <Section icon={Globe} title="Kolačići i usluge trećih lica">
           <p>
-            Sajt trenutno ne koristi spoljne usluge za analitiku, oglašavanje ili prikazivanje
-            dodatnih sadržaja koje bi postavljale kolačiće na altamoda.rs. Ako takve usluge uvedemo,
-            ovde ćemo navesti njihove pružaoce, svrhe korišćenja i linkove ka njihovim politikama
-            privatnosti.
+            Sajt ne koristi spoljne usluge za analitiku ni oglašavanje i ne učitava skripte, dodatke
+            ni ugrađeni sadržaj trećih lica. Zbog toga treća lica ne mogu postavljati kolačiće
+            tokom pregledanja sajta.
           </p>
           <p>
-            Plaćanje platnim karticama obavlja se na zaštićenoj stranici banke (UniCredit Bank Srbija
-            a.d., uz procesora Nexi). Ta stranica može postavljati sopstvene kolačiće neophodne za
-            bezbedno izvršenje plaćanja, u skladu sa politikama banke.
+            <strong>Instagram.</strong> Fotografije u Instagram sekciji na početnoj strani preuzete
+            su i čuvaju se na našem servisu za slike; sajt ne učitava sadržaj sa Instagrama. Klik na
+            fotografiju otvara objavu na sajtu instagram.com, gde važe pravila o kolačićima i
+            privatnosti kompanije Meta.
+          </p>
+          <p>
+            <strong>Fotografije.</strong> Fotografije proizvoda i ostale slike na sajtu isporučuju
+            se preko servisa Cloudinary i Unsplash. Ovi servisi pri prikazu slika ne postavljaju
+            kolačiće.
+          </p>
+          <p>
+            <strong>Plaćanje platnim karticama.</strong> Podatke o kartici unosite na zaštićenoj
+            stranici banke (UniCredit Bank Srbija a.d., uz procesora Nexi), na koju vas sajt
+            preusmerava pri plaćanju. Ta stranica nije deo sajta altamoda.rs i može postavljati
+            sopstvene kolačiće neophodne za bezbedno izvršenje plaćanja, u skladu sa politikama
+            banke. Sajt altamoda.rs pri tome ne postavlja dodatne kolačiće.
           </p>
           <p>
             Više informacija o obradi podataka o ličnosti i vašim pravima dostupno je u{" "}

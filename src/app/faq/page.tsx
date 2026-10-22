@@ -226,11 +226,11 @@ export default function FAQPage() {
           <h3 className="text-xl font-bold text-[#1a1c1e] mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>{t("faq.notFoundTitle")}</h3>
           <p className="text-[#1a1c1e] mb-6">{t("faq.notFoundDesc")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+381646473145" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors">
-              <Phone className="w-4 h-4" /> +381 (0)64 6473145
-            </a>
             <a href="tel:+381113088388" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors">
-              <Phone className="w-4 h-4" /> +381 (0)11 3088388
+              <Phone className="w-4 h-4" /> 011 308 8388
+            </a>
+            <a href="tel:+381646473145" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors">
+              <Phone className="w-4 h-4" /> 064 647 3145
             </a>
             <a href="mailto:kontakt@altamoda.rs" className="flex items-center justify-center gap-2 px-6 py-3 border border-[#dddbd9] rounded-sm text-sm font-medium text-[#1a1c1e] hover:border-black hover:text-[#edb4bd] transition-colors">
               <Mail className="w-4 h-4" /> kontakt@altamoda.rs
