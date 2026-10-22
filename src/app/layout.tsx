@@ -4,6 +4,7 @@ import AuthProvider from "@/components/providers/AuthProvider";
 import CartProvider from "@/components/providers/CartProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
+import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
 
 const inter = Inter({
@@ -48,6 +49,7 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>{children}</CartProvider>
             <ScrollToTop />
+            <CookieConsent />
           </AuthProvider>
         </LanguageProvider>
       </body>

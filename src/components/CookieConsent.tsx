@@ -1,8 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Cookie, ChevronDown, ChevronUp } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const STORAGE_KEY = "altamoda_cookie_consent";
+const OPEN_EVENT = "altamoda:cookie-settings";
+
+/** Reopen the banner with the settings panel expanded (footer link). */
+export function openCookieSettings() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
 
 interface CookieSettings {
   necessary: boolean;
@@ -19,31 +28,49 @@ export default function CookieConsent() {
     marketing: false,
   });
   const { t } = useLanguage();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const consent = localStorage.getItem("altamoda_cookie_consent");
-    if (!consent) {
-      const timer = setTimeout(() => setVisible(true), 1500);
-      return () => clearTimeout(timer);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        timer = setTimeout(() => setVisible(true), 1500);
+      }
+    } catch {
+      // Storage blocked — banner stays hidden; nothing optional is loaded anyway.
     }
+    const onOpen = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) setSettings({ ...JSON.parse(saved), necessary: true });
+      } catch {
+        // Ignore unreadable consent — show the defaults (optional off).
+      }
+      setShowSettings(true);
+      setVisible(true);
+    };
+    window.addEventListener(OPEN_EVENT, onOpen);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener(OPEN_EVENT, onOpen);
+    };
   }, []);
 
-  const acceptAll = () => {
-    const allAccepted: CookieSettings = {
-      necessary: true,
-      analytics: true,
-      marketing: true,
-    };
-    localStorage.setItem("altamoda_cookie_consent", JSON.stringify(allAccepted));
+  const save = (next: CookieSettings) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // Storage blocked — choice applies to this page view only.
+    }
+    setSettings(next);
     setVisible(false);
   };
 
-  const saveSettings = () => {
-    localStorage.setItem("altamoda_cookie_consent", JSON.stringify(settings));
-    setVisible(false);
-  };
+  const acceptAll = () => save({ necessary: true, analytics: true, marketing: true });
+  const rejectAll = () => save({ necessary: true, analytics: false, marketing: false });
+  const saveSettings = () => save(settings);
 
-  if (!visible) return null;
+  if (!visible || pathname?.startsWith("/admin")) return null;
 
   return (
     <div
@@ -60,7 +87,7 @@ export default function CookieConsent() {
               </div>
               <p className="text-xs text-[#1a1c1e] leading-relaxed tracking-wide">
                 {t("cookie.text")}{" "}
-                <a href="/faq#privatnost" className="text-[#1a1c1e] hover:underline font-medium">
+                <a href="/politika-kolacica" className="text-[#1a1c1e] hover:underline font-medium">
                   {t("cookie.cookiePolicy")}
                 </a>
                 .
@@ -68,7 +95,7 @@ export default function CookieConsent() {
             </div>
 
             {/* Buttons */}
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-3 flex-shrink-0">
               <button
                 onClick={() => setShowSettings(!showSettings)}
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-[#dddbd9] text-[#1a1c1e] rounded-sm text-xs font-bold uppercase tracking-widest hover:border-black hover:text-[#1a1c1e] transition-colors"
@@ -79,6 +106,12 @@ export default function CookieConsent() {
                 ) : (
                   <ChevronDown className="w-3.5 h-3.5" />
                 )}
+              </button>
+              <button
+                onClick={rejectAll}
+                className="px-5 py-2.5 border border-[#dddbd9] text-[#1a1c1e] rounded-sm text-xs font-bold uppercase tracking-widest hover:border-black transition-colors"
+              >
+                {t("cookie.rejectAll")}
               </button>
               <button
                 onClick={acceptAll}

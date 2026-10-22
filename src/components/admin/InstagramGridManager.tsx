@@ -1,44 +1,77 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ImageIcon, Trash2, Plus, Upload, Instagram } from "lucide-react";
+import { ImageIcon, Trash2, Plus, Upload, Instagram, Link2 } from "lucide-react";
+import { normalizeInstagramPostUrl } from "@/lib/instagram";
 
 /**
  * Admin manager for the home-page Instagram bento grid (8 image slots).
  * Admins paste an Instagram post link or a direct image URL (imported and
  * re-hosted into Cloudinary via /api/admin/import-image) or upload a file.
  * Persisted to the `instagramImages` site setting as a JSON array of URLs.
+ * Each slot's post link (where a click on the storefront tile leads) is kept
+ * in the parallel `instagramLinks` setting; it is filled automatically when
+ * the image is imported from a post link, or entered by hand for uploads.
  *
  * Self-contained — safe to render on any admin page (homepage, settings, …).
  */
 export default function InstagramGridManager() {
   const [instaImages, setInstaImages] = useState<string[]>(Array(8).fill(""));
   const [instaInputs, setInstaInputs] = useState<string[]>(Array(8).fill(""));
+  const [instaLinks, setInstaLinks] = useState<string[]>(Array(8).fill(""));
+  const [linkInputs, setLinkInputs] = useState<string[]>(Array(8).fill(""));
   const [instaImporting, setInstaImporting] = useState<number | null>(null);
   const [instaError, setInstaError] = useState("");
   const instaFileRef = useRef<HTMLInputElement>(null);
   const [instaUploadSlot, setInstaUploadSlot] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/site-settings?keys=instagramImages")
+    fetch("/api/admin/site-settings?keys=instagramImages,instagramLinks")
       .then((r) => r.json())
       .then((json) => {
-        const raw = json.data?.instagramImages;
-        if (!raw) return;
-        try {
-          const imgs = JSON.parse(raw) as string[];
-          setInstaImages(Array.from({ length: 8 }, (_, i) => imgs[i] || ""));
-        } catch { /* ignore */ }
+        const parse = (raw: string | undefined) => {
+          if (!raw) return null;
+          try {
+            const arr = JSON.parse(raw) as string[];
+            return Array.from({ length: 8 }, (_, i) => arr[i] || "");
+          } catch { return null; }
+        };
+        const imgs = parse(json.data?.instagramImages);
+        const links = parse(json.data?.instagramLinks);
+        if (imgs) setInstaImages(imgs);
+        if (links) {
+          setInstaLinks(links);
+          setLinkInputs(links);
+        }
       })
       .catch(() => {});
   }, []);
 
-  const persist = async (imgs: string[]) => {
+  const persist = async (imgs: string[], links: string[]) => {
     await fetch("/api/admin/site-settings", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instagramImages: JSON.stringify(imgs) }),
+      body: JSON.stringify({ instagramImages: JSON.stringify(imgs), instagramLinks: JSON.stringify(links) }),
     });
+  };
+
+  const setSlotLink = (slotIndex: number, link: string) => {
+    const updated = instaLinks.map((l, i) => (i === slotIndex ? link : l));
+    setInstaLinks(updated);
+    setLinkInputs((prev) => prev.map((v, i) => (i === slotIndex ? link : v)));
+    return updated;
+  };
+
+  const saveLink = async (slotIndex: number) => {
+    const raw = linkInputs[slotIndex]?.trim() ?? "";
+    if (raw === instaLinks[slotIndex]) return;
+    const normalized = raw ? normalizeInstagramPostUrl(raw) : "";
+    if (normalized === null) {
+      setInstaError(`Slot ${slotIndex + 1}: link mora biti link Instagram objave (npr. https://www.instagram.com/p/…).`);
+      return;
+    }
+    setInstaError("");
+    await persist(instaImages, setSlotLink(slotIndex, normalized));
   };
 
   const handleImport = async (slotIndex: number) => {
@@ -57,7 +90,9 @@ export default function InstagramGridManager() {
       const updated = instaImages.map((im, i) => (i === slotIndex ? json.data.url : im));
       setInstaImages(updated);
       setInstaInputs((prev) => prev.map((v, i) => (i === slotIndex ? "" : v)));
-      await persist(updated);
+      // Imported from a post link → that post becomes the tile's click target.
+      const postUrl = normalizeInstagramPostUrl(url);
+      await persist(updated, postUrl ? setSlotLink(slotIndex, postUrl) : instaLinks);
     } catch (err) {
       setInstaError(err instanceof Error ? err.message : "Greška pri uvozu slike");
     } finally {
@@ -80,7 +115,7 @@ export default function InstagramGridManager() {
       const old = instaImages[slot];
       const updated = instaImages.map((im, i) => (i === slot ? json.data.url : im));
       setInstaImages(updated);
-      await persist(updated);
+      await persist(updated, instaLinks);
       if (old?.includes("/altamoda/uploads/")) {
         fetch("/api/upload", {
           method: "DELETE",
@@ -101,7 +136,7 @@ export default function InstagramGridManager() {
     const removedUrl = instaImages[index];
     const updated = instaImages.map((im, i) => (i === index ? "" : im));
     setInstaImages(updated);
-    await persist(updated);
+    await persist(updated, setSlotLink(index, ""));
     if (removedUrl?.includes("/altamoda/uploads/")) {
       fetch("/api/upload", {
         method: "DELETE",
@@ -126,7 +161,9 @@ export default function InstagramGridManager() {
         <p className="text-sm text-[#1a1c1e] mb-1">
           Nalepite link Instagram objave (npr. <span className="font-mono">instagram.com/p/…</span>) ili direktan URL slike i kliknite Uvezi — slika se preuzima i čuva. Ako uvoz ne uspe, otpremite sliku dugmetom <span className="font-medium">Otpremi</span>.
         </p>
-        <p className="text-xs text-[#1a1c1e]/60 mb-2">Prazna polja koriste podrazumevanu sliku.</p>
+        <p className="text-xs text-[#1a1c1e]/60 mb-2">
+          Klik na sliku na sajtu vodi na link objave ispod slike. Popunjava se sam kada sliku uvezete preko linka objave; za otpremljene slike ga upišite ručno. Bez linka, slika vodi na Instagram profil. Prazna polja koriste podrazumevanu sliku.
+        </p>
         {instaError && <p className="text-sm text-red-600 mb-4">{instaError}</p>}
 
         <input ref={instaFileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
@@ -134,7 +171,7 @@ export default function InstagramGridManager() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mt-4">
           {instaImages.map((img, slotIndex) => (
             <div key={slotIndex} className="flex flex-col gap-2">
-              <div className="relative group overflow-hidden border-2 border-dashed border-stone-300 rounded-sm aspect-square bg-stone-50">
+              <div className="relative group overflow-hidden border-2 border-dashed border-stone-300 rounded-sm aspect-[4/5] bg-stone-50">
                 {img ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -184,6 +221,21 @@ export default function InstagramGridManager() {
               >
                 <Upload size={13} /> Otpremi
               </button>
+              {img && (
+                <label className="flex items-center gap-1.5 px-2.5 py-2 border border-stone-200 rounded-sm focus-within:border-black">
+                  <Link2 size={13} className="shrink-0 text-stone-400" />
+                  <input
+                    type="url"
+                    value={linkInputs[slotIndex]}
+                    onChange={(e) => setLinkInputs((prev) => prev.map((v, i) => (i === slotIndex ? e.target.value : v)))}
+                    onBlur={() => saveLink(slotIndex)}
+                    onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+                    placeholder="Link objave"
+                    aria-label={`Link objave za sliku ${slotIndex + 1}`}
+                    className="flex-1 min-w-0 text-xs focus:outline-none bg-transparent"
+                  />
+                </label>
+              )}
             </div>
           ))}
         </div>

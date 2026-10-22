@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import HomePageClient from './HomePageClient'
 import type { ProductData, ColorSiblingData } from './HomePageClient'
 import { applyBestPromo, fetchActivePromosByProduct, type ActivePromo } from '@/lib/promotions'
+import { normalizeInstagramPostUrl } from '@/lib/instagram'
 
 // Homepage is cached (revalidate=60) so the viewer's role isn't resolved here.
 // Apply only public-audience promotions ('all' / 'b2c') to keep B2B-only pricing
@@ -49,7 +50,7 @@ export default async function HomePage() {
   const saleAudiences = ['all', 'b2c'] as const
 
   // Fetch all product sets + hero settings + social links in parallel
-  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting, socialSettings, instagramImagesSetting] = await Promise.all([
+  const [featured, bestsellers, newArrivals, saleProducts, heroSetting, heroCardsSetting, socialSettings, instagramImagesSetting, instagramLinksSetting] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true, isFeatured: true },
       include: productInclude,
@@ -97,6 +98,7 @@ export default async function HomePage() {
     prisma.siteSetting.findUnique({ where: { key: 'heroCards' } }),
     prisma.siteSetting.findMany({ where: { key: { in: ['instagram', 'facebook', 'tiktok'] } } }),
     prisma.siteSetting.findUnique({ where: { key: 'instagramImages' } }),
+    prisma.siteSetting.findUnique({ where: { key: 'instagramLinks' } }),
   ])
 
   const socialMap: Record<string, string> = {}
@@ -171,6 +173,7 @@ export default async function HomePage() {
         tiktok: socialMap.tiktok || '',
       }}
       instagramImages={instagramImagesSetting?.value ? (() => { try { return JSON.parse(instagramImagesSetting.value); } catch { return []; } })() : []}
+      instagramLinks={instagramLinksSetting?.value ? (() => { try { return (JSON.parse(instagramLinksSetting.value) as string[]).map((l) => normalizeInstagramPostUrl(l) ?? ''); } catch { return []; } })() : []}
     />
   )
 }

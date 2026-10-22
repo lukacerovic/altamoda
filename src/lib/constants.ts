@@ -1,6 +1,6 @@
 export const CURRENCY = 'RSD'
 export const CURRENCY_SYMBOL = 'RSD'
-// Delivery terms differ by customer type. Pickup at the Pro Shop (Mihizova 9)
+// Delivery terms differ by customer type. Pickup at the Pro Shop (Mihizova 9/L3)
 // is always free.
 export const SHIPPING_COST = 500
 export const FREE_SHIPPING_THRESHOLD_B2C = 6000

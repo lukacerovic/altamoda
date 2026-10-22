@@ -12,7 +12,6 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import CookieConsent from "@/components/CookieConsent";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
@@ -554,12 +553,14 @@ interface Props {
   heroCards?: Partial<HeroCard>[];
   socialLinks?: { instagram?: string; facebook?: string; tiktok?: string };
   instagramImages?: string[];
+  /** Per-slot post links, parallel to instagramImages; already validated server-side. */
+  instagramLinks?: string[];
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Main editorial home page — inspired by botanical-press aesthetic
 ═══════════════════════════════════════════════════════════════════ */
-export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards, socialLinks, instagramImages }: Props) {
+export default function HomePageClient({ featuredProducts, bestsellers, newArrivals, saleProducts, heroImages, heroCards, socialLinks, instagramImages, instagramLinks }: Props) {
   // Admin-managed Instagram grid images; fall back per-slot to the editorial
   // defaults so the bento grid is never broken if a slot is left empty.
   const gridImages = Array.from({ length: 8 }, (_, i) => instagramImages?.[i] || socialImages[i]);
@@ -1121,27 +1122,20 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
             </div>
           </div>
 
-          {/* Bento grid — 4-col × 3-row packed layout (8 images, no gaps) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[240px] gap-2 md:gap-3">
-            {[
-              { img: gridImages[0], cls: "col-span-2 row-span-1" },            // A — wide top-left
-              { img: gridImages[1], cls: "col-span-1 row-span-1" },            // B — square top-center
-              { img: gridImages[2], cls: "col-span-1 row-span-2" },            // C — tall right
-              { img: gridImages[3], cls: "col-span-1 row-span-1" },            // D — square middle-left
-              { img: gridImages[4], cls: "col-span-2 row-span-1" },            // E — wide middle
-              { img: gridImages[5], cls: "col-span-2 row-span-1" },            // F — wide bottom-left
-              { img: gridImages[6], cls: "col-span-1 row-span-1" },            // G — square bottom-center
-              { img: gridImages[7], cls: "col-span-1 row-span-1" },            // H — square bottom-right
-            ].map((cell, i) => (
+          {/* Uniform grid of 4:5 portrait tiles — Instagram's own post ratio, so
+              admin-posted images aren't cropped differently than on Instagram. */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+            {gridImages.map((img, i) => (
               <a
                 key={i}
-                href={instagramUrl}
+                // Admin-set slots open their own post; default images open the profile.
+                href={(instagramImages?.[i] && instagramLinks?.[i]) || instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${cell.cls} relative overflow-hidden bg-[#dddbd9] group rounded-[4px]`}
+                className="relative aspect-[4/5] overflow-hidden bg-[#dddbd9] group rounded-[4px]"
               >
                 <Image
-                  src={cell.img}
+                  src={img}
                   alt={`altamoda instagram ${i + 1}`}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
@@ -1317,7 +1311,6 @@ export default function HomePageClient({ featuredProducts, bestsellers, newArriv
         </div>
       )}
 
-      <CookieConsent />
     </div>
   );
 }

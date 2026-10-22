@@ -75,16 +75,20 @@
     "address": "Mihizova 9/L3,",
     "city": "11000 Beograd, Srbija",
     "phone": "+381 (0)11 3088388",
-    "phone2": "+381 (0)64 6473154",
+    "phone2": "+381 (0)64 6473145",
     "email": "kontakt@altamoda.rs",
     "workHours": "Ponedeljak–petak: 9–17h",
     "pib": "PIB: 101773967",
+    "mb": "Matični broj: 17222783",
+    "seat": "Sedište: Cara Dušana 45, lokal J, 36000 Kraljevo",
     "bankAccount": "Br. računa: 170-0030013183000-92 UniCredit banka",
     "copyright": "© 2026 Alta Moda. Sva prava zadržana.",
     "newsletter": "Newsletter",
     "newsletterText": "Prijavite se i budite u toku sa novim proizvodima i akcijama.",
     "emailPlaceholder": "Email adresa",
-    "subscribe": "Prijavi se"
+    "subscribe": "Prijavi se",
+    "cookiePolicy": "Politika kolačića",
+    "cookieSettings": "Podešavanja kolačića"
   },
   "home": {
     "heroTitle1": "Profesionalna",
@@ -392,7 +396,7 @@
     "errPostalCode": "Poštanski broj mora imati tačno 5 cifara.",
     "shippingMethod": "Način dostave",
     "standardShipping": "Dostava na adresu",
-    "storePickup": "Lično preuzimanje u Pro Shop-u, Mihizova 9",
+    "storePickup": "Lično preuzimanje u Pro Shop-u, Mihizova 9/L3",
     "free": "Besplatno",
     "paymentMethod": "Način plaćanja",
     "noteOptional": "Napomena (opciono)",
@@ -401,7 +405,7 @@
     "contactDetails": "Kontakt podaci",
     "edit": "Izmeni",
     "standardShort": "Dostava na adresu",
-    "pickupShort": "Lično preuzimanje (Pro Shop, Mihizova 9)",
+    "pickupShort": "Lično preuzimanje (Pro Shop, Mihizova 9/L3)",
     "products": "Proizvodi",
     "createAccount": "Kreirajte nalog",
     "processing": "Obrada...",
@@ -585,8 +589,8 @@
     "viewAllProducts": "Svi proizvodi brenda {brand}"
   },
   "cookie": {
-    "text": "Koristimo kolačiće za poboljšanje vašeg iskustva. Nastavkom korišćenja sajta, prihvatate našu",
-    "cookiePolicy": "politiku kolačića",
+    "text": "Koristimo neophodne kolačiće za rad sajta. Opcione kolačiće koristimo samo uz vaš pristanak, koji možete promeniti u svakom trenutku. Više u našoj",
+    "cookiePolicy": "politici kolačića",
     "settings": "Podešavanja",
     "acceptAll": "Prihvatam",
     "necessaryCookies": "Neophodni kolačići",
@@ -595,7 +599,8 @@
     "analyticsDesc": "Pomažu nam da razumemo kako koristite sajt.",
     "marketingCookies": "Marketing kolačići",
     "marketingDesc": "Koriste se za prikazivanje relevantnih reklama.",
-    "saveSettings": "Sačuvaj podešavanja"
+    "saveSettings": "Sačuvaj podešavanja",
+    "rejectAll": "Odbij opcione"
   },
   "newsletter": {
     "subscribers": "Pretplatnici",
@@ -1204,7 +1209,7 @@
       "q2": "Koliko traje dostava?",
       "a2": "Većina porudžbina isporučuje se u roku od 1 do 3 radna dana od potvrde porudžbine.",
       "q3": "Kolika je cena dostave?",
-      "a3": "B2C kupci:\n• Dostava: 500 RSD\n• Besplatna dostava za porudžbine preko 6.000 RSD\n• Lično preuzimanje u Pro Shop-u, Mihizova 9: besplatno\n\nB2B kupci:\n• Dostava: 500 RSD\n• Besplatna dostava za porudžbine preko 12.000 RSD\n• Lično preuzimanje u Pro Shop-u, Mihizova 9: besplatno",
+      "a3": "B2C kupci:\n• Dostava: 500 RSD\n• Besplatna dostava za porudžbine preko 6.000 RSD\n• Lično preuzimanje u Pro Shop-u, Mihizova 9/L3: besplatno\n\nB2B kupci:\n• Dostava: 500 RSD\n• Besplatna dostava za porudžbine preko 12.000 RSD\n• Lično preuzimanje u Pro Shop-u, Mihizova 9/L3: besplatno",
       "q4": "Kojom kurirskom službom šaljete pošiljke?",
       "a4": "Pošiljke isporučuje ovlašćena kurirska služba.",
       "q5": "Šta ako nisam na adresi prilikom dostave?",
@@ -1218,7 +1223,7 @@
       "q1": "Mogu li da vratim proizvod?",
       "a1": "Da, u skladu sa Zakonom o zaštiti potrošača Republike Srbije.",
       "q2": "Kako da podnesem reklamaciju?",
-      "a2": "Kontaktirajte nas i dostavite:\n• broj porudžbine\n• opis problema\n• fotografije proizvoda (ukoliko su potrebne)",
+      "a2": "Kontaktirajte nas i dostavite:\n• broj porudžbine\n• opis problema\n• fotografije proizvoda (ukoliko su potrebne)\n\nAdresa za reklamacije: Mihizova 9/L3, Beograd.",
       "q3": "Šta ako dobijem pogrešan proizvod?",
       "a3": "Kontaktirajte nas odmah po prijemu pošiljke kako bismo organizovali zamenu ili pronašli odgovarajuće rešenje.",
       "q4": "Šta ako proizvod stigne oštećen?",
@@ -1260,7 +1265,7 @@
       "q2": "Online ili Pro Shop — izbor je vaš",
       "a2": "Kupovinu možete obaviti na način koji vam najviše odgovara.\n\nKupovina putem webshopa: Jednostavno poručite željene proizvode online, a mi ćemo ih dostaviti na vašu adresu ili pripremiti za lično preuzimanje.\n\nPreuzimanje u Pro Shop-u: Prilikom poručivanja putem webshopa možete odabrati opciju „Preuzimanje u Pro Shop-u“. Kada porudžbina bude spremna, obavestićemo vas putem e-maila ili telefona.",
       "q3": "Posetite nas",
-      "a3": "Alta Moda Pro Shop — Mihizova 9, Beograd.\n\nU našem Pro Shop-u možete:\n• kupiti proizvode iz naše ponude\n• preuzeti online porudžbinu\n• pogledati i uporediti proizvode pre kupovine\n• dobiti stručnu preporuku našeg tima\n• upoznati se sa profesionalnim brendovima koje zastupamo\n\nBez obzira na to da li kupujete online ili nas posećujete lično, možete računati na originalne proizvode, stručnu podršku i profesionalnu uslugu.",
+      "a3": "Alta Moda Pro Shop — Mihizova 9/L3, Beograd.\n\nU našem Pro Shop-u možete:\n• kupiti proizvode iz naše ponude\n• preuzeti online porudžbinu\n• pogledati i uporediti proizvode pre kupovine\n• dobiti stručnu preporuku našeg tima\n• upoznati se sa profesionalnim brendovima koje zastupamo\n\nBez obzira na to da li kupujete online ili nas posećujete lično, možete računati na originalne proizvode, stručnu podršku i profesionalnu uslugu.",
       "q4": "Zašto kupovati u Alta Modi?",
       "a4": "• 100% originalni proizvodi\n• Zvanični uvoznik i distributer za odabrane profesionalne brendove\n• Saradnja sa vodećim svetskim proizvođačima profesionalne kozmetike\n• Više od 30 godina iskustva u profesionalnoj nezi kose\n• Sigurna online kupovina\n• Brza i pouzdana dostava\n• Stručna korisnička podrška\n• Profesionalni proizvodi za frizerske salone i krajnje korisnike\n• Pažljivo odabran asortiman renomiranih svetskih brendova"
     },

@@ -6,6 +6,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { Instagram, Facebook, Music2, Youtube, AtSign } from "lucide-react";
 import PaymentLogos from "@/components/PaymentLogos";
+import CookieSettingsLink from "@/components/CookieSettingsLink";
 
 // Official profiles — used when no site-setting override exists.
 const SOCIAL_DEFAULTS = {
@@ -83,6 +84,12 @@ export default function Footer() {
         <Link href="/faq#uslovi" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
           {t("footer.termsOfUse")}
         </Link>
+        <Link href="/politika-kolacica" className="text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
+          {t("footer.cookiePolicy")}
+        </Link>
+        <CookieSettingsLink className="text-left text-xs uppercase tracking-wider text-[#FFFFFF]/90 hover:text-[#FFFFFF] transition-colors">
+          {t("footer.cookieSettings")}
+        </CookieSettingsLink>
       </div>
 
       {/* Column 3: Kontakt */}
@@ -113,7 +120,11 @@ export default function Footer() {
           {t("footer.workHours")}
         </p>
         <p className="text-[10px] uppercase tracking-wider text-[#FFFFFF]/60 mt-2">
+          {t("footer.seat")}
+          <br />
           {t("footer.pib")}
+          <br />
+          {t("footer.mb")}
           <br />
           {t("footer.bankAccount")}
         </p>

@@ -60,20 +60,43 @@ export default function UsloviPlacanjaPage() {
           </p>
           <ul className="list-none space-y-1">
             <li><strong>Alta Moda d.o.o.</strong></li>
-            <li>Mihizova 9/L3, 11000 Beograd, Republika Srbija</li>
+            <li>Sedište: Cara Dušana 45, lokal J, 36000 Kraljevo, Srbija</li>
             <li>PIB: 101773967</li>
+            <li>Matični broj: 17222783</li>
+          </ul>
+          <ul className="list-none space-y-1">
+            <li><strong>Ogranak Beograd – Pro shop</strong></li>
+            <li>Mihizova 9/L3, Beograd</li>
             <li>
-              Email:{" "}
+              Specijalizovana prodavnica profesionalnih proizvoda za kosu, namenjena frizerskim
+              salonima i krajnjim kupcima. Veleprodaja za salone i maloprodaja za kupce.
+            </li>
+            <li>Lično preuzimanje porudžbina: Mihizova 9/L3, Beograd</li>
+          </ul>
+          <ul className="list-none space-y-1">
+            <li><strong>Porudžbine, pitanja i reklamacije</strong></li>
+            <li>
+              Telefon:{" "}
+              <a href="tel:+381646473145" className="text-[#edb4bd] hover:underline">
+                064 647 3145
+              </a>
+              {" | "}
+              <a href="tel:+381113088388" className="text-[#edb4bd] hover:underline">
+                011 308 8388
+              </a>
+            </li>
+            <li>
+              E-mail:{" "}
               <a href="mailto:kontakt@altamoda.rs" className="text-[#edb4bd] hover:underline">
                 kontakt@altamoda.rs
               </a>
             </li>
-            <li>
-              Telefon:{" "}
-              <a href="tel:+381113088388" className="text-[#edb4bd] hover:underline">
-                +381 (0)11 3088388
-              </a>
-            </li>
+            <li>Adresa za reklamacije: Mihizova 9/L3, Beograd</li>
+          </ul>
+          <ul className="list-none space-y-1">
+            <li><strong>Podaci za uplatu</strong></li>
+            <li>Banka: UniCredit banka</li>
+            <li>Broj računa: 170-0030013183000-92</li>
           </ul>
         </Section>
 
