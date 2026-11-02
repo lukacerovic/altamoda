@@ -27,7 +27,8 @@ function getNewsletterFrom() {
 }
 
 function getSiteUrl() {
-  const explicit = process.env.SITE_URL
+  // Strip a trailing slash so `${getSiteUrl()}/path` never yields `//path`.
+  const explicit = process.env.SITE_URL?.replace(/\/+$/, '')
   if (explicit) return explicit
 
   // Vercel auto-sets VERCEL_URL (no scheme) on every deployment. Use it as a safety

@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Shared hosting (CloudLinux) caps processes per account; NEXT_BUILD_CPUS=1
+  // keeps `next build` from spawning more workers than the host allows.
+  ...(process.env.NEXT_BUILD_CPUS && {
+    experimental: { cpus: Number(process.env.NEXT_BUILD_CPUS) },
+  }),
   images: {
     loader: "custom",
     loaderFile: "./src/lib/cloudinary-loader.ts",
