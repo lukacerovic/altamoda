@@ -58,14 +58,14 @@ export function buildPantheonOrderPayload(args: {
   const { firstName, lastName } = splitName(args.userName)
   const ship = args.shippingAddress
   const bill = args.billingAddress ?? ship
-  const shipToDiff = areAddressesDifferent(ship, bill) ? 1 : 0
+  const shipToDiff = areAddressesDifferent(ship, bill)
 
   const items: PantheonOrderItem[] = args.items
     .filter((i) => !!i.productCode)
     .map((i) => ({
       product_code: i.productCode as string,
-      quantity: i.quantity,
-      price: i.unitPrice,
+      quantity: String(i.quantity),
+      price: String(i.unitPrice),
     }))
 
   return {
@@ -80,11 +80,11 @@ export function buildPantheonOrderPayload(args: {
     company_name: args.b2b?.salonName ?? '',
     company_pib: args.b2b?.pib ?? '',
     company_reg_number: args.b2b?.maticniBroj ?? '',
-    items_price: args.subtotal,
-    shipping_price: args.shippingCost,
-    total_price: args.total,
+    items_price: String(args.subtotal),
+    shipping_price: String(args.shippingCost),
+    total_price: String(args.total),
     payment_type: translatePaymentMethod(args.paymentMethod),
-    ship_to_diff_address: shipToDiff,
+    ship_to_diff_address: shipToDiff ? '1' : '0',
     shipping_first_name: shipToDiff ? firstName : '',
     shipping_last_name: shipToDiff ? lastName : '',
     shipping_email: shipToDiff ? args.userEmail : '',

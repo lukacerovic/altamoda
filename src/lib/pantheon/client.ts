@@ -101,8 +101,12 @@ export class PantheonClient {
     }
 
     if (!res.ok) {
+      // tkomserver (Tomcat) puts the real cause in an HTML error page, e.g.
+      // "JSONException: JSONObject["items_price"] not a string". Keep a short,
+      // tag-stripped excerpt so it shows up in erp_sync_queue / /admin/erp.
+      const detail = summarizeErrorBody(await res.text().catch(() => ''))
       throw new PantheonError(
-        `Pantheon HTTP ${res.status} (action=${action})`,
+        `Pantheon HTTP ${res.status} (action=${action})${detail ? `: ${detail}` : ''}`,
         undefined,
         res.status,
       )
@@ -118,7 +122,7 @@ export class PantheonClient {
       parsed = JSON.parse(text)
     } catch (err) {
       throw new PantheonError(
-        `Pantheon returned non-JSON (action=${action}): ${text.slice(0, 200)}`,
+        `Pantheon returned non-JSON (action=${action}): ${summarizeErrorBody(text)}`,
         err,
       )
     }
@@ -162,6 +166,17 @@ export class PantheonClient {
       data: JSON.stringify(payload),
     })
   }
+}
+
+/** Tag-stripped, whitespace-collapsed excerpt of an error body (HTML or text). */
+function summarizeErrorBody(body: string): string {
+  const exception = body.match(/JSONException[^<]*/)?.[0]
+  const text = (exception ?? body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' '))
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return text.slice(0, 300)
 }
 
 // ─── Normalizers ─────────────────────────────────────────────────────────────

@@ -52,10 +52,13 @@ export interface PantheonStockResponse {
 }
 
 /** Order line item sent inside altaorder.data.items[]. */
+// tkomserver reads every field with org.json getString(), which throws
+// "JSONObject[...] not a string" (HTTP 500) on JSON numbers. The legacy PHP
+// site sent MySQL row values, which are always strings. So: strings only.
 export interface PantheonOrderItem {
   product_code: string
-  quantity: number
-  price: number
+  quantity: string
+  price: string
 }
 
 /**
@@ -63,7 +66,7 @@ export interface PantheonOrderItem {
  * Field names match the legacy CodeIgniter `send_order()` exactly.
  */
 export interface PantheonOrderPayload {
-  order_id: number | string
+  order_id: string
   first_name: string
   last_name: string
   email: string
@@ -74,12 +77,12 @@ export interface PantheonOrderPayload {
   company_name: string
   company_pib: string
   company_reg_number: string
-  items_price: number
-  shipping_price: number
-  total_price: number
+  items_price: string
+  shipping_price: string
+  total_price: string
   /** "pouzecem" (COD) | "uplatnicom" (slip) | "karticom" (card) */
   payment_type: string
-  ship_to_diff_address: 0 | 1
+  ship_to_diff_address: '0' | '1'
   shipping_first_name: string
   shipping_last_name: string
   shipping_email: string
