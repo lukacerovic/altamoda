@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/auth-helpers'
 import { updateStatusSchema } from '@/lib/validations/order'
 import { sendTransactional } from '@/lib/email'
 import { orderShippedTemplate, type EmailLang } from '@/lib/email-templates'
+import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 
 const ORDER_SHIPPED_SUBJECT: Record<EmailLang, (orderNumber: string) => string> = {
   sr: (n) => `Vaša porudžbina ${n} je poslata`,
@@ -49,20 +50,24 @@ export const PATCH = withErrorHandler(async (req: Request, context: unknown) => 
     throw new ApiError(400, 'Uplata još nije potvrđena — porudžbina plaćena uplatnicom ne može biti poslata pre potvrde uplate')
   }
 
-  await prisma.$transaction([
-    prisma.order.update({
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({
       where: { id },
       data: { status },
-    }),
-    prisma.orderStatusHistory.create({
+    })
+    await tx.orderStatusHistory.create({
       data: {
         orderId: id,
         status,
         changedBy: user.id,
         note,
       },
-    }),
-  ])
+    })
+    // An order reaches Pantheon only once an admin confirms it (novi → u_obradi).
+    if (order.status === 'novi' && status === 'u_obradi') {
+      await enqueueOrderSync(id, tx)
+    }
+  })
 
   // "Isporučeno" means the parcel was handed to the courier — notify the
   // customer (best-effort; the status update must not fail on email errors).

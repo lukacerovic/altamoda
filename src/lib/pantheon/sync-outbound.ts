@@ -4,7 +4,8 @@
  * Replaces the legacy synchronous `Synchronization_model::send_order()` with
  * an async outbox pattern:
  *
- *   1. On order creation, we insert an ErpSyncQueue row (status=pending).
+ *   1. When an admin confirms an order (novi → u_obradi), we insert an
+ *      ErpSyncQueue row (status=pending).
  *   2. A worker (`processQueue`) polls the queue and pushes orders to
  *      Pantheon with retry/backoff per ERP_SYNC_RETRY_DELAYS_MS.
  *   3. On success: queue row goes to "done", Order.erpSynced=true,
@@ -276,8 +277,8 @@ export async function processOrderQueueItem(
   if (!order) {
     throw new Error(`Order ${orderId} not found`)
   }
-  if (order.erpSynced) {
-    // Already synced — mark queue row done.
+  if (order.erpSynced || order.status === 'otkazano') {
+    // Already synced, or cancelled before the push — nothing to send.
     await prisma.erpSyncQueue.update({
       where: { id: queueItemId },
       data: { status: 'done', lastError: null },

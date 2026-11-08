@@ -53,8 +53,13 @@ vi.mock('@/lib/auth-helpers', () => ({
   requireAdmin: vi.fn(),
 }))
 
+vi.mock('@/lib/pantheon/sync-outbound', () => ({
+  enqueueOrderSync: vi.fn(),
+}))
+
 import { prisma } from '@/lib/db'
 import { requireAuth, requireAdmin } from '@/lib/auth-helpers'
+import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 
 const mockPrisma = vi.mocked(prisma)
 const mockRequireAuth = vi.mocked(requireAuth)
@@ -307,6 +312,24 @@ describe('Order Status API Logic', () => {
   })
 
   describe('PATCH /api/orders/[id]/status — state machine', () => {
+    it.each([
+      ['novi', 'u_obradi', 1],
+      ['novi', 'otkazano', 0],
+      ['u_obradi', 'isporuceno', 0],
+    ])('%s → %s queues the Pantheon push %i time(s)', async (from, to, times) => {
+      mockPrisma.order.findUnique.mockResolvedValue({ id: 'ord-1', status: from } as any)
+      mockPrisma.$transaction.mockImplementation((async (cb: (tx: unknown) => unknown) => cb(mockPrisma)) as any)
+
+      const { PATCH } = await import('@/app/api/orders/[id]/status/route')
+      const req = new Request('http://localhost/api/orders/ord-1/status', {
+        method: 'PATCH',
+        body: JSON.stringify({ status: to }),
+      })
+      const res = await PATCH(req, { params: Promise.resolve({ id: 'ord-1' }) })
+      expect(res.status).toBe(200)
+      expect(enqueueOrderSync).toHaveBeenCalledTimes(times)
+    })
+
     it('allows novi → u_obradi', async () => {
       mockPrisma.order.findUnique.mockResolvedValue({ id: 'ord-1', status: 'novi' } as any)
       mockPrisma.$transaction.mockResolvedValue([{}, {}] as any)

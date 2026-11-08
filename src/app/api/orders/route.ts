@@ -7,7 +7,6 @@ import { generateOrderNumber } from '@/lib/utils'
 import { getShippingCost } from '@/lib/constants'
 import { orderRateLimiter, getClientIp, applyRateLimit } from '@/lib/rate-limit'
 import { getActivePromosByProductId, applyBestPromo } from '@/lib/pricing'
-import { enqueueOrderSync } from '@/lib/pantheon/sync-outbound'
 import { VPOS_ENABLED } from '@/lib/payments/vpos-config'
 import { sendEmail, rewriteAssetUrls } from '@/lib/email'
 import { orderConfirmationTemplate, newOrderAdminTemplate, orderPaymentMethodLabel, type EmailLang } from '@/lib/email-templates'
@@ -207,10 +206,6 @@ export const POST = withErrorHandler(async (req: Request) => {
         await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
       }
     }
-
-    // 8. Enqueue outbound Pantheon sync. Same transaction so the queue row and
-    // the order are written atomically — no orphan orders, no orphan queue rows.
-    await enqueueOrderSync(createdOrder.id, tx)
 
     return createdOrder
   }, {
