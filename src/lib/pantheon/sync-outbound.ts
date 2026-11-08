@@ -53,7 +53,14 @@ export function buildPantheonOrderPayload(args: {
   userEmail: string
   userPhone: string | null
   b2b: { salonName: string; pib: string | null; maticniBroj: string | null } | null
-  items: Array<{ productCode: string | null; quantity: number; unitPrice: number }>
+  items: Array<{
+    productCode: string | null
+    productName: string
+    productSlug: string
+    quantity: number
+    unitPrice: number
+    totalPrice: number
+  }>
 }): PantheonOrderPayload {
   const { firstName, lastName } = splitName(args.userName)
   const ship = args.shippingAddress
@@ -62,14 +69,20 @@ export function buildPantheonOrderPayload(args: {
 
   const items: PantheonOrderItem[] = args.items
     .filter((i) => !!i.productCode)
-    .map((i) => ({
-      product_code: i.productCode as string,
-      quantity: String(i.quantity),
-      price: String(i.unitPrice),
+    .map((i, index) => ({
+      id: String(index + 1),
+      code: i.productCode as string,
+      name: i.productName,
+      uri: i.productSlug,
+      amount: String(i.quantity),
+      price: i.unitPrice.toFixed(2),
+      total: i.totalPrice.toFixed(2),
+      options: '',
+      product_id: i.productCode as string,
     }))
 
   return {
-    order_id: args.orderId,
+    order_id: toLegacyOrderId(args.orderNumber),
     first_name: firstName,
     last_name: lastName,
     email: args.userEmail,
@@ -80,9 +93,9 @@ export function buildPantheonOrderPayload(args: {
     company_name: args.b2b?.salonName ?? '',
     company_pib: args.b2b?.pib ?? '',
     company_reg_number: args.b2b?.maticniBroj ?? '',
-    items_price: String(args.subtotal),
-    shipping_price: String(args.shippingCost),
-    total_price: String(args.total),
+    items_price: args.subtotal.toFixed(2),
+    shipping_price: args.shippingCost.toFixed(2),
+    total_price: args.total.toFixed(2),
     payment_type: translatePaymentMethod(args.paymentMethod),
     ship_to_diff_address: shipToDiff ? '1' : '0',
     shipping_first_name: shipToDiff ? firstName : '',
@@ -126,27 +139,36 @@ function areAddressesDifferent(a: ShippingAddress | null, b: ShippingAddress | n
 }
 
 /**
- * Match the legacy CodeIgniter send_order() payment_type mapping exactly.
- * tkomserver likely string-matches on these on its side.
+ * The legacy send_order() sent the raw orders.payment_type column: its
+ * translated `$forder` value was computed but never used.
  */
 function translatePaymentMethod(m: 'card' | 'bank_transfer' | 'cash_on_delivery' | 'invoice'): string {
   switch (m) {
     case 'cash_on_delivery':
-      return 'Pouzećem'
+      return '1'
     case 'bank_transfer':
-      return 'Uplatnicom'
+    case 'invoice': // no legacy equivalent; closest is payment by bank slip
+      return '2'
     case 'card':
-      return 'Karticom'
-    case 'invoice':
-      return 'Faktura'
+      return '3'
   }
 }
 
+/**
+ * The legacy order_id was a MySQL auto-increment. Ours is a cuid, so derive a
+ * stable numeric id from the hex suffix of the order number, within int32.
+ */
+function toLegacyOrderId(orderNumber: string): string {
+  const hex = orderNumber.split('-').pop() ?? ''
+  return String(parseInt(hex, 16) % 2 ** 31)
+}
+
+/** Legacy format: DATE_FORMAT(status_1_date, '%d.%m.%Y. %H:%i'). */
 function formatPantheonDate(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
   return (
-    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
-    `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+    `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}. ` +
+    `${pad(d.getHours())}:${pad(d.getMinutes())}`
   )
 }
 
@@ -237,7 +259,7 @@ export async function processOrderQueueItem(
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
-      items: { include: { product: { select: { erpId: true } } } },
+      items: { include: { product: { select: { erpId: true, slug: true } } } },
       user: {
         select: {
           name: true,
@@ -287,8 +309,11 @@ export async function processOrderQueueItem(
       : null,
     items: order.items.map((i) => ({
       productCode: i.product?.erpId ?? null,
+      productName: i.productName,
+      productSlug: i.product?.slug ?? '',
       quantity: i.quantity,
       unitPrice: Number(i.unitPrice),
+      totalPrice: Number(i.totalPrice),
     })),
   })
 

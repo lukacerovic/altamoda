@@ -55,10 +55,17 @@ export interface PantheonStockResponse {
 // tkomserver reads every field with org.json getString(), which throws
 // "JSONObject[...] not a string" (HTTP 500) on JSON numbers. The legacy PHP
 // site sent MySQL row values, which are always strings. So: strings only.
+// Keys mirror the legacy `Orders_model::get_order_items()` row, minus `image`.
 export interface PantheonOrderItem {
-  product_code: string
-  quantity: string
+  id: string
+  code: string
+  name: string
+  uri: string
+  amount: string
   price: string
+  total: string
+  options: string
+  product_id: string
 }
 
 /**
@@ -80,7 +87,7 @@ export interface PantheonOrderPayload {
   items_price: string
   shipping_price: string
   total_price: string
-  /** "pouzecem" (COD) | "uplatnicom" (slip) | "karticom" (card) */
+  /** Raw legacy DB value: "1" (COD) | "2" (slip) | "3" (card) */
   payment_type: string
   ship_to_diff_address: '0' | '1'
   shipping_first_name: string
@@ -91,7 +98,7 @@ export interface PantheonOrderPayload {
   shipping_postal_no: string
   shipping_contact_phone: string
   additional_instructions: string
-  /** Format: YYYY-MM-DD HH:mm:ss */
+  /** Format: DD.MM.YYYY. HH:mm (legacy DATE_FORMAT of status_1_date) */
   order_date: string
   items: PantheonOrderItem[]
 }
