@@ -17,6 +17,26 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
   },
+  async redirects() {
+    return [
+      // One canonical host: auth (AUTH_URL), emails and the VPOS callback all
+      // use https://www.altamoda.rs, so the bare domain always forwards there.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "altamoda.rs" }],
+        destination: "https://www.altamoda.rs/:path*",
+        permanent: true,
+      },
+      // The old Vercel deployment runs against a separate (stale) database.
+      // Send every visitor to the live site so no order lands there.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "altamoda.vercel.app" }],
+        destination: "https://www.altamoda.rs/:path*",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {
