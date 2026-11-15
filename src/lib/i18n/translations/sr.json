@@ -515,7 +515,22 @@
     "errNameMin": "Ime mora imati najmanje 2 karaktera",
     "errNameLetters": "Ime i prezime smeju da sadrže samo slova",
     "emailExists": "Korisnik sa ovom email adresom već postoji",
-    "invalidData": "Nevažeći podaci"
+    "invalidData": "Nevažeći podaci",
+    "forgotTitle": "Zaboravljena lozinka",
+    "forgotIntro": "Unesite e-mail adresu naloga. Poslaćemo vam link za postavljanje nove lozinke.",
+    "sendResetLink": "Pošalji link",
+    "sendingResetLink": "Slanje...",
+    "forgotSent": "Ako nalog sa tom adresom postoji, poslali smo vam mejl sa linkom za novu lozinku. Link važi 60 minuta. Proverite i folder za neželjenu poštu.",
+    "backToLogin": "Nazad na prijavu",
+    "resetTitle": "Nova lozinka",
+    "resetIntro": "Unesite novu lozinku za svoj nalog.",
+    "newPassword": "Nova lozinka",
+    "saveNewPassword": "Sačuvaj lozinku",
+    "savingNewPassword": "Čuvanje...",
+    "resetSuccess": "Lozinka je promenjena. Sada se možete prijaviti novom lozinkom.",
+    "resetLinkInvalid": "Link za promenu lozinke nije ispravan ili je istekao. Zatražite novi.",
+    "requestNewLink": "Zatraži novi link",
+    "genericError": "Došlo je do greške. Pokušajte ponovo."
   },
   "account": {
     "myOrders": "Moje Porudžbine",

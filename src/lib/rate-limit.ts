@@ -173,6 +173,12 @@ export const checkStatusRateLimiter = createRateLimiter({
   maxRequests: 15,
 })
 
+// Forgot/reset password: per IP and per email, so one inbox can't be flooded.
+export const passwordResetRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 5,
+})
+
 export const newsletterRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
   maxRequests: 5,

@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { compare } from 'bcryptjs'
 import { prisma } from './db'
+import { findUserIdByEmail, hashPassword, verifyLegacyPassword } from './password'
 import { authConfig } from './auth.config'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -18,20 +19,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
 
+        const userId = await findUserIdByEmail(credentials.email as string)
+        if (!userId) return null
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { id: userId },
           include: { b2bProfile: true },
         })
 
         if (!user) return null
-        if (!user.passwordHash) return null
+        const password = credentials.password as string
 
-        const isValidPassword = await compare(
-          credentials.password as string,
-          user.passwordHash
-        )
-
-        if (!isValidPassword) return null
+        if (user.passwordHash) {
+          if (!(await compare(password, user.passwordHash))) return null
+        } else if (user.legacyPasswordHash) {
+          // Account imported from the old site: verify the old SHA-1 hash once,
+          // then upgrade to bcrypt and drop the legacy hash.
+          if (!verifyLegacyPassword(password, user.legacyPasswordHash)) return null
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { passwordHash: await hashPassword(password), legacyPasswordHash: null },
+          })
+        } else {
+          return null
+        }
 
         if (user.status === 'suspended') return null
         if (user.status === 'pending') return null

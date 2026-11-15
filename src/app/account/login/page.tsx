@@ -27,7 +27,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/account";
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<"login" | "register">(
     searchParams.get("tab") === "register" ? "register" : "login"
   );
@@ -57,7 +57,11 @@ function LoginContent() {
   const [regAddress, setRegAddress] = useState("");
   const [regTerms, setRegTerms] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
-  const [forgotPasswordMsg, setForgotPasswordMsg] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState("");
 
   // Pre-fill from the checkout guest draft (if any) so a guest who decides to
   // log in or register mid-checkout doesn't retype their details. Only fills
@@ -180,6 +184,36 @@ function LoginContent() {
   };
   const inputBorder = (field: FieldName) =>
     fieldErrors[field] ? "border-red-500 focus:border-red-500" : "border-[#dddbd9]";
+
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault();
+    setForgotError("");
+    setForgotLoading(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail.trim(), lang: language }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setForgotSent(true);
+      } else {
+        setForgotError(json.code ? t(json.code) : json.error || t("auth.genericError"));
+      }
+    } catch {
+      setForgotError(t("auth.genericError"));
+    } finally {
+      setForgotLoading(false);
+    }
+  }
+
+  function openForgot() {
+    setForgotMode(true);
+    setForgotSent(false);
+    setForgotError("");
+    setForgotEmail((prev) => prev || loginEmail);
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -337,7 +371,7 @@ function LoginContent() {
         <div className="bg-white rounded-sm shadow-sm overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-[#dddbd9]">
-            <button onClick={() => { setActiveTab("login"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#edb4bd] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
+            <button onClick={() => { setActiveTab("login"); setForgotMode(false); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "login" ? "text-[#edb4bd] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.login")}</button>
             <button onClick={() => { setActiveTab("register"); setError(""); setSuccess(""); setFieldErrors({}); }} className={`flex-1 py-4 text-sm font-semibold text-center transition-colors ${activeTab === "register" ? "text-[#edb4bd] border-b-2 border-black" : "text-[#1a1c1e] hover:text-[#1a1c1e]"}`}>{t("auth.register")}</button>
           </div>
 
@@ -349,7 +383,36 @@ function LoginContent() {
               </div>
             )}
 
-            {activeTab === "login" ? (
+            {activeTab === "login" && forgotMode ? (
+              /* FORGOT PASSWORD FORM */
+              <form onSubmit={handleForgot}>
+                <h2 className="text-2xl font-bold text-[#1a1c1e] mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.forgotTitle")}</h2>
+                {forgotSent ? (
+                  <div className="p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded">{t("auth.forgotSent")}</div>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-sm text-[#1a1c1e]">{t("auth.forgotIntro")}</p>
+                    {forgotError && (
+                      <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>{forgotError}</span>
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1c1e] mb-1.5">{t("auth.emailAddress")}</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1c1e]" />
+                        <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} placeholder="vas@email.com" className="w-full border border-[#dddbd9] rounded pl-10 pr-4 py-3 text-sm" required autoFocus />
+                      </div>
+                    </div>
+                    <button type="submit" disabled={forgotLoading} className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
+                      {forgotLoading ? t("auth.sendingResetLink") : t("auth.sendResetLink")}
+                    </button>
+                  </div>
+                )}
+                <button type="button" onClick={() => setForgotMode(false)} className="mt-4 text-sm text-[#edb4bd] hover:text-[#1a1c1e]">{t("auth.backToLogin")}</button>
+              </form>
+            ) : activeTab === "login" ? (
               /* LOGIN FORM */
               <form onSubmit={handleLogin}>
                 <h2 className="text-2xl font-bold text-[#1a1c1e] mb-6" style={{ fontFamily: "'Noto Serif', serif" }}>{t("auth.welcomeBack")}</h2>
@@ -375,13 +438,8 @@ function LoginContent() {
                     <label className="flex items-center gap-2 text-sm text-[#1a1c1e] cursor-pointer">
                       <input type="checkbox" className="w-4 h-4 rounded border-[#dddbd9] text-[#edb4bd] focus:ring-[#1a1c1e]" /> {t("auth.rememberMe")}
                     </label>
-                    <button type="button" onClick={(e) => { e.preventDefault(); setForgotPasswordMsg(true); setTimeout(() => setForgotPasswordMsg(false), 3000); }} className="text-sm text-[#edb4bd] hover:text-[#1a1c1e]">{t("auth.forgotPassword")}</button>
+                    <button type="button" onClick={openForgot} className="text-sm text-[#edb4bd] hover:text-[#1a1c1e]">{t("auth.forgotPassword")}</button>
                   </div>
-                  {forgotPasswordMsg && (
-                    <div className="p-3 bg-[#FFFFFF] border border-[#dddbd9] text-[#1a1c1e] text-sm rounded">
-                      Funkcija resetovanja lozinke uskoro dolazi.
-                    </div>
-                  )}
                   <button type="submit" disabled={loading} className="w-full bg-[#edb4bd] hover:bg-[#413d3a] text-white py-3 rounded font-medium transition-colors disabled:opacity-50">
                     {loading ? t("auth.loggingIn") : t("auth.loginButton")}
                   </button>

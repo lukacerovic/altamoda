@@ -32,7 +32,11 @@ export const authConfig: NextAuthConfig = {
       if (pathname.startsWith('/admin')) {
         return user?.role === 'admin'
       }
-      if (pathname.startsWith('/account') && !pathname.startsWith('/account/login')) {
+      if (
+        pathname.startsWith('/account') &&
+        !pathname.startsWith('/account/login') &&
+        !pathname.startsWith('/account/reset-password')
+      ) {
         return !!user
       }
       // /checkout is accessible to guests (they fill in contact info)

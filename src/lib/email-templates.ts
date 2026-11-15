@@ -782,3 +782,60 @@ export function orderShippedTemplate(d: OrderShippedDetails): string {
   `
   return baseLayout(content, { lang })
 }
+
+const PASSWORD_RESET_COPY: Record<EmailLang, { subject: string; title: string; greeting: string; body: string; button: string; expiry: string; ignore: string; signoff: string }> = {
+  sr: {
+    subject: 'Promena lozinke — ALTA MODA',
+    title: 'Promena lozinke',
+    greeting: 'Poštovani,',
+    body: 'Primili smo zahtev za promenu lozinke za Vaš nalog na ALTA MODA webshopu. Kliknite na dugme ispod i unesite novu lozinku.',
+    button: 'Postavite novu lozinku',
+    expiry: 'Link važi 60 minuta i može se iskoristiti samo jednom.',
+    ignore: 'Ako niste Vi tražili promenu lozinke, zanemarite ovaj mejl. Vaša lozinka ostaje ista.',
+    signoff: 'Vaš ALTA MODA tim',
+  },
+  en: {
+    subject: 'Reset your password — ALTA MODA',
+    title: 'Reset your password',
+    greeting: 'Hello,',
+    body: 'We received a request to reset the password for your ALTA MODA webshop account. Click the button below and enter a new password.',
+    button: 'Set a new password',
+    expiry: 'The link is valid for 60 minutes and can be used only once.',
+    ignore: 'If you did not request a password reset, ignore this email. Your password stays the same.',
+    signoff: 'Your ALTA MODA team',
+  },
+  ru: {
+    subject: 'Смена пароля — ALTA MODA',
+    title: 'Смена пароля',
+    greeting: 'Здравствуйте,',
+    body: 'Мы получили запрос на смену пароля для Вашей учётной записи в интернет-магазине ALTA MODA. Нажмите кнопку ниже и введите новый пароль.',
+    button: 'Задать новый пароль',
+    expiry: 'Ссылка действительна 60 минут и может быть использована только один раз.',
+    ignore: 'Если Вы не запрашивали смену пароля, просто проигнорируйте это письмо. Ваш пароль не изменится.',
+    signoff: 'Ваша команда ALTA MODA',
+  },
+}
+
+export function passwordResetSubject(lang: EmailLang = 'sr'): string {
+  return PASSWORD_RESET_COPY[lang].subject
+}
+
+export function passwordResetTemplate(resetUrl: string, lang: EmailLang = 'sr'): string {
+  const c = PASSWORD_RESET_COPY[lang]
+  const p = (text: string, extra = '') =>
+    `<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${BRAND_TEXT};${extra}">${text}</p>`
+  const content = `
+    <div style="padding: 40px;">
+      <h2 style="margin: 0 0 16px; font-size: 22px; color: ${BRAND_PRIMARY};">${c.title}</h2>
+      ${p(c.greeting)}
+      ${p(c.body)}
+      ${ctaButton(resetUrl, c.button)}
+      <p style="margin: 24px 0 8px; font-size: 14px; line-height: 1.6; color: #413d3a;">${c.expiry}</p>
+      <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: #413d3a; word-break: break-all;"><a href="${resetUrl}" style="color: #413d3a;">${resetUrl}</a></p>
+      <p style="margin: 16px 0 0; font-size: 14px; line-height: 1.6; color: #413d3a;">${c.ignore}</p>
+      ${contactBlock(lang)}
+      <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">${c.signoff}</p>
+    </div>
+  `
+  return baseLayout(content, { lang })
+}

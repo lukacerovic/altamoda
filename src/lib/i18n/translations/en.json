@@ -515,7 +515,22 @@
     "errNameMin": "Name must be at least 2 characters",
     "errNameLetters": "First and last name may contain letters only",
     "emailExists": "A user with this email already exists",
-    "invalidData": "Invalid data"
+    "invalidData": "Invalid data",
+    "forgotTitle": "Forgot password",
+    "forgotIntro": "Enter your account email address. We will send you a link to set a new password.",
+    "sendResetLink": "Send link",
+    "sendingResetLink": "Sending...",
+    "forgotSent": "If an account with that address exists, we have sent you an email with a link to set a new password. The link is valid for 60 minutes. Please also check your spam folder.",
+    "backToLogin": "Back to login",
+    "resetTitle": "New password",
+    "resetIntro": "Enter a new password for your account.",
+    "newPassword": "New password",
+    "saveNewPassword": "Save password",
+    "savingNewPassword": "Saving...",
+    "resetSuccess": "Your password has been changed. You can now log in with your new password.",
+    "resetLinkInvalid": "The password reset link is invalid or has expired. Please request a new one.",
+    "requestNewLink": "Request a new link",
+    "genericError": "Something went wrong. Please try again."
   },
   "account": {
     "myOrders": "My Orders",
