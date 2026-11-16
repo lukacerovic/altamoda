@@ -43,7 +43,11 @@ export const POST = withErrorHandler(async (_req: Request, context: unknown) => 
   const campaign = await prisma.newsletterCampaign.findUniqueOrThrow({ where: { id } })
 
   const subscribers = await prisma.newsletterSubscriber.findMany({
-    where: { isSubscribed: true, segment: campaign.segment },
+    // Subscribers are stored as b2b or b2c; an "all" campaign goes to both.
+    where: {
+      isSubscribed: true,
+      ...(campaign.segment === 'all' ? {} : { segment: campaign.segment }),
+    },
     select: { email: true },
   })
 
