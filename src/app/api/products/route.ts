@@ -67,9 +67,31 @@ export const GET = withErrorHandler(async (req: Request) => {
       where: {
         OR: [{ slug: category }, { parent: { slug: category }, isActive: true }],
       },
-      select: { id: true },
+      select: { id: true, slug: true, nameLat: true, parentId: true },
     })
-    if (catWithChildren.length > 0) {
+    const requested = catWithChildren.find(c => c.slug === category)
+    if (requested?.parentId) {
+      // Subcategory (e.g. pribor-cetka). The AMS import assigns products to the
+      // top-level KATEGORIJA and keeps POTKATEGORIJA as free text (often a list:
+      // "Četka, Set četki"), so also match parent-category products whose first
+      // subcategory entry is this category's name.
+      const ids = catWithChildren.map(c => c.id)
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+        {
+          OR: [
+            { categoryId: { in: ids } },
+            {
+              categoryId: requested.parentId,
+              OR: [
+                { subcategory: { equals: requested.nameLat, mode: 'insensitive' } },
+                { subcategory: { startsWith: `${requested.nameLat},`, mode: 'insensitive' } },
+              ],
+            },
+          ],
+        },
+      ]
+    } else if (catWithChildren.length > 0) {
       where.categoryId = { in: catWithChildren.map(c => c.id) }
     }
   }

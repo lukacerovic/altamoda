@@ -21,7 +21,7 @@ export const createCampaignSchema = z.object({
   title: z.string().min(1).max(200),
   subject: z.string().min(1).max(200),
   content: z.string().min(1),
-  segment: z.enum(['b2b', 'b2c']).optional().default('b2c'),
+  segment: z.enum(['all', 'b2b', 'b2c']).optional().default('b2c'),
   emailOptions: z.lazy(() => emailTemplateOptionsSchema).optional(),
 })
 
@@ -29,7 +29,7 @@ export const updateCampaignSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   subject: z.string().min(1).max(200).optional(),
   content: z.string().min(1).optional(),
-  segment: z.enum(['b2b', 'b2c']).optional(),
+  segment: z.enum(['all', 'b2b', 'b2c']).optional(),
   scheduledAt: z.string().datetime().optional().nullable(),
 })
 

@@ -316,6 +316,26 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   // Keep categories that have products directly OR have children with products
   const catProductCount = new Map(flatCategories.map(c => [c.id, c._count.products]));
+  // The AMS import puts products on the top-level category and keeps POTKATEGORIJA
+  // as text, so subcategories have no direct products. Count them the same way
+  // /api/products filters them (first subcategory entry == category name), so
+  // they stay in the tree and the active-filter chip can find their name.
+  const subcategoryRows = await prisma.product.groupBy({
+    by: ['categoryId', 'subcategory'],
+    where: { isActive: true, subcategory: { not: null } },
+    _count: true,
+  });
+  for (const c of flatCategories) {
+    if (!c.parentId) continue;
+    const name = c.nameLat.toLowerCase();
+    const viaText = subcategoryRows
+      .filter(r => {
+        const sub = r.subcategory?.toLowerCase() ?? '';
+        return r.categoryId === c.parentId && (sub === name || sub.startsWith(`${name},`));
+      })
+      .reduce((sum, r) => sum + r._count, 0);
+    if (viaText > 0) catProductCount.set(c.id, (catProductCount.get(c.id) ?? 0) + viaText);
+  }
   const hasChildrenWithProducts = (catId: string): boolean => {
     return flatCategories.some(c => c.parentId === catId && (catProductCount.get(c.id)! > 0 || hasChildrenWithProducts(c.id)));
   };

@@ -461,7 +461,10 @@ export default function NewsletterPage() {
         }),
       });
       const createJson = await createRes.json();
-      if (!createJson.success) throw new Error("Failed to create campaign");
+      if (!createJson.success) {
+        setSendResult({ ok: false, msg: createJson.error || "Greška pri kreiranju kampanje" });
+        return;
+      }
       // 3. Send it
       const sendRes = await fetch(`/api/newsletter/campaigns/${createJson.data.id}/send`, { method: "POST" });
       const sendJson = await sendRes.json();

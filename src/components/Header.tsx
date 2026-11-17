@@ -151,6 +151,7 @@ export default function Header() {
   const searchToggleRef = useRef<HTMLButtonElement>(null);
   // The input + close button row; presses on the surrounding white band close.
   const searchRowRef = useRef<HTMLDivElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [brands, setBrands] = useState<BrandItem[]>(cachedBrands);
@@ -500,8 +501,12 @@ export default function Header() {
             // The overlay is a full-width band, so "clicking beside the field" is
             // still inside it and the document-level outside handler never fires.
             // Close whenever the press lands on the band rather than on the row.
+            // The suggestion list sits outside the row, so it is excluded too —
+            // otherwise the overlay unmounts on mousedown and the link's click never fires.
             onMouseDown={(e) => {
-              if (!searchRowRef.current?.contains(e.target as Node)) setSearchOpen(false);
+              const target = e.target as Node;
+              if (searchRowRef.current?.contains(target) || searchResultsRef.current?.contains(target)) return;
+              setSearchOpen(false);
             }}
           >
             <div className="max-w-7xl mx-auto px-4 py-4">
@@ -533,7 +538,7 @@ export default function Header() {
                 </button>
               </div>
               {searchResults.length > 0 && (
-                <div className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-[#dddbd9] shadow-xl overflow-hidden">
+                <div ref={searchResultsRef} className="max-w-xl mx-auto mt-3 bg-white rounded-lg border border-[#dddbd9] shadow-xl overflow-hidden">
                   <div className="p-3">
                     <span className="text-[11px] text-[#dddbd9] font-semibold tracking-widest uppercase">Proizvodi</span>
                     <div className="mt-2 space-y-1">

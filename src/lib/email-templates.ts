@@ -35,10 +35,12 @@ interface BaseLayoutOptions {
   headerDivider?: boolean
   /** Defaults to Serbian — only order-lifecycle emails pass a customer language. */
   lang?: EmailLang
+  /** Large "d" watermark behind the body. Order-lifecycle emails use the plain card. */
+  watermark?: boolean
 }
 
 function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
-  const { email, showUnsubscribe = false, footerBg = CARD_BG, headerDivider = false, lang = 'sr' } = opts
+  const { email, showUnsubscribe = false, footerBg = CARD_BG, headerDivider = false, lang = 'sr', watermark: showWatermark = true } = opts
   const site = getSiteUrl().replace(/\/$/, '')
   const wordmark = `${site}/email/wordmark-brown.png`
   const watermark = `${site}/email/watermark-d-blush.png`
@@ -90,7 +92,7 @@ function baseLayout(content: string, opts: BaseLayoutOptions = {}) {
             </td>
           </tr>
           <tr>
-            <td valign="top" bgcolor="${CARD_BG}" class="al-body" style="padding: 0; background-color: ${CARD_BG}; background-image: url('${watermark}'); background-repeat: no-repeat; background-position: bottom right; background-size: auto 50%;">${content}</td>
+            <td valign="top" bgcolor="${CARD_BG}" class="al-body" style="padding: 0; background-color: ${CARD_BG};${showWatermark ? ` background-image: url('${watermark}'); background-repeat: no-repeat; background-position: bottom right; background-size: auto 50%;` : ''}">${content}</td>
           </tr>
           <tr>
             <td bgcolor="${footerBg}" class="al-footer" style="padding: 24px 40px; background-color: ${footerBg};${footerBg === CARD_BG ? ' border-top: 1px solid rgba(44,22,11,0.12);' : ''}">
@@ -401,7 +403,7 @@ export function cardTransactionTemplate(d: CardTransactionDetails): string {
       ${ctaButton(`${site}`, T.cta)}
     </div>
   `
-  return baseLayout(content, { lang })
+  return baseLayout(content, { lang, watermark: false })
 }
 
 export interface OrderEmailItem {
@@ -652,7 +654,7 @@ export function orderConfirmationTemplate(d: OrderConfirmationDetails): string {
       </p>
     </div>
   `
-  return baseLayout(content, { lang })
+  return baseLayout(content, { lang, watermark: false })
 }
 
 export interface NewOrderAdminDetails {
@@ -780,7 +782,7 @@ export function orderShippedTemplate(d: OrderShippedDetails): string {
       </p>
     </div>
   `
-  return baseLayout(content, { lang })
+  return baseLayout(content, { lang, watermark: false })
 }
 
 const PASSWORD_RESET_COPY: Record<EmailLang, { subject: string; title: string; greeting: string; body: string; button: string; expiry: string; ignore: string; signoff: string }> = {
@@ -837,5 +839,5 @@ export function passwordResetTemplate(resetUrl: string, lang: EmailLang = 'sr'):
       <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: ${BRAND_TEXT};">${c.signoff}</p>
     </div>
   `
-  return baseLayout(content, { lang })
+  return baseLayout(content, { lang, watermark: false })
 }
