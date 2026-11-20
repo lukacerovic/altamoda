@@ -106,13 +106,19 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     return price
   }
 
-  // Helper: pick the best promotion (lowest final price) for a given base price and role
+  // Helper: pick the best promotion (lowest final price) for a given base price
+  // and role. Guests are treated as B2C (retail); admins see every audience.
   const pickBestPromo = (
     promos: Array<{ type: string; value: number; audience: string; badge?: string | null }>,
     price: number,
     userRole: string | undefined
   ) => {
-    const eligible = promos.filter(pr => pr.audience === 'all' || pr.audience === userRole)
+    const audiences = userRole === 'admin'
+      ? ['all', 'b2c', 'b2b']
+      : userRole === 'b2b'
+        ? ['all', 'b2b']
+        : ['all', 'b2c']
+    const eligible = promos.filter(pr => audiences.includes(pr.audience))
     if (eligible.length === 0) return null
     return eligible.reduce((best, pr) => {
       const dp = calcDiscounted(price, pr.type, pr.value)
@@ -126,9 +132,7 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
   const allProductIds = [product.id, ...related.map(r => r.id)]
   const promosByProduct = await fetchActivePromosByProduct(allProductIds)
 
-  // Apply best promotion for the main product. Guests are treated as B2C
-  // (retail) viewers — the same audience the public SSR page applies.
-  const promoRole = role ?? 'b2c'
+  // Apply best promotion for the main product.
   let promoBadge: string | null = null
   const mainPromos = promosByProduct.get(product.id) || []
 
@@ -137,7 +141,7 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
   let basePrice = role === 'b2b' && product.priceB2b ? Number(product.priceB2b) : Number(product.priceB2c)
   let oldPrice = product.oldPrice ? Number(product.oldPrice) : null
 
-  const bestPromo = pickBestPromo(mainPromos, basePrice, promoRole)
+  const bestPromo = pickBestPromo(mainPromos, basePrice, role)
   if (bestPromo) {
     const discountedPrice = calcDiscounted(basePrice, bestPromo.type, bestPromo.value)
     if (discountedPrice < basePrice) {
@@ -176,7 +180,7 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
       let relOldPrice = r.oldPrice ? Number(r.oldPrice) : null
 
       const relPromos = promosByProduct.get(r.id) || []
-      const relBest = pickBestPromo(relPromos, relPrice, promoRole)
+      const relBest = pickBestPromo(relPromos, relPrice, role)
       if (relBest) {
         const dp = calcDiscounted(relPrice, relBest.type, relBest.value)
         if (dp < relPrice) { relOldPrice = relPrice; relPrice = dp }

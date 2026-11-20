@@ -35,6 +35,24 @@ describe('promotions — price helpers', () => {
     expect(applied).toEqual({ price: 1404, oldPrice: null, promoBadge: null })
   })
 
+  it('applies B2C-audience promos to guests (guests are retail viewers)', () => {
+    const promos: ActivePromo[] = [{ type: 'percentage', value: 20, audience: 'b2c', badge: 'AKCIJA' }]
+    const applied = applyBestPromo(promos, 1404, null, undefined)
+    expect(applied.price).toBe(1123)
+    expect(applied.oldPrice).toBe(1404)
+    expect(applied.promoBadge).toBe('AKCIJA')
+  })
+
+  it('lets admin see every audience promo (b2c and b2b)', () => {
+    const promos: ActivePromo[] = [
+      { type: 'percentage', value: 10, audience: 'b2c', badge: 'AKCIJA' },
+      { type: 'percentage', value: 30, audience: 'b2b', badge: null },
+    ]
+    const applied = applyBestPromo(promos, 1404, null, 'admin')
+    expect(applied.price).toBe(Math.round(1404 * 0.7)) // best (b2b -30%)
+    expect(applied.oldPrice).toBe(1404)
+  })
+
   it('applies an eligible promo and moves the base price to oldPrice', () => {
     const applied = applyBestPromo([pct(20)], 1404, null, 'b2c')
     expect(applied.price).toBe(1123)

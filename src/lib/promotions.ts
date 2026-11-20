@@ -18,14 +18,19 @@ export function calcDiscountedPrice(price: number, type: string, value: number):
 }
 
 // Pick the promotion that yields the lowest price for a viewer's role.
-// `role` may be 'b2c' | 'b2b' | 'admin' | undefined (guest); promotions
-// targeted at 'all' are always eligible.
+// `role` may be 'b2c' | 'b2b' | 'admin' | undefined (guest). Guests are
+// treated as B2C (retail) viewers; admins see every audience's promotion.
 export function pickBestPromo(
   promos: ActivePromo[],
   basePrice: number,
   role: string | undefined,
 ): ActivePromo | null {
-  const eligible = promos.filter(p => p.audience === 'all' || p.audience === role)
+  const audiences = role === 'admin'
+    ? ['all', 'b2c', 'b2b']
+    : role === 'b2b'
+      ? ['all', 'b2b']
+      : ['all', 'b2c']
+  const eligible = promos.filter(p => audiences.includes(p.audience))
   if (eligible.length === 0) return null
   return eligible.reduce((best, p) =>
     calcDiscountedPrice(basePrice, p.type, p.value) <

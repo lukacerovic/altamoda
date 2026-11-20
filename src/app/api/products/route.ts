@@ -487,10 +487,14 @@ export const GET = withErrorHandler(async (req: Request) => {
 
     // Apply best matching active promotion (lowest final price) for this user's role.
     // Guests are treated as B2C (retail) viewers — the same audience the public
-    // SSR pages apply — so 'b2c'-audience promos show for non-logged-in visitors.
-    const promoRole = role ?? 'b2c'
+    // SSR pages apply — and admins see every audience's promotion.
+    const promoAudiences = role === 'admin'
+      ? ['all', 'b2c', 'b2b']
+      : role === 'b2b'
+        ? ['all', 'b2b']
+        : ['all', 'b2c']
     const promos = promosByProduct.get(p.id) || []
-    const eligible = promos.filter(pr => pr.audience === 'all' || pr.audience === promoRole)
+    const eligible = promos.filter(pr => promoAudiences.includes(pr.audience))
     const promo = eligible.length > 0
       ? eligible.reduce((best, pr) => {
           const dp = calcDisc(basePrice, pr.type, pr.value)
