@@ -60,25 +60,37 @@ export async function fetchActivePromosByProduct(
   const result = new Map<string, ActivePromo[]>()
   if (productIds.length === 0) return result
   try {
-    const rows = await prisma.$queryRaw<Array<{
-      product_id: string
-      type: string
-      value: number
-      audience: string
-      badge: string | null
-    }>>`
-      SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
-      FROM promotion_products pp
-      JOIN promotions pr ON pr.id = pp.promotion_id
-      WHERE pp.product_id = ANY(${productIds})
-        AND pr.is_active = true
-        AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
-        AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
-    `
+    // Prisma ORM on purpose: the same relation-filter path used by the admin
+    // panel and the storefront "Na akciji" filter. Keep the date logic here in
+    // sync with those queries (full-timestamp comparison, not ::date casting).
+    const now = new Date()
+    const rows = await prisma.promotionProduct.findMany({
+      where: {
+        productId: { in: productIds },
+        promotion: {
+          isActive: true,
+          AND: [
+            { OR: [{ startDate: null }, { startDate: { lte: now } }] },
+            { OR: [{ endDate: null }, { endDate: { gte: now } }] },
+          ],
+        },
+      },
+      select: {
+        productId: true,
+        promotion: {
+          select: { type: true, value: true, audience: true, badge: true },
+        },
+      },
+    })
     for (const r of rows) {
-      const arr = result.get(r.product_id) || []
-      arr.push({ type: r.type, value: Number(r.value), audience: r.audience, badge: r.badge })
-      result.set(r.product_id, arr)
+      const arr = result.get(r.productId) || []
+      arr.push({
+        type: r.promotion.type,
+        value: Number(r.promotion.value),
+        audience: r.promotion.audience,
+        badge: r.promotion.badge,
+      })
+      result.set(r.productId, arr)
     }
   } catch (err) {
     console.error('[promotions] Failed to fetch active promotions:', err)

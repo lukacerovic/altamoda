@@ -6,6 +6,7 @@ import { sanitizeRichText } from '@/lib/sanitize-rich-text'
 import { getRouteParams } from '@/lib/route-utils'
 import { updateProductSchema } from '@/lib/validations/product'
 import { resolveBrandId, resolveCategoryId, resolveProductLineId, cleanupOrphanBrand, cleanupOrphanCategory } from '@/lib/taxonomy'
+import { fetchActivePromosByProduct } from '@/lib/promotions'
 
 // GET /api/products/[id] — Full product detail
 export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
@@ -120,30 +121,10 @@ export const GET = withErrorHandler(async (_req: Request, context: unknown) => {
     })
   }
 
-  // Check active promotions for this product and all related products in one query
+  // Check active promotions for this product and all related products in one
+  // query (ORM relation filter — same path as the storefront "Na akciji" filter).
   const allProductIds = [product.id, ...related.map(r => r.id)]
-  const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
-
-  try {
-    const promoRows = await prisma.$queryRaw<Array<{
-      product_id: string; type: string; value: number; audience: string; badge: string | null
-    }>>`
-      SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
-      FROM promotion_products pp
-      JOIN promotions pr ON pr.id = pp.promotion_id
-      WHERE pp.product_id = ANY(${allProductIds})
-        AND pr.is_active = true
-        AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
-        AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
-    `
-    for (const row of promoRows) {
-      const arr = promosByProduct.get(row.product_id) || []
-      arr.push({ type: row.type, value: Number(row.value), audience: row.audience, badge: row.badge })
-      promosByProduct.set(row.product_id, arr)
-    }
-  } catch (err) {
-    console.error('[products/[id]] Failed to fetch promotions:', err)
-  }
+  const promosByProduct = await fetchActivePromosByProduct(allProductIds)
 
   // Apply best promotion for the main product
   let promoBadge: string | null = null

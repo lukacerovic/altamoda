@@ -264,7 +264,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const initialProducts = rawProducts.map((p) => {
     const basePrice = Number(p.priceB2c);
     const staticOld = p.oldPrice ? Number(p.oldPrice) : null;
-    const { price, oldPrice } = applyBestPromo(promosByProduct.get(p.id) || [], basePrice, staticOld, "b2c");
+    const { price, oldPrice, promoBadge } = applyBestPromo(promosByProduct.get(p.id) || [], basePrice, staticOld, "b2c");
     // Strip the color code from the name for grouped products -> clean group label.
     const displayName = p.groupSlug && p.colorCode
       ? p.nameLat.replace(p.colorCode, "").replace(/\/+/g, " ").replace(/\s{2,}/g, " ").trim()
@@ -282,6 +282,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     // them from the role-aware client refetch.
     priceB2b: null,
     oldPrice,
+    promoBadge,
     image: p.images[0]?.url || null,
     isProfessional: p.isProfessional,
     isNew: p.isNew,

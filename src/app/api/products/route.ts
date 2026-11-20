@@ -6,6 +6,7 @@ import { sanitizeRichText } from '@/lib/sanitize-rich-text'
 import { slugify } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 import { findFuzzyProductIds } from '@/lib/fuzzy-search'
+import { fetchActivePromosByProduct } from '@/lib/promotions'
 import { resolveBrandId, resolveCategoryId, resolveProductLineId } from '@/lib/taxonomy'
 
 // GET /api/products — List with filters, pagination, B2B/B2C visibility
@@ -455,31 +456,9 @@ export const GET = withErrorHandler(async (req: Request) => {
     where: { endDate: { not: null, lt: new Date() } },
   }).catch(() => {})
 
-  // Fetch active promotions for these products via raw SQL
-  // Store all active promotions per product, pick the best matching one later
-  const promosByProduct = new Map<string, Array<{ type: string; value: number; audience: string; badge: string | null }>>()
-  try {
-    if (productIds.length > 0) {
-      const promoRows = await prisma.$queryRaw<Array<{
-        product_id: string; type: string; value: number; audience: string; badge: string | null
-      }>>`
-        SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
-        FROM promotion_products pp
-        JOIN promotions pr ON pr.id = pp.promotion_id
-        WHERE pp.product_id = ANY(${productIds})
-          AND pr.is_active = true
-          AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
-          AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
-      `
-      for (const row of promoRows) {
-        const arr = promosByProduct.get(row.product_id) || []
-        arr.push({ type: row.type, value: Number(row.value), audience: row.audience, badge: row.badge })
-        promosByProduct.set(row.product_id, arr)
-      }
-    }
-  } catch (err) {
-    console.error('[products] Failed to fetch promotions:', err)
-  }
+  // Fetch active promotions for these products (ORM relation filter — same path
+  // as the "Na akciji" storefront filter, so both can never disagree).
+  const promosByProduct = await fetchActivePromosByProduct(productIds)
   const ratingMap = new Map(ratings.map(r => [r.productId, r._avg.rating || 0]))
   const variantCountMap = new Map(variantCounts.map(v => [v.groupSlug!, v._count]))
 

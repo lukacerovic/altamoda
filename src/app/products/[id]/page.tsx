@@ -3,6 +3,7 @@ export const revalidate = 120
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { getProductBySlugOrId } from '@/lib/cached-queries'
+import { fetchActivePromosByProduct, applyBestPromo } from '@/lib/promotions'
 import ProductDetailClient from './ProductDetailClient'
 import { htmlToPlainText } from '@/lib/html'
 import type { Metadata } from 'next'
@@ -77,6 +78,23 @@ export default async function ProductDetailPage({ params }: PageProps) {
       : Promise.resolve([]),
   ])
 
+  // Active promotions for the main + related products. The page is cached
+  // role-blind, so apply the public ('all'/'b2c') audience here — B2B/admin
+  // get their role-aware price via the client-side /api/products/[id] refetch.
+  const promosByProduct = await fetchActivePromosByProduct([
+    product.id,
+    ...relatedProducts.map((r) => r.id),
+  ])
+
+  const mainPromo = product.isProfessional
+    ? { price: null as number | null, oldPrice: null as number | null, promoBadge: null as string | null }
+    : applyBestPromo(
+        promosByProduct.get(product.id) || [],
+        Number(product.priceB2c),
+        product.oldPrice ? Number(product.oldPrice) : null,
+        'b2c',
+      )
+
   const serialized = {
     id: product.id,
     sku: product.sku,
@@ -106,8 +124,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
     // client-side via /api/products/[id].
     priceB2c: product.isProfessional ? null : Number(product.priceB2c),
     priceB2b: null,
-    oldPrice: product.isProfessional ? null : product.oldPrice ? Number(product.oldPrice) : null,
-    price: product.isProfessional ? null : Number(product.priceB2c),
+    oldPrice: product.isProfessional ? null : mainPromo.oldPrice,
+    price: product.isProfessional ? null : mainPromo.price,
+    promoBadge: product.isProfessional ? null : mainPromo.promoBadge,
     stockQuantity: product.stockQuantity,
     isProfessional: product.isProfessional,
     isNew: product.isNew,
@@ -138,18 +157,28 @@ export default async function ProductDetailPage({ params }: PageProps) {
     reviewCount: product._count.reviews,
   }
 
-  const related = relatedProducts.map(r => ({
-    id: r.id,
-    name: r.nameLat,
-    slug: r.slug,
-    brand: r.brand,
-    price: r.isProfessional ? null : Number(r.priceB2c),
-    oldPrice: r.isProfessional ? null : r.oldPrice ? Number(r.oldPrice) : null,
-    image: r.images[0]?.url || null,
-    isProfessional: r.isProfessional,
-    sku: r.sku,
-    stockQuantity: r.stockQuantity,
-  }))
+  const related = relatedProducts.map(r => {
+    const relPromo = r.isProfessional
+      ? { price: null as number | null, oldPrice: null as number | null, promoBadge: null as string | null }
+      : applyBestPromo(
+          promosByProduct.get(r.id) || [],
+          Number(r.priceB2c),
+          r.oldPrice ? Number(r.oldPrice) : null,
+          'b2c',
+        )
+    return {
+      id: r.id,
+      name: r.nameLat,
+      slug: r.slug,
+      brand: r.brand,
+      price: r.isProfessional ? null : relPromo.price,
+      oldPrice: r.isProfessional ? null : relPromo.oldPrice,
+      image: r.images[0]?.url || null,
+      isProfessional: r.isProfessional,
+      sku: r.sku,
+      stockQuantity: r.stockQuantity,
+    }
+  })
 
   const siblings = colorSiblings.map(s => ({
     id: s.id,

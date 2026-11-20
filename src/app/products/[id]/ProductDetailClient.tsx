@@ -86,6 +86,7 @@ interface Product {
   priceB2b: number | null;
   oldPrice: number | null;
   price: number | null;
+  promoBadge?: string | null;
   stockQuantity: number;
   isProfessional: boolean;
   isNew: boolean;
@@ -226,7 +227,7 @@ export default function ProductDetailClient({ product, related, colorSiblings = 
   const price = livePrices ? livePrices.price : product.price;
   const oldPrice = livePrices ? livePrices.oldPrice : product.oldPrice;
   const priceB2b = livePrices ? livePrices.priceB2b : product.priceB2b;
-  const promoBadge = livePrices?.promoBadge ?? null;
+  const promoBadge = livePrices?.promoBadge ?? product.promoBadge ?? null;
 
   // Show sibling images when a color variant is selected, otherwise show product's own images
   const displayImages = selectedSibling && !selectedSibling.isActive && selectedSibling.images.length > 0

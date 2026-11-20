@@ -18,7 +18,7 @@ function formatProduct(p: {
 }, avgRating: number, promos: ActivePromo[], siblings?: ColorSiblingData[]): ProductData {
   const basePrice = Number(p.priceB2c)
   const staticOld = p.oldPrice ? Number(p.oldPrice) : null
-  const { price, oldPrice } = applyBestPromo(promos, basePrice, staticOld, 'b2c')
+  const { price, oldPrice, promoBadge } = applyBestPromo(promos, basePrice, staticOld, 'b2c')
   return {
     id: p.id,
     name: p.nameLat,
@@ -26,6 +26,7 @@ function formatProduct(p: {
     brand: p.brand?.name || '',
     price,
     oldPrice,
+    promoBadge,
     rating: avgRating,
     image: p.images[0]?.url || null,
     isNew: p.isNew,

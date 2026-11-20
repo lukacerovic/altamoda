@@ -59,26 +59,36 @@ export async function getActivePromosByProductId(productIds: string[]): Promise<
   if (productIds.length === 0) return out
 
   try {
-    const rows = await prisma.$queryRaw<Array<{
-      product_id: string; type: string; value: number; audience: string; badge: string | null
-    }>>`
-      SELECT pp.product_id, pr.type, pr.value, pr.audience, pr.badge
-      FROM promotion_products pp
-      JOIN promotions pr ON pr.id = pp.promotion_id
-      WHERE pp.product_id = ANY(${productIds})
-        AND pr.is_active = true
-        AND (pr.start_date IS NULL OR pr.start_date::date <= CURRENT_DATE)
-        AND (pr.end_date IS NULL OR pr.end_date::date >= CURRENT_DATE)
-    `
+    // Same ORM relation-filter path as fetchActivePromosByProduct (promotions.ts);
+    // keep the date logic in sync with the storefront "Na akciji" filter.
+    const now = new Date()
+    const rows = await prisma.promotionProduct.findMany({
+      where: {
+        productId: { in: productIds },
+        promotion: {
+          isActive: true,
+          AND: [
+            { OR: [{ startDate: null }, { startDate: { lte: now } }] },
+            { OR: [{ endDate: null }, { endDate: { gte: now } }] },
+          ],
+        },
+      },
+      select: {
+        productId: true,
+        promotion: {
+          select: { type: true, value: true, audience: true, badge: true },
+        },
+      },
+    })
     for (const row of rows) {
-      const arr = out.get(row.product_id) ?? []
+      const arr = out.get(row.productId) ?? []
       arr.push({
-        type: row.type as PromoType,
-        value: Number(row.value),
-        audience: row.audience as PromoAudience,
-        badge: row.badge,
+        type: row.promotion.type as PromoType,
+        value: Number(row.promotion.value),
+        audience: row.promotion.audience as PromoAudience,
+        badge: row.promotion.badge,
       })
-      out.set(row.product_id, arr)
+      out.set(row.productId, arr)
     }
   } catch (err) {
     console.error('[pricing] Failed to fetch active promos:', err)
@@ -92,5 +102,6 @@ export async function revalidatePriceSurfaces() {
   const { revalidatePath } = await import('next/cache')
   revalidatePath('/')
   revalidatePath('/products')
+  revalidatePath('/products/[id]')
   revalidatePath('/cart')
 }
