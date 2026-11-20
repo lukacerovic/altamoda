@@ -50,6 +50,9 @@ export const GET = withErrorHandler(async (req: Request) => {
   const top = products.slice(0, take)
   const promosByProduct = await fetchActivePromosByProduct(top.map(p => p.id))
 
+  // Guests are treated as B2C (retail) viewers — same audience as the public pages.
+  const promoRole = role ?? 'b2c'
+
   const results = top.map(p => {
     const basePrice = role === 'b2b' && p.priceB2b ? Number(p.priceB2b) : Number(p.priceB2c)
     const staticOld = p.oldPrice ? Number(p.oldPrice) : null
@@ -57,7 +60,7 @@ export const GET = withErrorHandler(async (req: Request) => {
       promosByProduct.get(p.id) || [],
       basePrice,
       staticOld,
-      role,
+      promoRole,
     )
     // Professional products mirror priceB2b into priceB2c — never expose that
     // value to guests/B2C viewers (same masking as the main list endpoint).
